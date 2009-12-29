@@ -1,11 +1,13 @@
 package GUI;
 
+import java.awt.Desktop;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import javax.swing.JButton;
@@ -15,6 +17,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 /*
  * Copyright 2009 Volker Oth
@@ -47,20 +51,47 @@ public class LegalDialog extends JDialog {
 	private JButton jButtonOk = null;
 
 	private JScrollPane jScrollPane = null;
+	
+	private JEditorPane thisEditor = null;
 
 	// own stuff
 	private boolean ok = false;
+	
+	private URL thisURL;
 
 	/**
 	 * Initialize manually generated resources.
 	 */
 	private void init() {
 		ClassLoader loader = LegalDialog.class.getClassLoader();
-		URL url = loader.getResource("disclaimer.htm");
+		thisURL = loader.getResource("disclaimer.htm");
 		try {
-			JEditorPane htmlPane = new JEditorPane( url );
-			htmlPane.setEditable( false );
-			jScrollPane.setViewportView(htmlPane);  // Generated
+			thisEditor = new JEditorPane( thisURL );
+			thisEditor.setEditable( false );
+			// needed to open browser via clicking on a link
+			thisEditor.addHyperlinkListener(new HyperlinkListener() {
+				public void hyperlinkUpdate(HyperlinkEvent e) {
+					URL url = e.getURL();
+					if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+						try {							
+							if (url.sameFile(thisURL))
+								thisEditor.setPage(url);
+							else
+								Desktop.getDesktop().browse(url.toURI());
+						} catch (IOException ex) {
+						} catch (URISyntaxException ex) {
+						}
+					} else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+						if (url.sameFile(thisURL))
+							thisEditor.setToolTipText(url.getRef());
+						else
+							thisEditor.setToolTipText(url.toExternalForm());
+					} else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
+						thisEditor.setToolTipText(null);
+					}
+				}
+			});
+			jScrollPane.setViewportView(thisEditor);  // Generated
 		} catch (IOException ex) {ex.printStackTrace();};
 	}
 
@@ -92,7 +123,7 @@ public class LegalDialog extends JDialog {
 	 * Automatically generated init.
 	 */
 	private void initialize() {
-		this.setSize(545, 450);
+		this.setSize(640, 450);
 		this.setTitle("Lemmini - Disclaimer");
 		this.setContentPane(getJContentPane());
 	}

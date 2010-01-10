@@ -66,7 +66,7 @@ public class SpriteObject extends Sprite {
 			case 3:
 				return Type.NO_DIG_LEFT;
 			case 4:
-				return Type.NO_DIG_LEFT;
+				return Type.NO_DIG_RIGHT;
 			case 5:
 				return Type.TRAP_DROWN;
 			case 6:

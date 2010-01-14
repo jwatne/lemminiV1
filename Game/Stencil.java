@@ -51,6 +51,10 @@ public class Stencil {
 	public final static int MSK_NO_DIG_RIGHT = 64;
 	/** no digging - either left or right */
 	public final static int MSK_NO_DIG = MSK_NO_DIG_LEFT|MSK_NO_DIG_RIGHT;
+
+	/** mask used to erase stencil properties when a pixel is erased */
+	public final static int MSK_ERASE = ~(Stencil.MSK_WALK_ON|Stencil.MSK_STAIR|Stencil.MSK_NO_DIG);
+
 	/** a trap triggering the drowning animation - i.e. water */
 	public final static int MSK_TRAP_DROWN = 128;
 	/** a trap that replaces the Lemming with a special death animation */

@@ -298,7 +298,7 @@ class ReplayAssignSkillEvent extends ReplayEvent {
 	 */
 	@Override
 	public String toString() {
-		return super.toString()+", "+skill+", "+lemming;
+		return super.toString()+", "+skill.ordinal()+", "+lemming;
 	}
 }
 
@@ -324,7 +324,7 @@ class ReplaySelectSkillEvent extends ReplayEvent {
 	 */
 	@Override
 	public String toString() {
-		return super.toString()+", "+skill;
+		return super.toString()+", "+skill.ordinal();
 	}
 }
 

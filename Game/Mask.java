@@ -112,8 +112,8 @@ public class Mask {
 							// remove pixel from all object images
 							spr.setPixel(x-spr.getX(),y-spr.getY(),0);
 						}
-						// mask pixel set
-						stencil.set(sPos+x, s & ~(Stencil.MSK_WALK_ON|Stencil.MSK_STAIR)); // erase brick in stencil
+						// erase pixel
+						stencil.set(sPos+x, s & Stencil.MSK_ERASE); // erase brick in stencil
 						bgImage.setRGB(x,y,bgCol); // erase pixel in bgIMage
 						if (drawSmallX && drawSmallY)
 							bgImageSmall.setRGB(x/scaleX,y/scaleY,0xff000000/*bgCol*/); // erase pixel in bgIMageSmall

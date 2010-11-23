@@ -49,7 +49,7 @@ public class MidiMusic {
 	 */
 	public MidiMusic(final String fName) throws ResourceException, LemmException {
 		try {
-			FileInputStream f = new FileInputStream(Core.findResource(fName));
+			FileInputStream f = new FileInputStream(Core.INSTANCE.findResource(fName));
 			canPlay = false;
 			sequencer = MidiSystem.getSequencer();
 			if (sequencer == null) {

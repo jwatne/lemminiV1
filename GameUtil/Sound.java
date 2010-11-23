@@ -108,7 +108,7 @@ public class Sound {
 		try {
 			for (int i = 0; i<sampleNum; i++) {
 				fName = "sound/sound_"+Integer.toString(i)+".wav";
-				File fs = new File(Core.findResource(fName));
+				File fs = new File(Core.INSTANCE.findResource(fName));
 				AudioInputStream f = AudioSystem.getAudioInputStream(fs.toURI().toURL());
 				format[i] = f.getFormat();
 				info[i] = new DataLine.Info(Clip.class, format[i]);
@@ -343,7 +343,7 @@ public class Sound {
 			gain = 0;
 		else
 			gain = gn;
-		Core.programProps.set("soundGain", gain);
+		Core.INSTANCE.programProps.set("soundGain", gain);
 	}
 
 }

@@ -80,8 +80,8 @@ public class PlayerDialog extends JDialog {
 	 */
 	private void init() {
 		players = new Vector<String>();
-		for (int i=0; i<Core.getPlayerNum(); i++)
-			players.add(Core.getPlayer(i));
+		for (int i=0; i<Core.INSTANCE.getPlayerNum(); i++)
+			players.add(Core.INSTANCE.getPlayer(i));
 		jList = new JList(players);
 		jScrollPane.setViewportView(jList);
 	}
@@ -197,7 +197,7 @@ public class PlayerDialog extends JDialog {
 			jButtonNew.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					String player = JOptionPane.showInputDialog(
-							Core.getCmp(), "Enter Player Name", "Input", JOptionPane.QUESTION_MESSAGE);
+							Core.INSTANCE.getCmp(), "Enter Player Name", "Input", JOptionPane.QUESTION_MESSAGE);
 					if (player != null) {
 						// check if this player already exists
 						// it it alread exists, reset the existing profile

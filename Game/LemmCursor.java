@@ -70,7 +70,7 @@ public class LemmCursor  {
 	 * @throws ResourceException
 	 */
 	public static void init() throws ResourceException {
-		img = ToolBox.getAnimation(Core.loadImage("misc/cursor.gif"), 8, Transparency.BITMASK);
+		img = ToolBox.INSTANCE.getAnimation(Core.INSTANCE.loadImage("misc/cursor.gif"), 8, Transparency.BITMASK);
 		cursor = new Cursor[4];
 		int w = getImage(Type.NORMAL).getWidth()/2;
 		int h = getImage(Type.NORMAL).getHeight()/2;

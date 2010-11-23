@@ -942,7 +942,7 @@ public class Lemming {
 		int sy = y+1;
 		if (x > 0 && x < Level.WIDTH && sy > 0 && sy < Level.HEIGHT)
 			m.eraseMask(x-m.getWidth()/2,midY()-m.getHeight()/2+3,0,Stencil.MSK_STEEL);
-		//			if ((Core.stencil.get(x + sy*Level.width) & Stencil.MSK_STEEL) == 0)
+		//			if ((Core.INSTANCE.stencil.get(x + sy*Level.width) & Stencil.MSK_STEEL) == 0)
 		//				m.eraseMask(x-m.width/2,midY()-m.height/2,0,0);
 	}
 
@@ -1195,7 +1195,7 @@ public class Lemming {
 		explodeFont = new ExplodeFont(cmp);
 		MediaTracker tracker = new MediaTracker(cmp);
 		// read lemmings definition file
-		String fn = Core.findResource(LEMM_INI_STR);
+		String fn = Core.INSTANCE.findResource(LEMM_INI_STR);
 		Props p = new Props();
 		if (!p.load(fn))
 			throw new ResourceException(LEMM_INI_STR);
@@ -1209,8 +1209,8 @@ public class Lemming {
 				// frames, directions, animation type
 				type = i;
 				if (lemmings[type] == null) {
-					BufferedImage sourceImg = ToolBox.ImageToBuffered(
-							Core.loadImage(tracker, "misc/lemm_"+i+".gif"), Transparency.BITMASK);
+					BufferedImage sourceImg = ToolBox.INSTANCE.ImageToBuffered(
+							Core.INSTANCE.loadImage(tracker, "misc/lemm_"+i+".gif"), Transparency.BITMASK);
 					try {
 						tracker.waitForAll();
 					} catch (InterruptedException ex) {}
@@ -1223,12 +1223,12 @@ public class Lemming {
 			if (val.length == 3) {
 				// mask_Y: frames, directions, step
 				type = i;
-				Image sourceImg = Core.loadImage(tracker, "misc/mask_"+i+".gif");
-				Mask mask = new Mask(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
+				Image sourceImg = Core.INSTANCE.loadImage(tracker, "misc/mask_"+i+".gif");
+				Mask mask = new Mask(ToolBox.INSTANCE.ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
 				lemmings[type].setMask(Direction.RIGHT, mask);
 				int dirs = val[1];
 				if (dirs > 1) {
-					Mask maskLeft = new Mask(ToolBox.flipImageX(ToolBox.ImageToBuffered(sourceImg,Transparency.BITMASK)), val[0]);
+					Mask maskLeft = new Mask(ToolBox.INSTANCE.flipImageX(ToolBox.INSTANCE.ImageToBuffered(sourceImg,Transparency.BITMASK)), val[0]);
 					lemmings[type].setMask(Direction.LEFT, maskLeft);
 				}
 				lemmings[type].maskStep = val[2];
@@ -1238,12 +1238,12 @@ public class Lemming {
 			if (val.length == 2) {
 				// mask_Y: type, frames, directions, step
 				type = i;
-				Image sourceImg = Core.loadImage(tracker, "misc/imask_"+i+".gif");
-				Mask mask = new Mask(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
+				Image sourceImg = Core.INSTANCE.loadImage(tracker, "misc/imask_"+i+".gif");
+				Mask mask = new Mask(ToolBox.INSTANCE.ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
 				lemmings[type].setImask(Direction.RIGHT, mask);
 				int dirs = val[1];
 				if (dirs > 1) {
-					Mask maskLeft = new Mask(ToolBox.flipImageX(ToolBox.ImageToBuffered(sourceImg,Transparency.BITMASK)), val[0]);
+					Mask maskLeft = new Mask(ToolBox.INSTANCE.flipImageX(ToolBox.INSTANCE.ImageToBuffered(sourceImg,Transparency.BITMASK)), val[0]);
 					lemmings[type].setImask(Direction.LEFT, maskLeft);
 				}
 			}
@@ -1593,9 +1593,9 @@ class LemmingResource {
 		height = sourceImg.getHeight(null)/animFrames;
 		dirs = directions;
 		animMode = Lemming.Animation.NONE;
-		img[Lemming.Direction.RIGHT.ordinal()] = ToolBox.getAnimation(sourceImg, animFrames, Transparency.BITMASK);
+		img[Lemming.Direction.RIGHT.ordinal()] = ToolBox.INSTANCE.getAnimation(sourceImg, animFrames, Transparency.BITMASK);
 		if (dirs>1)
-			img[Lemming.Direction.LEFT.ordinal()] = ToolBox.getAnimation(ToolBox.flipImageX(sourceImg), animFrames, Transparency.BITMASK);
+			img[Lemming.Direction.LEFT.ordinal()] = ToolBox.INSTANCE.getAnimation(ToolBox.INSTANCE.flipImageX(sourceImg), animFrames, Transparency.BITMASK);
 	}
 
 	/**
@@ -1673,8 +1673,8 @@ class ExplodeFont {
 	 * @throws ResourceException
 	 */
 	ExplodeFont(final Component cmp) throws ResourceException {
-		Image sourceImg = Core.loadImage("misc/countdown.gif");
-		img = ToolBox.getAnimation(sourceImg,5,Transparency.BITMASK);
+		Image sourceImg = Core.INSTANCE.loadImage("misc/countdown.gif");
+		img = ToolBox.INSTANCE.getAnimation(sourceImg,5,Transparency.BITMASK);
 	}
 
 	/**

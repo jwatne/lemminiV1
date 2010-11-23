@@ -112,12 +112,12 @@ public class Icons {
 	 * @throws ResourceException
 	 */
 	public static void init(final Component cmp) throws ResourceException {
-		iconImg = ToolBox.createImage(WIDTH*(1+LAST_DRAWN),HEIGHT,Transparency.OPAQUE);
+		iconImg = ToolBox.INSTANCE.createImage(WIDTH*(1+LAST_DRAWN),HEIGHT,Transparency.OPAQUE);
 		iconGfx = iconImg.createGraphics();
 		MediaTracker tracker = new MediaTracker(cmp);
 		icons = new Sprite[15];
 		for (int i=0; i<14; i++) {
-			Image sourceImg = Core.loadImage(tracker, "misc/icon_"+i+".gif");
+			Image sourceImg = Core.INSTANCE.loadImage(tracker, "misc/icon_"+i+".gif");
 			try {
 				tracker.waitForAll();
 			} catch (InterruptedException ex) {}

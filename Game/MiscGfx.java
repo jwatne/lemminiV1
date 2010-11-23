@@ -59,17 +59,17 @@ public class MiscGfx {
 		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 		BufferedImage img;
 		/* 0: BORDER */
-		img = ToolBox.ImageToBuffered(Core.loadImage("misc/border.gif"),Transparency.OPAQUE);
+		img = ToolBox.INSTANCE.ImageToBuffered(Core.INSTANCE.loadImage("misc/border.gif"),Transparency.OPAQUE);
 		images.add(img);
 		/* 1: LEMMINI */
-		img = ToolBox.ImageToBuffered(Core.loadImageJar("lemmini.png"), Transparency.TRANSLUCENT);
+		img = ToolBox.INSTANCE.ImageToBuffered(Core.INSTANCE.loadImageJar("lemmini.png"), Transparency.TRANSLUCENT);
 		images.add(img);
 		/* 2: TILE_GREEN */
-		img = ToolBox.ImageToBuffered(Core.loadImageJar("background.gif"), Transparency.OPAQUE);
+		img = ToolBox.INSTANCE.ImageToBuffered(Core.INSTANCE.loadImageJar("background.gif"), Transparency.OPAQUE);
 		images.add(img);
 		/* 3: TILE_BROWN */
 		//patch brown version of tile
-		BufferedImage brownImg = ToolBox.createImage(img.getWidth(), img.getHeight(),Transparency.BITMASK);
+		BufferedImage brownImg = ToolBox.INSTANCE.createImage(img.getWidth(), img.getHeight(),Transparency.BITMASK);
 		for (int xp=0; xp<img.getWidth(null); xp++)
 			for (int yp=0; yp<img.getHeight(null); yp++) {
 				int col = img.getRGB(xp, yp); // A R G B
@@ -85,12 +85,12 @@ public class MiscGfx {
 			}
 		images.add(brownImg);
 		/* 4: REPLAY_1 */
-		BufferedImage anim[] = ToolBox.getAnimation(Core.loadImage("misc/replay.gif"),2,Transparency.BITMASK);
+		BufferedImage anim[] = ToolBox.INSTANCE.getAnimation(Core.INSTANCE.loadImage("misc/replay.gif"),2,Transparency.BITMASK);
 		images.add(anim[0]);
 		/* 5: REPLAY_2 */
 		images.add(anim[1]);
 		/* 6: SELECT */
-		img = ToolBox.ImageToBuffered(Core.loadImage("misc/select.gif"),Transparency.BITMASK);
+		img = ToolBox.INSTANCE.ImageToBuffered(Core.INSTANCE.loadImage("misc/select.gif"),Transparency.BITMASK);
 		images.add(img);
 
 		image = new BufferedImage[images.size()];

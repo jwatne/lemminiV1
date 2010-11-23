@@ -40,7 +40,9 @@ import javax.swing.JOptionPane;
  */
 public class ToolBox {
 
-	private static GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+	public static ToolBox INSTANCE = new ToolBox(); 
+	
+	private GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 
 	/**
 	 * Create a compatible buffered image.
@@ -49,7 +51,7 @@ public class ToolBox {
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
 	 */
-	public static BufferedImage createImage(final int width, final int height, final int transparency) {
+	public BufferedImage createImage(final int width, final int height, final int transparency) {
 		BufferedImage b = gc.createCompatibleImage(width, height, transparency);
 		return b;
 	}
@@ -59,7 +61,7 @@ public class ToolBox {
 	 * @param img existing {@link java.awt.Image}
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
-	 */	public static BufferedImage ImageToBuffered(final Image img, final int transparency) {
+	 */	public BufferedImage ImageToBuffered(final Image img, final int transparency) {
 		 BufferedImage bImg = createImage(img.getWidth(null), img.getHeight(null), transparency);
 		 Graphics2D g = bImg.createGraphics();
 		 g.drawImage(img, 0, 0, null);
@@ -74,7 +76,7 @@ public class ToolBox {
 	  * @param transparency {@link java.awt.Transparency}
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public static BufferedImage[] getAnimation(final Image img, final int frames, final int transparency) {
+	 public BufferedImage[] getAnimation(final Image img, final int frames, final int transparency) {
 		 int width = img.getWidth(null);
 		 return getAnimation(img, frames, transparency, width);
 	 }
@@ -87,7 +89,7 @@ public class ToolBox {
 	  * @param width image width
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public static BufferedImage[] getAnimation(final Image img, final int frames, final int transparency, final int width) {
+	 public BufferedImage[] getAnimation(final Image img, final int frames, final int transparency, final int width) {
 		 int height = img.getHeight(null)/frames;
 		 // characters stored one above the other - now separate them into single images
 		 ArrayList<BufferedImage> arrImg = new ArrayList<BufferedImage>(frames);
@@ -108,7 +110,7 @@ public class ToolBox {
 	  * @param img image to flip
 	  * @return flipped image
 	  */
-	 public static BufferedImage flipImageX(final BufferedImage img) {
+	 public BufferedImage flipImageX(final BufferedImage img) {
 		 BufferedImage trg = createImage(img.getWidth(), img.getHeight(), img.getColorModel().getTransparency());
 		 // affine transform for flipping
 		 AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
@@ -122,7 +124,7 @@ public class ToolBox {
 	  * @param fname file name
 	  * @return URL of the file
 	  */
-	 public static URL findFile(final String fname) {
+	 public URL findFile(final String fname) {
 		 ClassLoader loader = ToolBox.class.getClassLoader();
 		 return loader.getResource(fname);
 	 }
@@ -132,7 +134,7 @@ public class ToolBox {
 	  * @param fName String containing path name
 	  * @return String that ends with the (system default) path separator for sure
 	  */
-	 public static String addSeparator(final String fName) {
+	 public String addSeparator(final String fName) {
 		 int pos = fName.lastIndexOf(File.separator);
 		 if (pos != fName.length()-1)
 			 pos = fName.lastIndexOf("/");
@@ -146,7 +148,7 @@ public class ToolBox {
 	  * @param fName String containing file/path name
 	  * @return String with only Unix style path separators
 	  */
-	 public static String exchangeSeparators(final String fName) {
+	 public String exchangeSeparators(final String fName) {
 		 int pos;
 		 StringBuffer sb = new StringBuffer(fName);
 		 while ( (pos = sb.indexOf("\\")) != -1 )
@@ -159,7 +161,7 @@ public class ToolBox {
 	  * @param path String of a path with a file name
 	  * @return String containing only the file name
 	  */
-	 public static String getFileName(final String path) {
+	 public String getFileName(final String path) {
 		 int p1 = path.lastIndexOf("/");
 		 int p2 = path.lastIndexOf("\\");
 		 if (p2 > p1)
@@ -176,7 +178,7 @@ public class ToolBox {
 	  * @param path String containing file name
 	  * @return String containing only the extension (without the dot) or null (if no extension found)
 	  */
-	 public static String getExtension(final String path) {
+	 public String getExtension(final String path) {
 		 int p1 = path.lastIndexOf("/");
 		 int p2 = path.lastIndexOf("\\");
 		 int p = path.lastIndexOf(".");
@@ -192,7 +194,7 @@ public class ToolBox {
 	  * @param num Number of bytes to return
 	  * @return Array of bytes (size num) from the beginning of the file
 	  */
-	 public static byte[] getFileID(final String fname, final int num) {
+	 public byte[] getFileID(final String fname, final int num) {
 		 byte buf[] = new byte[num];
 		 File f = new File(fname);
 		 if (f.length() < num)
@@ -212,7 +214,7 @@ public class ToolBox {
 	  * @param path absolute file name
 	  * @return path name without the separator
 	  */
-	 public static String getPathName(final String path) {
+	 public String getPathName(final String path) {
 		 int p1 = path.lastIndexOf("/");
 		 int p2 = path.lastIndexOf("\\");
 		 if (p2 > p1)
@@ -226,7 +228,7 @@ public class ToolBox {
 	  * Show exception message box.
 	  * @param ex exception
 	  */
-	 public static void showException(final Throwable ex) {
+	 public void showException(final Throwable ex) {
 		 String m;
 		 m = "<html>";
 		 m += ex.getClass().getName()+"<p>";
@@ -249,7 +251,7 @@ public class ToolBox {
 	  * @param load true: load, false: save
 	  * @return absolute file name of selected file or null
 	  */
-	 public static String getFileName(final Component parent, final String path, final String ext[], final boolean load) {
+	 public String getFileName(final Component parent, final String path, final String ext[], final boolean load) {
 		 String p = path;
 		 if (p.length() == 0)
 			 p = ".";

@@ -105,7 +105,7 @@ public class Sprite {
 		animMode = Animation.NONE;
 		triggered = false;
 		// animation frames stored one above the other - now separate them into single images
-		frames = ToolBox.getAnimation(sourceImg, animFrames, Transparency.BITMASK);
+		frames = ToolBox.INSTANCE.getAnimation(sourceImg, animFrames, Transparency.BITMASK);
 	}
 
 	/**

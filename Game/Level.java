@@ -212,7 +212,7 @@ public class Level {
 		// load objects
 		sprObjAvailable = null;
 		// first load the data from object descriptor file xxx.ini
-		String fnames = Core.findResource("styles/"+strStyle + "/" + strStyle + ".ini");
+		String fnames = Core.INSTANCE.findResource("styles/"+strStyle + "/" + strStyle + ".ini");
 		props = new Props();
 		if (!props.load(fnames)) {
 			if (style != -1)
@@ -221,8 +221,8 @@ public class Level {
 				throw new LemmException("Style "+strStyle+ " not existing.");
 		}
 		// load blockset
-		tiles = loadTileSet(strStyle, Core.getCmp());
-		sprObjAvailable = loadObjects(strStyle, Core.getCmp());
+		tiles = loadTileSet(strStyle, Core.INSTANCE.getCmp());
+		sprObjAvailable = loadObjects(strStyle, Core.INSTANCE.getCmp());
 		ready = true;
 	}
 
@@ -373,7 +373,7 @@ public class Level {
 				// for upside down objects, just create the upside down copy
 				if (o.upsideDown || inFront) {
 					for (int frame = 0; frame < spr.getNumFrames(); frame++) {
-						imgSpr = ToolBox.createImage(spr.getWidth(),spr.getHeight(), Transparency.BITMASK);
+						imgSpr = ToolBox.INSTANCE.createImage(spr.getWidth(),spr.getHeight(), Transparency.BITMASK);
 						// get flipped or normal version
 						if (o.upsideDown) {
 							// flip the image vertically
@@ -524,7 +524,7 @@ public class Level {
 		int tiles = props.get("tiles", 64);
 		for (int n = 0; n < tiles; n++) {
 			String fName = "styles/" + set + "/" + set + "_" + Integer.toString(n) + ".gif";
-			Image img = Core.loadImage(tracker, fName);
+			Image img = Core.INSTANCE.loadImage(tracker, fName);
 			images.add(img);
 		}
 		try {
@@ -567,7 +567,7 @@ public class Level {
 				break;
 			// load screenBuffer
 			String fName = "styles/"+set + "/" + set + "o_" + Integer.toString(idx)+ ".gif";
-			Image img = Core.loadImage(tracker, fName);
+			Image img = Core.INSTANCE.loadImage(tracker, fName);
 			try {
 				tracker.waitForAll();
 			} catch (InterruptedException ex) {}
@@ -604,7 +604,7 @@ public class Level {
 				case TRAP_DROWN:
 					// load mask
 					fName = "styles/"+set + "/" + set + "om_" + Integer.toString(idx)+ ".gif";
-					img = Core.loadImage(tracker, fName);
+					img = Core.INSTANCE.loadImage(tracker, fName);
 					sprite.setMask(img);
 					break;
 			}
@@ -637,7 +637,7 @@ public class Level {
 		BufferedImage img;
 
 		if (image == null || image.getWidth() != width || image.getHeight() != height)
-			img = ToolBox.createImage(width,height,Transparency.OPAQUE);
+			img = ToolBox.INSTANCE.createImage(width,height,Transparency.OPAQUE);
 		else
 			img = image;
 		Graphics2D gx = img.createGraphics();

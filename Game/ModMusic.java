@@ -56,7 +56,7 @@ public class ModMusic implements Runnable {
 	public void load(final String fn) throws ResourceException {
 		if (mmThread != null)
 			close();
-		String fName = Core.findResource(fn);
+		String fName = Core.INSTANCE.findResource(fn);
 		int datalen = (int)(new File(fName).length());
 		if( datalen < 0 ) throw new ResourceException(fName);
 		try {

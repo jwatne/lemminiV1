@@ -74,7 +74,7 @@ public class MiniMap {
 	 * @param xOfs horizontal level offset
 	 */
 	public static void draw(final Graphics2D g, final int x, final int y, final int xOfs) {
-		int wWidth = Core.getCmp().getWidth();
+		int wWidth = Core.INSTANCE.getCmp().getWidth();
 		g.drawImage(img,x,y,null);
 		g.setColor(BORDER_COLOR);
 		g.drawRect(x+xOfs/scaleX,y,wWidth/scaleX,img.getHeight()-1);

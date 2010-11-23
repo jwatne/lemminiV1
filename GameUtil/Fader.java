@@ -103,7 +103,7 @@ public class Fader {
 		Color fillColor; /* ARGB color of the fading rectangle composed from alpha and color */
 		// create alpha image if needed
 		if (alphaImg == null) {
-			alphaImg = ToolBox.createImage(WIDTH, HEIGHT, Transparency.TRANSLUCENT);
+			alphaImg = ToolBox.INSTANCE.createImage(WIDTH, HEIGHT, Transparency.TRANSLUCENT);
 			alphaGfx = alphaImg.createGraphics();
 		}
 		// fill with alpha blended color

@@ -114,7 +114,7 @@ public class AwtToolBox implements ToolBox {
 	  * @return an array of buffered images which contain an animation
 	  */
 	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames) {
-		 return getAnimation(img, frames, img.getColorModel().getTransparency(), img.getWidth());
+		 return getAnimation(img, frames, img.getWidth());
 	 }
 
 	 /**
@@ -126,7 +126,7 @@ public class AwtToolBox implements ToolBox {
 	  * @return an array of buffered images which contain an animation
 	  */
 	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int width) {
-		 return getAnimation(img, frames, Transparency.BITMASK, width);
+		 return getAnimation(img, frames, img.getColorModel().getTransparency(), width);
 	 }
 
 	 /**

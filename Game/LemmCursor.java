@@ -1,10 +1,8 @@
 package Game;
 
-import java.awt.Cursor;
-import java.awt.Point;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 
+import Tools.Cursor;
 import Tools.ToolBox;
 
 /*
@@ -73,10 +71,10 @@ public class LemmCursor  {
 		cursor = new Cursor[4];
 		int w = getImage(Type.NORMAL).getWidth()/2;
 		int h = getImage(Type.NORMAL).getHeight()/2;
-		cursor[Type.NORMAL.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.NORMAL), new Point(w,h), "" );
-		cursor[Type.LEFT.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.LEFT),   new Point(w,h), "" );
-		cursor[Type.RIGHT.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.RIGHT),  new Point(w,h), "" );
-		cursor[Type.WALKER.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.WALKER), new Point(w,h), "" );
+		cursor[Type.NORMAL.ordinal()] = ToolBox.INSTANCE.get().createCursor(LemmCursor.getImage(Type.NORMAL), w, h);
+		cursor[Type.LEFT.ordinal()] = ToolBox.INSTANCE.get().createCursor(LemmCursor.getImage(Type.LEFT), w, h);
+		cursor[Type.RIGHT.ordinal()] = ToolBox.INSTANCE.get().createCursor(LemmCursor.getImage(Type.RIGHT), w, h);
+		cursor[Type.WALKER.ordinal()] = ToolBox.INSTANCE.get().createCursor(LemmCursor.getImage(Type.WALKER), w, h);
 
 		type = Type.NORMAL;
 		setX(0);

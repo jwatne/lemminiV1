@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 
 import AWT.AwtCore;
+import AWT.AwtCursor;
 import AWT.AwtToolBox;
 import GUI.GainDialog;
 import GUI.LevelCodeDialog;
@@ -1055,7 +1056,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 		paintSemaphore = new Object();
 		this.requestFocus();
-		this.setCursor(LemmCursor.getCursor());
+		this.setCursor(((AwtCursor)LemmCursor.getCursor()).getCursor());
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 	}
@@ -1066,7 +1067,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	 */
 	public void setCursor(final LemmCursor.Type c) {
 		LemmCursor.setType(c);
-		this.setCursor(LemmCursor.getCursor());
+		this.setCursor(((AwtCursor)LemmCursor.getCursor()).getCursor());
 	}
 
 	/* (non-Javadoc)

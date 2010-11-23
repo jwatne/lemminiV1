@@ -30,6 +30,15 @@ public interface ToolBox {
 	public static Instance INSTANCE = new Instance();
 	
 	/**
+	 * Creates a custom cursor from the image
+	 * @param image
+	 * @param width
+	 * @param height
+	 * @return the cursor
+	 */
+	public Cursor createCursor(BufferedImage image, int width, int height);
+	
+	/**
 	 * Create a compatible buffered image.
 	 * @param width width of image in pixels
 	 * @param height height of image in pixels

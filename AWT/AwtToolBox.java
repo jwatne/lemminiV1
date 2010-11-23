@@ -6,6 +6,8 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import Tools.Cursor;
 import Tools.JFileFilter;
 import Tools.ToolBox;
 
@@ -47,6 +50,17 @@ public class AwtToolBox implements ToolBox {
 	public static Instance INSTANCE = new Instance(); 
 	
 	private GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+
+	/**
+	 * Creates a custom cursor from the image
+	 * @param image
+	 * @param width
+	 * @param height
+	 * @return the cursor
+	 */
+	public Cursor createCursor(BufferedImage image, int width, int height) {
+		return new AwtCursor(Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(width, height), ""));
+	}
 
 	/**
 	 * Create a compatible buffered image.

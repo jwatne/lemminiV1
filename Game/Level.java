@@ -2,14 +2,13 @@ package Game;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 
 import GameUtil.Sprite;
+import Graphics.GraphicsOperation;
 import Tools.Props;
 import Tools.ToolBox;
 
@@ -307,7 +306,7 @@ public class Level {
 		ArrayList<SpriteObject> oBehind = new ArrayList<SpriteObject>(64);
 		ArrayList<SpriteObject> oFront = new ArrayList<SpriteObject>(4);
 		ArrayList<Entry> entry = new ArrayList<Entry>(4);
-		AffineTransform tx;
+		GraphicsOperation tx;
 		for (int n = 0; n < objects.size(); n++) {
 			try {
 				LvlObject o = objects.get(n);
@@ -316,9 +315,9 @@ public class Level {
 				spr.setX(o.xPos);
 				spr.setY(o.yPos);
 				// affine transform for flipping
-				tx = AffineTransform.getScaleInstance(1, -1);
+				tx = ToolBox.INSTANCE.get().createGraphicsOperation();
+				tx.setScale(1, -1);
 				tx.translate(0, -spr.getHeight());
-				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 				BufferedImage imgSpr;
 				// check for entries (ignore upside down entries)
 				if (spr.getType() == SpriteObject.Type.ENTRY && !o.upsideDown) {
@@ -373,7 +372,7 @@ public class Level {
 						// get flipped or normal version
 						if (o.upsideDown) {
 							// flip the image vertically
-							imgSpr = op.filter(spr.getImage(frame), imgSpr);
+							tx.execute(spr.getImage(frame), imgSpr);
 						} else {
 							WritableRaster rImgSpr = imgSpr.getRaster();
 							rImgSpr.setRect(spr.getImage(frame).getRaster()); // just copy

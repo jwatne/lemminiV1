@@ -8,10 +8,9 @@ import static Game.LemmFont.Color.VIOLET;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
+import Graphics.GraphicsOperation;
 import Tools.ToolBox;
 
 /*
@@ -95,7 +94,7 @@ public class TextScreen {
 	/** flip state for rotation: true - image is flipped in Y direction */
 	private static boolean flip;
 	/** affine transformation used for rotation animation */
-	private static AffineTransform at;
+	private static GraphicsOperation at;
 	/** counter used to trigger the rotation animation (in animation update frames) */
 	private static int rotCtr;
 	/** counter threshold used to trigger the rotation animation (in animation update frames) */
@@ -255,7 +254,7 @@ public class TextScreen {
 		rotFact = 1.0;
 		rotDelta = -0.1;
 		imgSrc = MiscGfx.getImage(MiscGfx.Index.LEMMINI);
-		at = new AffineTransform();
+		at = ToolBox.INSTANCE.get().createGraphicsOperation();
 		flip = false;
 		rotCtr = 0 ;
 		flipCtr = 0;
@@ -315,12 +314,11 @@ public class TextScreen {
 					rotCtr = 0;
 			}
 			if (flip) {
-				at.setToScale(1, -rotFact);
+				at.setScale(1, -rotFact);
 				at.translate(1,-imgSrc.getHeight());
-			} else at.setToScale(1, rotFact);
-			AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+			} else at.setScale(1, rotFact);
 			imgGfx.clearRect(0, 0, imgTrg.getWidth(), imgTrg.getHeight());
-			op.filter(imgSrc, imgTrg);
+			at.execute(imgSrc, imgTrg);
 			textScreen.drawImage(imgTrg, -120 - (int)(imgSrc.getHeight()/2*Math.abs(rotFact)+0.5));
 		} else {
 			// display original image

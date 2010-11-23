@@ -4,6 +4,8 @@ package Tools;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
+import Graphics.GraphicsOperation;
+
 /*
  * Copyright 2009 Volker Oth
  *
@@ -28,6 +30,12 @@ import java.net.URL;
 public interface ToolBox {
 
 	public static Instance INSTANCE = new Instance();
+	
+	/**
+	 * Creates a graphics operation
+	 * @return the graphics operation
+	 */
+	public GraphicsOperation createGraphicsOperation();
 	
 	/**
 	 * Creates a custom cursor from the image

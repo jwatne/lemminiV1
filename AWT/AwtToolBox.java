@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import Graphics.GraphicsOperation;
 import Tools.Cursor;
 import Tools.JFileFilter;
 import Tools.ToolBox;
@@ -50,6 +51,14 @@ public class AwtToolBox implements ToolBox {
 	public static Instance INSTANCE = new Instance(); 
 	
 	private GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+
+	/**
+	 * Creates a graphics operation
+	 * @return the graphics operation
+	 */
+	public GraphicsOperation createGraphicsOperation() {
+		return new AwtGraphicsOperation();
+	}
 
 	/**
 	 * Creates a custom cursor from the image

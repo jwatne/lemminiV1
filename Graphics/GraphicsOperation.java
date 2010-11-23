@@ -1,6 +1,6 @@
-package AWT;
+package Graphics;
 
-import Tools.Cursor;
+import java.awt.image.BufferedImage;
 
 /*
  * Copyright 2010 Arne Limburg
@@ -18,15 +18,12 @@ import Tools.Cursor;
  * limitations under the License.
  */
 
-public class AwtCursor implements Cursor {
+public interface GraphicsOperation {
 
-	private java.awt.Cursor cursor;
+	void setScale(double sx, double sy);
+
+	void translate(double tx, double ty);
 	
-	public AwtCursor(java.awt.Cursor cursor) {
-		this.cursor = cursor;
-	}
-	
-	public java.awt.Cursor getCursor() {
-		return cursor;
-	}
+	void execute(BufferedImage sourc, BufferedImage destination);
+
 }

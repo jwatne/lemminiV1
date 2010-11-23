@@ -1,9 +1,9 @@
 package Tools;
 
 
-import java.awt.image.BufferedImage;
 import java.net.URL;
 
+import Graphics.Image;
 import Graphics.GraphicsOperation;
 
 /*
@@ -44,7 +44,7 @@ public interface ToolBox {
 	 * @param height
 	 * @return the cursor
 	 */
-	public Cursor createCursor(BufferedImage image, int width, int height);
+	public Cursor createCursor(Image image, int width, int height);
 	
 	/**
 	 * Create a compatible buffered image.
@@ -53,7 +53,7 @@ public interface ToolBox {
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
 	 */
-	public BufferedImage createBitmaskImage(final int width, final int height);
+	public Image createBitmaskImage(final int width, final int height);
 
 	/**
 	 * Create a compatible buffered image.
@@ -62,7 +62,7 @@ public interface ToolBox {
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
 	 */
-	public BufferedImage createOpaqueImage(final int width, final int height);
+	public Image createOpaqueImage(final int width, final int height);
 
 	/**
 	 * Create a compatible buffered image.
@@ -71,7 +71,7 @@ public interface ToolBox {
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
 	 */
-	public BufferedImage createTranslucentImage(final int width, final int height);
+	public Image createTranslucentImage(final int width, final int height);
 
 	 /**
 	  * Return an array of buffered images which contain an animation.
@@ -80,7 +80,7 @@ public interface ToolBox {
 	  * @param transparency {@link java.awt.Transparency}
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames);
+	 public Image[] getAnimation(final Image img, final int frames);
 
 	 /**
 	  * Return an array of buffered images which contain an animation.
@@ -90,14 +90,14 @@ public interface ToolBox {
 	  * @param width image width
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int width);
+	 public Image[] getAnimation(final Image img, final int frames, final int width);
 
 	 /**
 	  * Flip image in X direction.
 	  * @param img image to flip
 	  * @return flipped image
 	  */
-	 public BufferedImage flipImageX(final BufferedImage img);
+	 public Image flipImageX(final Image img);
 
 	 /**
 	  * Use the Loader to find a file.

@@ -1,8 +1,7 @@
 package Game;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
+import Graphics.GraphicsContext;
+import Graphics.Image;
 import Tools.ToolBox;
 
 /*
@@ -54,26 +53,26 @@ public class LemmFont {
 	/** height of one character pixels */
 	private static int height;
 	/** array of array of images [color,character] */
-	static private BufferedImage img[][];
+	static private Image img[][];
 
 	/**
 	 * Initialization.
 	 * @throws ResourceException
 	 */
 	static public void init() throws ResourceException {
-		BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/lemmfont.gif");
+		Image sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/lemmfont.gif");
 
 		width = SPACING; //sourceImg.getWidth(null);
-		height = sourceImg.getHeight(null)/CHARS.length();
-		BufferedImage redImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
-		BufferedImage blueImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
-		BufferedImage turquoiseImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
-		BufferedImage brownImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
-		BufferedImage violetImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
-		img = new BufferedImage[7][];
+		height = sourceImg.getHeight()/CHARS.length();
+		Image redImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
+		Image blueImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
+		Image turquoiseImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
+		Image brownImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
+		Image violetImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
+		img = new Image[7][];
 		img[0] = ToolBox.INSTANCE.get().getAnimation(sourceImg,CHARS.length(),width);
-		for (int xp=0; xp<sourceImg.getWidth(null); xp++)
-			for (int yp=0; yp<sourceImg.getHeight(null); yp++) {
+		for (int xp=0; xp<sourceImg.getWidth(); xp++)
+			for (int yp=0; yp<sourceImg.getHeight(); yp++) {
 				int col = sourceImg.getRGB(xp, yp); // A R G B
 				int a = col & 0xff000000; // transparent part
 				int r = (col >> 16) & 0xff;
@@ -110,14 +109,14 @@ public class LemmFont {
 	 * @param sy y coordinate in pixels
 	 * @param color Color
 	 */
-	static public void strImage(final Graphics2D g, final String s, final int sx, final int sy, final Color color) {
+	static public void strImage(final GraphicsContext g, final String s, final int sx, final int sy, final Color color) {
 		for (int i=0, x = sx; i<s.length();i++,x+=SPACING) {
 			char c = s.charAt(i);
 			if (c==' ')
 				continue;
 			int pos = CHARS.indexOf(c);
 			if (pos > -1 && pos < CHARS.length()) {
-				g.drawImage(img[color.ordinal()][pos], x, sy, null);
+				g.drawImage(img[color.ordinal()][pos], x, sy);
 			}
 		}
 		return;
@@ -129,7 +128,7 @@ public class LemmFont {
 	 * @param s string to draw.
 	 * @param color Color
 	 */
-	static public void strImage(final Graphics2D g, final String s, final Color color) {
+	static public void strImage(final GraphicsContext g, final String s, final Color color) {
 		strImage(g, s, 0, 0, color);
 		return;
 	}
@@ -140,9 +139,9 @@ public class LemmFont {
 	 * @param color Color
 	 * @return a buffered image of the needed size that contains an image of the given string
 	 */
-	static public BufferedImage strImage(final String s, final Color color) {
-		BufferedImage image = ToolBox.INSTANCE.get().createBitmaskImage(width*s.length(), height);
-		strImage(image.createGraphics(), s, color);
+	static public Image strImage(final String s, final Color color) {
+		Image image = ToolBox.INSTANCE.get().createBitmaskImage(width*s.length(), height);
+		strImage(image.createGraphicsContext(), s, color);
 		return image;
 	}
 
@@ -151,7 +150,7 @@ public class LemmFont {
 	 * @param s string to draw
 	 * @return a buffered image of the needed size that contains an image of the given string
 	 */
-	static public BufferedImage strImage(final String s) {
+	static public Image strImage(final String s) {
 		return strImage(s, Color.GREEN);
 	}
 
@@ -160,7 +159,7 @@ public class LemmFont {
 	 * @param g graphics object to draw to.
 	 * @param s string to draw.
 	 */
-	static public void strImage(final Graphics2D g, final String s) {
+	static public void strImage(final GraphicsContext g, final String s) {
 		strImage(g, s, Color.GREEN);
 	}
 

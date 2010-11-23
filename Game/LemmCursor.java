@@ -1,7 +1,6 @@
 package Game;
 
-import java.awt.image.BufferedImage;
-
+import Graphics.Image;
 import Tools.Cursor;
 import Tools.ToolBox;
 
@@ -58,7 +57,7 @@ public class LemmCursor  {
 	/** current cursor type */
 	private static Type type;
 	/** array of images - one for each cursor type */
-	private static BufferedImage img[];
+	private static Image img[];
 	/** array of AWT cursor Objects */
 	private static Cursor cursor[];
 
@@ -86,7 +85,7 @@ public class LemmCursor  {
 	 * @param t cursor type
 	 * @return image for the given cursor type
 	 */
-	public static BufferedImage getImage(final Type t) {
+	public static Image getImage(final Type t) {
 		return img[t.ordinal()];
 	}
 
@@ -94,7 +93,7 @@ public class LemmCursor  {
 	 * Get image for current cursor type.
 	 * @return image for current cursor type
 	 */
-	public static BufferedImage getImage() {
+	public static Image getImage() {
 		return getImage(type);
 	}
 
@@ -102,7 +101,7 @@ public class LemmCursor  {
 	 * Get boxed version of image for the current cursor type.
 	 * @return boxed version of image for the current cursor type
 	 */
-	public static BufferedImage getBoxImage() {
+	public static Image getBoxImage() {
 		Type t;
 		switch (type) {
 			case NORMAL:

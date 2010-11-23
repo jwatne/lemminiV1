@@ -1,10 +1,8 @@
 package AWT;
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
 import java.awt.Transparency;
-import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -21,6 +19,7 @@ import Game.GameController;
 import Game.LemmException;
 import Game.Player;
 import Game.ResourceException;
+import Graphics.Image;
 import Tools.Props;
 import Tools.ToolBox;
 
@@ -236,11 +235,11 @@ public class AwtCore implements Core {
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	private BufferedImage loadBitmaskImage(final MediaTracker tracker, final String fName) throws ResourceException {
+	private java.awt.Image loadImage(final MediaTracker tracker, final String fName) throws ResourceException {
 		String fileLoc = findResource(fName);
 		if (fileLoc == null)
 			return null;
-		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImage(tracker, fileLoc, false), Transparency.BITMASK);
+		return loadImage(tracker, fileLoc, false);
 	}
 
 	/**
@@ -251,8 +250,8 @@ public class AwtCore implements Core {
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	private static Image loadImage(final MediaTracker tracker, final String fName, final boolean jar) throws ResourceException {
-		Image image;
+	private static java.awt.Image loadImage(final MediaTracker tracker, final String fName, final boolean jar) throws ResourceException {
+		java.awt.Image image;
 		if (jar)
 			image = Toolkit.getDefaultToolkit().createImage(ToolBox.INSTANCE.get().findFile(fName));
 		else
@@ -279,19 +278,23 @@ public class AwtCore implements Core {
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	public BufferedImage loadImage(final String fname) throws ResourceException {
+	public java.awt.Image loadImage(final String fname) throws ResourceException {
 		MediaTracker tracker = new MediaTracker(getCmp());
-		Image img = loadBitmaskImage(tracker, fname);
+		java.awt.Image img = loadImage(tracker, fname);
 		if (img == null)
 			throw new ResourceException(fname);
-		return AwtToolBox.INSTANCE.get().ImageToBuffered(img, Transparency.BITMASK);
+		return img;
 	}
 	
-	public BufferedImage loadBitmaskImage(final String fname) throws ResourceException {
+	public Image loadBitmaskImage(final String fname) throws ResourceException {
 		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImage(fname), Transparency.BITMASK);
 	}
 
-	public BufferedImage loadOpaqueImage(final String fname) throws ResourceException {
+	public Image loadTranslucentImage(final String fname) throws ResourceException {
+		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImage(fname), Transparency.TRANSLUCENT);
+	}
+
+	public Image loadOpaqueImage(final String fname) throws ResourceException {
 		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImage(fname), Transparency.OPAQUE);
 	}
 
@@ -301,19 +304,19 @@ public class AwtCore implements Core {
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	public Image loadImageJar(final String fname) throws ResourceException {
+	public java.awt.Image loadImageJar(final String fname) throws ResourceException {
 		MediaTracker tracker = new MediaTracker(getCmp());
-		Image img = loadImage(tracker, fname, true);
+		java.awt.Image img = loadImage(tracker, fname, true);
 		if (img == null)
 			throw new ResourceException(fname);
 		return img;
 	}
 
-	public BufferedImage loadOpaqueImageJar(final String fname) throws ResourceException {
+	public Image loadOpaqueImageJar(final String fname) throws ResourceException {
 		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImageJar(fname), Transparency.OPAQUE);
 	}
 	
-	public BufferedImage loadTranslucentImageJar(final String fname) throws ResourceException {
+	public Image loadTranslucentImageJar(final String fname) throws ResourceException {
 		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImageJar(fname), Transparency.TRANSLUCENT);
 	}
 	

@@ -1,6 +1,7 @@
 package Graphics;
 
 
+
 /*
  * Copyright 2010 Arne Limburg
  *
@@ -17,12 +18,29 @@ package Graphics;
  * limitations under the License.
  */
 
-public interface GraphicsOperation {
+public class Color {
 
-	void setScale(double sx, double sy);
+	public static final Color BLACK = new Color(0, 0, 0);
 
-	void translate(double tx, double ty);
+	public static final Color RED = new Color(255, 0, 0);
+
+	public static final Color YELLOW = new Color(255, 255, 0);
 	
-	void execute(Image sourc, Image destination);
+	private int argb;
+	
+	public Color(int rgb) {
+		this.argb = 0xff000000 | rgb;
+	}
+	
+    public Color(int r, int g, int b) {
+        this(r, g, b, 255);
+    }
 
+    public Color(int r, int g, int b, int a) {
+    	argb = ((a & 0xff) << 24) | ((r & 0xff) << 16) | ((g & 0xff) << 8) | ((b & 0xFf) << 0);
+	}
+
+	public int getARGB() {
+		return argb;
+	}
 }

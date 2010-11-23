@@ -5,12 +5,10 @@ import static Game.LemmFont.Color.GREEN;
 import static Game.LemmFont.Color.RED;
 import static Game.LemmFont.Color.TURQUOISE;
 import static Game.LemmFont.Color.VIOLET;
-
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-
+import Graphics.Color;
+import Graphics.GraphicsContext;
 import Graphics.GraphicsOperation;
+import Graphics.Image;
 import Tools.ToolBox;
 
 /*
@@ -86,11 +84,11 @@ public class TextScreen {
 	/** delta used for the rotation animation */
 	private static double rotDelta;
 	/** source image for rotation animation */
-	private static BufferedImage imgSrc;
+	private static Image imgSrc;
 	/** target image for rotation animation */
-	private static BufferedImage imgTrg;
+	private static Image imgTrg;
 	/** graphics for rotation animation */
-	private static Graphics2D imgGfx;
+	private static GraphicsContext imgGfx;
 	/** flip state for rotation: true - image is flipped in Y direction */
 	private static boolean flip;
 	/** affine transformation used for rotation animation */
@@ -106,9 +104,9 @@ public class TextScreen {
 	/** counter for scrolled pixels */
 	private static int scrollPixCtr;
 	/** image used for scroller */
-	private static BufferedImage scrollerImg;
+	private static Image scrollerImg;
 	/** graphics used for scroller */
-	private static Graphics2D scrollerGfx;
+	private static GraphicsContext scrollerGfx;
 	/** screen type to display */
 	private static Mode mode;
 	/** sychronization monitor */
@@ -259,13 +257,13 @@ public class TextScreen {
 		rotCtr = 0 ;
 		flipCtr = 0;
 		imgTrg = ToolBox.INSTANCE.get().createTranslucentImage(imgSrc.getWidth(),imgSrc.getHeight());
-		imgGfx = imgTrg.createGraphics();
+		imgGfx = imgTrg.createGraphicsContext();
 		imgGfx.setBackground(new Color(0,0,0,0)); // invisible
 		scrollCharCtr = 0;
 		scrollPixCtr = 0;
 
 		scrollerImg = ToolBox.INSTANCE.get().createBitmaskImage(LemmFont.getWidth()*(1+SCROLL_WIDTH),SCROLL_HEIGHT);
-		scrollerGfx = scrollerImg.createGraphics();
+		scrollerGfx = scrollerImg.createGraphicsContext();
 		scrollerGfx.setBackground(new Color(0,0,0,0));
 
 		textScreen  = new TextDialog(width, height);
@@ -341,8 +339,8 @@ public class TextScreen {
 		int w = SCROLL_WIDTH*LemmFont.getWidth();
 		int dx = (textScreen.getScreen().getWidth()-w)/2;
 		int dy = (textScreen.getScreen().getHeight()/2)+SCROLL_Y;
-		textScreen.getScreen().createGraphics().drawImage(
-				scrollerImg, dx, dy, dx+w, dy+SCROLL_HEIGHT, scrollPixCtr,0,scrollPixCtr+w,SCROLL_HEIGHT/2, null
+		textScreen.getScreen().createGraphicsContext().drawImage(
+				scrollerImg, dx, dy, dx+w, dy+SCROLL_HEIGHT, scrollPixCtr,0,scrollPixCtr+w,SCROLL_HEIGHT/2
 		);
 
 		scrollPixCtr+=SCROLL_STEP;
@@ -371,7 +369,7 @@ public class TextScreen {
 	 * Get image of text screen
 	 * @return image of text screen
 	 */
-	public static BufferedImage getScreen() {
+	public static Image getScreen() {
 		synchronized (monitor) {
 			return textScreen.getScreen();
 		}

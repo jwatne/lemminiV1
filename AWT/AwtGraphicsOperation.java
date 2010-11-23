@@ -2,9 +2,9 @@ package AWT;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 
 import Graphics.GraphicsOperation;
+import Graphics.Image;
 
 /*
  * Copyright 2010 Arne Limburg
@@ -37,9 +37,9 @@ public class AwtGraphicsOperation implements GraphicsOperation {
 	}
 
 	@Override
-	public void execute(BufferedImage sourc, BufferedImage destination) {
+	public void execute(Image source, Image destination) {
 		AffineTransformOp op = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-		op.filter(sourc, destination);
+		op.filter(((AwtImage)source).getImage(), ((AwtImage)destination).getImage());
 	}
 
 }

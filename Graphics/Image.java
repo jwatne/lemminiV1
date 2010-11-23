@@ -17,12 +17,16 @@ package Graphics;
  * limitations under the License.
  */
 
-public interface GraphicsOperation {
+public interface Image {
 
-	void setScale(double sx, double sy);
+	int getWidth();
 
-	void translate(double tx, double ty);
-	
-	void execute(Image sourc, Image destination);
+	int getHeight();
+
+	GraphicsContext createGraphicsContext();
+
+	int getRGB(int xp, int yp);
+
+	void setRGB(int xp, int yp, int col);
 
 }

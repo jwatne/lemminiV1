@@ -1,8 +1,8 @@
 package Game;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
+import Graphics.Color;
+import Graphics.GraphicsContext;
+import Graphics.Image;
 
 /*
  * Copyright 2009 Volker Oth
@@ -32,7 +32,7 @@ public class MiniMap {
 	final private static Color BORDER_COLOR = Color.YELLOW;
 
 	/** image used for mini map */
-	private static BufferedImage img;
+	private static Image img;
 	/** X position in main gfx */
 	private static int xPos;
 	/** Y position in main gfx */
@@ -60,7 +60,7 @@ public class MiniMap {
 		scaleX = sx;
 		scaleY = sy;
 		Level level = GameController.getLevel();
-		BufferedImage bgImage = GameController.getBgImage();
+		Image bgImage = GameController.getBgImage();
 		img = level.createMiniMap(img, bgImage, scaleX, scaleY, tint);
 		width = img.getWidth();
 		height = img.getHeight();
@@ -73,9 +73,9 @@ public class MiniMap {
 	 * @param y y position in pixels
 	 * @param xOfs horizontal level offset
 	 */
-	public static void draw(final Graphics2D g, final int x, final int y, final int xOfs) {
+	public static void draw(final GraphicsContext g, final int x, final int y, final int xOfs) {
 		int wWidth = Core.INSTANCE.get().getWidth();
-		g.drawImage(img,x,y,null);
+		g.drawImage(img,x,y);
 		g.setColor(BORDER_COLOR);
 		g.drawRect(x+xOfs/scaleX,y,wWidth/scaleX,img.getHeight()-1);
 	}
@@ -86,7 +86,7 @@ public class MiniMap {
 	 * @param lx original lemming x position in pixels
 	 * @param ly original lemming y position in pixels
 	 */
-	public static void drawLemming(final Graphics2D g, final int lx, final int ly) {
+	public static void drawLemming(final GraphicsContext g, final int lx, final int ly) {
 		int x = xPos + (lx+scaleX/2)/scaleX;
 		int y = yPos + (ly+scaleY/2)/scaleY;
 		g.setColor(LEMM_COLOR);
@@ -97,7 +97,7 @@ public class MiniMap {
 	 * Return current image.
 	 * @return current image.
 	 */
-	public static BufferedImage getImage() {
+	public static Image getImage() {
 		return img;
 	}
 

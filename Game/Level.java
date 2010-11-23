@@ -1,14 +1,12 @@
 package Game;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.awt.image.PixelGrabber;
-import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 
 import GameUtil.Sprite;
+import Graphics.Color;
+import Graphics.GraphicsContext;
 import Graphics.GraphicsOperation;
+import Graphics.Image;
 import Tools.Props;
 import Tools.ToolBox;
 
@@ -98,7 +96,7 @@ public class Level {
 	/** objects like doors - originally 32 objects where each consists of 8 bytes */
 	private ArrayList<LvlObject> objects;
 	/** background tiles - every pixel in them is interpreted as brick in the stencil */
-	private BufferedImage tiles[];
+	private Image tiles[];
 	/** sprite objects of all sprite objects available in this style */
 	private SpriteObject sprObjAvailable[];
 	/** terrain the Lemmings walk on etc. - originally 400 tiles, 4 bytes each */
@@ -228,7 +226,7 @@ public class Level {
 	 * @param s stencil to reuse
 	 * @return stencil of this level
 	 */
-	Stencil paintLevel(final BufferedImage bgImage, final Stencil s) {
+	Stencil paintLevel(final Image bgImage, final Stencil s) {
 		// flush all resources
 		sprObjFront = null;
 		sprObjBehind = null;
@@ -249,16 +247,13 @@ public class Level {
 		// paint terrain
 		for (int n = 0; n < terrain.size(); n++) {
 			Terrain t = terrain.get(n);
-			BufferedImage i = tiles[t.id];
-			int width = i.getWidth(null);
-			int height = i.getHeight(null);
+			Image i = tiles[t.id];
+			int width = i.getWidth();
+			int height = i.getHeight();
 
 			int source[] = new int[width * height];
-			PixelGrabber pixelgrabber = new PixelGrabber(i, 0, 0, width,
-					height, source, 0, width);
-			try {
-				pixelgrabber.grabPixels();
-			} catch (InterruptedException interruptedexception) {}
+			GraphicsContext graphicsContext = i.createGraphicsContext();
+			graphicsContext.grabPixels(i, 0, 0, width, height, source, 0, width);
 			int tx = t.xPos;
 			int ty = t.yPos;
 			boolean upsideDown = (t.modifier & Terrain.MODE_UPSIDE_DOWN) != 0;
@@ -318,7 +313,7 @@ public class Level {
 				tx = ToolBox.INSTANCE.get().createGraphicsOperation();
 				tx.setScale(1, -1);
 				tx.translate(0, -spr.getHeight());
-				BufferedImage imgSpr;
+				Image imgSpr;
 				// check for entries (ignore upside down entries)
 				if (spr.getType() == SpriteObject.Type.ENTRY && !o.upsideDown) {
 					Entry e = new Entry(o.xPos+spr.getWidth()/2, o.yPos);
@@ -374,8 +369,7 @@ public class Level {
 							// flip the image vertically
 							tx.execute(spr.getImage(frame), imgSpr);
 						} else {
-							WritableRaster rImgSpr = imgSpr.getRaster();
-							rImgSpr.setRect(spr.getImage(frame).getRaster()); // just copy
+							imgSpr.createGraphicsContext().copy(spr.getImage(frame), imgSpr);
 						}
 						// for "in front" objects the really drawn pixels have to be determined
 						if (inFront) {
@@ -463,15 +457,15 @@ public class Level {
 	 * @param width width of screen
 	 * @param xOfs level offset position
 	 */
-	public void drawBehindObjects(final Graphics2D g, final int width, final int xOfs) {
+	public void drawBehindObjects(final GraphicsContext g, final int width, final int xOfs) {
 		// draw "behind" objects
 		if (sprObjBehind != null) {
 			for (int n=0; n<sprObjBehind.length; n++) {
 				try {
 					SpriteObject spr = sprObjBehind[n];
-					BufferedImage img = spr.getImage();
+					Image img = spr.getImage();
 					if (spr.getX()+spr.getWidth() > xOfs && spr.getX() < xOfs+width)
-						g.drawImage(img,spr.getX()-xOfs,spr.getY(),null);
+						g.drawImage(img,spr.getX()-xOfs,spr.getY());
 					//spr.drawHidden(offImg,xOfsTemp);
 				} catch (ArrayIndexOutOfBoundsException ex) {}
 			}
@@ -484,15 +478,15 @@ public class Level {
 	 * @param width width of screen
 	 * @param xOfs level offset position
 	 */
-	public void drawInFrontObjects(final Graphics2D g, final int width, final int xOfs) {
+	public void drawInFrontObjects(final GraphicsContext g, final int width, final int xOfs) {
 		// draw "in front" objects
 		if (sprObjFront != null) {
 			for (int n=0; n<sprObjFront.length; n++) {
 				try {
 					SpriteObject spr = sprObjFront[n];
-					BufferedImage img = spr.getImage();
+					Image img = spr.getImage();
 					if (spr.getX()+spr.getWidth() > xOfs && spr.getX() < xOfs+width)
-						g.drawImage(img,spr.getX()-xOfs,spr.getY(),null);
+						g.drawImage(img,spr.getX()-xOfs,spr.getY());
 				} catch (ArrayIndexOutOfBoundsException ex) {}
 			}
 		}
@@ -513,15 +507,15 @@ public class Level {
 	 * @return array of images where each image contains one tile
 	 * @throws ResourceException
 	 */
-	private BufferedImage[] loadTileSet(final String set) throws ResourceException {
-		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>(64);
+	private Image[] loadTileSet(final String set) throws ResourceException {
+		ArrayList<Image> images = new ArrayList<Image>(64);
 		int tiles = props.get("tiles", 64);
 		for (int n = 0; n < tiles; n++) {
 			String fName = "styles/" + set + "/" + set + "_" + Integer.toString(n) + ".gif";
-			BufferedImage img = Core.INSTANCE.get().loadBitmaskImage(fName);
+			Image img = Core.INSTANCE.get().loadBitmaskImage(fName);
 			images.add(img);
 		}
-		BufferedImage ret[] = new BufferedImage[images.size()];
+		Image ret[] = new Image[images.size()];
 		ret = images.toArray(ret);
 		images = null;
 		return ret;
@@ -557,7 +551,7 @@ public class Level {
 				break;
 			// load screenBuffer
 			String fName = "styles/"+set + "/" + set + "o_" + Integer.toString(idx)+ ".gif";
-			BufferedImage img = Core.INSTANCE.get().loadBitmaskImage(fName);
+			Image img = Core.INSTANCE.get().loadBitmaskImage(fName);
 			// get animation mode
 			int anim = props.get("anim_" + sIdx, -1);
 			if (anim < 0)
@@ -616,18 +610,18 @@ public class Level {
 	 * @param tint apply a greenish color tint
 	 * @return image with mini map
 	 */
-	public BufferedImage createMiniMap(final BufferedImage image, final BufferedImage bgImage, final int scaleX, final int scaleY, final boolean tint) {
+	public Image createMiniMap(final Image image, final Image bgImage, final int scaleX, final int scaleY, final boolean tint) {
 		Level level = GameController.getLevel();
 		int bgCol;
 		int width = bgImage.getWidth()/scaleX;
 		int height = bgImage.getHeight()/scaleY;
-		BufferedImage img;
+		Image img;
 
 		if (image == null || image.getWidth() != width || image.getHeight() != height)
 			img = ToolBox.INSTANCE.get().createOpaqueImage(width,height);
 		else
 			img = image;
-		Graphics2D gx = img.createGraphics();
+		GraphicsContext gx = img.createGraphicsContext();
 		// clear background
 		gx.setBackground(bgColor);
 		gx.clearRect(0, 0, width, height);
@@ -639,21 +633,21 @@ public class Level {
 			for (int n=0; n<level.sprObjBehind.length; n++) {
 				try {
 					SpriteObject spr = level.sprObjBehind[n];
-					BufferedImage sprImg = spr.getImage();
+					Image sprImg = spr.getImage();
 					gx.drawImage(sprImg,spr.getX()/scaleX,spr.getY()/scaleY,
-							spr.getWidth()/scaleX, spr.getHeight()/scaleY, null);
+							spr.getWidth()/scaleX, spr.getHeight()/scaleY);
 				} catch (ArrayIndexOutOfBoundsException ex) {}
 			}
 		}
-		gx.drawImage(bgImage,0,0,width,height,0,0,bgImage.getWidth(),bgImage.getHeight(),null);
+		gx.drawImage(bgImage,0,0,width,height,0,0,bgImage.getWidth(),bgImage.getHeight());
 		// draw "in front" objects
 		if (level != null && level.sprObjFront != null) {
 			for (int n=0; n<level.sprObjFront.length; n++) {
 				try {
 					SpriteObject spr = level.sprObjFront[n];
-					BufferedImage sprImg = spr.getImage();
+					Image sprImg = spr.getImage();
 					gx.drawImage(sprImg,spr.getX()/scaleX,spr.getY()/scaleY,
-							spr.getWidth()/scaleX, spr.getHeight()/scaleY, null);
+							spr.getWidth()/scaleX, spr.getHeight()/scaleY);
 				} catch (ArrayIndexOutOfBoundsException ex) {}
 			}
 		}

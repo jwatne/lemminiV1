@@ -1,9 +1,5 @@
 package Game;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,6 +12,9 @@ import GameUtil.Fader;
 import GameUtil.KeyRepeat;
 import GameUtil.Sound;
 import GameUtil.Sprite;
+import Graphics.Color;
+import Graphics.GraphicsContext;
+import Graphics.Image;
 import Tools.MicrosecondTimer;
 import Tools.ToolBox;
 
@@ -152,7 +151,7 @@ public class GameController {
 	/** the background stencil */
 	private static Stencil stencil;
 	/** the background image */
-	private static BufferedImage bgImage;
+	private static Image bgImage;
 	/** flag: play music */
 	private static boolean musicOn;
 	/** flag: play sounds */
@@ -160,7 +159,7 @@ public class GameController {
 	/** flag: use advanced mouse selection methods */
 	private static boolean advancedSelect;
 	/** graphics object for the background image */
-	private static Graphics2D bgGfx;
+	private static GraphicsContext bgGfx;
 	/** color used to erase the background (black) */
 	private static Color blankColor = new Color(0xff,0,0,0);
 	/** flag: fast forward mode is active */
@@ -216,7 +215,7 @@ public class GameController {
 	/** array of available level packs */
 	private static LevelPack levelPack[];
 	/** small preview version of level used in briefing screen */
-	private static BufferedImage mapPreview;
+	private static Image mapPreview;
 	/** timer used for nuking */
 	private static MicrosecondTimer timerNuke;
 	/** key repeat object for plus key/icon */
@@ -286,7 +285,7 @@ public class GameController {
 	 */
 	public static void init() throws ResourceException {
 		bgImage = ToolBox.INSTANCE.get().createBitmaskImage(Level.WIDTH, Level.HEIGHT);
-		bgGfx = bgImage.createGraphics();
+		bgGfx = bgImage.createGraphicsContext();
 
 		gameState = State.INIT;
 		sound = new Sound(24,SND_MOUSEPRE);
@@ -609,7 +608,7 @@ public class GameController {
 	 * Get current replay image.
 	 * @return current replay image
 	 */
-	public synchronized static BufferedImage getReplayImage() {
+	public synchronized static Image getReplayImage() {
 		if (!replayMode)
 			return null;
 		if ( (replayFrame & 0x3f) > 0x20)
@@ -1153,7 +1152,7 @@ public class GameController {
 	 * Fade in/out.
 	 * @param g graphics object
 	 */
-	public static void fade(final Graphics g) {
+	public static void fade(final GraphicsContext g) {
 		if (Fader.getState() == Fader.State.OFF && transitionState != TransitionState.NONE) {
 			switch (transitionState) {
 				case END_LEVEL:
@@ -1211,7 +1210,7 @@ public class GameController {
 	 * @param height height of screen in pixels
 	 * @param xOfs horizontal level offset in pixels
 	 */
-	public static void drawExplosions(final Graphics2D g, final int width, final int height, final int xOfs) {
+	public static void drawExplosions(final GraphicsContext g, final int width, final int height, final int xOfs) {
 		synchronized (explosions) {
 			Iterator<Explosion> it = explosions.iterator();
 			while (it.hasNext()) {
@@ -1239,8 +1238,8 @@ public class GameController {
 	 * @param x x coordinate in pixels
 	 * @param y y coordinate in pixels
 	 */
-	public static void drawIcons(final Graphics2D g, final int x, final int y) {
-		g.drawImage(Icons.getImg(),x,y,null);
+	public static void drawIcons(final GraphicsContext g, final int x, final int y) {
+		g.drawImage(Icons.getImg(),x,y);
 	}
 
 	/**
@@ -1248,7 +1247,7 @@ public class GameController {
 	 * @param g graphics object
 	 * @param y y offset in pixels
 	 */
-	public static void drawCounters(final Graphics2D g, final int y) {
+	public static void drawCounters(final GraphicsContext g, final int y) {
 		// draw counters
 		int val = 0;
 		for (int i=0; i<10;i++) {
@@ -1284,7 +1283,7 @@ public class GameController {
 					val = numDiggers;
 					break;
 			}
-			g.drawImage(NumFont.numImage(val),Icons.WIDTH*i+8,y,null);
+			g.drawImage(NumFont.numImage(val),Icons.WIDTH*i+8,y);
 		}
 
 	}
@@ -1614,7 +1613,7 @@ public class GameController {
 	 * Get background image of level.
 	 * @return background image of level
 	 */
-	public static BufferedImage getBgImage() {
+	public static Image getBgImage() {
 		return bgImage;
 	}
 
@@ -1662,7 +1661,7 @@ public class GameController {
 	 * Get small preview image of level.
 	 * @return small preview image of level
 	 */
-	public static BufferedImage getMapPreview() {
+	public static Image getMapPreview() {
 		return mapPreview;
 	}
 

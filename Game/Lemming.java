@@ -1,10 +1,10 @@
 package Game;
 
-import java.awt.image.BufferedImage;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import Graphics.Image;
 import Tools.Props;
 import Tools.ToolBox;
 
@@ -1175,7 +1175,7 @@ public class Lemming {
 				for (int d=0; d<lr.dirs; d++)    // go though all dirs
 					for (int xp=0; xp<lr.width; xp++)
 						for (int yp=0; yp<lr.height; yp++) {
-							BufferedImage i = lr.getImage(Direction.get(d),f);
+							Image i = lr.getImage(Direction.get(d),f);
 							if (i.getRGB(xp,yp) == findCol)
 								i.setRGB(xp,yp,replaceCol);
 						}
@@ -1204,7 +1204,7 @@ public class Lemming {
 				// frames, directions, animation type
 				type = i;
 				if (lemmings[type] == null) {
-					BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/lemm_"+i+".gif");
+					Image sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/lemm_"+i+".gif");
 					lemmings[type] = new LemmingResource(sourceImg, val[0], val[1]);
 					lemmings[type].animMode = (val[2]==0) ? Animation.LOOP : Animation.ONCE;
 				}
@@ -1214,7 +1214,7 @@ public class Lemming {
 			if (val.length == 3) {
 				// mask_Y: frames, directions, step
 				type = i;
-				BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/mask_"+i+".gif");
+				Image sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/mask_"+i+".gif");
 				Mask mask = new Mask(sourceImg, val[0]);
 				lemmings[type].setMask(Direction.RIGHT, mask);
 				int dirs = val[1];
@@ -1229,7 +1229,7 @@ public class Lemming {
 			if (val.length == 2) {
 				// mask_Y: type, frames, directions, step
 				type = i;
-				BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/imask_"+i+".gif");
+				Image sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/imask_"+i+".gif");
 				Mask mask = new Mask(sourceImg, val[0]);
 				lemmings[type].setImask(Direction.RIGHT, mask);
 				int dirs = val[1];
@@ -1459,7 +1459,7 @@ public class Lemming {
 	 * Get current animation frame for this Lemming.
 	 * @return current animation frame for this Lemming
 	 */
-	public BufferedImage getImage() {
+	public Image getImage() {
 		return lemRes.getImage(dir,frameIdx/TIME_SCALE);
 	}
 
@@ -1467,7 +1467,7 @@ public class Lemming {
 	 * Get image for explosion countdown.
 	 * @return image for explosion countdown (or null if no explosion countdown)
 	 */
-	public BufferedImage getCountdown() {
+	public Image getCountdown() {
 		if (explodeNumCtr==0)
 			return null;
 		else return explodeFont.getImage(explodeNumCtr-1);
@@ -1484,7 +1484,7 @@ public class Lemming {
 	 * Get the selection image for replay.
 	 * @return the selection image (or null if no selection displayed)
 	 */
-	public BufferedImage getSelectImg() {
+	public Image getSelectImg() {
 		if (selectCtr==0)
 			return null;
 		else return MiscGfx.getImage(MiscGfx.Index.SELECT);
@@ -1563,7 +1563,7 @@ class LemmingResource {
 	int dirs;
 	int maskStep;
 	/** array of images to store the animation [Direction][AnimationFrame] */
-	private BufferedImage img[][];
+	private Image img[][];
 	/** array of removal masks used for digging/bashing/mining/explosions etc. [Direction] */
 	private Mask mask[];
 	/** array of check masks for indestructible pixels [Direction] */
@@ -1575,13 +1575,13 @@ class LemmingResource {
 	 * @param animFrames number of animation frames.
 	 * @param directions number of directions (1 or 2)
 	 */
-	LemmingResource(final BufferedImage sourceImg, final int animFrames, final int directions) {
-		img = new BufferedImage[directions][];
+	LemmingResource(final Image sourceImg, final int animFrames, final int directions) {
+		img = new Image[directions][];
 		mask = new Mask[directions];
 		iMask = new Mask[directions];
 		frames = animFrames;
-		width = sourceImg.getWidth(null);
-		height = sourceImg.getHeight(null)/animFrames;
+		width = sourceImg.getWidth();
+		height = sourceImg.getHeight()/animFrames;
 		dirs = directions;
 		animMode = Lemming.Animation.NONE;
 		img[Lemming.Direction.RIGHT.ordinal()] = ToolBox.INSTANCE.get().getAnimation(sourceImg, animFrames);
@@ -1643,7 +1643,7 @@ class LemmingResource {
 	 * @param frame Index of animation frame.
 	 * @return specific animation frame
 	 */
-	BufferedImage getImage(final Lemming.Direction dir, final int frame) {
+	Image getImage(final Lemming.Direction dir, final int frame) {
 		if (dirs > 1)
 			return img[dir.ordinal()][frame];
 		else
@@ -1664,7 +1664,7 @@ class ExplodeFont {
 	 * @throws ResourceException
 	 */
 	ExplodeFont() throws ResourceException {
-		BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/countdown.gif");
+		Image sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/countdown.gif");
 		img = ToolBox.INSTANCE.get().getAnimation(sourceImg,5);
 	}
 
@@ -1673,10 +1673,10 @@ class ExplodeFont {
 	 * @param num counter value (0..9)
 	 * @return
 	 */
-	BufferedImage getImage(final int num) {
+	Image getImage(final int num) {
 		return img[num];
 	}
 
 	/** array of images for each counter value */
-	private BufferedImage img[];
+	private Image img[];
 }

@@ -3,7 +3,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
@@ -38,6 +37,8 @@ import javax.swing.UIManager;
 
 import AWT.AwtCore;
 import AWT.AwtCursor;
+import AWT.AwtGraphicsContext;
+import AWT.AwtImage;
 import AWT.AwtToolBox;
 import GUI.GainDialog;
 import GUI.LevelCodeDialog;
@@ -63,6 +64,8 @@ import Game.Stencil;
 import Game.TextScreen;
 import Game.UpdateListener;
 import GameUtil.Fader;
+import Graphics.GraphicsContext;
+import Graphics.Image;
 import Tools.MicrosecondTimer;
 import Tools.ToolBox;
 
@@ -181,7 +184,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		this.setTitle("Lemmini");
 
 		ClassLoader loader = Lemmini.class.getClassLoader();
-		Image img = Toolkit.getDefaultToolkit().getImage(loader.getResource("icon_32.png"));
+		java.awt.Image img = Toolkit.getDefaultToolkit().getImage(loader.getResource("icon_32.png"));
 		setIconImage(img);
 
 		// set component pane
@@ -786,8 +789,8 @@ public class Lemmini extends JFrame implements KeyListener {
 					else {
 						try{
 							File file = new File(Core.INSTANCE.get().getResourcePath()+"/level.png");
-							BufferedImage tmp = GameController.getLevel().createMiniMap(null,GameController.getBgImage(), 1, 1, false);
-							ImageIO.write(tmp, "png", file);
+							Image tmp = GameController.getLevel().createMiniMap(null,GameController.getBgImage(), 1, 1, false);
+							ImageIO.write(((AwtImage)tmp).getImage(), "png", file);
 						} catch (Exception ex) {}
 					}
 					break;
@@ -1100,12 +1103,12 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	public void init() {
 		offImage = new BufferedImage[2];
 		offGraphics = new Graphics2D[2];
-		offImage[0] = ToolBox.INSTANCE.get().createOpaqueImage(this.getWidth(), this.getHeight());
-		offImage[1] = ToolBox.INSTANCE.get().createOpaqueImage(this.getWidth(), this.getHeight());
+		offImage[0] = AwtToolBox.INSTANCE.get().createOpaqueImage(this.getWidth(), this.getHeight()).getImage();
+		offImage[1] = AwtToolBox.INSTANCE.get().createOpaqueImage(this.getWidth(), this.getHeight()).getImage();
 		offGraphics[0] = offImage[0].createGraphics();
 		offGraphics[1] = offImage[1].createGraphics();
 
-		outStrImg = ToolBox.INSTANCE.get().createBitmaskImage(this.getWidth(), LemmFont.getHeight());
+		outStrImg = AwtToolBox.INSTANCE.get().createBitmaskImage(this.getWidth(), LemmFont.getHeight()).getImage();
 		outStrGfx = outStrImg.createGraphics();
 		outStrGfx.setBackground(new Color(0,0,0));
 
@@ -1124,32 +1127,34 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	private void redraw() {
 		int drawBuffer;
 		Graphics2D offGfx;
+		GraphicsContext context;
 
 		synchronized (paintSemaphore) {
 			if (offImage == null)
 				init();
 			drawBuffer = (activeBuffer == 0) ? 1:0;
 			offGfx = offGraphics[drawBuffer];
+			context = new AwtGraphicsContext(offGfx);
 		}
 
-		BufferedImage bgImage = GameController.getBgImage();
+		Image bgImage = GameController.getBgImage();
 		switch (GameController.getGameState()) {
 			case INTRO:
 				TextScreen.setMode(TextScreen.Mode.INTRO);
 				TextScreen.update();
-				offGfx.drawImage(TextScreen.getScreen(), 0,0,null);
+				offGfx.drawImage(((AwtImage)TextScreen.getScreen()).getImage(), 0,0, this);
 				//offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x, LemmCursor.y, null);
 				break;
 			case BRIEFING:
 				TextScreen.setMode(TextScreen.Mode.BRIEFING);
 				TextScreen.update();
-				offGfx.drawImage(TextScreen.getScreen(), 0,0,null);
+				offGfx.drawImage(((AwtImage)TextScreen.getScreen()).getImage(), 0,0, this);
 				//offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x, LemmCursor.y, null);
 				break;
 			case DEBRIEFING:
 				TextScreen.setMode(TextScreen.Mode.DEBRIEFING);
 				TextScreen.update();
-				offGfx.drawImage(TextScreen.getScreen(), 0,0,null);
+				offGfx.drawImage(((AwtImage)TextScreen.getScreen()).getImage(), 0,0, this);
 				TextScreen.getDialog().handleMouseMove(xMouseScreen, yMouseScreen);
 				//offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x, LemmCursor.y, null);
 				break;
@@ -1189,17 +1194,17 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 						// clear screen
 						offGfx.setClip(0,0,w,h);
-						offGfx.setBackground(level.getBgColor());
+						offGfx.setBackground(new java.awt.Color(level.getBgColor().getARGB()));
 						offGfx.clearRect(0, 0, w, h);
 
 						// draw "behind" objects
-						GameController.getLevel().drawBehindObjects(offGfx, w, xOfsTemp);
+						GameController.getLevel().drawBehindObjects(context, w, xOfsTemp);
 
 						// draw background
-						offGfx.drawImage(bgImage, 0, 0, w, h, xOfsTemp, 0, xOfsTemp+w, h, this);
+						offGfx.drawImage(((AwtImage)bgImage).getImage(), 0, 0, w, h, xOfsTemp, 0, xOfsTemp+w, h, this);
 
 						// draw "in front" objects
-						GameController.getLevel().drawInFrontObjects(offGfx, w, xOfsTemp);
+						GameController.getLevel().drawInFrontObjects(context, w, xOfsTemp);
 					}
 					// clear parts of the screen for menu etc.
 					offGfx.setClip(0,Level.HEIGHT,w,this.getHeight());
@@ -1208,11 +1213,11 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 					// draw counter, icons, small level pic
 					// draw menu
 					//Icons icons = GameController.getIcons();
-					GameController.drawIcons(offGfx, 0, iconsY);
-					offGfx.drawImage(MiscGfx.getImage(MiscGfx.Index.BORDER), smallX-4, smallY-4, null);
-					MiniMap.draw(offGfx, smallX, smallY, xOfsTemp);
+					GameController.drawIcons(context, 0, iconsY);
+					offGfx.drawImage(((AwtImage)MiscGfx.getImage(MiscGfx.Index.BORDER)).getImage(), smallX-4, smallY-4, this);
+					MiniMap.draw(new AwtGraphicsContext(offGfx), smallX, smallY, xOfsTemp);
 					// draw counters
-					GameController.drawCounters(offGfx,counterY);
+					GameController.drawCounters(context,counterY);
 
 					// draw lemmings
 					offGfx.setClip(0,0,w,h);
@@ -1226,17 +1231,17 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 							int ly = l.screenY();
 							int mx = l.midX()-16;
 							if (lx+l.width() > xOfsTemp && lx < xOfsTemp+w) {
-								offGfx.drawImage(l.getImage(),lx-xOfsTemp,ly,null);
+								offGfx.drawImage(((AwtImage)l.getImage()).getImage(),lx-xOfsTemp,ly,this);
 								if (LemmCursor.doesCollide(l, xOfsTemp)) {
 									GameController.getLemmsUnderCursor().add(l);
 								}
-								BufferedImage cd = l.getCountdown();
+								Image cd = l.getCountdown();
 								if (cd!=null)
-									offGfx.drawImage(cd,mx-xOfsTemp,ly-cd.getHeight(),null);
+									offGfx.drawImage(((AwtImage)cd).getImage(),mx-xOfsTemp,ly-cd.getHeight(),this);
 
-								BufferedImage sel = l.getSelectImg();
+								Image sel = l.getSelectImg();
 								if (sel!=null)
-									offGfx.drawImage(sel,mx-xOfsTemp,ly-sel.getHeight(),null);
+									offGfx.drawImage(((AwtImage)sel).getImage(),mx-xOfsTemp,ly-sel.getHeight(),this);
 
 							}
 						}
@@ -1248,13 +1253,13 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 							int lx = l.screenX();
 							int ly = l.screenY();
 							// draw pixel in mini map
-							MiniMap.drawLemming(offGfx,  lx, ly);
+							MiniMap.drawLemming(context,  lx, ly);
 						}
 					}
 					Lemming lemmUnderCursor = GameController.lemmUnderCursor(LemmCursor.getType());
 					offGfx.setClip(0,0,w,h);
 					// draw explosions
-					GameController.drawExplosions(offGfx,offImage[0].getWidth(), Level.HEIGHT, xOfsTemp);
+					GameController.drawExplosions(context,offImage[0].getWidth(), Level.HEIGHT, xOfsTemp);
 					offGfx.setClip(0,0,w,this.getHeight());
 
 					// draw info string
@@ -1264,8 +1269,8 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 						if (stencil != null) {
 							int stencilVal = stencil.get(xMouse+yMouse*Level.WIDTH);
 							String test = "x: "+xMouse+", y: "+yMouse+", mask: "+(stencilVal&0xffff)+" "+Stencil.getObjectID(stencilVal);
-							LemmFont.strImage(outStrGfx, test);
-							offGfx.drawImage(outStrImg,4,Level.HEIGHT+8,null);
+							LemmFont.strImage(new AwtGraphicsContext(outStrGfx), test);
+							offGfx.drawImage(outStrImg,4,Level.HEIGHT+8,this);
 						}
 					} else {
 						StringBuffer sb = new StringBuffer();
@@ -1297,28 +1302,28 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 							sb.insert(0,n);
 						} else
 							sb.insert(0,"              ");
-						LemmFont.strImage(outStrGfx, sb.toString());
-						offGfx.drawImage(outStrImg,4,Level.HEIGHT+8,null);
+						LemmFont.strImage(new AwtGraphicsContext(outStrGfx), sb.toString());
+						offGfx.drawImage(outStrImg,4,Level.HEIGHT+8,this);
 					}
 					// replay icon
-					BufferedImage replayImage = GameController.getReplayImage();
+					Image replayImage = GameController.getReplayImage();
 					if (replayImage != null)
-						offGfx.drawImage(replayImage,this.getWidth()-2*replayImage.getWidth(),replayImage.getHeight(),null);
+						offGfx.drawImage(((AwtImage)replayImage).getImage(),this.getWidth()-2*replayImage.getWidth(),replayImage.getHeight(),this);
 					// draw cursor
 					if (lemmUnderCursor != null) {
 						int lx = lemmUnderCursor.midX()-xOfsTemp;
 						int ly = lemmUnderCursor.midY();
-						BufferedImage cursorImg = LemmCursor.getBoxImage();
+						Image cursorImg = LemmCursor.getBoxImage();
 						lx -= cursorImg.getWidth()/2;
 						ly -= cursorImg.getHeight()/2;
-						offGfx.drawImage(cursorImg,lx,ly,null);
+						offGfx.drawImage(((AwtImage)cursorImg).getImage(),lx,ly,this);
 					}
 					//offGfx.drawImage(LemmCursor.getImage(0), LemmCursor.x, LemmCursor.y, null);
 				}
 		}
 
 		// fader
-		GameController.fade(offGfx);
+		GameController.fade(new AwtGraphicsContext(offGfx));
 		// and all onto screen
 		activeBuffer = drawBuffer;
 

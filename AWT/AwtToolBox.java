@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Transparency;
@@ -20,7 +19,9 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import Graphics.GraphicsContext;
 import Graphics.GraphicsOperation;
+import Graphics.Image;
 import Tools.Cursor;
 import Tools.JFileFilter;
 import Tools.ToolBox;
@@ -67,8 +68,8 @@ public class AwtToolBox implements ToolBox {
 	 * @param height
 	 * @return the cursor
 	 */
-	public Cursor createCursor(BufferedImage image, int width, int height) {
-		return new AwtCursor(Toolkit.getDefaultToolkit().createCustomCursor(image, new Point(width, height), ""));
+	public Cursor createCursor(Image image, int width, int height) {
+		return new AwtCursor(Toolkit.getDefaultToolkit().createCustomCursor(((AwtImage)image).getImage(), new Point(width, height), ""));
 	}
 
 	/**
@@ -90,8 +91,8 @@ public class AwtToolBox implements ToolBox {
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
 	 */
-	public BufferedImage createBitmaskImage(final int width, final int height) {
-		return createImage(width, height, Transparency.BITMASK);
+	public AwtImage createBitmaskImage(final int width, final int height) {
+		return new AwtImage(createImage(width, height, Transparency.BITMASK));
 	}
 
 	/**
@@ -101,8 +102,8 @@ public class AwtToolBox implements ToolBox {
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
 	 */
-	public BufferedImage createOpaqueImage(final int width, final int height) {
-		return createImage(width, height, Transparency.OPAQUE);
+	public AwtImage createOpaqueImage(final int width, final int height) {
+		return new AwtImage(createImage(width, height, Transparency.OPAQUE));
 	}
 
 	/**
@@ -112,8 +113,8 @@ public class AwtToolBox implements ToolBox {
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
 	 */
-	public BufferedImage createTranslucentImage(final int width, final int height) {
-		return createImage(width, height, Transparency.TRANSLUCENT);
+	public AwtImage createTranslucentImage(final int width, final int height) {
+		return new AwtImage(createImage(width, height, Transparency.TRANSLUCENT));
 	}
 
 	/**
@@ -121,12 +122,12 @@ public class AwtToolBox implements ToolBox {
 	 * @param img existing {@link java.awt.Image}
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
-	 */	public BufferedImage ImageToBuffered(final Image img, final int transparency) {
+	 */	public Image ImageToBuffered(final java.awt.Image img, final int transparency) {
 		 BufferedImage bImg = createImage(img.getWidth(null), img.getHeight(null), transparency);
 		 Graphics2D g = bImg.createGraphics();
 		 g.drawImage(img, 0, 0, null);
 		 g.dispose();
-		 return bImg;
+		 return new AwtImage(bImg);
 	 }
 
 	 /**
@@ -136,7 +137,7 @@ public class AwtToolBox implements ToolBox {
 	  * @param transparency {@link java.awt.Transparency}
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames) {
+	 public Image[] getAnimation(final Image img, final int frames) {
 		 return getAnimation(img, frames, img.getWidth());
 	 }
 
@@ -148,8 +149,8 @@ public class AwtToolBox implements ToolBox {
 	  * @param width image width
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int width) {
-		 return getAnimation(img, frames, img.getColorModel().getTransparency(), width);
+	 public Image[] getAnimation(final Image img, final int frames, final int width) {
+		 return getAnimation(img, frames, ((AwtImage)img).getImage().getColorModel().getTransparency(), width);
 	 }
 
 	 /**
@@ -160,19 +161,19 @@ public class AwtToolBox implements ToolBox {
 	  * @param width image width
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int transparency, final int width) {
-		 int height = img.getHeight(null)/frames;
+	 public Image[] getAnimation(final Image img, final int frames, final int transparency, final int width) {
+		 int height = img.getHeight()/frames;
 		 // characters stored one above the other - now separate them into single images
-		 ArrayList<BufferedImage> arrImg = new ArrayList<BufferedImage>(frames);
+		 ArrayList<Image> arrImg = new ArrayList<Image>(frames);
 		 int y0 = 0;
 		 for (int i=0; i<frames; i++, y0+=height) {
-			 BufferedImage frame = createImage(width, height, transparency);
-			 Graphics2D g = frame.createGraphics();
-			 g.drawImage(img, 0, 0, width, height, 0, y0, width, y0+height, null);
+			 Image frame = new AwtImage(createImage(width, height, transparency));
+			 GraphicsContext g = frame.createGraphicsContext();
+			 g.drawImage(img, 0, 0, width, height, 0, y0, width, y0+height);
 			 arrImg.add(frame);
 			 g.dispose();
 		 }
-		 BufferedImage images[] = new BufferedImage[arrImg.size()];
+		 Image images[] = new Image[arrImg.size()];
 		 return arrImg.toArray(images);
 	 }
 
@@ -181,13 +182,13 @@ public class AwtToolBox implements ToolBox {
 	  * @param img image to flip
 	  * @return flipped image
 	  */
-	 public BufferedImage flipImageX(final BufferedImage img) {
-		 BufferedImage trg = createImage(img.getWidth(), img.getHeight(), img.getColorModel().getTransparency());
+	 public Image flipImageX(final Image img) {
+		 BufferedImage trg = createImage(img.getWidth(), img.getHeight(), ((AwtImage)img).getImage().getColorModel().getTransparency());
 		 // affine transform for flipping
 		 AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
 		 tx.translate(-img.getWidth(), 0);
 		 AffineTransformOp op = new AffineTransformOp(tx,AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-		 return op.filter(img, trg);
+		 return new AwtImage(op.filter(((AwtImage)img).getImage(), trg));
 	 }
 
 	 /**

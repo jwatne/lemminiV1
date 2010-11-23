@@ -33,28 +33,13 @@ public class AwtGraphicsContext implements GraphicsContext {
 	}
 	
 	@Override
+	public void setClip(int x, int y, int width, int height) {
+		graphics.setClip(x, y, width, height);
+	}
+	
+	@Override
 	public void clearRect(int x, int y, int width, int height) {
 		graphics.clearRect(x, y, width, height);
-	}
-
-	@Override
-	public void dispose() {
-		graphics.dispose();
-	}
-
-	@Override
-	public void drawImage(Image image, int x, int y) {
-		graphics.drawImage(((AwtImage)image).getImage(), x, y, null);
-	}
-
-	@Override
-	public void drawImage(Image image, int x, int y, int width, int height) {
-		graphics.drawImage(((AwtImage)image).getImage(), x, y, width, height, null);
-	}
-
-	@Override
-	public void drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2) {
-		graphics.drawImage(((AwtImage)image).getImage(), dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
 	}
 
 	@Override
@@ -73,17 +58,27 @@ public class AwtGraphicsContext implements GraphicsContext {
 	}
 
 	@Override
-	public void setClip(int x, int y, int width, int height) {
-		graphics.setClip(x, y, width, height);
-	}
-
-	@Override
 	public void setColor(Color color) {
 		graphics.setColor(new java.awt.Color(color.getARGB(), true));
 	}
 
+	@Override
+	public void drawImage(Image image, int x, int y) {
+		graphics.drawImage(AwtToolBox.INSTANCE.get().getBufferedImage(image), x, y, null);
+	}
+
+	@Override
+	public void drawImage(Image image, int x, int y, int width, int height) {
+		graphics.drawImage(AwtToolBox.INSTANCE.get().getBufferedImage(image), x, y, width, height, null);
+	}
+
+	@Override
+	public void drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2) {
+		graphics.drawImage(AwtToolBox.INSTANCE.get().getBufferedImage(image), dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
+	}
+
 	public void grabPixels(Image image, int x, int y, int w, int h, int[] pix, int off, int scansize) {
-		PixelGrabber pixelgrabber = new PixelGrabber(((AwtImage)image).getImage(), x, y, w, h, pix, off, scansize);
+		PixelGrabber pixelgrabber = new PixelGrabber(AwtToolBox.INSTANCE.get().getBufferedImage(image), x, y, w, h, pix, off, scansize);
 		try {
 			pixelgrabber.grabPixels();
 		} catch (InterruptedException interruptedexception) {}
@@ -91,7 +86,12 @@ public class AwtGraphicsContext implements GraphicsContext {
 
 	@Override
 	public void copy(Image source, Image target) {
-		WritableRaster rImgSpr = ((AwtImage)target).getImage().getRaster();
-		rImgSpr.setRect(((AwtImage)source).getImage().getRaster()); // just copy
+		WritableRaster rImgSpr = AwtToolBox.INSTANCE.get().getBufferedImage(target).getRaster();
+		rImgSpr.setRect(AwtToolBox.INSTANCE.get().getBufferedImage(source).getRaster()); // just copy
+	}
+
+	@Override
+	public void dispose() {
+		graphics.dispose();
 	}
 }

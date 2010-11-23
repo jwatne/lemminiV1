@@ -80,7 +80,7 @@ public class TextScreen {
 	/** TextDialog used as base component */
 	private static TextDialog textScreen;
 	/** factor used for the rotation animation */
-	private static double rotFact = 1.0;
+	private static float rotFact = 1.0f;
 	/** delta used for the rotation animation */
 	private static double rotDelta;
 	/** source image for rotation animation */
@@ -249,7 +249,7 @@ public class TextScreen {
 	 * @param height height in pixels
 	 */
 	public static void init(final int width, final int height) {
-		rotFact = 1.0;
+		rotFact = 1.0f;
 		rotDelta = -0.1;
 		imgSrc = MiscGfx.getImage(MiscGfx.Index.LEMMINI);
 		at = ToolBox.INSTANCE.get().createGraphicsOperation();
@@ -300,12 +300,12 @@ public class TextScreen {
 			rotFact += rotDelta;
 			if (rotFact <= 0.0) {
 				// minimum size reached -> flip and increase again
-				rotFact = 0.1;
+				rotFact = 0.1f;
 				rotDelta = -rotDelta;
 				flip = !flip;
 			} else if (rotFact > 1.0) {
 				// maximum size reached -> decrease again
-				rotFact = 1.0;
+				rotFact = 1.0f;
 				rotDelta = -rotDelta;
 				// reset only after two rounds (flipped back)
 				if (++flipCtr > 1)

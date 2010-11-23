@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import Extract.Extract;
 import Extract.ExtractException;
 import GUI.LegalDialog;
+import Game.AbstractCore;
 import Game.Core;
 import Game.GameController;
 import Game.LemmException;
@@ -45,7 +46,7 @@ import Tools.ToolBox;
  * Would need some cleaning up, maybe remove the whole thing?
  * @author Volker Oth
  */
-public class AwtCore implements Core {
+public class AwtCore extends AbstractCore implements Core {
 	
 	public static final Instance INSTANCE = new Instance();
 	/** The revision string for resource compatibility - not necessarily the version number */
@@ -57,24 +58,8 @@ public class AwtCore implements Core {
 	/** extensions accepted for replay files in file dialog */
 	public final static String[] REPLAY_EXTENSIONS = {"rpl"};
 
-	/** program properties */
-	private Props programProps;
-	/** path of (extracted) resources */
-	private String resourcePath;
-	/** current player */
-	public Player player;
-
 	/** parent component (main frame) */
 	private JFrame cmp;
-	/** name of program properties file */
-	private String programPropsFileStr;
-	/** name of player properties file */
-	private String playerPropsFileStr;
-	/** player properties */
-	private Props playerProps;
-	/** list of all players */
-	private ArrayList<String> players;
-
 	/**
 	 * Initialize some core elements.
 	 * @param frame parent frame
@@ -179,39 +164,12 @@ public class AwtCore implements Core {
 		return cmp;
 	}
 	
-	public Props getProgramProps() {
-		return programProps;
-	}
-
 	public int getWidth() {
 		return cmp.getWidth();
 	}
 
-	public String getResourcePath() {
-		return resourcePath;
-	}
-
-	/**
-	 * Get String to resource in resource path.
-	 * @param fname file name (without path)
-	 * @return absolute path to resource
-	 */
-	public String findResource(final String fname) {
-		return resourcePath+fname;
-	}
-	
 	public void setTitle(String title) {
 		cmp.setTitle(title);
-	}
-
-	/**
-	 * Store program properties.
-	 */
-	public void saveProgramProps() {
-		programProps.save(programPropsFileStr);
-		playerProps.set("defaultPlayer", player.getName());
-		playerProps.save(playerPropsFileStr);
-		player.store();
 	}
 
 	/**
@@ -320,42 +278,6 @@ public class AwtCore implements Core {
 		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImageJar(fname), Transparency.TRANSLUCENT);
 	}
 	
-	/**
-	 * Get player name via index.
-	 * @param idx player index
-	 * @return player name
-	 */
-	public String getPlayer(final int idx) {
-		return players.get(idx);
-	}
-
-	/**
-	 * Get number of players.
-	 * @return number of player.
-	 */
-	public int getPlayerNum() {
-		if (players == null)
-			return 0;
-		return players.size();
-	}
-
-	/**
-	 * Reset list of players.
-	 */
-	public void clearPlayers() {
-		players.clear();
-		playerProps.clear();
-	}
-
-	/**
-	 * Add player.
-	 * @param name player name
-	 */
-	public void addPlayer(final String name) {
-		players.add(name);
-		playerProps.set("player_"+(players.size()-1), name);
-	}
-
 	public static class Instance {
 		
 		private AwtCore core;

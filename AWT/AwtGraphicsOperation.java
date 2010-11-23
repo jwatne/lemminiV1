@@ -27,19 +27,19 @@ public class AwtGraphicsOperation implements GraphicsOperation {
 	private AffineTransform affineTransform = new AffineTransform();
 
 	@Override
-	public void setScale(double sx, double sy) {
+	public void setScale(float sx, float sy) {
 		affineTransform.setToScale(sx, sy);
 	}
 
 	@Override
-	public void translate(double tx, double ty) {
+	public void translate(float tx, float ty) {
 		affineTransform.translate(tx, ty);
 	}
 
 	@Override
 	public void execute(Image source, Image destination) {
 		AffineTransformOp op = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-		op.filter(((AwtImage)source).getImage(), ((AwtImage)destination).getImage());
+		op.filter(AwtToolBox.INSTANCE.get().getBufferedImage(source), AwtToolBox.INSTANCE.get().getBufferedImage(destination));
 	}
 
 }

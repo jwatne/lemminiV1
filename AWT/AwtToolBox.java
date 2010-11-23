@@ -8,12 +8,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Transparency;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.net.URL;
 import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
@@ -22,6 +18,7 @@ import javax.swing.JOptionPane;
 import Graphics.GraphicsContext;
 import Graphics.GraphicsOperation;
 import Graphics.Image;
+import Tools.AbstractToolBox;
 import Tools.Cursor;
 import Tools.JFileFilter;
 import Tools.ToolBox;
@@ -47,7 +44,7 @@ import Tools.ToolBox;
  *
  * @author Volker Oth
  */
-public class AwtToolBox implements ToolBox {
+public class AwtToolBox extends AbstractToolBox implements ToolBox {
 
 	public static Instance INSTANCE = new Instance(); 
 	
@@ -69,7 +66,7 @@ public class AwtToolBox implements ToolBox {
 	 * @return the cursor
 	 */
 	public Cursor createCursor(Image image, int width, int height) {
-		return new AwtCursor(Toolkit.getDefaultToolkit().createCustomCursor(((AwtImage)image).getImage(), new Point(width, height), ""));
+		return new AwtCursor(Toolkit.getDefaultToolkit().createCustomCursor(getBufferedImage(image), new Point(width, height), ""));
 	}
 
 	/**
@@ -135,22 +132,11 @@ public class AwtToolBox implements ToolBox {
 	  * @param img image containing all the frames one above each other
 	  * @param frames number of frames
 	  * @param transparency {@link java.awt.Transparency}
-	  * @return an array of buffered images which contain an animation
-	  */
-	 public Image[] getAnimation(final Image img, final int frames) {
-		 return getAnimation(img, frames, img.getWidth());
-	 }
-
-	 /**
-	  * Return an array of buffered images which contain an animation.
-	  * @param img image containing all the frames one above each other
-	  * @param frames number of frames
-	  * @param transparency {@link java.awt.Transparency}
 	  * @param width image width
 	  * @return an array of buffered images which contain an animation
 	  */
 	 public Image[] getAnimation(final Image img, final int frames, final int width) {
-		 return getAnimation(img, frames, ((AwtImage)img).getImage().getColorModel().getTransparency(), width);
+		 return getAnimation(img, frames, AwtToolBox.INSTANCE.get().getBufferedImage(img).getColorModel().getTransparency(), width);
 	 }
 
 	 /**
@@ -175,125 +161,6 @@ public class AwtToolBox implements ToolBox {
 		 }
 		 Image images[] = new Image[arrImg.size()];
 		 return arrImg.toArray(images);
-	 }
-
-	 /**
-	  * Flip image in X direction.
-	  * @param img image to flip
-	  * @return flipped image
-	  */
-	 public Image flipImageX(final Image img) {
-		 BufferedImage trg = createImage(img.getWidth(), img.getHeight(), ((AwtImage)img).getImage().getColorModel().getTransparency());
-		 // affine transform for flipping
-		 AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-		 tx.translate(-img.getWidth(), 0);
-		 AffineTransformOp op = new AffineTransformOp(tx,AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-		 return new AwtImage(op.filter(((AwtImage)img).getImage(), trg));
-	 }
-
-	 /**
-	  * Use the Loader to find a file.
-	  * @param fname file name
-	  * @return URL of the file
-	  */
-	 public URL findFile(final String fname) {
-		 ClassLoader loader = AwtToolBox.class.getClassLoader();
-		 return loader.getResource(fname);
-	 }
-
-	 /**
-	  * Add (system default) path separator to string (if there isn't one already).
-	  * @param fName String containing path name
-	  * @return String that ends with the (system default) path separator for sure
-	  */
-	 public String addSeparator(final String fName) {
-		 int pos = fName.lastIndexOf(File.separator);
-		 if (pos != fName.length()-1)
-			 pos = fName.lastIndexOf("/");
-		 if (pos != fName.length()-1)
-			 return fName + "/";
-		 else return fName;
-	 }
-
-	 /**
-	  * Exchange any DOS style path separator ("\") with a Unix style separator ("/").
-	  * @param fName String containing file/path name
-	  * @return String with only Unix style path separators
-	  */
-	 public String exchangeSeparators(final String fName) {
-		 int pos;
-		 StringBuffer sb = new StringBuffer(fName);
-		 while ( (pos = sb.indexOf("\\")) != -1 )
-			 sb.setCharAt(pos,'/');
-		 return sb.toString();
-	 }
-
-	 /**
-	  * Return file name from path.
-	  * @param path String of a path with a file name
-	  * @return String containing only the file name
-	  */
-	 public String getFileName(final String path) {
-		 int p1 = path.lastIndexOf("/");
-		 int p2 = path.lastIndexOf("\\");
-		 if (p2 > p1)
-			 p1 = p2;
-		 if (p1 < 0)
-			 p1 = 0;
-		 else
-			 p1++;
-		 return path.substring(p1);
-	 }
-
-	 /**
-	  * Returns the extension (".XXX") of a filename without the dot.
-	  * @param path String containing file name
-	  * @return String containing only the extension (without the dot) or null (if no extension found)
-	  */
-	 public String getExtension(final String path) {
-		 int p1 = path.lastIndexOf("/");
-		 int p2 = path.lastIndexOf("\\");
-		 int p = path.lastIndexOf(".");
-		 if (p==-1 || p<p1 || p<p2)
-			 return null;
-		 return path.substring(p+1);
-	 }
-
-
-	 /**
-	  * Returns the first few bytes of a file to check its type.
-	  * @param fname Filename of the file
-	  * @param num Number of bytes to return
-	  * @return Array of bytes (size num) from the beginning of the file
-	  */
-	 public byte[] getFileID(final String fname, final int num) {
-		 byte buf[] = new byte[num];
-		 File f = new File(fname);
-		 if (f.length() < num)
-			 return null;
-		 try {
-			 FileInputStream fi = new FileInputStream(fname);
-			 fi.read(buf);
-			 fi.close();
-		 } catch (Exception ex) {
-			 return null;
-		 }
-		 return buf;
-	 }
-
-	 /**
-	  * Get path name from absolute file name.
-	  * @param path absolute file name
-	  * @return path name without the separator
-	  */
-	 public String getPathName(final String path) {
-		 int p1 = path.lastIndexOf("/");
-		 int p2 = path.lastIndexOf("\\");
-		 if (p2 > p1)
-			 p1 = p2;
-		 if (p1 < 0)
-			 p1 = 0;
-		 return path.substring(0,p1);
 	 }
 
 	 /**
@@ -344,6 +211,13 @@ public class AwtToolBox implements ToolBox {
 				 return f.getAbsolutePath();
 		 }
 		 return null;
+	 }
+	 
+	 public BufferedImage getBufferedImage(Image image) {
+		 if (!(image instanceof AwtImage)) {
+			 throw new IllegalArgumentException("image must be of type " + AwtImage.class.getName());
+		 }
+		 return ((AwtImage)image).getImage();
 	 }
 
 	 public static class Instance {

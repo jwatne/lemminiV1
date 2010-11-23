@@ -19,9 +19,9 @@ package Graphics;
 
 public interface GraphicsOperation {
 
-	void setScale(double sx, double sy);
+	void setScale(float sx, float sy);
 
-	void translate(double tx, double ty);
+	void translate(float tx, float ty);
 	
 	void execute(Image sourc, Image destination);
 

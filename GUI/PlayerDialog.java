@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import AWT.AwtCore;
 import Game.Core;
 
 /*
@@ -197,7 +198,7 @@ public class PlayerDialog extends JDialog {
 			jButtonNew.addActionListener(new java.awt.event.ActionListener() {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					String player = JOptionPane.showInputDialog(
-							Core.INSTANCE.get().getCmp(), "Enter Player Name", "Input", JOptionPane.QUESTION_MESSAGE);
+							AwtCore.INSTANCE.get().getCmp(), "Enter Player Name", "Input", JOptionPane.QUESTION_MESSAGE);
 					if (player != null) {
 						// check if this player already exists
 						// it it alread exists, reset the existing profile

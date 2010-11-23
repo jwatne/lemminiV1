@@ -1,9 +1,5 @@
 package Game;
-import java.awt.Component;
-import java.awt.MediaTracker;
 import java.awt.image.BufferedImage;
-
-import javax.swing.JFrame;
 
 import Tools.Props;
 
@@ -37,25 +33,16 @@ public interface Core {
 	public final static String[] REPLAY_EXTENSIONS = {"rpl"};
 
 	/**
-	 * Initialize some core elements.
-	 * @param frame parent frame
-	 * @param isWebstartApp true if this was started via Webstart, false otherwise
-	 * @throws LemmException
-	 */
-	public void init(final JFrame frame, final boolean isWebstartApp) throws LemmException;
-
-	/**
-	 * Get parent component (main frame).
-	 * @return parent component
-	 */
-	public Component getCmp();
-	
-	/**
 	 * Returns the program properties.
 	 * @return the program properties
 	 */
 	public Props getProgramProps();
 
+	/**
+	 * Returns the width of the game
+	 */
+	public int getWidth();
+	
 	/**
 	 * Returns the resource path.
 	 * @return the resource path
@@ -70,6 +57,11 @@ public interface Core {
 	public String findResource(final String fname);
 
 	/**
+	 * Set the title
+	 */
+	public void setTitle(String title);
+	
+	/**
 	 * Store program properties.
 	 */
 	public void saveProgramProps();
@@ -79,15 +71,6 @@ public interface Core {
 	 * @param rsrc name missing of resource.
 	 */
 	public void resourceError(final String rsrc);
-
-	/**
-	 * Load an image from the resource path.
-	 * @param tracker media tracker
-	 * @param fName file name
-	 * @return Image
-	 * @throws ResourceException
-	 */
-	public BufferedImage loadBitmaskImage(final MediaTracker tracker, final String fName) throws ResourceException;
 
 	/**
 	 * Load an image from the resource path.

@@ -47,6 +47,8 @@ import Tools.ToolBox;
  * @author Volker Oth
  */
 public class AwtCore implements Core {
+	
+	public static final Instance INSTANCE = new Instance();
 	/** The revision string for resource compatibility - not necessarily the version number */
 	private final static String REVISION = "0.80";
 	/** name of the ini file */
@@ -64,7 +66,7 @@ public class AwtCore implements Core {
 	public Player player;
 
 	/** parent component (main frame) */
-	private Component cmp;
+	private JFrame cmp;
 	/** name of program properties file */
 	private String programPropsFileStr;
 	/** name of player properties file */
@@ -181,7 +183,11 @@ public class AwtCore implements Core {
 	public Props getProgramProps() {
 		return programProps;
 	}
-	
+
+	public int getWidth() {
+		return cmp.getWidth();
+	}
+
 	public String getResourcePath() {
 		return resourcePath;
 	}
@@ -193,6 +199,10 @@ public class AwtCore implements Core {
 	 */
 	public String findResource(final String fname) {
 		return resourcePath+fname;
+	}
+	
+	public void setTitle(String title) {
+		cmp.setTitle(title);
 	}
 
 	/**
@@ -226,7 +236,7 @@ public class AwtCore implements Core {
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	public BufferedImage loadBitmaskImage(final MediaTracker tracker, final String fName) throws ResourceException {
+	private BufferedImage loadBitmaskImage(final MediaTracker tracker, final String fName) throws ResourceException {
 		String fileLoc = findResource(fName);
 		if (fileLoc == null)
 			return null;
@@ -270,7 +280,7 @@ public class AwtCore implements Core {
 	 * @throws ResourceException
 	 */
 	public BufferedImage loadImage(final String fname) throws ResourceException {
-		MediaTracker tracker = new MediaTracker(Core.INSTANCE.get().getCmp());
+		MediaTracker tracker = new MediaTracker(getCmp());
 		Image img = loadBitmaskImage(tracker, fname);
 		if (img == null)
 			throw new ResourceException(fname);
@@ -292,7 +302,7 @@ public class AwtCore implements Core {
 	 * @throws ResourceException
 	 */
 	public Image loadImageJar(final String fname) throws ResourceException {
-		MediaTracker tracker = new MediaTracker(Core.INSTANCE.get().getCmp());
+		MediaTracker tracker = new MediaTracker(getCmp());
 		Image img = loadImage(tracker, fname, true);
 		if (img == null)
 			throw new ResourceException(fname);
@@ -341,5 +351,23 @@ public class AwtCore implements Core {
 	public void addPlayer(final String name) {
 		players.add(name);
 		playerProps.set("player_"+(players.size()-1), name);
+	}
+
+	public static class Instance {
+		
+		private AwtCore core;
+		
+		private Instance() {
+			//prevent instantiation
+		}
+		
+		public AwtCore get() {
+			return core;
+		}
+		
+		public void set(AwtCore core) {
+			this.core = core;
+			Core.INSTANCE.set(core);
+		}
 	}
 }

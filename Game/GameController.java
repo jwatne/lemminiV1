@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import GameUtil.Fader;
@@ -293,9 +292,9 @@ public class GameController {
 		gameState = State.INIT;
 		sound = new Sound(24,SND_MOUSEPRE);
 		sound.setGain(soundGain);
-		Icons.init(Core.INSTANCE.get().getCmp());
+		Icons.init();
 		Explosion.init();
-		Lemming.loadLemmings(Core.INSTANCE.get().getCmp());
+		Lemming.loadLemmings();
 		lemmings = new LinkedList<Lemming>();
 		explosions = new LinkedList<Explosion>();
 		lemmsUnderCursor = new ArrayList<Lemming>(10);
@@ -481,7 +480,7 @@ public class GameController {
 		bgGfx.setBackground(blankColor);
 		bgGfx.clearRect(0, 0, bgImage.getWidth(), bgImage.getHeight());
 
-		stencil = getLevel().paintLevel(bgImage, Core.INSTANCE.get().getCmp(), stencil);
+		stencil = getLevel().paintLevel(bgImage, stencil);
 
 		lemmings.clear();
 		explosions.clear();
@@ -575,7 +574,7 @@ public class GameController {
 
 		String lvlPath = levelPack[curLevelPack].getInfo(curDiffLevel, curLevelNumber).getFileName();
 		// lemmings need to be reloaded to contain pink color
-		Lemming.loadLemmings(Core.INSTANCE.get().getCmp());
+		Lemming.loadLemmings();
 		// loading the level will patch pink lemmings pixels to correct color
 		getLevel().loadLevel(lvlPath);
 
@@ -1191,7 +1190,7 @@ public class GameController {
 				case LOAD_REPLAY:
 					try {
 						changeLevel(nextLevelPack, nextDiffLevel, nextLevelNumber, transitionState == TransitionState.LOAD_REPLAY);
-						((JFrame)Core.INSTANCE.get().getCmp()).setTitle("Lemmini - "+getLevel().getLevelName());
+						Core.INSTANCE.get().setTitle("Lemmini - "+getLevel().getLevelName());
 					} catch (ResourceException ex) {
 						Core.INSTANCE.get().resourceError(ex.getMessage());
 					} catch (LemmException ex) {

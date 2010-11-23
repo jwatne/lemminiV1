@@ -149,8 +149,8 @@ public class Lemmini extends JFrame implements KeyListener {
 		core = new AwtCore();
 		try {
 			AwtToolBox.INSTANCE.set(new AwtToolBox());
-			Core.INSTANCE.set(core);
-			Core.INSTANCE.get().init(this,isWebstartApp);      // initialize Core object
+			AwtCore.INSTANCE.set(core);
+			core.init(this,isWebstartApp);      // initialize Core object
 			GameController.init();
 			GameController.setLevelMenuUpdateListener(new LevelMenuUpdateListener());
 		} catch (ResourceException ex) {
@@ -209,7 +209,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		jMenuItemManagePlayer.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				core.player.store(); // save player in case it is changed
-				PlayerDialog d = new PlayerDialog((JFrame)Core.INSTANCE.get().getCmp(), true);
+				PlayerDialog d = new PlayerDialog((JFrame)core.getCmp(), true);
 				d.setVisible(true);
 				// blocked until dialog returns
 				List<String> players = d.getPlayers();
@@ -320,7 +320,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		jMenuItemLoad.setText("Load Level");
 		jMenuItemLoad.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				String p = ToolBox.INSTANCE.get().getFileName(thisFrame,lvlPath,Core.LEVEL_EXTENSIONS,true);
+				String p = AwtToolBox.INSTANCE.get().getFileName(thisFrame,lvlPath,Core.LEVEL_EXTENSIONS,true);
 				if (p != null) {
 					try {
 						if (ToolBox.INSTANCE.get().getExtension(p).equalsIgnoreCase("lvl")) {
@@ -338,7 +338,7 @@ public class Lemmini extends JFrame implements KeyListener {
 								return;
 							}
 						}
-						JOptionPane.showMessageDialog(Core.INSTANCE.get().getCmp(), "Wrong format!", "Loading level failed", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(core.getCmp(), "Wrong format!", "Loading level failed", JOptionPane.INFORMATION_MESSAGE);
 					} catch (Exception ex) {
 						ToolBox.INSTANCE.get().showException(ex);
 					}
@@ -351,7 +351,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		jMenuItemReplay.setText("Load Replay");
 		jMenuItemReplay.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				String replayPath = ToolBox.INSTANCE.get().getFileName(thisFrame,Core.INSTANCE.get().getResourcePath(),Core.REPLAY_EXTENSIONS,true);
+				String replayPath = AwtToolBox.INSTANCE.get().getFileName(thisFrame,Core.INSTANCE.get().getResourcePath(),Core.REPLAY_EXTENSIONS,true);
 				if (replayPath != null) {
 					try {
 						if (ToolBox.INSTANCE.get().getExtension(replayPath).equalsIgnoreCase("rpl")) {
@@ -368,7 +368,7 @@ public class Lemmini extends JFrame implements KeyListener {
 							}
 						}
 						// else: no success
-						JOptionPane.showMessageDialog(Core.INSTANCE.get().getCmp(), "Wrong format!", "Loading replay failed", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(core.getCmp(), "Wrong format!", "Loading replay failed", JOptionPane.INFORMATION_MESSAGE);
 					} catch (Exception ex) {
 						ToolBox.INSTANCE.get().showException(ex);
 					}
@@ -380,7 +380,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		jMenuItemLevelCode = new JMenuItem("Enter Level Code");
 		jMenuItemLevelCode.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				LevelCodeDialog lcd = new LevelCodeDialog((JFrame)Core.INSTANCE.get().getCmp(), true);
+				LevelCodeDialog lcd = new LevelCodeDialog((JFrame)core.getCmp(), true);
 				lcd.setVisible(true);
 				String levelCode = lcd.getCode();
 				int lvlPack = lcd.getLevelPack();
@@ -389,7 +389,7 @@ public class Lemmini extends JFrame implements KeyListener {
 					levelCode = levelCode.trim();
 					// cheat mode
 					if (levelCode.equals("0xdeadbeef")) {
-						JOptionPane.showMessageDialog(Core.INSTANCE.get().getCmp(), "All levels and debug mode enabled", "Cheater!", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(core.getCmp(), "All levels and debug mode enabled", "Cheater!", JOptionPane.INFORMATION_MESSAGE);
 						core.player.enableCheatMode();
 						updateLevelMenus();
 						return;
@@ -411,7 +411,7 @@ public class Lemmini extends JFrame implements KeyListener {
 					}
 				}
 				// not found
-				JOptionPane.showMessageDialog(Core.INSTANCE.get().getCmp(), "Invalid Level Code", "Error", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(core.getCmp(), "Invalid Level Code", "Error", JOptionPane.WARNING_MESSAGE);
 			}
 		});
 
@@ -498,7 +498,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		jMenuItemVolume = new JMenuItem("Volume Control");
 		jMenuItemVolume.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				GainDialog v = new GainDialog((JFrame)Core.INSTANCE.get().getCmp(), true);
+				GainDialog v = new GainDialog((JFrame)core.getCmp(), true);
 				v.setVisible(true);
 			}
 		});
@@ -1445,13 +1445,13 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 					case TextScreen.BUTTON_MENU:
 						GameController.setTransition(GameController.TransitionState.TO_INTRO);
 						Fader.setState(Fader.State.OUT);
-						((JFrame)Core.INSTANCE.get().getCmp()).setTitle("Lemmini");
+						Core.INSTANCE.get().setTitle("Lemmini");
 						break;
 					case TextScreen.BUTTON_REPLAY:
 						GameController.requestRestartLevel(true);
 						break;
 					case TextScreen.BUTTON_SAVEREPLAY:
-						String replayPath = ToolBox.INSTANCE.get().getFileName(Lemmini.thisFrame,Core.INSTANCE.get().getResourcePath(),Core.REPLAY_EXTENSIONS,false);
+						String replayPath = AwtToolBox.INSTANCE.get().getFileName(Lemmini.thisFrame,Core.INSTANCE.get().getResourcePath(),Core.REPLAY_EXTENSIONS,false);
 						if (replayPath != null) {
 							try {
 								String ext = ToolBox.INSTANCE.get().getExtension(replayPath);
@@ -1460,7 +1460,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 								if (GameController.saveReplay(replayPath))
 									return;
 								// else: no success
-								JOptionPane.showMessageDialog(Core.INSTANCE.get().getCmp(), "Error!", "Saving replay failed", JOptionPane.INFORMATION_MESSAGE);
+								JOptionPane.showMessageDialog(AwtCore.INSTANCE.get().getCmp(), "Error!", "Saving replay failed", JOptionPane.INFORMATION_MESSAGE);
 							} catch (Exception ex) {
 								ToolBox.INSTANCE.get().showException(ex);
 							}

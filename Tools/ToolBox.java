@@ -1,7 +1,6 @@
 package Tools;
 
 
-import java.awt.Component;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
@@ -120,16 +119,6 @@ public interface ToolBox {
 	  * @param ex exception
 	  */
 	 public void showException(final Throwable ex);
-
-	 /**
-	  * Open file dialog.
-	  * @param parent parent frame
-	  * @param path default file name
-	  * @param ext array of allowed extensions
-	  * @param load true: load, false: save
-	  * @return absolute file name of selected file or null
-	  */
-	 public String getFileName(final Component parent, final String path, final String ext[], final boolean load);
 
 	 public static class Instance {
 		 

@@ -1,9 +1,7 @@
 package Game;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.MediaTracker;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -220,8 +218,8 @@ public class Level {
 				throw new LemmException("Style "+strStyle+ " not existing.");
 		}
 		// load blockset
-		tiles = loadTileSet(strStyle, Core.INSTANCE.get().getCmp());
-		sprObjAvailable = loadObjects(strStyle, Core.INSTANCE.get().getCmp());
+		tiles = loadTileSet(strStyle);
+		sprObjAvailable = loadObjects(strStyle);
 		ready = true;
 	}
 
@@ -232,7 +230,7 @@ public class Level {
 	 * @param s stencil to reuse
 	 * @return stencil of this level
 	 */
-	Stencil paintLevel(final BufferedImage bgImage, final Component cmp, final Stencil s) {
+	Stencil paintLevel(final BufferedImage bgImage, final Stencil s) {
 		// flush all resources
 		sprObjFront = null;
 		sprObjBehind = null;
@@ -517,18 +515,14 @@ public class Level {
 	 * @return array of images where each image contains one tile
 	 * @throws ResourceException
 	 */
-	private BufferedImage[] loadTileSet(final String set, final Component cmp) throws ResourceException {
+	private BufferedImage[] loadTileSet(final String set) throws ResourceException {
 		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>(64);
-		MediaTracker tracker = new MediaTracker(cmp);
 		int tiles = props.get("tiles", 64);
 		for (int n = 0; n < tiles; n++) {
 			String fName = "styles/" + set + "/" + set + "_" + Integer.toString(n) + ".gif";
-			BufferedImage img = Core.INSTANCE.get().loadBitmaskImage(tracker, fName);
+			BufferedImage img = Core.INSTANCE.get().loadBitmaskImage(fName);
 			images.add(img);
 		}
-		try {
-			tracker.waitForAll();
-		} catch (InterruptedException ex) {}
 		BufferedImage ret[] = new BufferedImage[images.size()];
 		ret = images.toArray(ret);
 		images = null;
@@ -543,9 +537,8 @@ public class Level {
 	 * @return array of images where each image contains one tile
 	 * @throws ResourceException
 	 */
-	private SpriteObject[] loadObjects(final String set, final Component cmp) throws ResourceException {
+	private SpriteObject[] loadObjects(final String set) throws ResourceException {
 		//URLClassLoader urlLoader = (URLClassLoader) this.getClass().getClassLoader();
-		MediaTracker tracker = new MediaTracker(cmp);
 		// first some global settings
 		bgCol = props.get("bgColor",0x000000) | 0xff000000;
 		bgColor = new Color(bgCol);
@@ -566,10 +559,7 @@ public class Level {
 				break;
 			// load screenBuffer
 			String fName = "styles/"+set + "/" + set + "o_" + Integer.toString(idx)+ ".gif";
-			BufferedImage img = Core.INSTANCE.get().loadBitmaskImage(tracker, fName);
-			try {
-				tracker.waitForAll();
-			} catch (InterruptedException ex) {}
+			BufferedImage img = Core.INSTANCE.get().loadBitmaskImage(fName);
 			// get animation mode
 			int anim = props.get("anim_" + sIdx, -1);
 			if (anim < 0)
@@ -603,7 +593,7 @@ public class Level {
 				case TRAP_DROWN:
 					// load mask
 					fName = "styles/"+set + "/" + set + "om_" + Integer.toString(idx)+ ".gif";
-					img = Core.INSTANCE.get().loadBitmaskImage(tracker, fName);
+					img = Core.INSTANCE.get().loadBitmaskImage(fName);
 					sprite.setMask(img);
 					break;
 			}

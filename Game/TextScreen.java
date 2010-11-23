@@ -255,13 +255,13 @@ public class TextScreen {
 		flip = false;
 		rotCtr = 0 ;
 		flipCtr = 0;
-		imgTrg = ToolBox.INSTANCE.createImage(imgSrc.getWidth(),imgSrc.getHeight(), Transparency.TRANSLUCENT);
+		imgTrg = ToolBox.INSTANCE.get().createImage(imgSrc.getWidth(),imgSrc.getHeight(), Transparency.TRANSLUCENT);
 		imgGfx = imgTrg.createGraphics();
 		imgGfx.setBackground(new Color(0,0,0,0)); // invisible
 		scrollCharCtr = 0;
 		scrollPixCtr = 0;
 
-		scrollerImg = ToolBox.INSTANCE.createImage(LemmFont.getWidth()*(1+SCROLL_WIDTH),SCROLL_HEIGHT, Transparency.BITMASK);
+		scrollerImg = ToolBox.INSTANCE.get().createImage(LemmFont.getWidth()*(1+SCROLL_WIDTH),SCROLL_HEIGHT, Transparency.BITMASK);
 		scrollerGfx = scrollerImg.createGraphics();
 		scrollerGfx.setBackground(new Color(0,0,0,0));
 

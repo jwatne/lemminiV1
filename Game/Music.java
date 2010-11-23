@@ -57,7 +57,7 @@ public class Music {
 		modMusic = new ModMusic();
 
 		// read available musicfiles for random mode
-		File dir = new File(Core.INSTANCE.resourcePath+"music");
+		File dir = new File(Core.INSTANCE.get().getResourcePath()+"music");
 		File files[] = dir.listFiles(new MusicFileFilter());
 		musicFiles = new String[files.length];
 		for (int i=0; i<files.length; i++)
@@ -179,7 +179,7 @@ public class Music {
 				modMusic.setGain(gain);
 				break;
 		}
-		Core.INSTANCE.programProps.set("musicGain", gain);
+		Core.INSTANCE.get().getProgramProps().set("musicGain", gain);
 	}
 
 	/**

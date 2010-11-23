@@ -69,7 +69,7 @@ public class Explosion {
 	 * @throws ResourceException
 	 */
 	static void init() throws ResourceException {
-		expImg = ToolBox.INSTANCE.ImageToBuffered(Core.INSTANCE.loadImage("misc/explode.gif"), Transparency.BITMASK);
+		expImg = ToolBox.INSTANCE.get().ImageToBuffered(Core.INSTANCE.get().loadImage("misc/explode.gif"), Transparency.BITMASK);
 	}
 
 	/**

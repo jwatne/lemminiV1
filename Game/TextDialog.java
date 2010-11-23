@@ -60,10 +60,10 @@ public class TextDialog {
 		height = h;
 		centerX = width/2;
 		centerY = height/2;
-		screenBuffer = ToolBox.INSTANCE.createImage(w, h, Transparency.OPAQUE);
+		screenBuffer = ToolBox.INSTANCE.get().createImage(w, h, Transparency.OPAQUE);
 		gScreen = screenBuffer.createGraphics();
 		gScreen.setClip(0, 0, width, height);
-		backBuffer = ToolBox.INSTANCE.createImage(w, h, Transparency.OPAQUE);
+		backBuffer = ToolBox.INSTANCE.get().createImage(w, h, Transparency.OPAQUE);
 		gBack = backBuffer.createGraphics();
 		gBack.setClip(0, 0, width, height);
 		buttons = new ArrayList<Button>();

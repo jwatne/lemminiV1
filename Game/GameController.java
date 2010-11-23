@@ -287,15 +287,15 @@ public class GameController {
 	 * @throws ResourceException
 	 */
 	public static void init() throws ResourceException {
-		bgImage = ToolBox.INSTANCE.createImage(Level.WIDTH, Level.HEIGHT, Transparency.BITMASK);
+		bgImage = ToolBox.INSTANCE.get().createImage(Level.WIDTH, Level.HEIGHT, Transparency.BITMASK);
 		bgGfx = bgImage.createGraphics();
 
 		gameState = State.INIT;
 		sound = new Sound(24,SND_MOUSEPRE);
 		sound.setGain(soundGain);
-		Icons.init(Core.INSTANCE.getCmp());
+		Icons.init(Core.INSTANCE.get().getCmp());
 		Explosion.init();
-		Lemming.loadLemmings(Core.INSTANCE.getCmp());
+		Lemming.loadLemmings(Core.INSTANCE.get().getCmp());
 		lemmings = new LinkedList<Lemming>();
 		explosions = new LinkedList<Explosion>();
 		lemmsUnderCursor = new ArrayList<Lemming>(10);
@@ -315,7 +315,7 @@ public class GameController {
 		level = new Level();
 		// read level packs
 
-		File dir = new File(Core.INSTANCE.resourcePath+"levels");
+		File dir = new File(Core.INSTANCE.get().getResourcePath()+"levels");
 		File files[] = dir.listFiles();
 		// now get the names of the directories
 		ArrayList<String> dirs = new ArrayList<String>();
@@ -328,7 +328,7 @@ public class GameController {
 		levelPack[0] = new LevelPack(); // dummy
 		for (int i=0; i<dirs.size(); i++) {  // read levels
 			String lvlName = dirs.get(i);
-			levelPack[i+1] = new LevelPack(Core.INSTANCE.findResource("levels/"+ToolBox.INSTANCE.addSeparator(lvlName)+"levelpack.ini"));
+			levelPack[i+1] = new LevelPack(Core.INSTANCE.get().findResource("levels/"+ToolBox.INSTANCE.get().addSeparator(lvlName)+"levelpack.ini"));
 		}
 		curDiffLevel = 0;
 		curLevelPack = 1; // since 0 is dummy
@@ -432,10 +432,10 @@ public class GameController {
 			//			if ( num >= levelPack[curLevelPack].getLevels(curDiffLevel).length )
 			//				num = curLevelNumber;
 			//			// set next level as available
-			//			GroupBitfield bf = Core.INSTANCE.player.setAvailable(pack, diff, num);
+			//			GroupBitfield bf = Core.INSTANCE.get().player.setAvailable(pack, diff, num);
 			//			// update the menu
 			//			if (curLevelPack!=0) // 0 is the dummy pack
-			//				((Lemmini)Core.INSTANCE.getCmp()).updateLevelMenu(pack, diff, bf);
+			//				((Lemmini)Core.INSTANCE.get().getCmp()).updateLevelMenu(pack, diff, bf);
 		}
 		gameState = State.DEBRIEFING;
 	}
@@ -456,7 +456,7 @@ public class GameController {
 		initLevel();
 		if (doReplay) {
 			replayMode = true;
-			replay.save(Core.INSTANCE.resourcePath+"/replay.rpl");
+			replay.save(Core.INSTANCE.get().getResourcePath()+"/replay.rpl");
 			replay.rewind();
 		} else {
 			replayMode = false;
@@ -481,7 +481,7 @@ public class GameController {
 		bgGfx.setBackground(blankColor);
 		bgGfx.clearRect(0, 0, bgImage.getWidth(), bgImage.getHeight());
 
-		stencil = getLevel().paintLevel(bgImage, Core.INSTANCE.getCmp(), stencil);
+		stencil = getLevel().paintLevel(bgImage, Core.INSTANCE.get().getCmp(), stencil);
 
 		lemmings.clear();
 		explosions.clear();
@@ -575,7 +575,7 @@ public class GameController {
 
 		String lvlPath = levelPack[curLevelPack].getInfo(curDiffLevel, curLevelNumber).getFileName();
 		// lemmings need to be reloaded to contain pink color
-		Lemming.loadLemmings(Core.INSTANCE.getCmp());
+		Lemming.loadLemmings(Core.INSTANCE.get().getCmp());
 		// loading the level will patch pink lemmings pixels to correct color
 		getLevel().loadLevel(lvlPath);
 
@@ -1176,7 +1176,7 @@ public class GameController {
 						Music.load("music/"+GameController.levelPack[GameController.curLevelPack].getInfo(GameController.curDiffLevel,
 								GameController.curLevelNumber).getMusic());
 					} catch (ResourceException ex) {
-						Core.INSTANCE.resourceError(ex.getMessage());
+						Core.INSTANCE.get().resourceError(ex.getMessage());
 					} catch (LemmException ex) {
 						JOptionPane.showMessageDialog( null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE );
 						System.exit(1);
@@ -1191,9 +1191,9 @@ public class GameController {
 				case LOAD_REPLAY:
 					try {
 						changeLevel(nextLevelPack, nextDiffLevel, nextLevelNumber, transitionState == TransitionState.LOAD_REPLAY);
-						((JFrame)Core.INSTANCE.getCmp()).setTitle("Lemmini - "+getLevel().getLevelName());
+						((JFrame)Core.INSTANCE.get().getCmp()).setTitle("Lemmini - "+getLevel().getLevelName());
 					} catch (ResourceException ex) {
-						Core.INSTANCE.resourceError(ex.getMessage());
+						Core.INSTANCE.get().resourceError(ex.getMessage());
 					} catch (LemmException ex) {
 						JOptionPane.showMessageDialog( null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE );
 						System.exit(1);

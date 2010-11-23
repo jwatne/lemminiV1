@@ -50,9 +50,9 @@ public class Player {
 		// read main ini file
 		props = new Props();
 		// create players directory if it doesn't exist
-		File dest = new File(Core.INSTANCE.resourcePath+"players");
+		File dest = new File(Core.INSTANCE.get().getResourcePath()+"players");
 		dest.mkdirs();
-		iniFileStr = Core.INSTANCE.resourcePath+"players/"+name+".ini";
+		iniFileStr = Core.INSTANCE.get().getResourcePath()+"players/"+name+".ini";
 
 		if (props.load(iniFileStr)) {// might exist or not - if not, it's created
 			// file existed, now extract entries

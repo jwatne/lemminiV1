@@ -1,6 +1,5 @@
 package GameUtil;
 
-import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
@@ -65,7 +64,7 @@ public class Sprite {
 	 * @param sourceImg Image containing animation frames one above each other.
 	 * @param animFrames number of frames.
 	 */
-	public Sprite(final Image sourceImg, final int animFrames) {
+	public Sprite(final BufferedImage sourceImg, final int animFrames) {
 		init(sourceImg, animFrames);
 	}
 
@@ -97,7 +96,7 @@ public class Sprite {
 	 * @param sourceImg Image containing animation frames one above each other.
 	 * @param animFrames number of frames.
 	 */
-	private void init(final Image sourceImg, final int animFrames) {
+	private void init(final BufferedImage sourceImg, final int animFrames) {
 		numframes = animFrames;
 		width = sourceImg.getWidth(null);
 		height = sourceImg.getHeight(null)/numframes;

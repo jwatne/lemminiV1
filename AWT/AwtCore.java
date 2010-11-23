@@ -3,6 +3,8 @@ import java.awt.Component;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -224,11 +226,11 @@ public class AwtCore implements Core {
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	public Image loadImage(final MediaTracker tracker, final String fName) throws ResourceException {
+	public BufferedImage loadBitmaskImage(final MediaTracker tracker, final String fName) throws ResourceException {
 		String fileLoc = findResource(fName);
 		if (fileLoc == null)
 			return null;
-		return loadImage(tracker, fileLoc, false);
+		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImage(tracker, fileLoc, false), Transparency.BITMASK);
 	}
 
 	/**
@@ -267,12 +269,20 @@ public class AwtCore implements Core {
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	public Image loadImage(final String fname) throws ResourceException {
+	public BufferedImage loadImage(final String fname) throws ResourceException {
 		MediaTracker tracker = new MediaTracker(Core.INSTANCE.get().getCmp());
-		Image img = loadImage(tracker, fname);
+		Image img = loadBitmaskImage(tracker, fname);
 		if (img == null)
 			throw new ResourceException(fname);
-		return img;
+		return AwtToolBox.INSTANCE.get().ImageToBuffered(img, Transparency.BITMASK);
+	}
+	
+	public BufferedImage loadBitmaskImage(final String fname) throws ResourceException {
+		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImage(fname), Transparency.BITMASK);
+	}
+
+	public BufferedImage loadOpaqueImage(final String fname) throws ResourceException {
+		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImage(fname), Transparency.OPAQUE);
 	}
 
 	/**
@@ -289,6 +299,14 @@ public class AwtCore implements Core {
 		return img;
 	}
 
+	public BufferedImage loadOpaqueImageJar(final String fname) throws ResourceException {
+		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImageJar(fname), Transparency.OPAQUE);
+	}
+	
+	public BufferedImage loadTranslucentImageJar(final String fname) throws ResourceException {
+		return AwtToolBox.INSTANCE.get().ImageToBuffered(loadImageJar(fname), Transparency.TRANSLUCENT);
+	}
+	
 	/**
 	 * Get player name via index.
 	 * @param idx player index

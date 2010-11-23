@@ -1,7 +1,7 @@
 package Game;
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.MediaTracker;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 
@@ -87,7 +87,7 @@ public interface Core {
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	public Image loadImage(final MediaTracker tracker, final String fName) throws ResourceException;
+	public BufferedImage loadBitmaskImage(final MediaTracker tracker, final String fName) throws ResourceException;
 
 	/**
 	 * Load an image from the resource path.
@@ -95,7 +95,15 @@ public interface Core {
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	public Image loadImage(final String fname) throws ResourceException;
+	public BufferedImage loadBitmaskImage(final String fname) throws ResourceException;
+
+	/**
+	 * Load an image from the resource path.
+	 * @param fname file name
+	 * @return Image
+	 * @throws ResourceException
+	 */
+	public BufferedImage loadOpaqueImage(final String fname) throws ResourceException;
 
 	/**
 	 * Load an image from inside the JAR or the directory of the main class.
@@ -103,7 +111,15 @@ public interface Core {
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	public Image loadImageJar(final String fname) throws ResourceException;
+	public BufferedImage loadOpaqueImageJar(final String fname) throws ResourceException;
+
+	/**
+	 * Load an image from inside the JAR or the directory of the main class.
+	 * @param fname
+	 * @return Image
+	 * @throws ResourceException
+	 */
+	public BufferedImage loadTranslucentImageJar(final String fname) throws ResourceException;
 
 	/**
 	 * Get player name via index.

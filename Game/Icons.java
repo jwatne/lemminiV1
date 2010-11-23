@@ -2,7 +2,6 @@ package Game;
 
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
@@ -117,7 +116,7 @@ public class Icons {
 		MediaTracker tracker = new MediaTracker(cmp);
 		icons = new Sprite[15];
 		for (int i=0; i<14; i++) {
-			Image sourceImg = Core.INSTANCE.get().loadImage(tracker, "misc/icon_"+i+".gif");
+			BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage(tracker, "misc/icon_"+i+".gif");
 			try {
 				tracker.waitForAll();
 			} catch (InterruptedException ex) {}

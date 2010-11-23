@@ -3,7 +3,6 @@ package Game;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
@@ -103,7 +102,7 @@ public class Level {
 	/** objects like doors - originally 32 objects where each consists of 8 bytes */
 	private ArrayList<LvlObject> objects;
 	/** background tiles - every pixel in them is interpreted as brick in the stencil */
-	private Image tiles[];
+	private BufferedImage tiles[];
 	/** sprite objects of all sprite objects available in this style */
 	private SpriteObject sprObjAvailable[];
 	/** terrain the Lemmings walk on etc. - originally 400 tiles, 4 bytes each */
@@ -254,7 +253,7 @@ public class Level {
 		// paint terrain
 		for (int n = 0; n < terrain.size(); n++) {
 			Terrain t = terrain.get(n);
-			Image i = tiles[t.id];
+			BufferedImage i = tiles[t.id];
 			int width = i.getWidth(null);
 			int height = i.getHeight(null);
 
@@ -518,19 +517,19 @@ public class Level {
 	 * @return array of images where each image contains one tile
 	 * @throws ResourceException
 	 */
-	private Image[] loadTileSet(final String set, final Component cmp) throws ResourceException {
-		ArrayList<Image> images = new ArrayList<Image>(64);
+	private BufferedImage[] loadTileSet(final String set, final Component cmp) throws ResourceException {
+		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>(64);
 		MediaTracker tracker = new MediaTracker(cmp);
 		int tiles = props.get("tiles", 64);
 		for (int n = 0; n < tiles; n++) {
 			String fName = "styles/" + set + "/" + set + "_" + Integer.toString(n) + ".gif";
-			Image img = Core.INSTANCE.get().loadImage(tracker, fName);
+			BufferedImage img = Core.INSTANCE.get().loadBitmaskImage(tracker, fName);
 			images.add(img);
 		}
 		try {
 			tracker.waitForAll();
 		} catch (InterruptedException ex) {}
-		Image ret[] = new Image[images.size()];
+		BufferedImage ret[] = new BufferedImage[images.size()];
 		ret = images.toArray(ret);
 		images = null;
 		return ret;
@@ -567,7 +566,7 @@ public class Level {
 				break;
 			// load screenBuffer
 			String fName = "styles/"+set + "/" + set + "o_" + Integer.toString(idx)+ ".gif";
-			Image img = Core.INSTANCE.get().loadImage(tracker, fName);
+			BufferedImage img = Core.INSTANCE.get().loadBitmaskImage(tracker, fName);
 			try {
 				tracker.waitForAll();
 			} catch (InterruptedException ex) {}
@@ -604,7 +603,7 @@ public class Level {
 				case TRAP_DROWN:
 					// load mask
 					fName = "styles/"+set + "/" + set + "om_" + Integer.toString(idx)+ ".gif";
-					img = Core.INSTANCE.get().loadImage(tracker, fName);
+					img = Core.INSTANCE.get().loadBitmaskImage(tracker, fName);
 					sprite.setMask(img);
 					break;
 			}

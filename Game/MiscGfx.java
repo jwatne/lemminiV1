@@ -59,13 +59,13 @@ public class MiscGfx {
 		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 		BufferedImage img;
 		/* 0: BORDER */
-		img = ToolBox.INSTANCE.get().ImageToBuffered(Core.INSTANCE.get().loadImage("misc/border.gif"),Transparency.OPAQUE);
+		img = Core.INSTANCE.get().loadOpaqueImage("misc/border.gif");
 		images.add(img);
 		/* 1: LEMMINI */
-		img = ToolBox.INSTANCE.get().ImageToBuffered(Core.INSTANCE.get().loadImageJar("lemmini.png"), Transparency.TRANSLUCENT);
+		img = Core.INSTANCE.get().loadTranslucentImageJar("lemmini.png");
 		images.add(img);
 		/* 2: TILE_GREEN */
-		img = ToolBox.INSTANCE.get().ImageToBuffered(Core.INSTANCE.get().loadImageJar("background.gif"), Transparency.OPAQUE);
+		img = Core.INSTANCE.get().loadOpaqueImageJar("background.gif");
 		images.add(img);
 		/* 3: TILE_BROWN */
 		//patch brown version of tile
@@ -85,12 +85,12 @@ public class MiscGfx {
 			}
 		images.add(brownImg);
 		/* 4: REPLAY_1 */
-		BufferedImage anim[] = ToolBox.INSTANCE.get().getAnimation(Core.INSTANCE.get().loadImage("misc/replay.gif"),2,Transparency.BITMASK);
+		BufferedImage anim[] = ToolBox.INSTANCE.get().getAnimation(Core.INSTANCE.get().loadBitmaskImage("misc/replay.gif"),2,Transparency.BITMASK);
 		images.add(anim[0]);
 		/* 5: REPLAY_2 */
 		images.add(anim[1]);
 		/* 6: SELECT */
-		img = ToolBox.INSTANCE.get().ImageToBuffered(Core.INSTANCE.get().loadImage("misc/select.gif"),Transparency.BITMASK);
+		img = Core.INSTANCE.get().loadBitmaskImage("misc/select.gif");
 		images.add(img);
 
 		image = new BufferedImage[images.size()];

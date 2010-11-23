@@ -148,7 +148,7 @@ public class Lemmini extends JFrame implements KeyListener {
 	Lemmini() {
 		core = new AwtCore();
 		try {
-			ToolBox.INSTANCE.set(new AwtToolBox());
+			AwtToolBox.INSTANCE.set(new AwtToolBox());
 			Core.INSTANCE.set(core);
 			Core.INSTANCE.get().init(this,isWebstartApp);      // initialize Core object
 			GameController.init();

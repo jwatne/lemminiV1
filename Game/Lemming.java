@@ -1,7 +1,6 @@
 package Game;
 
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
@@ -1209,8 +1208,7 @@ public class Lemming {
 				// frames, directions, animation type
 				type = i;
 				if (lemmings[type] == null) {
-					BufferedImage sourceImg = ToolBox.INSTANCE.get().ImageToBuffered(
-							Core.INSTANCE.get().loadImage(tracker, "misc/lemm_"+i+".gif"), Transparency.BITMASK);
+					BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage(tracker, "misc/lemm_"+i+".gif");
 					try {
 						tracker.waitForAll();
 					} catch (InterruptedException ex) {}
@@ -1223,12 +1221,12 @@ public class Lemming {
 			if (val.length == 3) {
 				// mask_Y: frames, directions, step
 				type = i;
-				Image sourceImg = Core.INSTANCE.get().loadImage(tracker, "misc/mask_"+i+".gif");
-				Mask mask = new Mask(ToolBox.INSTANCE.get().ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
+				BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage(tracker, "misc/mask_"+i+".gif");
+				Mask mask = new Mask(sourceImg, val[0]);
 				lemmings[type].setMask(Direction.RIGHT, mask);
 				int dirs = val[1];
 				if (dirs > 1) {
-					Mask maskLeft = new Mask(ToolBox.INSTANCE.get().flipImageX(ToolBox.INSTANCE.get().ImageToBuffered(sourceImg,Transparency.BITMASK)), val[0]);
+					Mask maskLeft = new Mask(ToolBox.INSTANCE.get().flipImageX(sourceImg), val[0]);
 					lemmings[type].setMask(Direction.LEFT, maskLeft);
 				}
 				lemmings[type].maskStep = val[2];
@@ -1238,12 +1236,12 @@ public class Lemming {
 			if (val.length == 2) {
 				// mask_Y: type, frames, directions, step
 				type = i;
-				Image sourceImg = Core.INSTANCE.get().loadImage(tracker, "misc/imask_"+i+".gif");
-				Mask mask = new Mask(ToolBox.INSTANCE.get().ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
+				BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage(tracker, "misc/imask_"+i+".gif");
+				Mask mask = new Mask(sourceImg, val[0]);
 				lemmings[type].setImask(Direction.RIGHT, mask);
 				int dirs = val[1];
 				if (dirs > 1) {
-					Mask maskLeft = new Mask(ToolBox.INSTANCE.get().flipImageX(ToolBox.INSTANCE.get().ImageToBuffered(sourceImg,Transparency.BITMASK)), val[0]);
+					Mask maskLeft = new Mask(ToolBox.INSTANCE.get().flipImageX(sourceImg), val[0]);
 					lemmings[type].setImask(Direction.LEFT, maskLeft);
 				}
 			}
@@ -1673,7 +1671,7 @@ class ExplodeFont {
 	 * @throws ResourceException
 	 */
 	ExplodeFont(final Component cmp) throws ResourceException {
-		Image sourceImg = Core.INSTANCE.get().loadImage("misc/countdown.gif");
+		BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/countdown.gif");
 		img = ToolBox.INSTANCE.get().getAnimation(sourceImg,5,Transparency.BITMASK);
 	}
 

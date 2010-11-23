@@ -62,7 +62,7 @@ public class LemmFont {
 	 * @throws ResourceException
 	 */
 	static public void init() throws ResourceException {
-		BufferedImage sourceImg = ToolBox.INSTANCE.get().ImageToBuffered(Core.INSTANCE.get().loadImage("misc/lemmfont.gif"),Transparency.BITMASK);
+		BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/lemmfont.gif");
 
 		width = SPACING; //sourceImg.getWidth(null);
 		height = sourceImg.getHeight(null)/CHARS.length();

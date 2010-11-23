@@ -43,7 +43,7 @@ import Tools.ToolBox;
  */
 public class AwtToolBox implements ToolBox {
 
-	public static AwtToolBox INSTANCE = new AwtToolBox(); 
+	public static Instance INSTANCE = new Instance(); 
 	
 	private GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 
@@ -79,7 +79,7 @@ public class AwtToolBox implements ToolBox {
 	  * @param transparency {@link java.awt.Transparency}
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final Image img, final int frames, final int transparency) {
+	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int transparency) {
 		 int width = img.getWidth(null);
 		 return getAnimation(img, frames, transparency, width);
 	 }
@@ -92,7 +92,7 @@ public class AwtToolBox implements ToolBox {
 	  * @param width image width
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final Image img, final int frames, final int transparency, final int width) {
+	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int transparency, final int width) {
 		 int height = img.getHeight(null)/frames;
 		 // characters stored one above the other - now separate them into single images
 		 ArrayList<BufferedImage> arrImg = new ArrayList<BufferedImage>(frames);
@@ -275,5 +275,23 @@ public class AwtToolBox implements ToolBox {
 				 return f.getAbsolutePath();
 		 }
 		 return null;
+	 }
+
+	 public static class Instance {
+		 
+		 private AwtToolBox toolBox;
+		 
+		 private Instance() {
+			 //prevent instantiation
+		 }
+		 
+		 public AwtToolBox get() {
+			 return toolBox;
+		 }
+		 
+		 public void set(AwtToolBox toolBox) {
+			 this.toolBox = toolBox;
+			 ToolBox.INSTANCE.set(toolBox);
+		 }
 	 }
 }

@@ -2,7 +2,6 @@ package Tools;
 
 
 import java.awt.Component;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 
@@ -40,13 +39,6 @@ public interface ToolBox {
 	 */
 	public BufferedImage createImage(final int width, final int height, final int transparency);
 
-	/**
-	 * Create a compatible buffered image from an image.
-	 * @param img existing {@link java.awt.Image}
-	 * @param transparency {@link java.awt.Transparency}
-	 * @return compatible buffered image
-	 */	public BufferedImage ImageToBuffered(final Image img, final int transparency);
-
 	 /**
 	  * Return an array of buffered images which contain an animation.
 	  * @param img image containing all the frames one above each other
@@ -54,7 +46,7 @@ public interface ToolBox {
 	  * @param transparency {@link java.awt.Transparency}
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final Image img, final int frames, final int transparency);
+	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int transparency);
 
 	 /**
 	  * Return an array of buffered images which contain an animation.
@@ -64,7 +56,7 @@ public interface ToolBox {
 	  * @param width image width
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final Image img, final int frames, final int transparency, final int width);
+	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int transparency, final int width);
 
 	 /**
 	  * Flip image in X direction.

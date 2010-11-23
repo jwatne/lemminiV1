@@ -2,10 +2,7 @@ package Game;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
-
-import Tools.ToolBox;
 
 /*
  * Copyright 2009 Volker Oth
@@ -69,7 +66,7 @@ public class Explosion {
 	 * @throws ResourceException
 	 */
 	static void init() throws ResourceException {
-		expImg = ToolBox.INSTANCE.get().ImageToBuffered(Core.INSTANCE.get().loadImage("misc/explode.gif"), Transparency.BITMASK);
+		expImg = Core.INSTANCE.get().loadBitmaskImage("misc/explode.gif");
 	}
 
 	/**

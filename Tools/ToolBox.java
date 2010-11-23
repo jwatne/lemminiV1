@@ -36,7 +36,25 @@ public interface ToolBox {
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
 	 */
-	public BufferedImage createImage(final int width, final int height, final int transparency);
+	public BufferedImage createBitmaskImage(final int width, final int height);
+
+	/**
+	 * Create a compatible buffered image.
+	 * @param width width of image in pixels
+	 * @param height height of image in pixels
+	 * @param transparency {@link java.awt.Transparency}
+	 * @return compatible buffered image
+	 */
+	public BufferedImage createOpaqueImage(final int width, final int height);
+
+	/**
+	 * Create a compatible buffered image.
+	 * @param width width of image in pixels
+	 * @param height height of image in pixels
+	 * @param transparency {@link java.awt.Transparency}
+	 * @return compatible buffered image
+	 */
+	public BufferedImage createTranslucentImage(final int width, final int height);
 
 	 /**
 	  * Return an array of buffered images which contain an animation.
@@ -45,7 +63,7 @@ public interface ToolBox {
 	  * @param transparency {@link java.awt.Transparency}
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int transparency);
+	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames);
 
 	 /**
 	  * Return an array of buffered images which contain an animation.
@@ -55,7 +73,7 @@ public interface ToolBox {
 	  * @param width image width
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int transparency, final int width);
+	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int width);
 
 	 /**
 	  * Flip image in X direction.

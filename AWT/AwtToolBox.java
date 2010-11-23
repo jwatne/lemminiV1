@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
+import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -60,6 +61,39 @@ public class AwtToolBox implements ToolBox {
 	}
 
 	/**
+	 * Create a compatible buffered image.
+	 * @param width width of image in pixels
+	 * @param height height of image in pixels
+	 * @param transparency {@link java.awt.Transparency}
+	 * @return compatible buffered image
+	 */
+	public BufferedImage createBitmaskImage(final int width, final int height) {
+		return createImage(width, height, Transparency.BITMASK);
+	}
+
+	/**
+	 * Create a compatible buffered image.
+	 * @param width width of image in pixels
+	 * @param height height of image in pixels
+	 * @param transparency {@link java.awt.Transparency}
+	 * @return compatible buffered image
+	 */
+	public BufferedImage createOpaqueImage(final int width, final int height) {
+		return createImage(width, height, Transparency.OPAQUE);
+	}
+
+	/**
+	 * Create a compatible buffered image.
+	 * @param width width of image in pixels
+	 * @param height height of image in pixels
+	 * @param transparency {@link java.awt.Transparency}
+	 * @return compatible buffered image
+	 */
+	public BufferedImage createTranslucentImage(final int width, final int height) {
+		return createImage(width, height, Transparency.TRANSLUCENT);
+	}
+
+	/**
 	 * Create a compatible buffered image from an image.
 	 * @param img existing {@link java.awt.Image}
 	 * @param transparency {@link java.awt.Transparency}
@@ -79,9 +113,20 @@ public class AwtToolBox implements ToolBox {
 	  * @param transparency {@link java.awt.Transparency}
 	  * @return an array of buffered images which contain an animation
 	  */
-	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int transparency) {
-		 int width = img.getWidth(null);
-		 return getAnimation(img, frames, transparency, width);
+	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames) {
+		 return getAnimation(img, frames, img.getColorModel().getTransparency(), img.getWidth());
+	 }
+
+	 /**
+	  * Return an array of buffered images which contain an animation.
+	  * @param img image containing all the frames one above each other
+	  * @param frames number of frames
+	  * @param transparency {@link java.awt.Transparency}
+	  * @param width image width
+	  * @return an array of buffered images which contain an animation
+	  */
+	 public BufferedImage[] getAnimation(final BufferedImage img, final int frames, final int width) {
+		 return getAnimation(img, frames, Transparency.BITMASK, width);
 	 }
 
 	 /**

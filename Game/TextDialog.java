@@ -2,7 +2,6 @@ package Game;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -60,10 +59,10 @@ public class TextDialog {
 		height = h;
 		centerX = width/2;
 		centerY = height/2;
-		screenBuffer = ToolBox.INSTANCE.get().createImage(w, h, Transparency.OPAQUE);
+		screenBuffer = ToolBox.INSTANCE.get().createOpaqueImage(w, h);
 		gScreen = screenBuffer.createGraphics();
 		gScreen.setClip(0, 0, width, height);
-		backBuffer = ToolBox.INSTANCE.get().createImage(w, h, Transparency.OPAQUE);
+		backBuffer = ToolBox.INSTANCE.get().createOpaqueImage(w, h);
 		gBack = backBuffer.createGraphics();
 		gBack.setClip(0, 0, width, height);
 		buttons = new ArrayList<Button>();

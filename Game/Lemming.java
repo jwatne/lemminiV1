@@ -1,6 +1,5 @@
 package Game;
 
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -1585,9 +1584,9 @@ class LemmingResource {
 		height = sourceImg.getHeight(null)/animFrames;
 		dirs = directions;
 		animMode = Lemming.Animation.NONE;
-		img[Lemming.Direction.RIGHT.ordinal()] = ToolBox.INSTANCE.get().getAnimation(sourceImg, animFrames, Transparency.BITMASK);
+		img[Lemming.Direction.RIGHT.ordinal()] = ToolBox.INSTANCE.get().getAnimation(sourceImg, animFrames);
 		if (dirs>1)
-			img[Lemming.Direction.LEFT.ordinal()] = ToolBox.INSTANCE.get().getAnimation(ToolBox.INSTANCE.get().flipImageX(sourceImg), animFrames, Transparency.BITMASK);
+			img[Lemming.Direction.LEFT.ordinal()] = ToolBox.INSTANCE.get().getAnimation(ToolBox.INSTANCE.get().flipImageX(sourceImg), animFrames);
 	}
 
 	/**
@@ -1666,7 +1665,7 @@ class ExplodeFont {
 	 */
 	ExplodeFont() throws ResourceException {
 		BufferedImage sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/countdown.gif");
-		img = ToolBox.INSTANCE.get().getAnimation(sourceImg,5,Transparency.BITMASK);
+		img = ToolBox.INSTANCE.get().getAnimation(sourceImg,5);
 	}
 
 	/**

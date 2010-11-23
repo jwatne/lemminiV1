@@ -1,7 +1,6 @@
 package Game;
 
 import java.awt.Graphics2D;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -109,7 +108,7 @@ public class Icons {
 	 * @throws ResourceException
 	 */
 	public static void init() throws ResourceException {
-		iconImg = ToolBox.INSTANCE.get().createImage(WIDTH*(1+LAST_DRAWN),HEIGHT,Transparency.OPAQUE);
+		iconImg = ToolBox.INSTANCE.get().createOpaqueImage(WIDTH*(1+LAST_DRAWN),HEIGHT);
 		iconGfx = iconImg.createGraphics();
 		icons = new Sprite[15];
 		for (int i=0; i<14; i++) {

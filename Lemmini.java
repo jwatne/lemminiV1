@@ -6,7 +6,6 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.Transparency;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -1100,12 +1099,12 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	public void init() {
 		offImage = new BufferedImage[2];
 		offGraphics = new Graphics2D[2];
-		offImage[0] = ToolBox.INSTANCE.get().createImage(this.getWidth(), this.getHeight(), Transparency.OPAQUE);
-		offImage[1] = ToolBox.INSTANCE.get().createImage(this.getWidth(), this.getHeight(), Transparency.OPAQUE);
+		offImage[0] = ToolBox.INSTANCE.get().createOpaqueImage(this.getWidth(), this.getHeight());
+		offImage[1] = ToolBox.INSTANCE.get().createOpaqueImage(this.getWidth(), this.getHeight());
 		offGraphics[0] = offImage[0].createGraphics();
 		offGraphics[1] = offImage[1].createGraphics();
 
-		outStrImg = ToolBox.INSTANCE.get().createImage(this.getWidth(), LemmFont.getHeight(), Transparency.BITMASK);
+		outStrImg = ToolBox.INSTANCE.get().createBitmaskImage(this.getWidth(), LemmFont.getHeight());
 		outStrGfx = outStrImg.createGraphics();
 		outStrGfx.setBackground(new Color(0,0,0));
 

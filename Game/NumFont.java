@@ -1,7 +1,6 @@
 package Game;
 
 import java.awt.Graphics2D;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import Tools.ToolBox;
@@ -43,12 +42,12 @@ public class NumFont {
 	 */
 	public static void init() throws ResourceException {
 		BufferedImage sourceImg = Core.INSTANCE.get().loadOpaqueImage("misc/numfont.gif");
-		BufferedImage img[] = ToolBox.INSTANCE.get().getAnimation(sourceImg,10,Transparency.OPAQUE);
+		BufferedImage img[] = ToolBox.INSTANCE.get().getAnimation(sourceImg,10);
 		width = sourceImg.getWidth(null);
 		height = sourceImg.getHeight(null)/10;
 		numImg = new BufferedImage[100];
 		for (int i=0; i<100; i++) {
-			numImg[i] = ToolBox.INSTANCE.get().createImage(width*2, height, Transparency.OPAQUE);
+			numImg[i] = ToolBox.INSTANCE.get().createOpaqueImage(width*2, height);
 			Graphics2D g = numImg[i].createGraphics();
 			g.drawImage(img[i/10], 0, 0, null);
 			g.drawImage(img[i%10], width, 0, null);

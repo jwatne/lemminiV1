@@ -1,14 +1,18 @@
 package Game;
+import static Game.LemmFont.Color.BLUE;
+import static Game.LemmFont.Color.BROWN;
+import static Game.LemmFont.Color.GREEN;
+import static Game.LemmFont.Color.RED;
+import static Game.LemmFont.Color.TURQUOISE;
+import static Game.LemmFont.Color.VIOLET;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import Tools.ToolBox;
-
-import static Game.LemmFont.Color.*;
 
 /*
  * Copyright 2009 Volker Oth
@@ -255,13 +259,13 @@ public class TextScreen {
 		flip = false;
 		rotCtr = 0 ;
 		flipCtr = 0;
-		imgTrg = ToolBox.INSTANCE.get().createImage(imgSrc.getWidth(),imgSrc.getHeight(), Transparency.TRANSLUCENT);
+		imgTrg = ToolBox.INSTANCE.get().createTranslucentImage(imgSrc.getWidth(),imgSrc.getHeight());
 		imgGfx = imgTrg.createGraphics();
 		imgGfx.setBackground(new Color(0,0,0,0)); // invisible
 		scrollCharCtr = 0;
 		scrollPixCtr = 0;
 
-		scrollerImg = ToolBox.INSTANCE.get().createImage(LemmFont.getWidth()*(1+SCROLL_WIDTH),SCROLL_HEIGHT, Transparency.BITMASK);
+		scrollerImg = ToolBox.INSTANCE.get().createBitmaskImage(LemmFont.getWidth()*(1+SCROLL_WIDTH),SCROLL_HEIGHT);
 		scrollerGfx = scrollerImg.createGraphics();
 		scrollerGfx.setBackground(new Color(0,0,0,0));
 

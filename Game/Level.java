@@ -2,7 +2,6 @@ package Game;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -370,7 +369,7 @@ public class Level {
 				// for upside down objects, just create the upside down copy
 				if (o.upsideDown || inFront) {
 					for (int frame = 0; frame < spr.getNumFrames(); frame++) {
-						imgSpr = ToolBox.INSTANCE.get().createImage(spr.getWidth(),spr.getHeight(), Transparency.BITMASK);
+						imgSpr = ToolBox.INSTANCE.get().createBitmaskImage(spr.getWidth(),spr.getHeight());
 						// get flipped or normal version
 						if (o.upsideDown) {
 							// flip the image vertically
@@ -626,7 +625,7 @@ public class Level {
 		BufferedImage img;
 
 		if (image == null || image.getWidth() != width || image.getHeight() != height)
-			img = ToolBox.INSTANCE.get().createImage(width,height,Transparency.OPAQUE);
+			img = ToolBox.INSTANCE.get().createOpaqueImage(width,height);
 		else
 			img = image;
 		Graphics2D gx = img.createGraphics();

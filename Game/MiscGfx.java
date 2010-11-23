@@ -1,6 +1,5 @@
 package Game;
 
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -69,7 +68,7 @@ public class MiscGfx {
 		images.add(img);
 		/* 3: TILE_BROWN */
 		//patch brown version of tile
-		BufferedImage brownImg = ToolBox.INSTANCE.get().createImage(img.getWidth(), img.getHeight(),Transparency.BITMASK);
+		BufferedImage brownImg = ToolBox.INSTANCE.get().createBitmaskImage(img.getWidth(), img.getHeight());
 		for (int xp=0; xp<img.getWidth(null); xp++)
 			for (int yp=0; yp<img.getHeight(null); yp++) {
 				int col = img.getRGB(xp, yp); // A R G B
@@ -85,7 +84,7 @@ public class MiscGfx {
 			}
 		images.add(brownImg);
 		/* 4: REPLAY_1 */
-		BufferedImage anim[] = ToolBox.INSTANCE.get().getAnimation(Core.INSTANCE.get().loadBitmaskImage("misc/replay.gif"),2,Transparency.BITMASK);
+		BufferedImage anim[] = ToolBox.INSTANCE.get().getAnimation(Core.INSTANCE.get().loadBitmaskImage("misc/replay.gif"),2);
 		images.add(anim[0]);
 		/* 5: REPLAY_2 */
 		images.add(anim[1]);

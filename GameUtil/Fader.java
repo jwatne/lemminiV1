@@ -3,7 +3,6 @@ package GameUtil;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import Tools.ToolBox;
@@ -103,7 +102,7 @@ public class Fader {
 		Color fillColor; /* ARGB color of the fading rectangle composed from alpha and color */
 		// create alpha image if needed
 		if (alphaImg == null) {
-			alphaImg = ToolBox.INSTANCE.get().createImage(WIDTH, HEIGHT, Transparency.TRANSLUCENT);
+			alphaImg = ToolBox.INSTANCE.get().createTranslucentImage(WIDTH, HEIGHT);
 			alphaGfx = alphaImg.createGraphics();
 		}
 		// fill with alpha blended color

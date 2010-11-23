@@ -1,6 +1,5 @@
 package GameUtil;
 
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import Tools.ToolBox;
@@ -104,7 +103,7 @@ public class Sprite {
 		animMode = Animation.NONE;
 		triggered = false;
 		// animation frames stored one above the other - now separate them into single images
-		frames = ToolBox.INSTANCE.get().getAnimation(sourceImg, animFrames, Transparency.BITMASK);
+		frames = ToolBox.INSTANCE.get().getAnimation(sourceImg, animFrames);
 	}
 
 	/**

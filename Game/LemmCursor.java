@@ -3,7 +3,6 @@ package Game;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import Tools.ToolBox;
@@ -70,7 +69,7 @@ public class LemmCursor  {
 	 * @throws ResourceException
 	 */
 	public static void init() throws ResourceException {
-		img = ToolBox.INSTANCE.get().getAnimation(Core.INSTANCE.get().loadBitmaskImage("misc/cursor.gif"), 8, Transparency.BITMASK);
+		img = ToolBox.INSTANCE.get().getAnimation(Core.INSTANCE.get().loadBitmaskImage("misc/cursor.gif"), 8);
 		cursor = new Cursor[4];
 		int w = getImage(Type.NORMAL).getWidth()/2;
 		int h = getImage(Type.NORMAL).getHeight()/2;

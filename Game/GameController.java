@@ -3,7 +3,6 @@ package Game;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -286,7 +285,7 @@ public class GameController {
 	 * @throws ResourceException
 	 */
 	public static void init() throws ResourceException {
-		bgImage = ToolBox.INSTANCE.get().createImage(Level.WIDTH, Level.HEIGHT, Transparency.BITMASK);
+		bgImage = ToolBox.INSTANCE.get().createBitmaskImage(Level.WIDTH, Level.HEIGHT);
 		bgGfx = bgImage.createGraphics();
 
 		gameState = State.INIT;

@@ -3,8 +3,8 @@ package Tools;
 
 import java.net.URL;
 
-import Graphics.Image;
 import Graphics.GraphicsOperation;
+import Graphics.Image;
 
 /*
  * Copyright 2009 Volker Oth
@@ -46,6 +46,15 @@ public interface ToolBox {
 	 */
 	public Cursor createCursor(Image image, int width, int height);
 	
+	/**
+	 * Create an image specially designed for level backgrounds.
+	 * @param width width of image in pixels
+	 * @param height height of image in pixels
+	 * @param transparency {@link java.awt.Transparency}
+	 * @return compatible buffered image
+	 */
+	public Image createBackgroundImage(final int width, final int height);
+
 	/**
 	 * Create a compatible buffered image.
 	 * @param width width of image in pixels
@@ -120,6 +129,16 @@ public interface ToolBox {
 	  */
 	 public String exchangeSeparators(final String fName);
 
+	 /**
+	  * Open file dialog.
+	  * @param parent parent frame
+	  * @param path default file name
+	  * @param ext array of allowed extensions
+	  * @param load true: load, false: save
+	  * @return absolute file name of selected file or null
+	  */
+	 public String getFileName(final Object parent, final String path, final String ext[], final boolean load);
+	 
 	 /**
 	  * Return file name from path.
 	  * @param path String of a path with a file name

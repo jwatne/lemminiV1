@@ -81,6 +81,10 @@ public class AwtToolBox extends AbstractToolBox implements ToolBox {
 		return b;
 	}
 
+	public AwtImage createBackgroundImage(final int width, final int height) {
+		return createBitmaskImage(width, height);
+	}
+
 	/**
 	 * Create a compatible buffered image.
 	 * @param width width of image in pixels
@@ -190,7 +194,7 @@ public class AwtToolBox extends AbstractToolBox implements ToolBox {
 	  * @param load true: load, false: save
 	  * @return absolute file name of selected file or null
 	  */
-	 public String getFileName(final Component parent, final String path, final String ext[], final boolean load) {
+	 public String getFileName(final Object parent, final String path, final String ext[], final boolean load) {
 		 String p = path;
 		 if (p.length() == 0)
 			 p = ".";
@@ -204,7 +208,7 @@ public class AwtToolBox extends AbstractToolBox implements ToolBox {
 		 jf.setFileSelectionMode(JFileChooser.FILES_ONLY );
 		 if (!load)
 			 jf.setDialogType(JFileChooser.SAVE_DIALOG);
-		 int returnVal = jf.showDialog(parent,null);
+		 int returnVal = jf.showDialog((Component)parent,null);
 		 if(returnVal == JFileChooser.APPROVE_OPTION) {
 			 File f = jf.getSelectedFile();
 			 if (f != null)

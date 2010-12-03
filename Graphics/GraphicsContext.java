@@ -24,6 +24,8 @@ public interface GraphicsContext {
 
 	void drawImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2);
 
+	void drawBackgroundImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2);
+
 	void setClip(int x, int y, int width, int height);
 
 	void setBackground(Color color);

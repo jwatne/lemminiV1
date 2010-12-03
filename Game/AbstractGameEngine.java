@@ -3,11 +3,15 @@ package Game;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
+import AWT.AwtCore;
 import GameUtil.Fader;
 import Graphics.Color;
 import Graphics.GraphicsContext;
 import Graphics.Image;
 import Tools.MicrosecondTimer;
+import Tools.MouseEvent;
 import Tools.ToolBox;
 
 /*
@@ -59,6 +63,22 @@ public abstract class AbstractGameEngine implements Runnable {
 	private int activeBuffer;
 	/** monitoring object used for synchronized painting */
 	private final Object paintSemaphore = new Object();
+	/** start position of mouse drag (for mouse scrolling) */
+	private int mouseDragStartX;
+	/** x position of cursor in level */
+	private int xMouse;
+	/** x position of cursor on screen */
+	private int xMouseScreen;
+	/** y position of cursor in level */
+	private int yMouse;
+	/** y position of cursor on screen */
+	private int yMouseScreen;
+	/** mouse drag length in x direction (pixels) */
+	private int mouseDx;
+	/** mouse drag length in y direction (pixels) */
+	private int mouseDy;
+	/** flag: left mouse button is currently pressed */
+	private boolean leftMousePressed;
 
 	public abstract int getWidth();
 	
@@ -130,6 +150,236 @@ public abstract class AbstractGameEngine implements Runnable {
 			System.exit(1);
 		}
 	}
+	
+	public void mousePressed(MouseEvent mouseevent) {
+		int x = mouseevent.getX();
+		int y = mouseevent.getY();
+		mouseDx = 0;
+		mouseDy = 0;
+		if (mouseevent.getButton() == MouseEvent.BUTTON1)
+			leftMousePressed = true;
+
+		if (Fader.getState() != Fader.State.OFF)
+			return;
+
+		switch (GameController.getGameState()) {
+			case BRIEFING:
+				MiniMap.init(AbstractGameEngine.smallX, AbstractGameEngine.smallY, 16, 8, true);
+				GameController.setTransition(GameController.TransitionState.TO_LEVEL);
+				Fader.setState(Fader.State.OUT);
+				mouseevent.consume();
+				break;
+			case DEBRIEFING:
+				int button = TextScreen.getDialog().handleLeftClick(x,y);
+				switch (button) {
+					case TextScreen.BUTTON_CONTINUE:
+						GameController.nextLevel(); // continue to next level
+						GameController.requestChangeLevel(GameController.getCurLevelPackIdx(), GameController.getCurDiffLevel(),
+								GameController.getCurLevelNumber(), false);
+						break;
+					case TextScreen.BUTTON_RESTART:
+						GameController.requestRestartLevel(false);
+						break;
+					case TextScreen.BUTTON_MENU:
+						GameController.setTransition(GameController.TransitionState.TO_INTRO);
+						Fader.setState(Fader.State.OUT);
+						Core.INSTANCE.get().setTitle("Lemmini");
+						break;
+					case TextScreen.BUTTON_REPLAY:
+						GameController.requestRestartLevel(true);
+						break;
+					case TextScreen.BUTTON_SAVEREPLAY:
+						String replayPath = ToolBox.INSTANCE.get().getFileName(getParent(),Core.INSTANCE.get().getResourcePath(),Core.REPLAY_EXTENSIONS,false);
+						if (replayPath != null) {
+							try {
+								String ext = ToolBox.INSTANCE.get().getExtension(replayPath);
+								if (ext == null)
+									replayPath += ".rpl";
+								if (GameController.saveReplay(replayPath))
+									return;
+								// else: no success
+								JOptionPane.showMessageDialog(AwtCore.INSTANCE.get().getCmp(), "Error!", "Saving replay failed", JOptionPane.INFORMATION_MESSAGE);
+							} catch (Exception ex) {
+								ToolBox.INSTANCE.get().showException(ex);
+							}
+						}
+						break;
+				}
+				mouseevent.consume();
+				break;
+			case LEVEL:
+				//  debug drawing
+				debugDraw(x,y,leftMousePressed);
+				if (leftMousePressed) {
+					if (y > iconsY && y < iconsY+Icons.HEIGHT) {
+						Icons.Type type = GameController.getIconType(x);
+						if (type != Icons.Type.INVALID) {
+							GameController.handleIconButton(type);
+						}
+					} else {
+						Lemming l = GameController.lemmUnderCursor(LemmCursor.getType());
+						if (l != null)
+							GameController.requestSkill(l);
+					}
+					// check minimap mouse move
+					int ofs = MiniMap.move(x,y,this.getWidth());
+					if (ofs != -1)
+						GameController.setxPos(ofs);
+					mouseevent.consume();
+				}
+		}
+	}
+	
+	public void mouseReleased(MouseEvent mouseevent) {
+		int x = mouseevent.getX();
+		int y = mouseevent.getY();
+		mouseDx = 0;
+		mouseDy = 0;
+		if (mouseevent.getButton() == MouseEvent.BUTTON1)
+			leftMousePressed = false;
+
+		switch (GameController.getGameState()) {
+			case LEVEL:
+				if (y > AbstractGameEngine.iconsY && y < AbstractGameEngine.iconsY+Icons.HEIGHT) {
+					Icons.Type type = GameController.getIconType(x);
+					if (type != Icons.Type.INVALID)
+						GameController.releaseIcon(type);
+				}
+				// always release icons which don't stay pressed
+				// this is to avoid the icons get stuck when they're pressed,
+				// the the mouse is dragged out and released outside
+				GameController.releasePlus(GameController.KEYREPEAT_ICON);
+				GameController.releaseMinus(GameController.KEYREPEAT_ICON);
+				GameController.releaseIcon(Icons.Type.MINUS);
+				GameController.releaseIcon(Icons.Type.PLUS);
+				GameController.releaseIcon(Icons.Type.NUKE);
+				mouseevent.consume();
+				break;
+		}
+	}
+	
+	public void mouseEntered(final MouseEvent mouseevent) {
+		mouseDx = 0;
+		mouseDy = 0;
+		int x = mouseevent.getX()/*-LemmCursor.width/2*/;
+		int y = mouseevent.getY()/*-LemmCursor.height/2*/;
+		LemmCursor.setX(x/*-LemmCursor.width/2*/);
+		LemmCursor.setY(y/*-LemmCursor.height/2*/);
+	}
+
+	public void mouseExited(final MouseEvent mouseevent) {
+		int x = xMouseScreen + mouseDx;
+		switch (GameController.getGameState()) {
+			case BRIEFING:
+			case DEBRIEFING:
+			case LEVEL:
+				if (x>=this.getWidth())
+					x = this.getWidth()-1;
+				if (x<0)
+					x = 0;
+				xMouseScreen = x;
+				x += GameController.getxPos();
+				if (x>=Level.WIDTH)
+					x = Level.WIDTH-1;
+				xMouse = x;
+				LemmCursor.setX(xMouseScreen/*-LemmCursor.width/2*/);
+
+				int y = yMouseScreen + mouseDy;
+				if (y >= this.getHeight())
+					y = this.getHeight()-1;
+				if (y<0)
+					y = 0;
+				yMouseScreen = y;
+
+				y = yMouse + mouseDy;
+				if (y >= Level.HEIGHT)
+					y = Level.HEIGHT-1;
+				if (y<0)
+					y = 0;
+				yMouse = y;
+				LemmCursor.setY(yMouseScreen/*-LemmCursor.height/2*/);
+				mouseevent.consume();
+				break;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
+	 */
+	public void mouseDragged(final MouseEvent mouseevent) {
+		mouseDx = 0;
+		mouseDy = 0;
+		// check minimap mouse move
+		switch (GameController.getGameState()) {
+			case LEVEL:
+				int x = mouseevent.getX();
+				int y = mouseevent.getY();
+				if (leftMousePressed) {
+					int ofs = MiniMap.move(x,y,this.getWidth());
+					if (ofs != -1)
+						GameController.setxPos(ofs);
+				} else {
+					int xOfsTemp = GameController.getxPos() + (x-mouseDragStartX);
+					if (xOfsTemp < 0)
+						xOfsTemp = 0;
+					else if (xOfsTemp >= Level.WIDTH-this.getWidth())
+						GameController.setxPos(Level.WIDTH-this.getWidth());
+					else GameController.setxPos(xOfsTemp);
+				}
+				// debug drawing
+				debugDraw(x,y,leftMousePressed);
+				mouseMoved(mouseevent);
+				mouseevent.consume();
+				break;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
+	 */
+	public void mouseMoved(final MouseEvent mouseevent) {
+		//long t = System.currentTimeMillis();
+		int x,y;
+		int oldX = xMouse;
+		int oldY = yMouse;
+
+		x = (mouseevent.getX() + GameController.getxPos());
+		y = mouseevent.getY();
+		if (x>=Level.WIDTH)
+			x = Level.WIDTH-1;
+		if (y >= Level.HEIGHT)
+			y = Level.HEIGHT-1;
+		xMouse = x;
+		yMouse = y;
+		// LemmCursor
+		xMouseScreen = mouseevent.getX();
+		if (xMouseScreen>=this.getWidth())
+			xMouseScreen = this.getWidth();
+		else if (xMouseScreen <0)
+			xMouseScreen = 0;
+		yMouseScreen = mouseevent.getY();
+		if (yMouseScreen>=this.getHeight())
+			yMouseScreen = this.getHeight();
+		else if (yMouseScreen <0)
+			yMouseScreen = 0;
+		LemmCursor.setX(xMouseScreen/*-LemmCursor.width/2*/);
+		LemmCursor.setY(yMouseScreen/*-LemmCursor.height/2*/);
+
+		switch (GameController.getGameState()) {
+			case INTRO:
+			case BRIEFING:
+			case DEBRIEFING:
+				TextScreen.getDialog().handleMouseMove(xMouseScreen, yMouseScreen);
+				//$FALL-THROUGH$
+			case LEVEL:
+				mouseDx = (xMouse - oldX);
+				mouseDy = (yMouse - oldY);
+				mouseDragStartX = mouseevent.getX();
+				mouseevent.consume();
+				break;
+		}
+	}
+
 	/**
 	 * redraw the offscreen image, then flip buffers and force repaint.
 	 */
@@ -162,7 +412,7 @@ public abstract class AbstractGameEngine implements Runnable {
 				TextScreen.setMode(TextScreen.Mode.DEBRIEFING);
 				TextScreen.update();
 				offGfx.drawImage(TextScreen.getScreen(), 0,0);
-				TextScreen.getDialog().handleMouseMove(getScreenMouseX(), getScreenMouseY());
+				TextScreen.getDialog().handleMouseMove(xMouseScreen, yMouseScreen);
 				//offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x, LemmCursor.y, null);
 				break;
 			case LEVEL:
@@ -170,15 +420,15 @@ public abstract class AbstractGameEngine implements Runnable {
 				if (bgImage != null) {
 					GameController.update();
 					// mouse movement
-					if (getScreenMouseY() > 40 && getScreenMouseY() <scoreY) { // avoid scrolling if menu is selected
+					if (yMouseScreen > 40 && yMouseScreen <scoreY) { // avoid scrolling if menu is selected
 						int xOfsTemp;
-						if (getScreenMouseX() > this.getWidth() - AUTOSCROLL_RANGE) {
+						if (xMouseScreen > this.getWidth() - AUTOSCROLL_RANGE) {
 							xOfsTemp = GameController.getxPos() + (isShiftPressed() ? X_STEP_FAST : X_STEP);
 							if (xOfsTemp < Level.WIDTH-this.getWidth())
 								GameController.setxPos(xOfsTemp);
 							else
 								GameController.setxPos(Level.WIDTH-this.getWidth());
-						} else if (getScreenMouseX() < AUTOSCROLL_RANGE) {
+						} else if (xMouseScreen < AUTOSCROLL_RANGE) {
 							xOfsTemp = GameController.getxPos() - (isShiftPressed() ? X_STEP_FAST : X_STEP);
 							if (xOfsTemp > 0)
 								GameController.setxPos(xOfsTemp);
@@ -208,7 +458,7 @@ public abstract class AbstractGameEngine implements Runnable {
 						GameController.getLevel().drawBehindObjects(offGfx, w, xOfsTemp);
 
 						// draw background
-						offGfx.drawImage(bgImage, 0, 0, w, h, xOfsTemp, 0, xOfsTemp+w, h);
+						offGfx.drawBackgroundImage(bgImage, 0, 0, w, h, xOfsTemp, 0, xOfsTemp+w, h);
 
 						// draw "in front" objects
 						GameController.getLevel().drawInFrontObjects(offGfx, w, xOfsTemp);
@@ -274,8 +524,8 @@ public abstract class AbstractGameEngine implements Runnable {
 					if (GameController.isCheat()) {
 						Stencil stencil = GameController.getStencil();
 						if (stencil != null) {
-							int stencilVal = stencil.get(getMouseX()+getMouseY()*Level.WIDTH);
-							String test = "x: "+getMouseX()+", y: "+getMouseY()+", mask: "+(stencilVal&0xffff)+" "+Stencil.getObjectID(stencilVal);
+							int stencilVal = stencil.get(xMouse+yMouse*Level.WIDTH);
+							String test = "x: "+xMouse+", y: "+yMouse+", mask: "+(stencilVal&0xffff)+" "+Stencil.getObjectID(stencilVal);
 							LemmFont.strImage(outStrGfx, test);
 							offGfx.drawImage(outStrImg,4,Level.HEIGHT+8);
 						}
@@ -348,17 +598,21 @@ public abstract class AbstractGameEngine implements Runnable {
 		return offImage[activeBuffer];
 	}
 	
+	public int getMouseX() {
+		return xMouse;
+	}
+
+	public int getMouseY() {
+		return yMouse;
+	}
+	
 	protected abstract boolean isRunning();
-	
-	protected abstract int getMouseX();
-	
-	protected abstract int getMouseY();
-	
-	protected abstract int getScreenMouseX();
-	
-	protected abstract int getScreenMouseY();
+
+	protected abstract Object getParent();
 	
 	protected abstract boolean isShiftPressed();
 	
 	protected abstract void repaint();
+
+	protected abstract void debugDraw(int x, int y, boolean leftMousePressed);
 }

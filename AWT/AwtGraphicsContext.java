@@ -77,6 +77,11 @@ public class AwtGraphicsContext implements GraphicsContext {
 		graphics.drawImage(AwtToolBox.INSTANCE.get().getBufferedImage(image), dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2, null);
 	}
 
+	@Override
+	public void drawBackgroundImage(Image image, int dx1, int dy1, int dx2, int dy2, int sx1, int sy1, int sx2, int sy2) {
+		drawImage(image, dx1, dy1, dx2, dy2, sx1, sy1, sx2, sy2);
+	}
+
 	public void grabPixels(Image image, int x, int y, int w, int h, int[] pix, int off, int scansize) {
 		PixelGrabber pixelgrabber = new PixelGrabber(AwtToolBox.INSTANCE.get().getBufferedImage(image), x, y, w, h, pix, off, scansize);
 		try {

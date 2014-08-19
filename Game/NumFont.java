@@ -1,7 +1,10 @@
 package Game;
 
-import Graphics.GraphicsContext;
-import Graphics.Image;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+
 import Tools.ToolBox;
 
 /*
@@ -33,23 +36,23 @@ public class NumFont {
 	/** height in pixels */
 	private static int height;
 	/** array of images - one for each cipher 0..9 */
-	private static Image numImg[];
+	private static BufferedImage numImg[];
 
 	/**
 	 * Load and initialize the font.
 	 * @throws ResourceException
 	 */
 	public static void init() throws ResourceException {
-		Image sourceImg = Core.INSTANCE.get().loadOpaqueImage("misc/numfont.gif");
-		Image img[] = ToolBox.INSTANCE.get().getAnimation(sourceImg,10);
-		width = sourceImg.getWidth();
-		height = sourceImg.getHeight()/10;
-		numImg = new Image[100];
+		Image sourceImg = Core.loadImage("misc/numfont.gif");
+		BufferedImage img[] = ToolBox.getAnimation(sourceImg,10,Transparency.OPAQUE);
+		width = sourceImg.getWidth(null);
+		height = sourceImg.getHeight(null)/10;
+		numImg = new BufferedImage[100];
 		for (int i=0; i<100; i++) {
-			numImg[i] = ToolBox.INSTANCE.get().createOpaqueImage(width*2, height);
-			GraphicsContext g = numImg[i].createGraphicsContext();
-			g.drawImage(img[i/10], 0, 0);
-			g.drawImage(img[i%10], width, 0);
+			numImg[i] = ToolBox.createImage(width*2, height, Transparency.OPAQUE);
+			Graphics2D g = numImg[i].createGraphics();
+			g.drawImage(img[i/10], 0, 0, null);
+			g.drawImage(img[i%10], width, 0, null);
 			g.dispose();
 		}
 	}
@@ -59,7 +62,7 @@ public class NumFont {
 	 * @param n number (0..99)
 	 * @return image of the number
 	 */
-	public static Image numImage(final int n) {
+	public static BufferedImage numImage(final int n) {
 		int num;
 		if (n>99)
 			num = 99;

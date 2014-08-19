@@ -107,16 +107,20 @@ public class ReplayStream {
 			ArrayList<ReplayEvent> ev = new ArrayList<ReplayEvent>();
 			BufferedReader f = new BufferedReader(new FileReader(fname));
 			String line = f.readLine();
-			if (!line.equals("#REPLAY"))
+			if (!line.equals("#REPLAY")) {
+				f.close();
 				return null;
+			}
 			// read level info
 			line = f.readLine();
 			String e[] = line.split(",");
 			for (int j=0; j<e.length; j++)
 				e[j] = e[j].trim();
 			ReplayLevelInfo rli = new ReplayLevelInfo();
-			if (e[0].charAt(0) != '#')
+			if (e[0].charAt(0) != '#') {
+				f.close();
 				return null;
+			}
 			rli.setLevelPack(e[0].substring(1));
 			rli.setDiffLevel(Integer.parseInt(e[1]));
 			rli.setLvlNumber(Integer.parseInt(e[2]));

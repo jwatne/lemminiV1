@@ -1,7 +1,9 @@
 package Game;
 
+import java.awt.Image;
+import java.awt.image.PixelGrabber;
+
 import GameUtil.Sprite;
-import Graphics.Image;
 
 /*
  * Copyright 2009 Volker Oth
@@ -109,10 +111,13 @@ public class SpriteObject extends Sprite {
 	 * @param imgMask image containing the collision mask.
 	 */
 	void setMask(final Image imgMask) {
-		int w = imgMask.getWidth();
-		int h = imgMask.getHeight();
+		int w = imgMask.getWidth(null);
+		int h = imgMask.getHeight(null);
 		mask = new int[w*h];
-		imgMask.createGraphicsContext().grabPixels(imgMask, 0, 0, w, h, mask, 0, w);
+		PixelGrabber grab = new PixelGrabber(imgMask,0,0,w,h,mask,0,w);
+		try {
+			grab.grabPixels();
+		} catch (InterruptedException interruptedexception) {}
 	}
 
 	/**

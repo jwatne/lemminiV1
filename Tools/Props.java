@@ -31,8 +31,6 @@ import java.util.Properties;
  */
 public class Props {
 
-	private final static long serialVersionUID = 0x01;
-
 	/** extended hash to store properties */
 	private final Properties hash;
 	/** header string */

@@ -49,10 +49,11 @@ public class MidiMusic {
 	 */
 	public MidiMusic(final String fName) throws ResourceException, LemmException {
 		try {
-			FileInputStream f = new FileInputStream(Core.INSTANCE.get().findResource(fName));
+			FileInputStream f = new FileInputStream(Core.findResource(fName));
 			canPlay = false;
 			sequencer = MidiSystem.getSequencer();
 			if (sequencer == null) {
+				f.close();;
 				throw new LemmException("Midi not supported");
 			} else {
 				// Acquire resources and make operational.
@@ -64,6 +65,7 @@ public class MidiMusic {
 				sequencer.setSequence(mySeq);
 				canPlay = true;
 				sequencer.addMetaEventListener(new MetaEventListener() {
+					@Override
 					public void meta(MetaMessage event) {
 						int type = event.getType();
 						//System.out.println("midi message: "+type+" "+event.toString());

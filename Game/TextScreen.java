@@ -1,15 +1,13 @@
 package Game;
-import static Game.LemmFont.Color.BLUE;
-import static Game.LemmFont.Color.BROWN;
-import static Game.LemmFont.Color.GREEN;
-import static Game.LemmFont.Color.RED;
-import static Game.LemmFont.Color.TURQUOISE;
-import static Game.LemmFont.Color.VIOLET;
-import Graphics.Color;
-import Graphics.GraphicsContext;
-import Graphics.GraphicsOperation;
-import Graphics.Image;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Transparency;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+
 import Tools.ToolBox;
+import static Game.LemmFont.Color.*;
 
 /*
  * Copyright 2009 Volker Oth
@@ -80,19 +78,19 @@ public class TextScreen {
 	/** TextDialog used as base component */
 	private static TextDialog textScreen;
 	/** factor used for the rotation animation */
-	private static float rotFact = 1.0f;
+	private static double rotFact = 1.0;
 	/** delta used for the rotation animation */
 	private static double rotDelta;
 	/** source image for rotation animation */
-	private static Image imgSrc;
+	private static BufferedImage imgSrc;
 	/** target image for rotation animation */
-	private static Image imgTrg;
+	private static BufferedImage imgTrg;
 	/** graphics for rotation animation */
-	private static GraphicsContext imgGfx;
+	private static Graphics2D imgGfx;
 	/** flip state for rotation: true - image is flipped in Y direction */
 	private static boolean flip;
 	/** affine transformation used for rotation animation */
-	private static GraphicsOperation at;
+	private static AffineTransform at;
 	/** counter used to trigger the rotation animation (in animation update frames) */
 	private static int rotCtr;
 	/** counter threshold used to trigger the rotation animation (in animation update frames) */
@@ -104,13 +102,15 @@ public class TextScreen {
 	/** counter for scrolled pixels */
 	private static int scrollPixCtr;
 	/** image used for scroller */
-	private static Image scrollerImg;
+	private static BufferedImage scrollerImg;
 	/** graphics used for scroller */
-	private static GraphicsContext scrollerGfx;
+	private static Graphics2D scrollerGfx;
 	/** screen type to display */
 	private static Mode mode;
 	/** sychronization monitor */
 	private static Object monitor = new Object();
+	
+	private static int oldScale = Core.getScale();
 
 	/**
 	 * Set mode.
@@ -118,14 +118,15 @@ public class TextScreen {
 	 */
 	public static void setMode(final Mode m) {
 		synchronized (monitor) {
-			if (mode != m) {
+			int scale = Core.getScale();
+			if (mode != m || oldScale != scale) {
 				switch (m) {
 					case INTRO:
 						textScreen.init();
 						textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_BROWN));
 						textScreen.printCentered("A game engine for Lemmings(tm) in Java", 0, RED);
-						textScreen.printCentered("Release 0.84 1/2010", 1, BLUE);
-						textScreen.printCentered("Coded by Volker Oth 2005-2010", 2, VIOLET);
+						textScreen.printCentered("Release 0.85 8/2014", 1, BLUE);
+						textScreen.printCentered("Coded by Volker Oth 2005-2014", 2, VIOLET);
 						textScreen.printCentered("www.lemmini.de", 3, GREEN);
 						textScreen.copyToBackBuffer();
 						//textScreen.addTextButton(-4, 3, 1, "  Start ", "Let's go", BLUE, RED);
@@ -139,6 +140,7 @@ public class TextScreen {
 				}
 			}
 			mode = m;
+			oldScale = scale;
 		}
 	}
 
@@ -249,25 +251,26 @@ public class TextScreen {
 	 * @param height height in pixels
 	 */
 	public static void init(final int width, final int height) {
-		rotFact = 1.0f;
-		rotDelta = -0.1;
-		imgSrc = MiscGfx.getImage(MiscGfx.Index.LEMMINI);
-		at = ToolBox.INSTANCE.get().createGraphicsOperation();
-		flip = false;
-		rotCtr = 0 ;
-		flipCtr = 0;
-		imgTrg = ToolBox.INSTANCE.get().createTranslucentImage(imgSrc.getWidth(),imgSrc.getHeight());
-		imgGfx = imgTrg.createGraphicsContext();
-		imgGfx.setBackground(new Color(0,0,0,0)); // invisible
-		scrollCharCtr = 0;
-		scrollPixCtr = 0;
+		synchronized (monitor) {
+			rotFact = 1.0;
+			rotDelta = -0.1;
+			imgSrc = MiscGfx.getImage(MiscGfx.Index.LEMMINI);
+			at = new AffineTransform();
+			flip = false;
+			rotCtr = 0 ;
+			flipCtr = 0;
+			imgTrg = ToolBox.createImage(imgSrc.getWidth(),imgSrc.getHeight(), Transparency.TRANSLUCENT);
+			imgGfx = imgTrg.createGraphics();
+			imgGfx.setBackground(new Color(0,0,0,0)); // invisible
+			scrollCharCtr = 0;
+			scrollPixCtr = 0;
 
-		scrollerImg = ToolBox.INSTANCE.get().createBitmaskImage(LemmFont.getWidth()*(1+SCROLL_WIDTH),SCROLL_HEIGHT);
-		scrollerGfx = scrollerImg.createGraphicsContext();
-		scrollerGfx.setBackground(new Color(0,0,0,0));
+			scrollerImg = ToolBox.createImage(LemmFont.getWidth()*(1+SCROLL_WIDTH),SCROLL_HEIGHT, Transparency.BITMASK);
+			scrollerGfx = scrollerImg.createGraphics();
+			scrollerGfx.setBackground(new Color(0,0,0,0));
 
-		textScreen  = new TextDialog(width, height);
-
+			textScreen  = new TextDialog(width, height);
+		}
 	}
 
 	/**
@@ -300,23 +303,24 @@ public class TextScreen {
 			rotFact += rotDelta;
 			if (rotFact <= 0.0) {
 				// minimum size reached -> flip and increase again
-				rotFact = 0.1f;
+				rotFact = 0.1;
 				rotDelta = -rotDelta;
 				flip = !flip;
 			} else if (rotFact > 1.0) {
 				// maximum size reached -> decrease again
-				rotFact = 1.0f;
+				rotFact = 1.0;
 				rotDelta = -rotDelta;
 				// reset only after two rounds (flipped back)
 				if (++flipCtr > 1)
 					rotCtr = 0;
 			}
 			if (flip) {
-				at.setScale(1, -rotFact);
+				at.setToScale(1, -rotFact);
 				at.translate(1,-imgSrc.getHeight());
-			} else at.setScale(1, rotFact);
+			} else at.setToScale(1, rotFact);
+			AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 			imgGfx.clearRect(0, 0, imgTrg.getWidth(), imgTrg.getHeight());
-			at.execute(imgSrc, imgTrg);
+			op.filter(imgSrc, imgTrg);
 			textScreen.drawImage(imgTrg, -120 - (int)(imgSrc.getHeight()/2*Math.abs(rotFact)+0.5));
 		} else {
 			// display original image
@@ -339,8 +343,8 @@ public class TextScreen {
 		int w = SCROLL_WIDTH*LemmFont.getWidth();
 		int dx = (textScreen.getScreen().getWidth()-w)/2;
 		int dy = (textScreen.getScreen().getHeight()/2)+SCROLL_Y;
-		textScreen.getScreen().createGraphicsContext().drawImage(
-				scrollerImg, dx, dy, dx+w, dy+SCROLL_HEIGHT, scrollPixCtr,0,scrollPixCtr+w,SCROLL_HEIGHT/2
+		textScreen.getScreen().createGraphics().drawImage(
+				scrollerImg, dx, dy, dx+w, dy+SCROLL_HEIGHT, scrollPixCtr,0,scrollPixCtr+w,SCROLL_HEIGHT/2, null
 		);
 
 		scrollPixCtr+=SCROLL_STEP;
@@ -369,7 +373,7 @@ public class TextScreen {
 	 * Get image of text screen
 	 * @return image of text screen
 	 */
-	public static Image getScreen() {
+	public static BufferedImage getScreen() {
 		synchronized (monitor) {
 			return textScreen.getScreen();
 		}

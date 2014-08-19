@@ -1,10 +1,11 @@
 package Game;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import Graphics.Color;
-import Graphics.GraphicsContext;
-import Graphics.Image;
 import Tools.ToolBox;
 
 /*
@@ -33,13 +34,13 @@ public class TextDialog {
 	/** list of buttons */
 	private ArrayList<Button> buttons;
 	/** image used as screen buffer */
-	private Image screenBuffer;
+	private BufferedImage screenBuffer;
 	/** graphics object to draw in screen buffer */
-	private GraphicsContext gScreen;
+	private Graphics2D gScreen;
 	/** image used as 2nd screen buffer for offscreen drawing */
-	private Image backBuffer;
+	private BufferedImage backBuffer;
 	/** graphics object to draw in 2nd (offscreen) screen buffer */
-	private GraphicsContext gBack;
+	private Graphics2D gBack;
 	/** width of screen in pixels */
 	private int width;
 	/** height of screen in pixels */
@@ -59,11 +60,11 @@ public class TextDialog {
 		height = h;
 		centerX = width/2;
 		centerY = height/2;
-		screenBuffer = ToolBox.INSTANCE.get().createOpaqueImage(w, h);
-		gScreen = screenBuffer.createGraphicsContext();
+		screenBuffer = ToolBox.createImage(w, h, Transparency.OPAQUE);
+		gScreen = screenBuffer.createGraphics();
 		gScreen.setClip(0, 0, width, height);
-		backBuffer = ToolBox.INSTANCE.get().createOpaqueImage(w, h);
-		gBack = backBuffer.createGraphicsContext();
+		backBuffer = ToolBox.createImage(w, h, Transparency.OPAQUE);
+		gBack = backBuffer.createGraphics();
 		gBack.setClip(0, 0, width, height);
 		buttons = new ArrayList<Button>();
 	}
@@ -81,7 +82,7 @@ public class TextDialog {
 	 * Get image containing current (on screen) screenbuffer.
 	 * @return image containing current (on screen) screenbuffer
 	 */
-	public Image getScreen() {
+	public BufferedImage getScreen() {
 		return screenBuffer;
 	}
 
@@ -89,39 +90,39 @@ public class TextDialog {
 	 * Fill brackground with tiles.
 	 * @param tile Image used as tile
 	 */
-	public void fillBackground(final Image tile) {
+	public void fillBackground(final BufferedImage tile) {
 		for (int x=0; x<width; x+=tile.getWidth()) {
 			for (int y=0; y<width; y+= tile.getHeight())
-				gBack.drawImage(tile,x,y);
+				gBack.drawImage(tile,x,y,null);
 		}
-		gScreen.drawImage(backBuffer,0,0);
+		gScreen.drawImage(backBuffer,0,0,null);
 	}
 
 	/**
 	 * Copy back buffer to front buffer.
 	 */
 	public void copyToBackBuffer() {
-		gBack.drawImage(screenBuffer,0,0);
+		gBack.drawImage(screenBuffer,0,0,null);
 	}
 
 	/**
 	 * Set Image as background. The image will appear centered.
 	 * @param image Image to use as background
 	 */
-	public void setBackground(final Image image) {
+	public void setBackground(final BufferedImage image) {
 		int x= (width-image.getWidth())/2;
 		int y= (height-image.getHeight())/2;
 		gBack.setBackground(Color.BLACK);
 		gBack.clearRect(0, 0, width, height);
-		gBack.drawImage(image,x,y);
-		gScreen.drawImage(backBuffer,0,0);
+		gBack.drawImage(image,x,y,null);
+		gScreen.drawImage(backBuffer,0,0,null);
 	}
 
 	/**
 	 * Restore whole background from back buffer.
 	 */
 	public void restore() {
-		gScreen.drawImage(backBuffer,0,0);
+		gScreen.drawImage(backBuffer,0,0,null);
 	}
 
 	/**
@@ -132,7 +133,7 @@ public class TextDialog {
 	 * @param height height of rectangle
 	 */
 	public void restoreRect(final int x, final int y, final int width, final int height) {
-		gScreen.drawImage(backBuffer,x,y,x+width,y+height,x,y,x+width,y+height);
+		gScreen.drawImage(backBuffer,x,y,x+width,y+height,x,y,x+width,y+height,null);
 	}
 
 	/**
@@ -147,7 +148,7 @@ public class TextDialog {
 		int y = y0*(LemmFont.getHeight()+4);
 		int len = l*LemmFont.getWidth();
 		int h = LemmFont.getHeight()+4;
-		gScreen.drawImage(backBuffer,x,y,x+len,y+h,x,y,x+len,y+h);
+		gScreen.drawImage(backBuffer,x,y,x+len,y+h,x,y,x+len,y+h,null);
 	}
 
 	/**
@@ -203,8 +204,8 @@ public class TextDialog {
 	 * @param x X position relative to center
 	 * @param y Y position relative to center
 	 */
-	public void drawImage(final Image img, final int x, final int y) {
-		gScreen.drawImage(img,centerX+x,centerY+y);
+	public void drawImage(final BufferedImage img, final int x, final int y) {
+		gScreen.drawImage(img,centerX+x,centerY+y,null);
 	}
 
 	/**
@@ -212,9 +213,9 @@ public class TextDialog {
 	 * @param img Image
 	 * @param y Y position relative to center
 	 */
-	public void drawImage(final Image img, final int y) {
+	public void drawImage(final BufferedImage img, final int y) {
 		int x = centerX-img.getWidth()/2;
-		gScreen.drawImage(img,x,centerY+y);
+		gScreen.drawImage(img,x,centerY+y,null);
 	}
 
 	/**
@@ -225,7 +226,7 @@ public class TextDialog {
 	 * @param imgSelected Button selected image
 	 * @param id Button ID
 	 */
-	public void addButton(final int x, final int y, final Image img, final Image imgSelected, final int id) {
+	public void addButton(final int x, final int y, final BufferedImage img, final  BufferedImage imgSelected, final int id) {
 		Button b = new Button(centerX+x,centerY+y,id);
 		b.SetImage(img);
 		b.SetImageSelected(imgSelected);
@@ -324,9 +325,9 @@ class Button {
 	/** true if button is selected */
 	protected boolean selected;
 	/** normal button image */
-	protected Image image;
+	protected BufferedImage image;
 	/** selected button image */
-	protected Image imgSelected;
+	protected BufferedImage imgSelected;
 
 	/**
 	 * Constructor
@@ -344,7 +345,7 @@ class Button {
 	 * Set normal button image.
 	 * @param img image
 	 */
-	void SetImage(final Image img) {
+	void SetImage(final BufferedImage img) {
 		image = img;
 		if (image.getHeight() > height)
 			height = image.getHeight();
@@ -356,7 +357,7 @@ class Button {
 	 * Set selected button image.
 	 * @param img image
 	 */
-	void SetImageSelected(final Image img) {
+	void SetImageSelected(final BufferedImage img) {
 		imgSelected = img;
 		if (imgSelected.getHeight() > height)
 			height = imgSelected.getHeight();
@@ -368,7 +369,7 @@ class Button {
 	 * Return current button image (normal or selected, depending on state).
 	 * @return current button image
 	 */
-	Image getImage() {
+	BufferedImage getImage() {
 		if (selected)
 			return imgSelected;
 		else
@@ -379,8 +380,8 @@ class Button {
 	 * Draw the button.
 	 * @param g graphics object to draw on
 	 */
-	void draw(final GraphicsContext g) {
-		g.drawImage(getImage(),x,y);
+	void draw(final Graphics2D g) {
+		g.drawImage(getImage(),x,y,null);
 	}
 
 	/**

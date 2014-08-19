@@ -57,7 +57,7 @@ public class Music {
 		modMusic = new ModMusic();
 
 		// read available musicfiles for random mode
-		File dir = new File(Core.INSTANCE.get().getResourcePath()+"music");
+		File dir = new File(Core.resourcePath+"music");
 		File files[] = dir.listFiles(new MusicFileFilter());
 		musicFiles = new String[files.length];
 		for (int i=0; i<files.length; i++)
@@ -179,7 +179,7 @@ public class Music {
 				modMusic.setGain(gain);
 				break;
 		}
-		Core.INSTANCE.get().getProgramProps().set("musicGain", gain);
+		Core.programProps.set("musicGain", gain);
 	}
 
 	/**
@@ -199,6 +199,7 @@ class MusicFileFilter implements FileFilter {
 	/* (non-Javadoc)
 	 * @see java.io.FileFilter#accept(java.io.File)
 	 */
+	@Override
 	public boolean accept(final File f) {
 		if (!f.isFile())
 			return false;

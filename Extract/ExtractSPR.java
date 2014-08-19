@@ -32,8 +32,6 @@ public class ExtractSPR {
 	/** palette index of transparent color */
 	private final static int transparentIndex = 0;
 
-	private final static long serialVersionUID = 0x01;
-
 	/** array of GIF images to store to disk */
 	private GIFImage images[];
 	/** color palette */

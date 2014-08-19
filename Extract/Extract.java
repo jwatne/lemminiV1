@@ -837,6 +837,7 @@ class LvlFilter implements FilenameFilter {
 	/* (non-Javadoc)
 	 * @see java.io.FilenameFilter#accept(java.io.File, java.lang.String)
 	 */
+	@Override
 	public boolean accept(final File dir, final String name) {
 		if (name.toLowerCase().indexOf(".lvl") != -1)
 			return true;

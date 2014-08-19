@@ -240,8 +240,6 @@ class LvlObject {
 	/** paint mode: paint without any further checks */
 	private static final int MODE_FULL = 0;
 
-	private final static long serialVersionUID = 0x01;
-
 	/** x position in pixels */
 	int xPos;
 	/** y position in pixels */
@@ -294,8 +292,6 @@ class LvlObject {
  * @author Volker Oth
  */
 class Terrain {
-	private final static long serialVersionUID = 0x01;
-
 	/** identifier */
 	int id;
 	/** x position in pixels */
@@ -339,8 +335,6 @@ class Terrain {
  * @author Volker Oth
  */
 class Steel {
-	private final static long serialVersionUID = 0x01;
-
 	/** x position in pixels */
 	int xPos;
 	/** y position in pixels */
@@ -380,8 +374,6 @@ class LevelBuffer {
 	private byte buffer[];
 	/** byte offset */
 	private int ofs;
-
-	private final static long serialVersionUID = 0x01;
 
 	/**
 	 * Constructor.

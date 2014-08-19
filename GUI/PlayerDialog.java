@@ -15,7 +15,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import AWT.AwtCore;
 import Game.Core;
 
 /*
@@ -46,6 +45,7 @@ public class PlayerDialog extends JDialog {
 
 	private JScrollPane jScrollPane = null;
 
+	@SuppressWarnings("rawtypes")
 	private JList jList = null;
 
 	private JButton jButtonNew = null;
@@ -79,10 +79,11 @@ public class PlayerDialog extends JDialog {
 	/**
 	 * Initialize manually generated resources.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void init() {
 		players = new Vector<String>();
-		for (int i=0; i<Core.INSTANCE.get().getPlayerNum(); i++)
-			players.add(Core.INSTANCE.get().getPlayer(i));
+		for (int i=0; i<Core.getPlayerNum(); i++)
+			players.add(Core.getPlayer(i));
 		jList = new JList(players);
 		jScrollPane.setViewportView(jList);
 	}
@@ -179,6 +180,7 @@ public class PlayerDialog extends JDialog {
 	 *
 	 * @return javax.swing.JList
 	 */
+	@SuppressWarnings("rawtypes")
 	private JList getJList() {
 		if (jList == null) {
 			jList = new JList();
@@ -196,9 +198,11 @@ public class PlayerDialog extends JDialog {
 			jButtonNew = new JButton();
 			jButtonNew.setText("New Player");
 			jButtonNew.addActionListener(new java.awt.event.ActionListener() {
+				@SuppressWarnings("unchecked")
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					String player = JOptionPane.showInputDialog(
-							AwtCore.INSTANCE.get().getCmp(), "Enter Player Name", "Input", JOptionPane.QUESTION_MESSAGE);
+							Core.getCmp(), "Enter Player Name", "Input", JOptionPane.QUESTION_MESSAGE);
 					if (player != null) {
 						// check if this player already exists
 						// it it alread exists, reset the existing profile
@@ -235,6 +239,8 @@ public class PlayerDialog extends JDialog {
 			jButtonDelete = new JButton();
 			jButtonDelete.setText("Delete Player");
 			jButtonDelete.addActionListener(new java.awt.event.ActionListener() {
+				@SuppressWarnings("unchecked")
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					int idx =jList.getSelectedIndex();
 					if (idx != -1) {
@@ -257,6 +263,7 @@ public class PlayerDialog extends JDialog {
 			jButtonOK = new JButton();
 			jButtonOK.setText("Ok");
 			jButtonOK.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					dispose();
 				}
@@ -275,6 +282,7 @@ public class PlayerDialog extends JDialog {
 			jButtonCancel = new JButton();
 			jButtonCancel.setText("Cancel");
 			jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					players.clear();
 					players = null;

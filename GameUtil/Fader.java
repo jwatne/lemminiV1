@@ -1,8 +1,11 @@
 package GameUtil;
 
-import Graphics.Color;
-import Graphics.GraphicsContext;
-import Graphics.Image;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+
 import Tools.ToolBox;
 
 /*
@@ -61,9 +64,9 @@ public class Fader {
 	/** height of faded area */
 	private static int height;
 	/** the image used as fading rectangle */
-	private static Image alphaImg = null;
+	private static BufferedImage alphaImg = null;
 	/** the graphics used as fading rectangle (static to avoid multiple allocation) */
-	private static GraphicsContext alphaGfx;
+	private static Graphics2D alphaGfx;
 
 	/**
 	 * Set color to be used for fading.
@@ -100,8 +103,8 @@ public class Fader {
 		Color fillColor; /* ARGB color of the fading rectangle composed from alpha and color */
 		// create alpha image if needed
 		if (alphaImg == null) {
-			alphaImg = ToolBox.INSTANCE.get().createTranslucentImage(WIDTH, HEIGHT);
-			alphaGfx = alphaImg.createGraphicsContext();
+			alphaImg = ToolBox.createImage(WIDTH, HEIGHT, Transparency.TRANSLUCENT);
+			alphaGfx = alphaImg.createGraphics();
 		}
 		// fill with alpha blended color
 		fillColor = new Color((color>>16)&0xff, (color>>8)&0xff, color&0xff, alpha);
@@ -113,10 +116,10 @@ public class Fader {
 	 * Apply fader without changing the fader state.
 	 * @param g graphics to apply fader to
 	 */
-	public static synchronized void apply(final GraphicsContext g) {
+	public static synchronized void apply(final Graphics g) {
 		for (int y=0; y<height; y+= HEIGHT)
 			for (int x=0; x<width; x+= WIDTH)
-				g.drawImage(alphaImg,x,y);
+				g.drawImage(alphaImg,x,y,null);
 	}
 
 	/**
@@ -157,7 +160,7 @@ public class Fader {
 	 * Fade.
 	 * @param g graphics to fade
 	 */
-	public static synchronized void fade(final GraphicsContext g) {
+	public static synchronized void fade(final Graphics g) {
 		switch (fadeState) {
 			case IN:
 				if (fadeValue >= fadeStep)

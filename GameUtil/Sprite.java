@@ -1,6 +1,9 @@
 package GameUtil;
 
-import Graphics.Image;
+import java.awt.Image;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+
 import Tools.ToolBox;
 
 /*
@@ -55,7 +58,7 @@ public class Sprite {
 	/** boolean flag: animation was triggered */
 	private boolean triggered;
 	/** array of animation frames */
-	private Image frames[];
+	private BufferedImage frames[];
 
 	/**
 	 * Constructor.
@@ -96,13 +99,13 @@ public class Sprite {
 	 */
 	private void init(final Image sourceImg, final int animFrames) {
 		numframes = animFrames;
-		width = sourceImg.getWidth();
-		height = sourceImg.getHeight()/numframes;
+		width = sourceImg.getWidth(null);
+		height = sourceImg.getHeight(null)/numframes;
 		frameIdx = 0;
 		animMode = Animation.NONE;
 		triggered = false;
 		// animation frames stored one above the other - now separate them into single images
-		frames = ToolBox.INSTANCE.get().getAnimation(sourceImg, animFrames);
+		frames = ToolBox.getAnimation(sourceImg, animFrames, Transparency.BITMASK);
 	}
 
 	/**
@@ -110,7 +113,7 @@ public class Sprite {
 	 * @param idx index of animation frame
 	 * @return animation frame at position idx.
 	 */
-	public Image getImage(final int idx) {
+	public BufferedImage getImage(final int idx) {
 		return frames[idx];
 	}
 
@@ -118,7 +121,7 @@ public class Sprite {
 	 * Get current animation frame.
 	 * @return current animation frame.
 	 */
-	public Image getImage() {
+	public BufferedImage getImage() {
 		return frames[frameIdx];
 	}
 
@@ -128,7 +131,7 @@ public class Sprite {
 	 * @param idx index of frame to replace
 	 * @param img image to use for this animation frame
 	 */
-	public void setImage(final int idx, final Image img) {
+	public void setImage(final int idx, final BufferedImage img) {
 		frames[idx] = img;
 	}
 
@@ -136,8 +139,8 @@ public class Sprite {
 	 * Get current animation frame and animate.
 	 * @return current animation frame (before increasing the animation step).
 	 */
-	public Image getImageAnim() {
-		Image i = frames[frameIdx];
+	public BufferedImage getImageAnim() {
+		BufferedImage i = frames[frameIdx];
 		switch (animMode) {
 			case LOOP:
 				if(++frameIdx >= numframes)

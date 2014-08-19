@@ -1,7 +1,9 @@
 package Game;
 
-import Graphics.GraphicsContext;
-import Graphics.Image;
+import java.awt.Graphics2D;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+
 import Tools.ToolBox;
 
 /*
@@ -53,26 +55,26 @@ public class LemmFont {
 	/** height of one character pixels */
 	private static int height;
 	/** array of array of images [color,character] */
-	static private Image img[][];
+	static private BufferedImage img[][];
 
 	/**
 	 * Initialization.
 	 * @throws ResourceException
 	 */
 	static public void init() throws ResourceException {
-		Image sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/lemmfont.gif");
+		BufferedImage sourceImg = ToolBox.ImageToBuffered(Core.loadImage("misc/lemmfont.gif"),Transparency.BITMASK);
 
 		width = SPACING; //sourceImg.getWidth(null);
-		height = sourceImg.getHeight()/CHARS.length();
-		Image redImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
-		Image blueImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
-		Image turquoiseImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
-		Image brownImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
-		Image violetImg = ToolBox.INSTANCE.get().createBitmaskImage(sourceImg.getWidth(), sourceImg.getHeight());
-		img = new Image[7][];
-		img[0] = ToolBox.INSTANCE.get().getAnimation(sourceImg,CHARS.length(),width);
-		for (int xp=0; xp<sourceImg.getWidth(); xp++)
-			for (int yp=0; yp<sourceImg.getHeight(); yp++) {
+		height = sourceImg.getHeight(null)/CHARS.length();
+		BufferedImage redImg = ToolBox.createImage(sourceImg.getWidth(), sourceImg.getHeight(),Transparency.BITMASK);
+		BufferedImage blueImg = ToolBox.createImage(sourceImg.getWidth(), sourceImg.getHeight(),Transparency.BITMASK);
+		BufferedImage turquoiseImg = ToolBox.createImage(sourceImg.getWidth(), sourceImg.getHeight(),Transparency.BITMASK);
+		BufferedImage brownImg = ToolBox.createImage(sourceImg.getWidth(), sourceImg.getHeight(),Transparency.BITMASK);
+		BufferedImage violetImg = ToolBox.createImage(sourceImg.getWidth(), sourceImg.getHeight(),Transparency.BITMASK);
+		img = new BufferedImage[7][];
+		img[0] = ToolBox.getAnimation(sourceImg,CHARS.length(),Transparency.BITMASK,width);
+		for (int xp=0; xp<sourceImg.getWidth(null); xp++)
+			for (int yp=0; yp<sourceImg.getHeight(null); yp++) {
 				int col = sourceImg.getRGB(xp, yp); // A R G B
 				int a = col & 0xff000000; // transparent part
 				int r = (col >> 16) & 0xff;
@@ -94,11 +96,11 @@ public class LemmFont {
 				col = a | (g<<16) | (((r+b)<<7)&0xff00) | g;
 				violetImg.setRGB(xp, yp, col);
 			}
-		img[Color.RED.ordinal()] = ToolBox.INSTANCE.get().getAnimation(redImg,CHARS.length(),width);
-		img[Color.BLUE.ordinal()] = ToolBox.INSTANCE.get().getAnimation(blueImg,CHARS.length(),width);
-		img[Color.TURQUOISE.ordinal()] = ToolBox.INSTANCE.get().getAnimation(turquoiseImg,CHARS.length(),width);
-		img[Color.BROWN.ordinal()] = ToolBox.INSTANCE.get().getAnimation(brownImg,CHARS.length(),width);
-		img[Color.VIOLET.ordinal()] = ToolBox.INSTANCE.get().getAnimation(violetImg,CHARS.length(),width);
+		img[Color.RED.ordinal()] = ToolBox.getAnimation(redImg,CHARS.length(),Transparency.BITMASK,width);
+		img[Color.BLUE.ordinal()] = ToolBox.getAnimation(blueImg,CHARS.length(),Transparency.BITMASK,width);
+		img[Color.TURQUOISE.ordinal()] = ToolBox.getAnimation(turquoiseImg,CHARS.length(),Transparency.BITMASK,width);
+		img[Color.BROWN.ordinal()] = ToolBox.getAnimation(brownImg,CHARS.length(),Transparency.BITMASK,width);
+		img[Color.VIOLET.ordinal()] = ToolBox.getAnimation(violetImg,CHARS.length(),Transparency.BITMASK,width);
 	}
 
 	/**
@@ -109,14 +111,14 @@ public class LemmFont {
 	 * @param sy y coordinate in pixels
 	 * @param color Color
 	 */
-	static public void strImage(final GraphicsContext g, final String s, final int sx, final int sy, final Color color) {
+	static public void strImage(final Graphics2D g, final String s, final int sx, final int sy, final Color color) {
 		for (int i=0, x = sx; i<s.length();i++,x+=SPACING) {
 			char c = s.charAt(i);
 			if (c==' ')
 				continue;
 			int pos = CHARS.indexOf(c);
 			if (pos > -1 && pos < CHARS.length()) {
-				g.drawImage(img[color.ordinal()][pos], x, sy);
+				g.drawImage(img[color.ordinal()][pos], x, sy, null);
 			}
 		}
 		return;
@@ -128,7 +130,7 @@ public class LemmFont {
 	 * @param s string to draw.
 	 * @param color Color
 	 */
-	static public void strImage(final GraphicsContext g, final String s, final Color color) {
+	static public void strImage(final Graphics2D g, final String s, final Color color) {
 		strImage(g, s, 0, 0, color);
 		return;
 	}
@@ -139,9 +141,9 @@ public class LemmFont {
 	 * @param color Color
 	 * @return a buffered image of the needed size that contains an image of the given string
 	 */
-	static public Image strImage(final String s, final Color color) {
-		Image image = ToolBox.INSTANCE.get().createBitmaskImage(width*s.length(), height);
-		strImage(image.createGraphicsContext(), s, color);
+	static public BufferedImage strImage(final String s, final Color color) {
+		BufferedImage image = ToolBox.createImage(width*s.length(), height, Transparency.BITMASK);
+		strImage(image.createGraphics(), s, color);
 		return image;
 	}
 
@@ -150,7 +152,7 @@ public class LemmFont {
 	 * @param s string to draw
 	 * @return a buffered image of the needed size that contains an image of the given string
 	 */
-	static public Image strImage(final String s) {
+	static public BufferedImage strImage(final String s) {
 		return strImage(s, Color.GREEN);
 	}
 
@@ -159,7 +161,7 @@ public class LemmFont {
 	 * @param g graphics object to draw to.
 	 * @param s string to draw.
 	 */
-	static public void strImage(final GraphicsContext g, final String s) {
+	static public void strImage(final Graphics2D g, final String s) {
 		strImage(g, s, Color.GREEN);
 	}
 

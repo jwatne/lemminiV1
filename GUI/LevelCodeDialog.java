@@ -44,6 +44,7 @@ public class LevelCodeDialog extends JDialog {
 
 	private JLabel jLabelLvlPack = null;
 
+	@SuppressWarnings("rawtypes")
 	private JComboBox jComboBoxLvlPack = null;
 
 	private JLabel jLabelCode = null;
@@ -62,6 +63,7 @@ public class LevelCodeDialog extends JDialog {
 	/**
 	 * Initialize manually generated resources.
 	 */
+	@SuppressWarnings("unchecked")
 	private void init() {
 		// level pack 0 is the dummy level pack -> not selectable
 		for (int i=1; i<GameController.getLevelPackNum(); i++)
@@ -186,6 +188,7 @@ public class LevelCodeDialog extends JDialog {
 	 *
 	 * @return javax.swing.JComboBox
 	 */
+	@SuppressWarnings("rawtypes")
 	private JComboBox getJComboBoxLvlPack() {
 		if (jComboBoxLvlPack == null) {
 			jComboBoxLvlPack = new JComboBox();
@@ -202,6 +205,7 @@ public class LevelCodeDialog extends JDialog {
 		if (jTextFieldCode == null) {
 			jTextFieldCode = new JTextField();
 			jTextFieldCode.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					code = jTextFieldCode.getText();
 					levelPackIndex = jComboBoxLvlPack.getSelectedIndex()+1;
@@ -223,6 +227,7 @@ public class LevelCodeDialog extends JDialog {
 			jButtonOk.setText("Ok");
 			jButtonOk.setPreferredSize(new Dimension(90, 50));
 			jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					code = jTextFieldCode.getText();
 					levelPackIndex = jComboBoxLvlPack.getSelectedIndex()+1;
@@ -243,6 +248,7 @@ public class LevelCodeDialog extends JDialog {
 			jButtonCancel = new JButton();
 			jButtonCancel.setText("Cancel");
 			jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					code = null;
 					levelPackIndex = -1;

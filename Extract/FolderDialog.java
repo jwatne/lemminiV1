@@ -224,6 +224,7 @@ public class FolderDialog extends JDialog {
 			jTextFieldTrg = new JTextField();
 			jTextFieldTrg.setPreferredSize(new java.awt.Dimension(100,19));
 			jTextFieldTrg.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					targetPath = jTextFieldTrg.getText();
 				}
@@ -241,6 +242,7 @@ public class FolderDialog extends JDialog {
 			jTextFieldSrc = new JTextField();
 			jTextFieldSrc.setPreferredSize(new java.awt.Dimension(100,19));
 			jTextFieldSrc.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					sourcePath = jTextFieldSrc.getText();
 				}
@@ -258,6 +260,7 @@ public class FolderDialog extends JDialog {
 			jButtonSrc = new JButton();
 			jButtonSrc.setText("Browse");
 			jButtonSrc.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					JFileChooser jf = new JFileChooser(sourcePath);
 					jf.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY );
@@ -282,6 +285,7 @@ public class FolderDialog extends JDialog {
 			jButtonTrg = new JButton();
 			jButtonTrg.setText("Browse");
 			jButtonTrg.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					JFileChooser jf = new JFileChooser(targetPath);
 					jf.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY );
@@ -305,6 +309,7 @@ public class FolderDialog extends JDialog {
 			jButtonQuit = new JButton();
 			jButtonQuit.setText("Quit");
 			jButtonQuit.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					sourcePath = jTextFieldSrc.getText();
 					targetPath = jTextFieldTrg.getText();
@@ -324,6 +329,7 @@ public class FolderDialog extends JDialog {
 			jButtonExtract = new JButton();
 			jButtonExtract.setText("Extract");
 			jButtonExtract.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					sourcePath = jTextFieldSrc.getText();
 					targetPath = jTextFieldTrg.getText();

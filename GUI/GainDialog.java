@@ -149,6 +149,7 @@ public class GainDialog extends JDialog {
 			jButtonOK.setBounds(new Rectangle(210, 135, 66, 25));
 			jButtonOK.setText(" Ok ");
 			jButtonOK.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					Music.setGain(jSliderMusic.getValue()/100.0);
 					GameController.sound.setGain(jSliderSound.getValue()/100.0);
@@ -170,6 +171,7 @@ public class GainDialog extends JDialog {
 			jButtonCancel.setBounds(new Rectangle(14, 136, 77, 23));
 			jButtonCancel.setText("Cancel");
 			jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					dispose();
 				}

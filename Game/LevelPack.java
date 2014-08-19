@@ -71,7 +71,7 @@ public class LevelPack {
 	 */
 	public LevelPack(final String fname) throws ResourceException {
 		// extract path from descriptor file
-		path = ToolBox.INSTANCE.get().getPathName(fname);
+		path = ToolBox.getPathName(fname);
 		// load the descriptor file
 		Props props = new Props();
 		if (!props.load(fname))

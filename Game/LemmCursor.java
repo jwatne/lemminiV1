@@ -1,7 +1,11 @@
 package Game;
 
-import Graphics.Image;
-import Tools.Cursor;
+import java.awt.Cursor;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+
 import Tools.ToolBox;
 
 /*
@@ -57,7 +61,7 @@ public class LemmCursor  {
 	/** current cursor type */
 	private static Type type;
 	/** array of images - one for each cursor type */
-	private static Image img[];
+	private static BufferedImage img[];
 	/** array of AWT cursor Objects */
 	private static Cursor cursor[];
 
@@ -66,14 +70,14 @@ public class LemmCursor  {
 	 * @throws ResourceException
 	 */
 	public static void init() throws ResourceException {
-		img = ToolBox.INSTANCE.get().getAnimation(Core.INSTANCE.get().loadBitmaskImage("misc/cursor.gif"), 8);
+		img = ToolBox.getAnimation(Core.loadImage("misc/cursor.gif"), 8, Transparency.BITMASK);
 		cursor = new Cursor[4];
 		int w = getImage(Type.NORMAL).getWidth()/2;
 		int h = getImage(Type.NORMAL).getHeight()/2;
-		cursor[Type.NORMAL.ordinal()] = ToolBox.INSTANCE.get().createCursor(LemmCursor.getImage(Type.NORMAL), w, h);
-		cursor[Type.LEFT.ordinal()] = ToolBox.INSTANCE.get().createCursor(LemmCursor.getImage(Type.LEFT), w, h);
-		cursor[Type.RIGHT.ordinal()] = ToolBox.INSTANCE.get().createCursor(LemmCursor.getImage(Type.RIGHT), w, h);
-		cursor[Type.WALKER.ordinal()] = ToolBox.INSTANCE.get().createCursor(LemmCursor.getImage(Type.WALKER), w, h);
+		cursor[Type.NORMAL.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.NORMAL), new Point(w,h), "" );
+		cursor[Type.LEFT.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.LEFT),   new Point(w,h), "" );
+		cursor[Type.RIGHT.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.RIGHT),  new Point(w,h), "" );
+		cursor[Type.WALKER.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.WALKER), new Point(w,h), "" );
 
 		type = Type.NORMAL;
 		setX(0);
@@ -85,7 +89,7 @@ public class LemmCursor  {
 	 * @param t cursor type
 	 * @return image for the given cursor type
 	 */
-	public static Image getImage(final Type t) {
+	public static BufferedImage getImage(final Type t) {
 		return img[t.ordinal()];
 	}
 
@@ -93,7 +97,7 @@ public class LemmCursor  {
 	 * Get image for current cursor type.
 	 * @return image for current cursor type
 	 */
-	public static Image getImage() {
+	public static BufferedImage getImage() {
 		return getImage(type);
 	}
 
@@ -101,7 +105,7 @@ public class LemmCursor  {
 	 * Get boxed version of image for the current cursor type.
 	 * @return boxed version of image for the current cursor type
 	 */
-	public static Image getBoxImage() {
+	public static BufferedImage getBoxImage() {
 		Type t;
 		switch (type) {
 			case NORMAL:

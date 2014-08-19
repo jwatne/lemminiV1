@@ -1,6 +1,6 @@
 package Game;
 
-import Graphics.Image;
+import java.awt.image.BufferedImage;
 
 /*
  * Copyright 2009 Volker Oth
@@ -40,9 +40,9 @@ public class Mask {
 	 * @param img image which may contain several animation frames one above each other
 	 * @param frames number of animation frames
 	 */
-	public Mask(final Image img, final int frames) {
-		width = img.getWidth();
-		height = img.getHeight()/frames;
+	public Mask(final BufferedImage img, final int frames) {
+		width = img.getWidth(null);
+		height = img.getHeight(null)/frames;
 		mask = new byte[frames][];
 		maxMaskPixels = new int[frames];
 		for (int i=0; i<frames; i++) {
@@ -79,8 +79,8 @@ public class Mask {
 	 */
 	public boolean eraseMask(final int x0, final int y0, final int maskNum, final int checkMask) {
 		int ctrIndestructable = 0;
-		Image bgImage = GameController.getBgImage();
-		Image bgImageSmall = MiniMap.getImage();
+		BufferedImage bgImage = GameController.getBgImage();
+		BufferedImage bgImageSmall = MiniMap.getImage();
 		Stencil stencil = GameController.getStencil();
 		byte m[] = mask[maskNum];
 		int sPos = y0*bgImage.getWidth();
@@ -133,8 +133,8 @@ public class Mask {
 	 * @param color Color to use to paint the step in the background image
 	 */
 	public void paintStep(final int x0, final int y0, final int maskNum, final int color) {
-		Image bgImage = GameController.getBgImage();
-		Image bgImageSmall = MiniMap.getImage();
+		BufferedImage bgImage = GameController.getBgImage();
+		BufferedImage bgImageSmall = MiniMap.getImage();
 		Stencil stencil = GameController.getStencil();
 		byte m[] = mask[maskNum];
 		int sPos = y0*bgImage.getWidth();
@@ -175,7 +175,7 @@ public class Mask {
 	 * @param xMid x position of Lemming's foot
 	 */
 	public void setStopperMask(final int x0, final int y0, final int xMid) {
-		Image bgImage = GameController.getBgImage();
+		BufferedImage bgImage = GameController.getBgImage();
 		Stencil stencil = GameController.getStencil();
 		byte m[] = mask[0];
 		int sPos = y0*bgImage.getWidth();
@@ -245,7 +245,7 @@ public class Mask {
 	 * @param type Stencil bitmask to erase (may contain several attributes)
 	 */
 	public void clearType(final int x0, final int y0, final int maskNum, final int type) {
-		Image bgImage = GameController.getBgImage();
+		BufferedImage bgImage = GameController.getBgImage();
 		Stencil stencil = GameController.getStencil();
 		byte m[] = mask[maskNum];
 		int sPos = y0*bgImage.getWidth();

@@ -1,12 +1,16 @@
 package Game;
 
+import java.awt.Component;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
 import GameUtil.Sprite;
-import Graphics.GraphicsContext;
-import Graphics.Image;
 import Tools.ToolBox;
 
 /*
@@ -97,9 +101,9 @@ public class Icons {
 	/** array of Sprites that contains the icons */
 	private static Sprite icons[];
 	/** buffered image that contains the whole icon bar in its current state */
-	private static Image iconImg;
+	private static BufferedImage iconImg;
 	/** graphics object used to draw on iconImg */
-	private static GraphicsContext iconGfx;
+	private static Graphics2D iconGfx;
 
 
 	/**
@@ -107,15 +111,19 @@ public class Icons {
 	 * @param cmp parent component
 	 * @throws ResourceException
 	 */
-	public static void init() throws ResourceException {
-		iconImg = ToolBox.INSTANCE.get().createOpaqueImage(WIDTH*(1+LAST_DRAWN),HEIGHT);
-		iconGfx = iconImg.createGraphicsContext();
+	public static void init(final Component cmp) throws ResourceException {
+		iconImg = ToolBox.createImage(WIDTH*(1+LAST_DRAWN),HEIGHT,Transparency.OPAQUE);
+		iconGfx = iconImg.createGraphics();
+		MediaTracker tracker = new MediaTracker(cmp);
 		icons = new Sprite[15];
 		for (int i=0; i<14; i++) {
-			Image sourceImg = Core.INSTANCE.get().loadBitmaskImage("misc/icon_"+i+".gif");
+			Image sourceImg = Core.loadImage(tracker, "misc/icon_"+i+".gif");
+			try {
+				tracker.waitForAll();
+			} catch (InterruptedException ex) {}
 			icons[i] = new Sprite(sourceImg, (i==Type.EMPTY.ordinal())?1:2);
 			if (i<=LAST_DRAWN)
-				iconGfx.drawImage(icons[i].getImage(),WIDTH*i,0);
+				iconGfx.drawImage(icons[i].getImage(),WIDTH*i,0,null);
 		}
 	}
 
@@ -134,7 +142,7 @@ public class Icons {
 	 * Get buffered image that contains the whole icon bar in its current state.
 	 * @return image of icon bar
 	 */
-	public static Image getImg() {
+	public static BufferedImage getImg() {
 		return iconImg;
 	}
 
@@ -161,7 +169,7 @@ public class Icons {
 			case FFWD:
 				icons[idx].setFrameIdx((icons[idx].getFrameIdx()==0)?1:0); // toggle
 				if (idx <= LAST_DRAWN)
-					iconGfx.drawImage(icons[idx].getImage(),WIDTH*idx,0);
+					iconGfx.drawImage(icons[idx].getImage(),WIDTH*idx,0,null);
 				break;
 			case CLIMB:
 			case FLOAT:
@@ -174,7 +182,7 @@ public class Icons {
 				for (int i=FIRST_RADIO; i<=LAST_RADIO; i++)
 					if (i!=idx) {
 						icons[i].setFrameIdx(0);
-						iconGfx.drawImage(icons[i].getImage(),WIDTH*i,0);
+						iconGfx.drawImage(icons[i].getImage(),WIDTH*i,0,null);
 					}
 				//$FALL-THROUGH$
 			case MINUS:
@@ -182,7 +190,7 @@ public class Icons {
 			case NUKE:
 				icons[idx].setFrameIdx(1); // set "pressed" frame
 				if (idx <= LAST_DRAWN)
-					iconGfx.drawImage(icons[idx].getImage(),WIDTH*idx,0);
+					iconGfx.drawImage(icons[idx].getImage(),WIDTH*idx,0,null);
 				break;
 		}
 	}
@@ -199,7 +207,7 @@ public class Icons {
 			case NUKE:
 				icons[idx].setFrameIdx(0); // set "released" frame
 				if (idx <= LAST_DRAWN)
-					iconGfx.drawImage(icons[idx].getImage(),WIDTH*idx,0);
+					iconGfx.drawImage(icons[idx].getImage(),WIDTH*idx,0,null);
 				break;
 		}
 	}
@@ -210,7 +218,7 @@ public class Icons {
 	static void reset() {
 		for (int i=0; i<=LAST_DRAWN; i++) {
 			icons[i].setFrameIdx(0);
-			iconGfx.drawImage(icons[i].getImage(),WIDTH*i,0);
+			iconGfx.drawImage(icons[i].getImage(),WIDTH*i,0,null);
 		}
 	}
 }

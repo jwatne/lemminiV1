@@ -108,7 +108,7 @@ public class Sound {
 		try {
 			for (int i = 0; i<sampleNum; i++) {
 				fName = "sound/sound_"+Integer.toString(i)+".wav";
-				File fs = new File(Core.INSTANCE.get().findResource(fName));
+				File fs = new File(Core.findResource(fName));
 				AudioInputStream f = AudioSystem.getAudioInputStream(fs.toURI().toURL());
 				format[i] = f.getFormat();
 				info[i] = new DataLine.Info(Clip.class, format[i]);
@@ -343,7 +343,7 @@ public class Sound {
 			gain = 0;
 		else
 			gain = gn;
-		Core.INSTANCE.get().getProgramProps().set("soundGain", gain);
+		Core.programProps.set("soundGain", gain);
 	}
 
 }
@@ -356,6 +356,7 @@ class DefaultListener implements LineListener {
 	/* (non-Javadoc)
 	 * @see javax.sound.sampled.LineListener#update(javax.sound.sampled.LineEvent)
 	 */
+	@Override
 	public synchronized void update(final LineEvent event) {
 		if (event.getType().equals(LineEvent.Type.STOP)) {
 			Clip c = (Clip)event.getLine();

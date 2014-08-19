@@ -70,6 +70,7 @@ public class LegalDialog extends JDialog {
 			thisEditor.setEditable( false );
 			// needed to open browser via clicking on a link
 			thisEditor.addHyperlinkListener(new HyperlinkListener() {
+				@Override
 				public void hyperlinkUpdate(HyperlinkEvent e) {
 					URL url = e.getURL();
 					if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
@@ -170,6 +171,7 @@ public class LegalDialog extends JDialog {
 			jButtonCancel = new JButton();
 			jButtonCancel.setText("I disagree");
 			jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					ok = false;
 					dispose();
@@ -189,6 +191,7 @@ public class LegalDialog extends JDialog {
 			jButtonOk = new JButton();
 			jButtonOk.setText("I agree");
 			jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+				@Override
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					ok = true;
 					dispose();

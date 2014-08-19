@@ -1,8 +1,9 @@
 package Game;
 
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import Graphics.Image;
 import Tools.ToolBox;
 
 /*
@@ -48,29 +49,29 @@ public class MiscGfx {
 	}
 
 	/** array of images */
-	private static Image image[];
+	private static BufferedImage image[];
 
 	/**
 	 * Initialization.
 	 * @throws ResourceException
 	 */
 	public static void init() throws ResourceException {
-		ArrayList<Image> images = new ArrayList<Image>();
-		Image img;
+		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
+		BufferedImage img;
 		/* 0: BORDER */
-		img = Core.INSTANCE.get().loadOpaqueImage("misc/border.gif");
+		img = ToolBox.ImageToBuffered(Core.loadImage("misc/border.gif"),Transparency.OPAQUE);
 		images.add(img);
 		/* 1: LEMMINI */
-		img = Core.INSTANCE.get().loadTranslucentImageJar("lemmini.png");
+		img = ToolBox.ImageToBuffered(Core.loadImageJar("lemmini.png"), Transparency.TRANSLUCENT);
 		images.add(img);
 		/* 2: TILE_GREEN */
-		img = Core.INSTANCE.get().loadOpaqueImageJar("background.gif");
+		img = ToolBox.ImageToBuffered(Core.loadImageJar("background.gif"), Transparency.OPAQUE);
 		images.add(img);
 		/* 3: TILE_BROWN */
 		//patch brown version of tile
-		Image brownImg = ToolBox.INSTANCE.get().createBitmaskImage(img.getWidth(), img.getHeight());
-		for (int xp=0; xp<img.getWidth(); xp++)
-			for (int yp=0; yp<img.getHeight(); yp++) {
+		BufferedImage brownImg = ToolBox.createImage(img.getWidth(), img.getHeight(),Transparency.BITMASK);
+		for (int xp=0; xp<img.getWidth(null); xp++)
+			for (int yp=0; yp<img.getHeight(null); yp++) {
 				int col = img.getRGB(xp, yp); // A R G B
 				int a = col & 0xff000000; // transparent part
 				int r = (col >> 16) & 0xff;
@@ -84,15 +85,15 @@ public class MiscGfx {
 			}
 		images.add(brownImg);
 		/* 4: REPLAY_1 */
-		Image anim[] = ToolBox.INSTANCE.get().getAnimation(Core.INSTANCE.get().loadBitmaskImage("misc/replay.gif"),2);
+		BufferedImage anim[] = ToolBox.getAnimation(Core.loadImage("misc/replay.gif"),2,Transparency.BITMASK);
 		images.add(anim[0]);
 		/* 5: REPLAY_2 */
 		images.add(anim[1]);
 		/* 6: SELECT */
-		img = Core.INSTANCE.get().loadBitmaskImage("misc/select.gif");
+		img = ToolBox.ImageToBuffered(Core.loadImage("misc/select.gif"),Transparency.BITMASK);
 		images.add(img);
 
-		image = new Image[images.size()];
+		image = new BufferedImage[images.size()];
 		image = images.toArray(image);
 	}
 
@@ -101,7 +102,7 @@ public class MiscGfx {
 	 * @param idx Index
 	 * @return image of the given index
 	 */
-	public static Image getImage(Index idx) {
+	public static BufferedImage getImage(Index idx) {
 		return image[idx.ordinal()];
 	}
 }

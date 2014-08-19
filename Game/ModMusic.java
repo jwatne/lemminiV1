@@ -56,7 +56,7 @@ public class ModMusic implements Runnable {
 	public void load(final String fn) throws ResourceException {
 		if (mmThread != null)
 			close();
-		String fName = Core.INSTANCE.get().findResource(fn);
+		String fName = Core.findResource(fn);
 		int datalen = (int)(new File(fName).length());
 		if( datalen < 0 ) throw new ResourceException(fName);
 		try {
@@ -89,6 +89,7 @@ public class ModMusic implements Runnable {
 	 * 	Begin playback.
 	 *	This method will return once the song has finished, or stop has been called.
 	 */
+	@Override
 	public void run() {
 		int buflen = 2048;
 		int[] lbuf = new int[ buflen ];

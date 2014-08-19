@@ -1,8 +1,11 @@
 package Game;
 
-import Graphics.Color;
-import Graphics.GraphicsContext;
-import Graphics.Image;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
+
+import Tools.ToolBox;
 
 /*
  * Copyright 2009 Volker Oth
@@ -58,7 +61,7 @@ public class Explosion {
 	/** flag: explosion is finished */
 	private boolean finished;
 	/** explosion image used for the first few frames */
-	private static Image expImg;
+	private static BufferedImage expImg;
 
 	/**
 	 * Load explosion image as static resource.
@@ -66,7 +69,7 @@ public class Explosion {
 	 * @throws ResourceException
 	 */
 	static void init() throws ResourceException {
-		expImg = Core.INSTANCE.get().loadBitmaskImage("misc/explode.gif");
+		expImg = ToolBox.ImageToBuffered(Core.loadImage("misc/explode.gif"), Transparency.BITMASK);
 	}
 
 	/**
@@ -120,7 +123,7 @@ public class Explosion {
 	 * @param height
 	 * @param xOfs
 	 */
-	public void draw(final GraphicsContext g, final int width, final int height, final int xOfs) {
+	public void draw(final Graphics2D g, final int width, final int height, final int xOfs) {
 		if (!finished) {
 			int maxY = height-1;
 			int maxX = width-1;
@@ -128,7 +131,7 @@ public class Explosion {
 			if (counter < REMOVE_IMAGE_CTR) {
 				int x = xExp-xOfs;
 				if (x>0 && x<maxX)
-					g.drawImage(expImg, xExp-xOfs, yExp);
+					g.drawImage(expImg, xExp-xOfs, yExp, null);
 			}
 			// draw particles
 			for (int i=0; i<PARTICLE_NUM; i++) {

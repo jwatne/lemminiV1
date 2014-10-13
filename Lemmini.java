@@ -129,6 +129,7 @@ public class Lemmini extends JFrame implements KeyListener {
 	private JMenuItem jMenuItemVolume = null;
 	private JMenu jMenuOptions = null;
 	private JMenuItem jMenuItemCursor = null;
+	private JMenuItem jMenuItemClassicalCursor = null;
 	private JMenuItem jMenuItemExit = null;
 	private JMenuItem jMenuItemManagePlayer = null;
 	private JMenuItem jMenuItemLoad = null;
@@ -161,7 +162,9 @@ public class Lemmini extends JFrame implements KeyListener {
 		}
 		// read frame props
 		int posX, posY;
-		this.setSize(Core.getDrawWidth()*Core.getScale(),Core.getDrawHeight()*Core.getScale());
+		this.setSize((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale()));
+		this.setMinimumSize(new Dimension((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale())));
+		this.setMaximumSize(new Dimension((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale())));
 		this.setResizable(false); // at least for the moment: forbid resize
 		Point p = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
 		p.x -= this.getWidth()/2;
@@ -181,6 +184,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		gp.setDoubleBuffered(false);
 		this.setContentPane(gp);
 
+		this.pack();
 		this.validate(); // force redraw
 		this.setTitle("Lemmini");
 
@@ -533,9 +537,28 @@ public class Lemmini extends JFrame implements KeyListener {
 		});
 		jMenuItemCursor.setSelected(GameController.isAdvancedSelect());
 
+		jMenuItemClassicalCursor = new JCheckBoxMenuItem("Classical Cursor", false);
+		jMenuItemClassicalCursor.addActionListener(new java.awt.event.ActionListener() {
+			/* (non-Javadoc)
+			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+			 */
+			@Override
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				boolean selected = jMenuItemClassicalCursor.isSelected();
+				if (selected)
+					GameController.setClassicalCursor(true);
+				else {
+					GameController.setClassicalCursor(false);
+				}
+				Core.programProps.set("classicalCursor", GameController.isClassicalCursor());
+			}
+		});
+		jMenuItemClassicalCursor.setSelected(GameController.isClassicalCursor());
+
 		jMenuOptions = new JMenu();
 		jMenuOptions.setText("Options");
 		jMenuOptions.add(jMenuItemCursor);
+		jMenuOptions.add(jMenuItemClassicalCursor);
 
 		jMenuBar = new JMenuBar();
 		jMenuBar.add(jMenuFile);
@@ -558,6 +581,16 @@ public class Lemmini extends JFrame implements KeyListener {
 		jMenuZoom.add(jMenuRadioItemX1);
 		zoomGroup.add(jMenuRadioItemX1);
 		
+		JRadioButtonMenuItem jMenuRadioItemX1P5 = new JRadioButtonMenuItem("X1.5");
+		jMenuRadioItemX1P5.addActionListener(new java.awt.event.ActionListener() {
+			@Override
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				setScale(1.5);
+			}
+		});
+		jMenuZoom.add(jMenuRadioItemX1P5);
+		zoomGroup.add(jMenuRadioItemX1P5);
+		
 		JRadioButtonMenuItem jMenuRadioItemX2 = new JRadioButtonMenuItem("x2");
 		jMenuRadioItemX2.addActionListener(new java.awt.event.ActionListener() {
 			@Override
@@ -567,6 +600,16 @@ public class Lemmini extends JFrame implements KeyListener {
 		});
 		jMenuZoom.add(jMenuRadioItemX2);
 		zoomGroup.add(jMenuRadioItemX2);
+		
+		JRadioButtonMenuItem jMenuRadioItemX2P5 = new JRadioButtonMenuItem("X2.5");
+		jMenuRadioItemX2P5.addActionListener(new java.awt.event.ActionListener() {
+			@Override
+			public void actionPerformed(java.awt.event.ActionEvent e) {
+				setScale(2.5);
+			}
+		});
+		jMenuZoom.add(jMenuRadioItemX2P5);
+		zoomGroup.add(jMenuRadioItemX2P5);
 		
 		JRadioButtonMenuItem jMenuRadioItemX3 = new JRadioButtonMenuItem("x3");
 		jMenuRadioItemX3.addActionListener(new java.awt.event.ActionListener() {
@@ -579,11 +622,14 @@ public class Lemmini extends JFrame implements KeyListener {
 		zoomGroup.add(jMenuRadioItemX3);
 		this.setJMenuBar(jMenuBar);
 		
-		switch (Core.getScale()) {
-			case 2:
+		switch ((int)Math.round(Core.getScale()*2)) {
+			case 3:
+				jMenuRadioItemX1P5.setSelected(true);
+				break;
+			case 4:
 				jMenuRadioItemX2.setSelected(true);
 				break;
-			case 3:
+			case 6:
 				jMenuRadioItemX3.setSelected(true);
 				break;
 			default:
@@ -719,10 +765,13 @@ public class Lemmini extends JFrame implements KeyListener {
 		thisFrame = new Lemmini();
 	}
 
-	void setScale(int scale) {
+	void setScale(double scale) {
 		gp.shutdown();
 		Core.setScale(scale);
-		setSize(Core.getDrawWidth()*Core.getScale(),Core.getDrawHeight()*Core.getScale());
+		setSize((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale()));
+		this.setMinimumSize(new Dimension((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale())));
+		this.setMaximumSize(new Dimension((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale())));
+		pack();
 		validate(); // force redraw
 		gp.init();
 	}
@@ -1132,6 +1181,15 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 		LemmCursor.setType(c);
 		this.setCursor(LemmCursor.getCursor());
 	}
+	
+	/**
+	 * Show/hide Mouse cursor.
+	 * @param en true to show the Mouse cursor, false to hide it
+	 */
+	public void enableCursor(boolean en) {
+		LemmCursor.setEnabled(en);
+		this.setCursor(LemmCursor.getCursor());
+	}
 
 	/* (non-Javadoc)
 	 * @see javax.swing.JComponent#paint(java.awt.Graphics)
@@ -1143,9 +1201,9 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 			if (offImage != null) {
 				int w = Core.getDrawWidth();
 				int h = Core.getDrawHeight();
-				int scale = Core.getScale();
+				double scale = Core.getScale();
 				//g.drawImage(offImage[activeBuffer],0,0,null);
-				g.drawImage(offImage[activeBuffer],0,0,w*scale,h*scale,0,0,w,h,null);
+				g.drawImage(offImage[activeBuffer],0,0,(int)Math.round(w*scale),(int)Math.round(h*scale),0,0,w,h,null);
 			}
 		}
 	}
@@ -1160,9 +1218,9 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 			if (offImage != null) {
 				int w = Core.getDrawWidth();
 				int h = Core.getDrawHeight();
-				int scale = Core.getScale();
+				double scale = Core.getScale();
 				//g.drawImage(offImage[activeBuffer],0,0,null);
-				g.drawImage(offImage[activeBuffer],0,0,w*scale,h*scale,0,0,w,h,null);
+				g.drawImage(offImage[activeBuffer],0,0,(int)Math.round(w*scale),(int)Math.round(h*scale),0,0,w,h,null);
 			}
 		}
 	}
@@ -1174,7 +1232,9 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 		synchronized (paintSemaphore) {
 			int w = Core.getDrawWidth();
 			int h = Core.getDrawHeight();
-			int scale = Core.getScale();
+			double scale = Core.getScale();
+			
+			this.setSize((int)Math.round(scale*w), (int)Math.round(scale*h));
 
 			offImage = new BufferedImage[2];
 			offGraphics = new Graphics2D[2];
@@ -1187,13 +1247,13 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 			outStrGfx = outStrImg.createGraphics();
 			outStrGfx.setBackground(new Color(0,0,0));
 
-			TextScreen.init(w, this.getHeight()/scale);
+			TextScreen.init(w, (int)Math.round(this.getHeight()/scale));
 			shiftPressed = false;
 		}
 	}
 	
 	/**
-	 * Delete offImage to avoid redra and force init.
+	 * Delete offImage to avoid redraw and force init.
 	 */
 	public void shutdown() {
 		synchronized (paintSemaphore) {
@@ -1205,7 +1265,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	 * redraw the offscreen image, then flip buffers and force repaint.
 	 */
 	private void redraw() {
-		int scale = Core.getScale();
+		double scale = Core.getScale();
 		int drawBuffer;
 		Graphics2D offGfx;
 
@@ -1233,7 +1293,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 					TextScreen.setMode(TextScreen.Mode.DEBRIEFING);
 					TextScreen.update();
 					offGfx.drawImage(TextScreen.getScreen(), 0,0,null);
-					TextScreen.getDialog().handleMouseMove(xMouseScreen/scale, yMouseScreen/scale);
+					TextScreen.getDialog().handleMouseMove((int)Math.round(xMouseScreen/scale), (int)Math.round(yMouseScreen/scale));
 					//offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x, LemmCursor.y, null);
 					break;
 				case LEVEL:
@@ -1248,7 +1308,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 								if (xOfsTemp < Level.WIDTH-this.getWidth()/scale)
 									GameController.setxPos(xOfsTemp);
 								else
-									GameController.setxPos(Level.WIDTH-this.getWidth()/scale);
+									GameController.setxPos((int)Math.round(Level.WIDTH-this.getWidth()/scale));
 							} else if (xMouseScreen < AUTOSCROLL_RANGE*scale) {
 								xOfsTemp = GameController.getxPos() - ((shiftPressed) ? X_STEP_FAST : X_STEP);
 								if (xOfsTemp > 0)
@@ -1389,14 +1449,21 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 							offGfx.drawImage(replayImage,this.getWidth()-2*replayImage.getWidth(),replayImage.getHeight(),null);
 						// draw cursor
 						if (lemmUnderCursor != null) {
-							int lx = lemmUnderCursor.midX()-xOfsTemp;
-							int ly = lemmUnderCursor.midY();
+							int lx,ly;
+							if (GameController.isClassicalCursor()) {
+	                            lx = (int)Math.round(xMouseScreen/scale);
+	                            ly = (int)Math.round(yMouseScreen/scale);
+	                            enableCursor(false);
+							} else {
+								lx = lemmUnderCursor.midX()-xOfsTemp;
+								ly = lemmUnderCursor.midY();
+							}
 							BufferedImage cursorImg = LemmCursor.getBoxImage();
 							lx -= cursorImg.getWidth()/2;
 							ly -= cursorImg.getHeight()/2;
-							offGfx.drawImage(cursorImg,lx,ly,null);
-						}
-						//offGfx.drawImage(LemmCursor.getImage(0), LemmCursor.x, LemmCursor.y, null);
+							offGfx.drawImage(cursorImg,lx,ly,null);							
+						} else if (LemmCursor.getEnabled() == false)
+							enableCursor(true);
 					}
 			}
 
@@ -1464,9 +1531,9 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	 */
 	@Override
 	public void mouseReleased(final MouseEvent mouseevent) {
-		int scale = Core.getScale();
-		int x = mouseevent.getX()/scale;
-		int y = mouseevent.getY()/scale;
+		double scale = Core.getScale();
+		int x = (int)Math.round(mouseevent.getX()/scale);
+		int y = (int)Math.round(mouseevent.getY()/scale);
 		mouseDx = 0;
 		mouseDy = 0;
 		if (mouseevent.getButton() == MouseEvent.BUTTON1)
@@ -1504,9 +1571,9 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	 */
 	@Override
 	public void mousePressed(final MouseEvent mouseevent) {
-		int scale = Core.getScale();
-		int x = mouseevent.getX()/scale;
-		int y = mouseevent.getY()/scale;
+		double scale = Core.getScale();
+		int x = (int)Math.round(mouseevent.getX()/scale);
+		int y = (int)Math.round(mouseevent.getY()/scale);
 		mouseDx = 0;
 		mouseDy = 0;
 		if (mouseevent.getButton() == MouseEvent.BUTTON1)
@@ -1575,7 +1642,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 							GameController.requestSkill(l);
 					}
 					// check minimap mouse move
-					int ofs = MiniMap.move(x,y,this.getWidth()/scale);
+					int ofs = MiniMap.move(x,y,(int)Math.round(this.getWidth()/scale));
 					if (ofs != -1)
 						GameController.setxPos(ofs);
 					mouseevent.consume();
@@ -1612,11 +1679,11 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	 */
 	@Override
 	public void mouseEntered(final MouseEvent mouseevent) {
-		int scale = Core.getScale();
+		double scale = Core.getScale();
 		mouseDx = 0;
 		mouseDy = 0;
-		int x = mouseevent.getX()/scale/*-LemmCursor.width/2*/;
-		int y = mouseevent.getY()/scale/*-LemmCursor.height/2*/;
+		int x = (int)Math.round(mouseevent.getX()/scale/*-LemmCursor.width/2*/);
+		int y = (int)Math.round(mouseevent.getY()/scale/*-LemmCursor.height/2*/);
 		LemmCursor.setX(x/*-LemmCursor.width/2*/);
 		LemmCursor.setY(y/*-LemmCursor.height/2*/);
 	}
@@ -1626,7 +1693,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	 */
 	@Override
 	public void mouseExited(final MouseEvent mouseevent) {
-		int scale = Core.getScale();
+		double scale = Core.getScale();
 		int x = xMouseScreen + mouseDx;
 		switch (GameController.getGameState()) {
 			case BRIEFING:
@@ -1641,7 +1708,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 				if (x>=Level.WIDTH)
 					x = Level.WIDTH-1;
 				xMouse = x;
-				LemmCursor.setX(xMouseScreen/scale/*-LemmCursor.width/2*/);
+				LemmCursor.setX((int)Math.round(xMouseScreen/scale/*-LemmCursor.width/2*/));
 
 				int y = yMouseScreen + mouseDy;
 				if (y >= this.getHeight())
@@ -1656,7 +1723,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 				if (y<0)
 					y = 0;
 				yMouse = y;
-				LemmCursor.setY(yMouseScreen/scale/*-LemmCursor.height/2*/);
+				LemmCursor.setY((int)Math.round(yMouseScreen/scale/*-LemmCursor.height/2*/));
 				mouseevent.consume();
 				break;
 		}
@@ -1667,16 +1734,16 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	 */
 	@Override
 	public void mouseDragged(final MouseEvent mouseevent) {
-		int scale = Core.getScale();
+		double scale = Core.getScale();
 		mouseDx = 0;
 		mouseDy = 0;
 		// check minimap mouse move
 		switch (GameController.getGameState()) {
 			case LEVEL:
-				int x = mouseevent.getX()/scale;
-				int y = mouseevent.getY()/scale;
+				int x = (int)Math.round(mouseevent.getX()/scale);
+				int y = (int)Math.round(mouseevent.getY()/scale);
 				if (leftMousePressed) {
-					int ofs = MiniMap.move(x,y,this.getWidth()/scale);
+					int ofs = MiniMap.move(x,y,(int)Math.round(this.getWidth()/scale));
 					if (ofs != -1)
 						GameController.setxPos(ofs);
 				} else {
@@ -1684,7 +1751,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 					if (xOfsTemp < 0)
 						xOfsTemp = 0;
 					else if (xOfsTemp >= Level.WIDTH-this.getWidth()/scale)
-						GameController.setxPos(Level.WIDTH-this.getWidth()/scale);
+						GameController.setxPos((int)Math.round(Level.WIDTH-this.getWidth()/scale));
 					else GameController.setxPos(xOfsTemp);
 				}
 				// debug drawing
@@ -1701,19 +1768,19 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	@Override
 	public void mouseMoved(final MouseEvent mouseevent) {
 		//long t = System.currentTimeMillis();
-		int scale = Core.getScale();
+		double scale = Core.getScale();
 		int x,y;
 		int oldX = xMouse;
 		int oldY = yMouse;
 
-		x = (mouseevent.getX()/scale + GameController.getxPos());
-		y = mouseevent.getY()/scale;
+		x = (int)Math.round((mouseevent.getX()/scale + GameController.getxPos()));
+		y = (int)Math.round(mouseevent.getY()/scale);
 		if (x>=Level.WIDTH)
 			x = Level.WIDTH-1;
 		if (y >= Level.HEIGHT)
 			y = Level.HEIGHT-1;
-		xMouse = x*scale;
-		yMouse = y*scale;
+		xMouse = (int)Math.round(x*scale);
+		yMouse = (int)Math.round(y*scale);
 		// LemmCursor
 		xMouseScreen = mouseevent.getX();
 		if (xMouseScreen>=this.getWidth())
@@ -1725,19 +1792,19 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 			yMouseScreen = this.getHeight();
 		else if (yMouseScreen <0)
 			yMouseScreen = 0;
-		LemmCursor.setX(xMouseScreen/scale/*-LemmCursor.width/2*/);
-		LemmCursor.setY(yMouseScreen/scale/*-LemmCursor.height/2*/);
+		LemmCursor.setX((int)Math.round(xMouseScreen/scale/*-LemmCursor.width/2*/));
+		LemmCursor.setY((int)Math.round(yMouseScreen/scale/*-LemmCursor.height/2*/));
 
 		switch (GameController.getGameState()) {
 			case INTRO:
 			case BRIEFING:
 			case DEBRIEFING:
-				TextScreen.getDialog().handleMouseMove(xMouseScreen/scale, yMouseScreen/scale);
+				TextScreen.getDialog().handleMouseMove((int)Math.round(xMouseScreen/scale), (int)Math.round(yMouseScreen/scale));
 				//$FALL-THROUGH$
 			case LEVEL:
 				mouseDx = (xMouse - oldX);
 				mouseDy = (yMouse - oldY);
-				mouseDragStartX = mouseevent.getX()/scale;
+				mouseDragStartX = (int)Math.round(mouseevent.getX()/scale);
 				mouseevent.consume();
 				break;
 		}

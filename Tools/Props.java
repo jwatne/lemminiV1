@@ -202,7 +202,7 @@ public class Props {
 	/**
 	 * Save property file
 	 * @param fname File name of property file
-	 * @return True if ok, false if exception occured
+	 * @return True if OK, false if exception occurred
 	 */
 	public boolean save(final String fname) {
 		try {

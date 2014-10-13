@@ -36,6 +36,8 @@ public class LemmCursor  {
 
 	/** cursor type */
 	public enum Type {
+		/** empty image to hide cursor */
+		HIDDEN,
 		/** normal cursor */
 		NORMAL,
 		/** select left cursor */
@@ -51,7 +53,7 @@ public class LemmCursor  {
 		/** select right cursor with selection box */
 		BOX_RIGHT,
 		/** select walkers cursor with selection box */
-		BOX_WALKER
+		BOX_WALKER,
 	}
 
 	/** x position in pixels */
@@ -64,6 +66,8 @@ public class LemmCursor  {
 	private static BufferedImage img[];
 	/** array of AWT cursor Objects */
 	private static Cursor cursor[];
+	/** is Mouse cursor hidden? */
+	private static boolean enabled;
 
 	/**
 	 * Initialization.
@@ -71,26 +75,43 @@ public class LemmCursor  {
 	 */
 	public static void init() throws ResourceException {
 		img = ToolBox.getAnimation(Core.loadImage("misc/cursor.gif"), 8, Transparency.BITMASK);
-		cursor = new Cursor[4];
+		cursor = new Cursor[5];
 		int w = getImage(Type.NORMAL).getWidth()/2;
 		int h = getImage(Type.NORMAL).getHeight()/2;
+		cursor[Type.HIDDEN.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "");
 		cursor[Type.NORMAL.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.NORMAL), new Point(w,h), "" );
 		cursor[Type.LEFT.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.LEFT),   new Point(w,h), "" );
 		cursor[Type.RIGHT.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.RIGHT),  new Point(w,h), "" );
 		cursor[Type.WALKER.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.WALKER), new Point(w,h), "" );
-
 		type = Type.NORMAL;
 		setX(0);
 		setY(0);
+		enabled = true;
 	}
-
+	
+	/**
+	 * Set enable state for Mouse cursor.
+	 * @param en true to show, false to hide
+	 */
+	public static void setEnabled(boolean en) {
+		enabled = en;
+	}
+	
+	/**
+	 * Get enable state.
+	 * @return true if shows, false if hidden
+	 */
+	public static boolean getEnabled() {
+		return enabled;
+	}
+	
 	/**
 	 * Get image for a certain cursor type.
 	 * @param t cursor type
 	 * @return image for the given cursor type
 	 */
 	public static BufferedImage getImage(final Type t) {
-		return img[t.ordinal()];
+		return img[t.ordinal()-1];
 	}
 
 	/**
@@ -131,7 +152,10 @@ public class LemmCursor  {
 	 * @return current cursor as AWT cursor object
 	 */
 	public static Cursor getCursor() {
-		return cursor[type.ordinal()];
+		if (enabled)
+			return cursor[type.ordinal()];
+		else
+			return cursor[Type.HIDDEN.ordinal()];
 	}
 
 	/**

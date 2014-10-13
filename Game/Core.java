@@ -70,7 +70,7 @@ public class Core {
 	private static ArrayList<String> players;
 
 	/** Zoom scale */
-	private static int scale;
+	private static double scale;
 
 	/**
 	 * Initialize some core elements.
@@ -116,7 +116,7 @@ public class Core {
 				throw new LemmException("User abort");
 		}
 
-		scale = Core.programProps.get("scale",1);
+		scale = Core.programProps.get("scale",1.0);
 
 		resourcePath = programProps.get("resourcePath", "");
 		String sourcePath = programProps.get("sourcePath", "");
@@ -129,6 +129,7 @@ public class Core {
 		gain = programProps.get("soundGain", 1.0);
 		GameController.setSoundGain(gain);
 		GameController.setAdvancedSelect(programProps.get("advancedSelect", true));
+		GameController.setClassicalCursor(programProps.get("classicalCursor", false));
 		if (resourcePath.length()==0 || !REVISION.equalsIgnoreCase(rev)) {
 			// extract resources
 			try {
@@ -341,7 +342,7 @@ public class Core {
 	 * Get Zoom scale
 	 * @return zoom scale
 	 */
-	public static int getScale() {
+	public static double getScale() {
 		return scale;
 	}
 
@@ -349,7 +350,7 @@ public class Core {
 	 * Set zoom scale
 	 * @param s zoom scale
 	 */
-	public static void setScale(int s) {
+	public static void setScale(double s) {
 		scale = s;
 	}
 

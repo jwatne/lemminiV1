@@ -57,7 +57,7 @@ public class TextScreen {
 	public final static int BUTTON_SAVEREPLAY = 4;
 
 	/** y position of scroll text - pixels relative to center */
-	private final static int SCROLL_Y = 150;
+	private final static int SCROLL_Y = 140;
 	/** width of scroll text in characters */
 	private final static int SCROLL_WIDTH = 39;
 	/** height of scroll text in pixels */
@@ -107,10 +107,10 @@ public class TextScreen {
 	private static Graphics2D scrollerGfx;
 	/** screen type to display */
 	private static Mode mode;
-	/** sychronization monitor */
+	/** synchronization monitor */
 	private static Object monitor = new Object();
 	
-	private static int oldScale = Core.getScale();
+	private static double oldScale = Core.getScale();
 
 	/**
 	 * Set mode.
@@ -118,14 +118,14 @@ public class TextScreen {
 	 */
 	public static void setMode(final Mode m) {
 		synchronized (monitor) {
-			int scale = Core.getScale();
+			double scale = Core.getScale();
 			if (mode != m || oldScale != scale) {
 				switch (m) {
 					case INTRO:
 						textScreen.init();
 						textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_BROWN));
 						textScreen.printCentered("A game engine for Lemmings(tm) in Java", 0, RED);
-						textScreen.printCentered("Release 0.85 8/2014", 1, BLUE);
+						textScreen.printCentered("Release 0.86 10/2014", 1, BLUE);
 						textScreen.printCentered("Coded by Volker Oth 2005-2014", 2, VIOLET);
 						textScreen.printCentered("www.lemmini.de", 3, GREEN);
 						textScreen.copyToBackBuffer();

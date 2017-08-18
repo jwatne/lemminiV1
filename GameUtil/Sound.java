@@ -43,8 +43,6 @@ public class Sound {
 
 	/** default sampling frequency */
 	final private static float DEFAULT_FREQUENCY = 22050;
-	/** allow upsampling for lower frequencies */
-	final private static boolean ALLOW_UPSAMLING = true;
 	/** number of pitch levels */
 	final private static int NUMBER_PITCHED = 100;
 	/** fade in the first n samples when calculating the pitched buffers */
@@ -99,10 +97,8 @@ public class Sound {
 		defaultListener = new DefaultListener();
 
 		// upsampling to default frequency (more compatible for weird sample frequencies)
-		if (ALLOW_UPSAMLING) {
-			defaultFormat  = new AudioFormat( DEFAULT_FREQUENCY, 8, 1, false, false);
-			defaultInfo = new DataLine.Info(Clip.class, defaultFormat);
-		}
+		defaultFormat  = new AudioFormat( DEFAULT_FREQUENCY, 16, 1, true, false);
+		defaultInfo = new DataLine.Info(Clip.class, defaultFormat);
 
 		int maxLen = 0;
 		try {
@@ -112,19 +108,21 @@ public class Sound {
 				AudioInputStream f = AudioSystem.getAudioInputStream(fs.toURI().toURL());
 				format[i] = f.getFormat();
 				info[i] = new DataLine.Info(Clip.class, format[i]);
-				soundBuffer[i] = new byte[(int)f.getFrameLength()*format[i].getFrameSize()];
-				f.read(soundBuffer[i]);
+				byte soundBuffer8[] = new byte[(int)f.getFrameLength()*format[i].getFrameSize()];
+				f.read(soundBuffer8);
 				f.close();
 
-				if (ALLOW_UPSAMLING) {
-					// convert samples with frequencies < 8kHz no work around bug in JDK6
-					float sr = format[i].getSampleRate();
-					if ( (sr < DEFAULT_FREQUENCY) && (sr!=8000) && (sr!=11025) ) {
-						soundBuffer[i] = convertToDefault(soundBuffer[i], format[i].getSampleRate());
-						format[i] = defaultFormat;
-						info[i] = defaultInfo;
-					}
-				}
+				// convert samples with frequencies < 8kHz no work around bug in JDK6
+				// convert to 16bit due to bug in MacOS JRE
+				if (format[i].getFrameSize() > 2)
+					throw new ResourceException("Unsupported sample format for sample "+fName);
+				if ( (format[i].getFrameSize()==1) && (format[i].getEncoding() != AudioFormat.Encoding.PCM_UNSIGNED)) 
+						throw new ResourceException("Unsupported sample format for sample "+fName);
+				if ( (format[i].getFrameSize()==2) && (format[i].getEncoding() != AudioFormat.Encoding.PCM_SIGNED)) 
+					throw new ResourceException("Unsupported sample format for sample "+fName);				
+				soundBuffer[i] = convertToDefault(soundBuffer8, format[i]);
+				format[i] = defaultFormat;
+				info[i] = defaultInfo;
 
 				if (soundBuffer[i].length > maxLen)
 					maxLen = soundBuffer[i].length;
@@ -136,7 +134,7 @@ public class Sound {
 		if (pitchID >= 0) {
 			// create buffers for pitching
 			// note that bit size (8) and channels (1) have to be the same for all pitched buffers
-			pitchFormat = new AudioFormat( 44100, 8, 1, false, false);
+			pitchFormat = new AudioFormat( 44100, 16, 1, true, false);
 			pitchInfo = new DataLine.Info(Clip.class, pitchFormat);
 			pitchBuffers = new byte[NUMBER_PITCHED][];
 			for (int i=0; i<NUMBER_PITCHED; i++)
@@ -216,27 +214,59 @@ public class Sound {
 	/**
 	 * Convert sampling rate to default sampling rate.
 	 * @param buffer byte array containing source sample
-	 * @param frqSource sampling frequency of source sample
-	 * @return sample converted to DEFAULT_FREQUENCY stored in byte array
+	 * @param format AudioFormat of source sample (only unsigned 8bit PCM or signed 16bit PCM supported)
+	 * @return sample converted to default format (16bit signed PCM 22050Hz) stored in byte array
 	 */
-	public synchronized byte[] convertToDefault(final byte buffer[], final float frqSource) {
+	public synchronized byte[] convertToDefault(final byte buffer[], final AudioFormat format) {
+		// check unsupported formats
+		
+		// check if the default format is already OK
+		if ( (format.getFrameRate() == DEFAULT_FREQUENCY) && (format.getFrameSize() == 2) && !format.isBigEndian() && (format.getEncoding() == AudioFormat.Encoding.PCM_SIGNED))
+			return buffer;
+
+		boolean from8bit = (format.getFrameSize() == 1);
+		boolean convertEndian = ((format.getFrameSize() == 2) && format.isBigEndian()); 
+			
 		// sample up low frequency files to a DEFAULT_FREQUENCY to work around sound bug in JDK6
-		double scale = DEFAULT_FREQUENCY/frqSource;
-		int len = (int)(buffer.length*scale);  // length of target buffer in samples
-		byte buf[] = new byte[len];
+		double scale = DEFAULT_FREQUENCY/format.getSampleRate();
+		int sampleNumSrc = buffer.length/(from8bit?1:2); 
+		int sampleNumTrg = (int)(buffer.length*scale)/(from8bit?1:2);  // length of target buffer in samples
+		byte buf[] = new byte[sampleNumTrg*(from8bit?2:1)];
+		
 
 		// create scaled buffer
-		for (int i=0; i<len; i++ ) {
+		for (int i=0; i<sampleNumTrg; i++ ) {
 			int pos = (int)(i/scale);
 			double ofs = i/scale - pos;
-			if (pos >= buffer.length)
-				pos = buffer.length-1;
-			if (ofs < 0.1 || pos == buffer.length-1)
-				buf[i] = buffer[pos];
-			else {
-				// interpolate between sample points
-				buf[i] = (byte)( (buffer[pos]&0xff)*(1.0-ofs) + (buffer[pos+1]&0xff)*(ofs));
-			}
+			if (pos >= sampleNumSrc)
+				pos = sampleNumSrc-1;
+			int val,val2;
+			
+			if (from8bit) {
+				if (ofs < 0.1 || pos == sampleNumSrc-1)
+					val = buffer[pos]&0xff;
+				else {
+					// interpolate between sample points
+					val = (int)( (buffer[pos]&0xff)*(1.0-ofs) + (buffer[pos+1]&0xff)*ofs);
+				}
+				// byte order is little endian		
+				val = (val - 0x80) << 8;			
+			} else {
+				if (convertEndian)
+					val = (buffer[2*pos+1]&0xff) | (buffer[2*pos]<<8);
+				else
+					val = (buffer[2*pos]&0xff) | (buffer[2*pos+1]<<8);
+				if (ofs >= 0.1 && pos < sampleNumSrc-1) {
+					// interpolate between sample points
+					if (convertEndian)
+						val2 = (buffer[2*pos+3]&0xff) | (buffer[2*pos+2]<<8);
+					else
+						val2 = (buffer[2*pos+2]&0xff) | (buffer[2*pos+3]<<8);										
+					val = (int)( val*(1.0-ofs) + val2*ofs);
+				}
+			}			
+			buf[i*2] = (byte)val;
+			buf[i*2+1] = (byte)(val>>8);				
 		}
 		return buf;
 	}
@@ -252,31 +282,30 @@ public class Sound {
 		// then increase the sample rate virtually by creating a buffer which contains only
 		// every Nth sample
 
-		if (format[idx].getFrameSize() > 1) // only 8bit supported at the moment
+		if (format[idx].getFrameSize() != 2) // only 16bit supported
 			return null;
 		double scale = pitchFormat.getSampleRate()/format[idx].getSampleRate();
 		double dpitch = (1.0+((pitch-1)*0.0204));
 		if (dpitch < 1.0)
 			dpitch = 1.0;
 		double fact = dpitch/scale;
-		boolean signed = pitchFormat.getEncoding() == AudioFormat.Encoding.PCM_SIGNED;
-		int len = (int)(soundBuffer[idx].length/fact); // length of target buffer in samples
-		byte buf[] = new byte[len];
+		int len = (int)(soundBuffer[idx].length/(2*fact)); // length of target buffer in samples
+		byte buf[] = new byte[len*2];
 		// create scaled buffer
 		for (int i=0; i<len; i++) {
-			int pos = (int)(i*fact+0.5);
-			if (pos >= soundBuffer[idx].length)
-				pos = soundBuffer[idx].length-1;
-			byte b = soundBuffer[idx][pos/**bytes+k*/];
-			double val;
-			if (signed)
-				val = b;
-			else
-				val = (b & 0xff);
+			int pos = (int)(i*fact+0.5)*2;
+			if (pos >= soundBuffer[idx].length-1)
+				pos = soundBuffer[idx].length-2; 
+
+			double val = (soundBuffer[idx][pos]&0xff) | (soundBuffer[idx][pos+1]<<8);
 			// fade in
 			if (i<PITCH_FADE_IN)
 				val *= 1.0 - (PITCH_FADE_IN-1-i)/10.0;
-			buf[i] = (byte)val;
+			// byte order is little endian
+			int ival = (int)val;
+			buf[i*2] = (byte)ival;
+			buf[i*2+1] = (byte)(ival>>8);
+
 		}
 		return buf;
 	}

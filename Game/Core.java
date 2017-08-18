@@ -335,7 +335,7 @@ public class Core {
 	 * @return internal draw width
 	 */
 	public static int getDrawHeight() {
-		return Level.HEIGHT+WIN_OFS+60; //Core.programProps.get("frameHeight", Level.height+winOfs+60);
+		return Level.HEIGHT+WIN_OFS+90; //Core.programProps.get("frameHeight", Level.height+winOfs+60);
 	}
 
 	/**

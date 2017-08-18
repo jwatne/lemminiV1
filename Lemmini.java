@@ -713,7 +713,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		/*
 		 * Apple menu bar for MacOS
 		 */
-		System.setProperty("com.apple.macos.useScreenMenuBar", "true");
+		System.setProperty("apple.laf.useScreenMenuBar", "true");
 
 		/*
 		 * Check JVM version

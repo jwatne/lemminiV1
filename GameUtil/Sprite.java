@@ -141,6 +141,7 @@ public class Sprite {
 	 */
 	public BufferedImage getImageAnim() {
 		BufferedImage i = frames[frameIdx];
+		
 		switch (animMode) {
 			case LOOP:
 				if(++frameIdx >= numframes)
@@ -159,6 +160,8 @@ public class Sprite {
 						frameIdx = 0;
 					}
 				} else frameIdx = 0;
+				break;
+			default:
 				break;
 		}
 		return i;

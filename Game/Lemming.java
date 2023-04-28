@@ -766,6 +766,7 @@ public class Lemming {
 					m.clearType(maskX,maskY,0,Stencil.MSK_STOPPER);
 				}
 				break; }
+
 			case Stencil.MSK_EXIT:
 				switch (type) {
 					case WALKER:
@@ -778,12 +779,16 @@ public class Lemming {
 						newType = Type.EXITING;
 						GameController.sound.play(spr.getSound());
 						break;
+					default:
+						break;
 				}
+				
 				break;
 		}
 		// animate
 		if (oldType == newType) {
 			boolean trigger = false;
+			
 			switch (lemRes.animMode) {
 				case LOOP:
 					if(++frameIdx >= lemRes.frames*TIME_SCALE)
@@ -796,6 +801,8 @@ public class Lemming {
 						frameIdx++;
 					else
 						trigger = true;
+					break;
+				default:
 					break;
 			}
 			if (trigger) {
@@ -871,6 +878,8 @@ public class Lemming {
 					break;}
 					case BUILDER_END:
 						newType = Type.WALKER;
+						break;
+					default:
 						break;
 				}
 			}
@@ -1322,7 +1331,10 @@ public class Lemming {
 					} else return false;
 				}
 				return false;
+			default:
+				break;
 		}
+		
 		// check additional skills
 		switch (skill) {
 			case CLIMBER:
@@ -1346,6 +1358,8 @@ public class Lemming {
 					explodeCtr = 0;
 					return true;
 				} else return false;
+			default:
+				break;
 		}
 		// check main skills
 		if (canChangeSkill) {
@@ -1390,6 +1404,8 @@ public class Lemming {
 					// set stopper mask
 					m.setStopperMask(maskX,maskY,x);
 					return true;}
+				default:
+					break;
 			}
 		}
 		return false;

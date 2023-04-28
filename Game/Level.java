@@ -595,6 +595,7 @@ public class Level {
 			if (type < 0)
 				break;
 			sprite.setType(SpriteObject.getType(type));
+			
 			switch (sprite.getType()) {
 				case EXIT:
 				case NO_DIG_LEFT:
@@ -606,6 +607,8 @@ public class Level {
 					fName = "styles/"+set + "/" + set + "om_" + Integer.toString(idx)+ ".gif";
 					img = Core.loadImage(tracker, fName);
 					sprite.setMask(img);
+					break;
+				default:
 					break;
 			}
 			// get sound

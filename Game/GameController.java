@@ -775,6 +775,7 @@ public class GameController {
 							l.setSkill(rs.skill);
 							l.setSelected();
 						}
+						
 						switch (rs.skill) {
 							case FLOATER:
 								numFloaters -= 1;
@@ -800,6 +801,34 @@ public class GameController {
 							case STOPPER:
 								numBlockers -= 1;
 								break;
+							case BOMBER_STOPPER:
+								break;
+							case BUILDER_END:
+								break;
+							case CLIMBER_TO_WALKER:
+								break;
+							case DROWNING:
+								break;
+							case EXITING:
+								break;
+							case FALLER:
+								break;
+							case FLOATER_START:
+								break;
+							case JUMPER:
+								break;
+							case NUKE:
+								break;
+							case SPLAT:
+								break;
+							case TRAPPED:
+								break;
+							case UNDEFINED:
+								break;
+							case WALKER:
+								break;
+							default:
+								break;
 						}
 						sound.play(SND_CHANGE_OP);
 						break;
@@ -821,6 +850,7 @@ public class GameController {
 					case ReplayStream.SELECT_SKILL: {
 						ReplaySelectSkillEvent rs = (ReplaySelectSkillEvent)r;
 						lemmSkill = rs.skill;
+						
 						switch (lemmSkill) {
 							case FLOATER:
 								Icons.press(Icons.Type.FLOAT);
@@ -845,6 +875,34 @@ public class GameController {
 								break;
 							case STOPPER:
 								Icons.press(Icons.Type.BLOCK);
+								break;
+							case BOMBER_STOPPER:
+								break;
+							case BUILDER_END:
+								break;
+							case CLIMBER_TO_WALKER:
+								break;
+							case DROWNING:
+								break;
+							case EXITING:
+								break;
+							case FALLER:
+								break;
+							case FLOATER_START:
+								break;
+							case JUMPER:
+								break;
+							case NUKE:
+								break;
+							case SPLAT:
+								break;
+							case TRAPPED:
+								break;
+							case UNDEFINED:
+								break;
+							case WALKER:
+								break;
+							default:
 								break;
 						}
 						break;
@@ -1032,6 +1090,34 @@ public class GameController {
 						canSet = true;
 					}
 					break;
+				case BOMBER_STOPPER:
+					break;
+				case BUILDER_END:
+					break;
+				case CLIMBER_TO_WALKER:
+					break;
+				case DROWNING:
+					break;
+				case EXITING:
+					break;
+				case FALLER:
+					break;
+				case FLOATER_START:
+					break;
+				case JUMPER:
+					break;
+				case NUKE:
+					break;
+				case SPLAT:
+					break;
+				case TRAPPED:
+					break;
+				case UNDEFINED:
+					break;
+				case WALKER:
+					break;
+				default:
+					break;
 			}
 		}
 		if (canSet) {
@@ -1070,6 +1156,7 @@ public class GameController {
 	public static synchronized void handleIconButton(final Icons.Type type) {
 		Lemming.Type lemmSkillOld = lemmSkill;
 		boolean ok = false;
+		
 		switch (type) {
 			case FLOAT:
 				if (isCheat() || numFloaters>0)
@@ -1139,6 +1226,12 @@ public class GameController {
 				minus.pressed(KEYREPEAT_ICON);
 				stopReplayMode();
 				break;
+			case EMPTY:
+				break;
+			case INVALID:
+				break;
+			default:
+				break;
 		}
 		if (ok || lemmSkill != lemmSkillOld) {
 			switch (type) {
@@ -1200,6 +1293,10 @@ public class GameController {
 						JOptionPane.showMessageDialog( null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE );
 						System.exit(1);
 					}
+					break;
+				case NONE:
+					break;
+				default:
 					break;
 			}
 			Fader.setState(Fader.State.IN);

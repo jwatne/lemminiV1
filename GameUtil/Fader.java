@@ -128,6 +128,7 @@ public class Fader {
 	 */
 	public static synchronized void setState(final State s) {
 		fadeState = s;
+		
 		switch (fadeState) {
 			case IN:
 				fadeValue = MAX_ALPHA; // opaque
@@ -136,6 +137,8 @@ public class Fader {
 			case OUT:
 				fadeValue = 0; // transparent
 				setAlpha(fadeValue);
+				break;
+			default:
 				break;
 		}
 	}
@@ -183,6 +186,8 @@ public class Fader {
 				Fader.setAlpha(fadeValue);
 				Fader.apply(g);
 				// System.out.println(fadeValue);
+				break;
+			default:
 				break;
 		}
 	}

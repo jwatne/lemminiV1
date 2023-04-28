@@ -109,6 +109,8 @@ public class Music {
 				modMusic.play();
 				playing = true;
 				break;
+			default:
+				break;
 		}
 	}
 
@@ -125,6 +127,8 @@ public class Music {
 				modMusic.stop();
 				playing = false;
 				break;
+			default:
+				break;
 		}
 	}
 
@@ -140,6 +144,8 @@ public class Music {
 			case MOD:
 				modMusic.close();
 				playing = false;
+				break;
+			default:
 				break;
 		}
 	}
@@ -171,6 +177,7 @@ public class Music {
 			gain = 0;
 		else
 			gain = gn;
+
 		switch (type) {
 			case MIDI:
 				midiMusic.setGain(gain);
@@ -178,7 +185,10 @@ public class Music {
 			case MOD:
 				modMusic.setGain(gain);
 				break;
+			default:
+				break;
 		}
+		
 		Core.programProps.set("musicGain", gain);
 	}
 

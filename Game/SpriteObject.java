@@ -138,6 +138,8 @@ public class SpriteObject extends Sprite {
 				return Stencil.MSK_TRAP_DIE;
 			case EXIT:
 				return Stencil.MSK_EXIT;
+			default:
+				break;
 		}
 		return -1;
 	}

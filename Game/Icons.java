@@ -164,6 +164,7 @@ public class Icons {
 	 */
 	static void press(final Type type) {
 		int idx = type.ordinal();
+		
 		switch (type) {
 			case PAUSE:
 			case FFWD:
@@ -192,6 +193,12 @@ public class Icons {
 				if (idx <= LAST_DRAWN)
 					iconGfx.drawImage(icons[idx].getImage(),WIDTH*idx,0,null);
 				break;
+			case EMPTY:
+				break;
+			case INVALID:
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -208,6 +215,8 @@ public class Icons {
 				icons[idx].setFrameIdx(0); // set "released" frame
 				if (idx <= LAST_DRAWN)
 					iconGfx.drawImage(icons[idx].getImage(),WIDTH*idx,0,null);
+				break;
+			default:
 				break;
 		}
 	}

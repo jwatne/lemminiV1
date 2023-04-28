@@ -171,6 +171,8 @@ public class KeyRepeat {
 				if (timer.timePassedUpdate(timeRepeat)) // new repeat event occured
 					return Event.SINGLE_CLICK;
 				break;
+			default:
+				break;
 		}
 		return Event.NONE;
 	}

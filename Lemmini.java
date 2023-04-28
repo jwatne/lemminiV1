@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-import javax.jnlp.ServiceManager;
-import javax.jnlp.UnavailableServiceException;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -99,8 +97,6 @@ public class Lemmini extends JFrame implements KeyListener {
 	final static int MIN_SLEEP = 10;
 	/** threshold for sleep - don't sleep if time to wait is shorter than this as sleep might return too late */
 	final static int THR_SLEEP = 16;
-	/** flag: started as Webstart application */
-	private static boolean isWebstartApp = true;
 
 	private final static long serialVersionUID = 0x01;
 
@@ -145,7 +141,7 @@ public class Lemmini extends JFrame implements KeyListener {
 	 */
 	Lemmini() {
 		try {
-			Core.init(this,isWebstartApp);      // initialize Core object
+			Core.init(this);      // initialize Core object
 			GameController.init();
 			GameController.setLevelMenuUpdateListener(new LevelMenuUpdateListener());
 		} catch (ResourceException ex) {
@@ -738,13 +734,6 @@ public class Lemmini extends JFrame implements KeyListener {
 			System.exit(1);
 		}
 
-		// detect webstart
-		try {
-			ServiceManager.lookup("javax.jnlp.BasicService");
-		} catch (UnavailableServiceException ex) {
-			isWebstartApp = false;
-		};
-
 		// workaround to adjust time base to 1ms under XP
 		// see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6435126
 		new Thread() {
@@ -1276,6 +1265,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 			offGfx = offGraphics[drawBuffer];
 
 			BufferedImage bgImage = GameController.getBgImage();
+			
 			switch (GameController.getGameState()) {
 				case INTRO:
 					TextScreen.setMode(TextScreen.Mode.INTRO);
@@ -1465,6 +1455,10 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 						} else if (LemmCursor.getEnabled() == false)
 							enableCursor(true);
 					}
+				case INIT:
+					break;
+				default:
+					break;
 			}
 
 			// fader
@@ -1555,6 +1549,18 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 				GameController.releaseIcon(Icons.Type.PLUS);
 				GameController.releaseIcon(Icons.Type.NUKE);
 				mouseevent.consume();
+				break;
+			case BRIEFING:
+				break;
+			case DEBRIEFING:
+				break;
+			case INIT:
+				break;
+			case INTRO:
+				break;
+			case LEVEL_END:
+				break;
+			default:
 				break;
 		}
 	}
@@ -1647,6 +1653,14 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 						GameController.setxPos(ofs);
 					mouseevent.consume();
 				}
+			case INIT:
+				break;
+			case INTRO:
+				break;
+			case LEVEL_END:
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -1695,6 +1709,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	public void mouseExited(final MouseEvent mouseevent) {
 		double scale = Core.getScale();
 		int x = xMouseScreen + mouseDx;
+		
 		switch (GameController.getGameState()) {
 			case BRIEFING:
 			case DEBRIEFING:
@@ -1726,6 +1741,14 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 				LemmCursor.setY((int)Math.round(yMouseScreen/scale/*-LemmCursor.height/2*/));
 				mouseevent.consume();
 				break;
+			case INIT:
+				break;
+			case INTRO:
+				break;
+			case LEVEL_END:
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -1737,6 +1760,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 		double scale = Core.getScale();
 		mouseDx = 0;
 		mouseDy = 0;
+		
 		// check minimap mouse move
 		switch (GameController.getGameState()) {
 			case LEVEL:
@@ -1758,6 +1782,18 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 				debugDraw(x,y,leftMousePressed);
 				mouseMoved(mouseevent);
 				mouseevent.consume();
+				break;
+			case BRIEFING:
+				break;
+			case DEBRIEFING:
+				break;
+			case INIT:
+				break;
+			case INTRO:
+				break;
+			case LEVEL_END:
+				break;
+			default:
 				break;
 		}
 	}
@@ -1806,6 +1842,12 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 				mouseDy = (yMouse - oldY);
 				mouseDragStartX = (int)Math.round(mouseevent.getX()/scale);
 				mouseevent.consume();
+				break;
+			case INIT:
+				break;
+			case LEVEL_END:
+				break;
+			default:
 				break;
 		}
 	}

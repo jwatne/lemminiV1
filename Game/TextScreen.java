@@ -137,6 +137,8 @@ public class TextScreen {
 					case DEBRIEFING:
 						initDebriefing();
 						break;
+					default:
+						break;
 				}
 			}
 			mode = m;
@@ -279,6 +281,7 @@ public class TextScreen {
 	public static void update() {
 		synchronized (monitor) {
 			textScreen.restore();
+			
 			switch (mode) {
 				case INTRO:
 					update_intro();
@@ -288,6 +291,8 @@ public class TextScreen {
 					break;
 				case DEBRIEFING:
 					update_debriefing();
+					break;
+				default:
 					break;
 			}
 		}

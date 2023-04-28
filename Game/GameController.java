@@ -801,32 +801,19 @@ public class GameController {
 							case STOPPER:
 								numBlockers -= 1;
 								break;
-							case BOMBER_STOPPER:
-								break;
-							case BUILDER_END:
-								break;
-							case CLIMBER_TO_WALKER:
-								break;
-							case DROWNING:
-								break;
-							case EXITING:
-								break;
-							case FALLER:
-								break;
-							case FLOATER_START:
-								break;
-							case JUMPER:
-								break;
-							case NUKE:
-								break;
-							case SPLAT:
-								break;
-							case TRAPPED:
-								break;
-							case UNDEFINED:
-								break;
-							case WALKER:
-								break;
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
 							default:
 								break;
 						}
@@ -876,32 +863,19 @@ public class GameController {
 							case STOPPER:
 								Icons.press(Icons.Type.BLOCK);
 								break;
-							case BOMBER_STOPPER:
-								break;
-							case BUILDER_END:
-								break;
-							case CLIMBER_TO_WALKER:
-								break;
-							case DROWNING:
-								break;
-							case EXITING:
-								break;
-							case FALLER:
-								break;
-							case FLOATER_START:
-								break;
-							case JUMPER:
-								break;
-							case NUKE:
-								break;
-							case SPLAT:
-								break;
-							case TRAPPED:
-								break;
-							case UNDEFINED:
-								break;
-							case WALKER:
-								break;
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
+							
 							default:
 								break;
 						}
@@ -1090,32 +1064,19 @@ public class GameController {
 						canSet = true;
 					}
 					break;
-				case BOMBER_STOPPER:
-					break;
-				case BUILDER_END:
-					break;
-				case CLIMBER_TO_WALKER:
-					break;
-				case DROWNING:
-					break;
-				case EXITING:
-					break;
-				case FALLER:
-					break;
-				case FLOATER_START:
-					break;
-				case JUMPER:
-					break;
-				case NUKE:
-					break;
-				case SPLAT:
-					break;
-				case TRAPPED:
-					break;
-				case UNDEFINED:
-					break;
-				case WALKER:
-					break;
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
 				default:
 					break;
 			}
@@ -1226,18 +1187,15 @@ public class GameController {
 				minus.pressed(KEYREPEAT_ICON);
 				stopReplayMode();
 				break;
-			case EMPTY:
-				break;
-			case INVALID:
-				break;
+			
+			
 			default:
 				break;
 		}
 		if (ok || lemmSkill != lemmSkillOld) {
 			switch (type) {
 				case PLUS:
-				case MINUS:
-					break; // supress sound
+				 // supress sound
 				default:
 					sound.play(SND_CHANGE_OP);
 			}
@@ -1294,8 +1252,7 @@ public class GameController {
 						System.exit(1);
 					}
 					break;
-				case NONE:
-					break;
+				
 				default:
 					break;
 			}

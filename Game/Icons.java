@@ -193,10 +193,8 @@ public class Icons {
 				if (idx <= LAST_DRAWN)
 					iconGfx.drawImage(icons[idx].getImage(),WIDTH*idx,0,null);
 				break;
-			case EMPTY:
-				break;
-			case INVALID:
-				break;
+			
+			
 			default:
 				break;
 		}

@@ -172,7 +172,7 @@ public class ToolBox {
 	 }
 
 	 /**
-	  * Returns the extension (".XXX") of a filename without the dot.
+	  * Returns the extension of a filename without the dot.
 	  * @param path String containing file name
 	  * @return String containing only the extension (without the dot) or null (if no extension found)
 	  */

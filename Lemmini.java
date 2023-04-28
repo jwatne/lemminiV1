@@ -81,21 +81,30 @@ import javax.swing.JRadioButtonMenuItem;
 
 /**
  * Lemmini - a game engine for Lemmings.<br>
- * This is the main window including input handling. The game logic is located in
+ * This is the main window including input handling. The game logic is located
+ * in
  * {@link GameController}, some core components are in {@link Core}.<br>
  * <br>
- * Note: this was developed for JRE1.4 and only ported to JRE1.5 after it was finished.
- * Also the design evolved during two years of development and thus isn't nearly as clean
- * as it should be. During the porting to 1.5, I cleaned up some things here and there,
+ * Note: this was developed for JRE1.4 and only ported to JRE1.5 after it was
+ * finished.
+ * Also the design evolved during two years of development and thus isn't nearly
+ * as clean
+ * as it should be. During the porting to 1.5, I cleaned up some things here and
+ * there,
  * but didn't want to redesign the whole thing from scratch.
  *
  * @author Volker Oth
  */
-
 public class Lemmini extends JFrame implements KeyListener {
-	/** minimum sleep duration in milliseconds - values too small may cause system clock shift under WinXP etc. */
+	/**
+	 * minimum sleep duration in milliseconds - values too small may cause system
+	 * clock shift under WinXP etc.
+	 */
 	final static int MIN_SLEEP = 10;
-	/** threshold for sleep - don't sleep if time to wait is shorter than this as sleep might return too late */
+	/**
+	 * threshold for sleep - don't sleep if time to wait is shorter than this as
+	 * sleep might return too late
+	 */
 	final static int THR_SLEEP = 16;
 
 	private final static long serialVersionUID = 0x01;
@@ -106,12 +115,11 @@ public class Lemmini extends JFrame implements KeyListener {
 	/** path for loading single level files */
 	private String lvlPath;
 	/** HashMap to store menu items for difficulty levels */
-	private HashMap<String,ArrayList<LvlMenuItem>> diffLevelMenus;
+	private HashMap<String, ArrayList<LvlMenuItem>> diffLevelMenus;
 	/** panel for the game graphics */
 	private GraphicsPane gp;
 
 	// Swing stuff
-
 	private JMenuBar jMenuBar = null;
 	private JMenu jMenuLevel = null;
 	private JMenuItem jMenuItemRestart = null;
@@ -135,19 +143,18 @@ public class Lemmini extends JFrame implements KeyListener {
 	private ButtonGroup playerGroup = null;
 	private ButtonGroup zoomGroup = null;
 
-
 	/**
 	 * Constructor of the main frame.
 	 */
 	Lemmini() {
 		try {
-			Core.init(this);      // initialize Core object
+			Core.init(this); // initialize Core object
 			GameController.init();
 			GameController.setLevelMenuUpdateListener(new LevelMenuUpdateListener());
 		} catch (ResourceException ex) {
 			Core.resourceError(ex.getMessage());
 		} catch (LemmException ex) {
-			JOptionPane.showMessageDialog( null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE );
+			JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		} catch (Exception ex) {
 			ToolBox.showException(ex);
@@ -156,15 +163,19 @@ public class Lemmini extends JFrame implements KeyListener {
 			ToolBox.showException(ex);
 			System.exit(1);
 		}
+
 		// read frame props
 		int posX, posY;
-		this.setSize((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale()));
-		this.setMinimumSize(new Dimension((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale())));
-		this.setMaximumSize(new Dimension((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale())));
+		this.setSize((int) Math.round(Core.getDrawWidth() * Core.getScale()),
+				(int) Math.round(Core.getDrawHeight() * Core.getScale()));
+		this.setMinimumSize(new Dimension((int) Math.round(Core.getDrawWidth() * Core.getScale()),
+				(int) Math.round(Core.getDrawHeight() * Core.getScale())));
+		this.setMaximumSize(new Dimension((int) Math.round(Core.getDrawWidth() * Core.getScale()),
+				(int) Math.round(Core.getDrawHeight() * Core.getScale())));
 		this.setResizable(false); // at least for the moment: forbid resize
 		Point p = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-		p.x -= this.getWidth()/2;
-		p.y -= this.getHeight()/2;
+		p.x -= this.getWidth() / 2;
+		p.y -= this.getHeight() / 2;
 		posX = Core.programProps.get("framePosX", p.x > 0 ? p.x : 0);
 		posY = Core.programProps.get("framePosY", p.y > 0 ? p.y : 0);
 		this.setLocation(posX, posY);
@@ -184,7 +195,6 @@ public class Lemmini extends JFrame implements KeyListener {
 		this.validate(); // force redraw
 		this.setTitle("Lemmini");
 
-
 		// create Menu
 		jMenuItemExit = new JMenuItem("Exit");
 		jMenuItemExit.addActionListener(new java.awt.event.ActionListener() {
@@ -203,32 +213,43 @@ public class Lemmini extends JFrame implements KeyListener {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				Core.player.store(); // save player in case it is changed
-				PlayerDialog d = new PlayerDialog((JFrame)Core.getCmp(), true);
+				PlayerDialog d = new PlayerDialog((JFrame) Core.getCmp(), true);
 				d.setVisible(true);
 				// blocked until dialog returns
 				List<String> players = d.getPlayers();
+
 				if (players != null) {
 					String player = Core.player.getName(); // old player
 					int playerIdx = d.getSelection();
-					if (playerIdx != -1)
+
+					if (playerIdx != -1) {
 						player = players.get(playerIdx); // remember selected player
+					}
+
 					// check for players to delete
-					for (int i=0; i<Core.getPlayerNum(); i++) {
+					for (int i = 0; i < Core.getPlayerNum(); i++) {
 						String p = Core.getPlayer(i);
+
 						if (!players.contains(p)) {
-							File f = new File(Core.resourcePath+"players/"+p+".ini");
+							File f = new File(Core.resourcePath + "players/" + p + ".ini");
 							f.delete();
-							if (p.equals(player))
+
+							if (p.equals(player)) {
 								player = "default";
+							}
 						}
 					}
+
 					// rebuild players list
 					Core.clearPlayers();
+
 					// add default player if missing
-					if (!players.contains("default"))
+					if (!players.contains("default")) {
 						players.add("default");
+					}
+
 					// now copy all player and create properties
-					for (int i=0; i<players.size(); i++) {
+					for (int i = 0; i < players.size(); i++) {
 						Core.addPlayer(players.get(i));
 					}
 
@@ -238,64 +259,79 @@ public class Lemmini extends JFrame implements KeyListener {
 					// rebuild players menu
 					playerGroup = new ButtonGroup();
 					jMenuSelectPlayer.removeAll();
-					for (int idx=0; idx < Core.getPlayerNum(); idx++) {
+
+					for (int idx = 0; idx < Core.getPlayerNum(); idx++) {
 						JCheckBoxMenuItem item = addPlayerItem(Core.getPlayer(idx));
-						if ( Core.player.getName().equals(Core.getPlayer(idx)) )
+
+						if (Core.player.getName().equals(Core.getPlayer(idx))) {
 							item.setSelected(true);
+						}
 					}
+
 					updateLevelMenus();
 				}
 			}
 		});
 
-
 		jMenuSelectPlayer = new JMenu("Select Player");
 		playerGroup = new ButtonGroup();
-		for (int idx=0; idx < Core.getPlayerNum(); idx++) {
+
+		for (int idx = 0; idx < Core.getPlayerNum(); idx++) {
 			JCheckBoxMenuItem item = addPlayerItem(Core.getPlayer(idx));
-			if ( Core.player.getName().equals(Core.getPlayer(idx)) )
+
+			if (Core.player.getName().equals(Core.getPlayer(idx))) {
 				item.setSelected(true);
+			}
 		}
+
 		jMenuPlayer = new JMenu("Player");
 		jMenuPlayer.add(jMenuItemManagePlayer);
 		jMenuPlayer.add(jMenuSelectPlayer);
-
 
 		// load level packs and create Level menu
 		java.awt.event.ActionListener lvlListener = new java.awt.event.ActionListener() {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				LvlMenuItem item = (LvlMenuItem)e.getSource();
+				LvlMenuItem item = (LvlMenuItem) e.getSource();
 				GameController.requestChangeLevel(item.levelPack, item.diffLevel, item.level, false);
 			}
 		};
-		diffLevelMenus = new HashMap<String,ArrayList<LvlMenuItem>>(); // store menus to access them later
+
+		diffLevelMenus = new HashMap<String, ArrayList<LvlMenuItem>>(); // store menus to access them later
 		jMenuSelect = new JMenu("Select Level");
-		for (int lp=1; lp<GameController.getLevelPackNum(); lp++) { // skip dummy level pack
+
+		for (int lp = 1; lp < GameController.getLevelPackNum(); lp++) { // skip dummy level pack
 			LevelPack lPack = GameController.getLevelPack(lp);
 			JMenu jMenuPack = new JMenu(lPack.getName());
 			String difficulties[] = lPack.getDiffLevels();
-			for (int i=0; i<difficulties.length; i++) {
+
+			for (int i = 0; i < difficulties.length; i++) {
 				// get activated levels for this group
 				GroupBitfield bf = Core.player.getBitField(lPack.getName(), difficulties[i]);
 				String names[] = lPack.getLevels(i);
 				JMenu jMenuDiff = new JMenu(difficulties[i]);
 				// store menus to access them later
 				ArrayList<LvlMenuItem> menuItems = new ArrayList<LvlMenuItem>();
-				for (int n=0; n<names.length; n++) {
-					LvlMenuItem jMenuLvl = new LvlMenuItem(names[n],lp,i,n);
+
+				for (int n = 0; n < names.length; n++) {
+					LvlMenuItem jMenuLvl = new LvlMenuItem(names[n], lp, i, n);
 					jMenuLvl.addActionListener(lvlListener);
-					if (Core.player.isAvailable(bf, n))
+
+					if (Core.player.isAvailable(bf, n)) {
 						jMenuLvl.setEnabled(true);
-					else
+					} else {
 						jMenuLvl.setEnabled(false);
+					}
+
 					jMenuDiff.add(jMenuLvl);
 					menuItems.add(jMenuLvl);
 				}
+
 				jMenuPack.add(jMenuDiff);
 				// store menus to access them later
 				diffLevelMenus.put(LevelPack.getID(lPack.getName(), difficulties[i]), menuItems);
 			}
+
 			jMenuSelect.add(jMenuPack);
 		}
 
@@ -305,41 +341,45 @@ public class Lemmini extends JFrame implements KeyListener {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				if (!GameController.getLevel().isReady())
-					GameController.requestChangeLevel(GameController.getCurLevelPackIdx(), GameController.getCurDiffLevel(), GameController.getCurLevelNumber(), false);
+					GameController.requestChangeLevel(GameController.getCurLevelPackIdx(),
+							GameController.getCurDiffLevel(), GameController.getCurLevelNumber(), false);
 				else
 					GameController.requestRestartLevel(false);
 			}
 		});
-
 
 		jMenuItemLoad = new JMenuItem();
 		jMenuItemLoad.setText("Load Level");
 		jMenuItemLoad.addActionListener(new java.awt.event.ActionListener() {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				String p = ToolBox.getFileName(thisFrame,lvlPath,Core.LEVEL_EXTENSIONS,true);
+				String p = ToolBox.getFileName(thisFrame, lvlPath, Core.LEVEL_EXTENSIONS, true);
+
 				if (p != null) {
 					try {
 						if (ToolBox.getExtension(p).equalsIgnoreCase("lvl")) {
-							Extract.ExtractLevel.convertLevel(p, Core.resourcePath+"/temp.ini");
-							p = Core.resourcePath+"/temp.ini";
+							Extract.ExtractLevel.convertLevel(p, Core.resourcePath + "/temp.ini");
+							p = Core.resourcePath + "/temp.ini";
 						}
+
 						if (ToolBox.getExtension(p).equalsIgnoreCase("ini")) {
-							String id = new String(ToolBox.getFileID(p,5));
+							String id = new String(ToolBox.getFileID(p, 5));
+
 							if (id.equalsIgnoreCase("# LVL")) {
 								// this is a hack - maybe find a better way
 								GameController.getLevelPack(0).getInfo(0, 0).setFileName(p);
 								GameController.getLevelPack(0).getInfo(0, 0).setMusic(Music.getRandomTrack());
-								GameController.requestChangeLevel(0,0,0,false);
+								GameController.requestChangeLevel(0, 0, 0, false);
 								lvlPath = p;
 								return;
 							}
 						}
-						JOptionPane.showMessageDialog(Core.getCmp(), "Wrong format!", "Loading level failed", JOptionPane.INFORMATION_MESSAGE);
+
+						JOptionPane.showMessageDialog(Core.getCmp(), "Wrong format!", "Loading level failed",
+								JOptionPane.INFORMATION_MESSAGE);
 					} catch (Exception ex) {
 						ToolBox.showException(ex);
 					}
-
 				}
 			}
 		});
@@ -349,24 +389,33 @@ public class Lemmini extends JFrame implements KeyListener {
 		jMenuItemReplay.addActionListener(new java.awt.event.ActionListener() {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				String replayPath = ToolBox.getFileName(thisFrame,Core.resourcePath,Core.REPLAY_EXTENSIONS,true);
+				String replayPath = ToolBox.getFileName(thisFrame, Core.resourcePath, Core.REPLAY_EXTENSIONS, true);
+
 				if (replayPath != null) {
 					try {
 						if (ToolBox.getExtension(replayPath).equalsIgnoreCase("rpl")) {
 							ReplayLevelInfo rli = GameController.loadReplay(replayPath);
+
 							if (rli != null) {
 								int lpn = -1;
-								for (int i=0; i<GameController.getLevelPackNum(); i++)
-									if (GameController.getLevelPack(i).getName().equals(rli.getLevelPack()))
+
+								for (int i = 0; i < GameController.getLevelPackNum(); i++) {
+									if (GameController.getLevelPack(i).getName().equals(rli.getLevelPack())) {
 										lpn = i;
+									}
+								}
+
 								if (lpn > -1) {
-									GameController.requestChangeLevel(lpn,rli.getDiffLevel(), rli.getLvlNumber(), true);
+									GameController.requestChangeLevel(lpn, rli.getDiffLevel(), rli.getLvlNumber(),
+											true);
 									return; // success
 								}
 							}
 						}
+
 						// else: no success
-						JOptionPane.showMessageDialog(Core.getCmp(), "Wrong format!", "Loading replay failed", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(Core.getCmp(), "Wrong format!", "Loading replay failed",
+								JOptionPane.INFORMATION_MESSAGE);
 					} catch (Exception ex) {
 						ToolBox.showException(ex);
 					}
@@ -374,21 +423,22 @@ public class Lemmini extends JFrame implements KeyListener {
 			}
 		});
 
-
 		jMenuItemLevelCode = new JMenuItem("Enter Level Code");
 		jMenuItemLevelCode.addActionListener(new java.awt.event.ActionListener() {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				LevelCodeDialog lcd = new LevelCodeDialog((JFrame)Core.getCmp(), true);
+				LevelCodeDialog lcd = new LevelCodeDialog((JFrame) Core.getCmp(), true);
 				lcd.setVisible(true);
 				String levelCode = lcd.getCode();
 				int lvlPack = lcd.getLevelPack();
-				if (levelCode != null && levelCode.length() != 0 && lvlPack > 0) {
 
+				if (levelCode != null && levelCode.length() != 0 && lvlPack > 0) {
 					levelCode = levelCode.trim();
+
 					// cheat mode
 					if (levelCode.equals("0xdeadbeef")) {
-						JOptionPane.showMessageDialog(Core.getCmp(), "All levels and debug mode enabled", "Cheater!", JOptionPane.INFORMATION_MESSAGE);
+						JOptionPane.showMessageDialog(Core.getCmp(), "All levels and debug mode enabled", "Cheater!",
+								JOptionPane.INFORMATION_MESSAGE);
 						Core.player.enableCheatMode();
 						updateLevelMenus();
 						return;
@@ -398,6 +448,7 @@ public class Lemmini extends JFrame implements KeyListener {
 					levelCode = levelCode.toUpperCase();
 					LevelPack lpack = GameController.getLevelPack(lvlPack);
 					int lvlAbs = LevelCode.getLevel(lpack.getCodeSeed(), levelCode, lpack.getCodeOffset());
+
 					if (lvlAbs != -1) {
 						// calculate level pack and relative levelnumber from absolute number
 						int l[] = GameController.relLevelNum(lvlPack, lvlAbs);
@@ -409,8 +460,10 @@ public class Lemmini extends JFrame implements KeyListener {
 						return;
 					}
 				}
+
 				// not found
-				JOptionPane.showMessageDialog(Core.getCmp(), "Invalid Level Code", "Error", JOptionPane.WARNING_MESSAGE);
+				JOptionPane.showMessageDialog(Core.getCmp(), "Invalid Level Code", "Error",
+						JOptionPane.WARNING_MESSAGE);
 			}
 		});
 
@@ -426,11 +479,14 @@ public class Lemmini extends JFrame implements KeyListener {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				boolean selected = jMenuItemMusic.isSelected();
-				//jMenuItemMusic.setSelected(selected);
-				if (selected)
+				// jMenuItemMusic.setSelected(selected);
+
+				if (selected) {
 					GameController.setMusicOn(true);
-				else
+				} else {
 					GameController.setMusicOn(false);
+				}
+
 				Core.programProps.set("music", GameController.isMusicOn());
 				if (GameController.getLevel() != null) // to be improved: level is running (game state)
 					if (GameController.isMusicOn())
@@ -439,6 +495,7 @@ public class Lemmini extends JFrame implements KeyListener {
 						Music.stop();
 			}
 		});
+
 		jMenuItemMusic.setSelected(GameController.isMusicOn());
 
 		jMenuItemSound = new JCheckBoxMenuItem("Sound", false);
@@ -446,13 +503,17 @@ public class Lemmini extends JFrame implements KeyListener {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				boolean selected = jMenuItemSound.isSelected();
-				if (selected)
+
+				if (selected) {
 					GameController.setSoundOn(true);
-				else
+				} else {
 					GameController.setSoundOn(false);
+				}
+
 				Core.programProps.set("sound", GameController.isSoundOn());
 			}
 		});
+
 		jMenuItemSound.setSelected(GameController.isSoundOn());
 
 		jMenuSFX = new JMenu("SFX Mixer");
@@ -462,16 +523,19 @@ public class Lemmini extends JFrame implements KeyListener {
 
 		// special handling of mixer from INI that doesn't exist (any more)
 		boolean found = false;
-		for (int i=0; i<mixerNames.length; i++) {
+
+		for (int i = 0; i < mixerNames.length; i++) {
 			if (mixerNames[i].equals(lastMixerName)) {
 				found = true;
 				break;
 			}
 		}
-		if (!found)
-			lastMixerName = "Java Sound Audio Engine";
 
-		for (int i=0; i<mixerNames.length; i++) {
+		if (!found) {
+			lastMixerName = "Java Sound Audio Engine";
+		}
+
+		for (int i = 0; i < mixerNames.length; i++) {
 			JCheckBoxMenuItem item = new JCheckBoxMenuItem();
 			item.setText(mixerNames[i]);
 			item.addActionListener(new java.awt.event.ActionListener() {
@@ -479,7 +543,8 @@ public class Lemmini extends JFrame implements KeyListener {
 				public void actionPerformed(java.awt.event.ActionEvent e) {
 					String mixerNames[] = GameController.sound.getMixers();
 					String mixerName = e.getActionCommand();
-					for (int i=0; i<mixerNames.length; i++) {
+
+					for (int i = 0; i < mixerNames.length; i++) {
 						if (mixerNames[i].equals(mixerName)) {
 							GameController.sound.setMixer(i);
 							Core.programProps.set("mixerName", mixerName);
@@ -488,6 +553,7 @@ public class Lemmini extends JFrame implements KeyListener {
 					}
 				}
 			});
+
 			if (mixerNames[i].equals(lastMixerName)) { // default setting
 				item.setState(true);
 				GameController.sound.setMixer(i);
@@ -501,11 +567,10 @@ public class Lemmini extends JFrame implements KeyListener {
 		jMenuItemVolume.addActionListener(new java.awt.event.ActionListener() {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
-				GainDialog v = new GainDialog((JFrame)Core.getCmp(), true);
+				GainDialog v = new GainDialog((JFrame) Core.getCmp(), true);
 				v.setVisible(true);
 			}
 		});
-
 
 		jMenuSound = new JMenu();
 		jMenuSound.setText("Sound");
@@ -516,39 +581,40 @@ public class Lemmini extends JFrame implements KeyListener {
 
 		jMenuItemCursor = new JCheckBoxMenuItem("Advanced select", false);
 		jMenuItemCursor.addActionListener(new java.awt.event.ActionListener() {
-			/* (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
+
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				boolean selected = jMenuItemCursor.isSelected();
-				if (selected)
+
+				if (selected) {
 					GameController.setAdvancedSelect(true);
-				else {
+				} else {
 					GameController.setAdvancedSelect(false);
 					gp.setCursor(LemmCursor.Type.NORMAL);
 				}
+
 				Core.programProps.set("advancedSelect", GameController.isAdvancedSelect());
 			}
 		});
+
 		jMenuItemCursor.setSelected(GameController.isAdvancedSelect());
 
 		jMenuItemClassicalCursor = new JCheckBoxMenuItem("Classical Cursor", false);
 		jMenuItemClassicalCursor.addActionListener(new java.awt.event.ActionListener() {
-			/* (non-Javadoc)
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
+
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				boolean selected = jMenuItemClassicalCursor.isSelected();
-				if (selected)
+				if (selected) {
 					GameController.setClassicalCursor(true);
-				else {
+				} else {
 					GameController.setClassicalCursor(false);
 				}
+
 				Core.programProps.set("classicalCursor", GameController.isClassicalCursor());
 			}
 		});
+
 		jMenuItemClassicalCursor.setSelected(GameController.isClassicalCursor());
 
 		jMenuOptions = new JMenu();
@@ -562,11 +628,11 @@ public class Lemmini extends JFrame implements KeyListener {
 		jMenuBar.add(jMenuLevel);
 		jMenuBar.add(jMenuSound);
 		jMenuBar.add(jMenuOptions);
-		
+
 		zoomGroup = new ButtonGroup();
 		JMenu jMenuZoom = new JMenu("Zoom");
-		jMenuOptions.add(jMenuZoom);		
-		
+		jMenuOptions.add(jMenuZoom);
+
 		JRadioButtonMenuItem jMenuRadioItemX1 = new JRadioButtonMenuItem("x1");
 		jMenuRadioItemX1.addActionListener(new java.awt.event.ActionListener() {
 			@Override
@@ -574,9 +640,10 @@ public class Lemmini extends JFrame implements KeyListener {
 				setScale(1);
 			}
 		});
+
 		jMenuZoom.add(jMenuRadioItemX1);
 		zoomGroup.add(jMenuRadioItemX1);
-		
+
 		JRadioButtonMenuItem jMenuRadioItemX1P5 = new JRadioButtonMenuItem("X1.5");
 		jMenuRadioItemX1P5.addActionListener(new java.awt.event.ActionListener() {
 			@Override
@@ -584,9 +651,10 @@ public class Lemmini extends JFrame implements KeyListener {
 				setScale(1.5);
 			}
 		});
+
 		jMenuZoom.add(jMenuRadioItemX1P5);
 		zoomGroup.add(jMenuRadioItemX1P5);
-		
+
 		JRadioButtonMenuItem jMenuRadioItemX2 = new JRadioButtonMenuItem("x2");
 		jMenuRadioItemX2.addActionListener(new java.awt.event.ActionListener() {
 			@Override
@@ -594,9 +662,10 @@ public class Lemmini extends JFrame implements KeyListener {
 				setScale(2);
 			}
 		});
+
 		jMenuZoom.add(jMenuRadioItemX2);
 		zoomGroup.add(jMenuRadioItemX2);
-		
+
 		JRadioButtonMenuItem jMenuRadioItemX2P5 = new JRadioButtonMenuItem("X2.5");
 		jMenuRadioItemX2P5.addActionListener(new java.awt.event.ActionListener() {
 			@Override
@@ -604,9 +673,10 @@ public class Lemmini extends JFrame implements KeyListener {
 				setScale(2.5);
 			}
 		});
+
 		jMenuZoom.add(jMenuRadioItemX2P5);
 		zoomGroup.add(jMenuRadioItemX2P5);
-		
+
 		JRadioButtonMenuItem jMenuRadioItemX3 = new JRadioButtonMenuItem("x3");
 		jMenuRadioItemX3.addActionListener(new java.awt.event.ActionListener() {
 			@Override
@@ -614,11 +684,12 @@ public class Lemmini extends JFrame implements KeyListener {
 				setScale(3);
 			}
 		});
+
 		jMenuZoom.add(jMenuRadioItemX3);
 		zoomGroup.add(jMenuRadioItemX3);
 		this.setJMenuBar(jMenuBar);
-		
-		switch ((int)Math.round(Core.getScale()*2)) {
+
+		switch ((int) Math.round(Core.getScale() * 2)) {
 			case 3:
 				jMenuRadioItemX1P5.setSelected(true);
 				break;
@@ -643,7 +714,8 @@ public class Lemmini extends JFrame implements KeyListener {
 				exit();
 			}
 		});
-		this.setVisible(true);		
+
+		this.setVisible(true);
 		gp.init();
 		GameController.setGameState(GameController.State.INTRO);
 		GameController.setTransition(GameController.TransitionState.NONE);
@@ -660,6 +732,7 @@ public class Lemmini extends JFrame implements KeyListener {
 
 	/**
 	 * Add a menu item for a player.
+	 * 
 	 * @param name player name
 	 * @return JCheckBoxMenuItem
 	 */
@@ -669,7 +742,7 @@ public class Lemmini extends JFrame implements KeyListener {
 			@Override
 			public void actionPerformed(java.awt.event.ActionEvent e) {
 				Core.player.store(); // save player in case it is changed
-				JMenuItem item = (JMenuItem)e.getSource();
+				JMenuItem item = (JMenuItem) e.getSource();
 				String player = item.getText();
 				Player p = new Player(player);
 				Core.player = p; // default player
@@ -677,6 +750,7 @@ public class Lemmini extends JFrame implements KeyListener {
 				updateLevelMenus();
 			}
 		});
+
 		playerGroup.add(item);
 		jMenuSelectPlayer.add(item);
 		return item;
@@ -684,6 +758,7 @@ public class Lemmini extends JFrame implements KeyListener {
 
 	/**
 	 * Convert String to int.
+	 * 
 	 * @param s String with decimal integer value
 	 * @return integer value (0 if no valid number)
 	 */
@@ -697,6 +772,7 @@ public class Lemmini extends JFrame implements KeyListener {
 
 	/**
 	 * The main function. Entry point of the program.
+	 * 
 	 * @param args
 	 */
 	public static void main(final String[] args) {
@@ -705,7 +781,8 @@ public class Lemmini extends JFrame implements KeyListener {
 		 */
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e) { /* don't care */}
+		} catch (Exception e) {
+			/* don't care */}
 		/*
 		 * Apple menu bar for MacOS
 		 */
@@ -717,34 +794,40 @@ public class Lemmini extends JFrame implements KeyListener {
 		String jreStr = System.getProperty("java.version");
 		String vs[] = jreStr.split("[._]");
 		double vnum;
+
 		if (vs.length >= 3) {
 			vnum = (getInt(vs[0]))
-			+ (getInt(vs[1])) * 0.1
-			+ (getInt(vs[2])) * 0.01;
+					+ (getInt(vs[1])) * 0.1
+					+ (getInt(vs[2])) * 0.01;
+
 			if (vnum < 1.5) {
-				JOptionPane.showMessageDialog(null,"Run this with JVM >= 1.5","Error",JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Run this with JVM >= 1.5", "Error", JOptionPane.ERROR_MESSAGE);
 				System.exit(1);
 			}
 		}
 
 		// check free memory
 		long free = Runtime.getRuntime().maxMemory();
-		if (free < 60*1024*1024) { // 64MB doesn't seem to work even if set with -Xmx64M
-			JOptionPane.showMessageDialog(null,"You need at least 64MB of heap","Error",JOptionPane.ERROR_MESSAGE);
+
+		if (free < 60 * 1024 * 1024) { // 64MB doesn't seem to work even if set with -Xmx64M
+			JOptionPane.showMessageDialog(null, "You need at least 64MB of heap", "Error", JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
 		}
 
 		// workaround to adjust time base to 1ms under XP
 		// see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6435126
 		new Thread() {
-			{ this.setDaemon(true); this.start(); }
+			{
+				this.setDaemon(true);
+				this.start();
+			}
+
 			@Override
 			public void run() {
-				while(true) {
+				while (true) {
 					try {
 						Thread.sleep(Integer.MAX_VALUE);
-					}
-					catch(InterruptedException ex) {
+					} catch (InterruptedException ex) {
 					}
 				}
 			}
@@ -757,23 +840,27 @@ public class Lemmini extends JFrame implements KeyListener {
 	void setScale(double scale) {
 		gp.shutdown();
 		Core.setScale(scale);
-		setSize((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale()));
-		this.setMinimumSize(new Dimension((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale())));
-		this.setMaximumSize(new Dimension((int)Math.round(Core.getDrawWidth()*Core.getScale()),(int)Math.round(Core.getDrawHeight()*Core.getScale())));
+		setSize((int) Math.round(Core.getDrawWidth() * Core.getScale()),
+				(int) Math.round(Core.getDrawHeight() * Core.getScale()));
+		this.setMinimumSize(new Dimension((int) Math.round(Core.getDrawWidth() * Core.getScale()),
+				(int) Math.round(Core.getDrawHeight() * Core.getScale())));
+		this.setMaximumSize(new Dimension((int) Math.round(Core.getDrawWidth() * Core.getScale()),
+				(int) Math.round(Core.getDrawHeight() * Core.getScale())));
 		pack();
 		validate(); // force redraw
 		gp.init();
 	}
-	
+
 	/**
 	 * Update the level menus according to the progress of the current player.
 	 */
 	private void updateLevelMenus() {
 		// update level menus
-		for (int lp=1; lp<GameController.getLevelPackNum(); lp++) { // skip dummy level pack
+		for (int lp = 1; lp < GameController.getLevelPackNum(); lp++) { // skip dummy level pack
 			LevelPack lPack = GameController.getLevelPack(lp);
 			String difficulties[] = lPack.getDiffLevels();
-			for (int i=0; i<difficulties.length; i++) {
+
+			for (int i = 0; i < difficulties.length; i++) {
 				// get activated levels for this group
 				GroupBitfield bf = Core.player.getBitField(lPack.getName(), difficulties[i]);
 				updateLevelMenu(lPack.getName(), difficulties[i], bf);
@@ -783,27 +870,32 @@ public class Lemmini extends JFrame implements KeyListener {
 
 	/**
 	 * Update the level menus according to the given progress information.
+	 * 
 	 * @param pack name of level pack
 	 * @param diff name of difficulty level
-	 * @param bf bitmap containing availability flags for each level
+	 * @param bf   bitmap containing availability flags for each level
 	 */
 	private void updateLevelMenu(final String pack, final String diff, final GroupBitfield bf) {
 		ArrayList<LvlMenuItem> menuItems = diffLevelMenus.get(LevelPack.getID(pack, diff));
-		for (int k=0; k<menuItems.size(); k++) {
+
+		for (int k = 0; k < menuItems.size(); k++) {
 			// select level, e.g. "All fall down"
 			JMenuItem level = menuItems.get(k);
-			if (k == 0 || Core.player.isAvailable(bf, k))
+
+			if (k == 0 || Core.player.isAvailable(bf, k)) {
 				level.setEnabled(true);
-			else
+			} else {
 				level.setEnabled(false);
+			}
 		}
 
 	}
 
-
 	/**
-	 * Development function: patch current level x offset in the level configuration file.
+	 * Development function: patch current level x offset in the level configuration
+	 * file.
 	 * Works only in cheat mode.
+	 * 
 	 * @param lvlPath path of level configuration files
 	 */
 	private void patchLevel(final String lvlPath) {
@@ -811,28 +903,34 @@ public class Lemmini extends JFrame implements KeyListener {
 			ArrayList<String> lines = new ArrayList<String>();
 			BufferedReader r = new BufferedReader(new FileReader(lvlPath));
 			String l;
-			while ( (l = r.readLine()) != null)
+
+			while ((l = r.readLine()) != null) {
 				lines.add(l);
+			}
+
 			r.close();
 			FileWriter sw = new FileWriter(lvlPath);
-			for (int i=0; i<lines.size(); i++) {
+
+			for (int i = 0; i < lines.size(); i++) {
 				String s = lines.get(i);
+
 				if (s.startsWith("xPos =")) {
-					sw.write("xPos = "+Integer.toString(GameController.getxPos())+"\n");
-				} else
-					sw.write(s+"\n");
+					sw.write("xPos = " + Integer.toString(GameController.getxPos()) + "\n");
+				} else {
+					sw.write(s + "\n");
+				}
 			}
+
 			sw.close();
-		} catch (FileNotFoundException ex) {}
-		catch (IOException ex) {}
+		} catch (FileNotFoundException ex) {
+		} catch (IOException ex) {
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-	 */
 	@Override
 	public void keyPressed(final KeyEvent keyevent) {
 		int code = keyevent.getKeyCode();
+
 		if (GameController.getGameState() == GameController.State.LEVEL) {
 			switch (code) {
 				case KeyEvent.VK_1:
@@ -879,27 +977,34 @@ public class Lemmini extends JFrame implements KeyListener {
 					break;
 				case KeyEvent.VK_L: // print current level on the console
 					if (GameController.isCheat())
-						System.out.println(GameController.getLevelPack(GameController.getCurLevelPackIdx()).getInfo(GameController.getCurDiffLevel(), GameController.getCurLevelNumber()).getFileName());
+						System.out.println(GameController.getLevelPack(GameController.getCurLevelPackIdx())
+								.getInfo(GameController.getCurDiffLevel(), GameController.getCurLevelNumber())
+								.getFileName());
 					break;
 				case KeyEvent.VK_S: // superlemming on/off
 					if (GameController.isCheat())
 						GameController.setSuperLemming(!GameController.isSuperLemming());
 					else {
-						try{
-							File file = new File(Core.resourcePath+"/level.png");
-							BufferedImage tmp = GameController.getLevel().createMiniMap(null,GameController.getBgImage(), 1, 1, false);
+						try {
+							File file = new File(Core.resourcePath + "/level.png");
+							BufferedImage tmp = GameController.getLevel().createMiniMap(null,
+									GameController.getBgImage(), 1, 1, false);
 							ImageIO.write(tmp, "png", file);
-						} catch (Exception ex) {}
+						} catch (Exception ex) {
+						}
 					}
 					break;
 				case KeyEvent.VK_C:
 					if (Core.player.isCheat()) {
 						GameController.setCheat(!GameController.isCheat());
-						if (GameController.isCheat())
+
+						if (GameController.isCheat()) {
 							GameController.setWasCheated(true);
-					}
-					else
+						}
+					} else {
 						GameController.setCheat(false);
+					}
+
 					break;
 				case KeyEvent.VK_F11:
 				case KeyEvent.VK_P:
@@ -912,44 +1017,60 @@ public class Lemmini extends JFrame implements KeyListener {
 					GameController.pressIcon(Icons.Type.FFWD);
 					break;
 				case KeyEvent.VK_X:
-					if (GameController.isCheat())
-						patchLevel(GameController.getLevelPack(GameController.getCurLevelPackIdx()).getInfo(GameController.getCurDiffLevel(), GameController.getCurLevelNumber()).getFileName());
+					if (GameController.isCheat()) {
+						patchLevel(GameController.getLevelPack(GameController.getCurLevelPackIdx())
+								.getInfo(GameController.getCurDiffLevel(), GameController.getCurLevelNumber())
+								.getFileName());
+					}
+
 					break;
-				case KeyEvent.VK_RIGHT /*39*/: {
-					if (GameController.isAdvancedSelect())
+				case KeyEvent.VK_RIGHT /* 39 */: {
+					if (GameController.isAdvancedSelect()) {
 						gp.setCursor(LemmCursor.Type.RIGHT);
-					else {
-						int xOfsTemp = GameController.getxPos() + ((gp.isShiftPressed()) ? GraphicsPane.X_STEP_FAST : GraphicsPane.X_STEP);
-						if (xOfsTemp < Level.WIDTH-this.getWidth())
+					} else {
+						int xOfsTemp = GameController.getxPos()
+								+ ((gp.isShiftPressed()) ? GraphicsPane.X_STEP_FAST : GraphicsPane.X_STEP);
+						if (xOfsTemp < Level.WIDTH - this.getWidth())
 							GameController.setxPos(xOfsTemp);
 						else
-							GameController.setxPos(Level.WIDTH-this.getWidth());
+							GameController.setxPos(Level.WIDTH - this.getWidth());
 					}
-					break; }
-				case KeyEvent.VK_LEFT /*37*/: {
-					if (GameController.isAdvancedSelect())
+
+					break;
+				}
+
+				case KeyEvent.VK_LEFT /* 37 */: {
+					if (GameController.isAdvancedSelect()) {
 						gp.setCursor(LemmCursor.Type.LEFT);
-					else {
-						int xOfsTemp = GameController.getxPos() - ((gp.isShiftPressed()) ? GraphicsPane.X_STEP_FAST : GraphicsPane.X_STEP);
+					} else {
+						int xOfsTemp = GameController.getxPos()
+								- ((gp.isShiftPressed()) ? GraphicsPane.X_STEP_FAST : GraphicsPane.X_STEP);
 						if (xOfsTemp > 0)
 							GameController.setxPos(xOfsTemp);
 						else
 							GameController.setxPos(0);
 					}
-					break; }
+
+					break;
+				}
+
 				case KeyEvent.VK_UP: {
 					gp.setCursor(LemmCursor.Type.WALKER);
-					break;}
+					break;
+				}
+
 				case KeyEvent.VK_SHIFT:
 					gp.setShiftPressed(true);
 					break;
 				case KeyEvent.VK_SPACE:
 					if (GameController.isCheat()) {
 						Lemming l = new Lemming(gp.getCursorX(), gp.getCursorY());
+
 						synchronized (GameController.getLemmings()) {
 							GameController.getLemmings().add(l);
 						}
 					}
+
 					break;
 				case KeyEvent.VK_PLUS:
 				case KeyEvent.VK_ADD:
@@ -965,17 +1086,16 @@ public class Lemmini extends JFrame implements KeyListener {
 					GameController.handleIconButton(Icons.Type.NUKE);
 					break;
 			}
+
 			keyevent.consume();
 		}
-		//System.out.println(keyevent.getKeyCode());
+		// System.out.println(keyevent.getKeyCode());
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-	 */
 	@Override
 	public void keyReleased(final KeyEvent keyevent) {
 		int code = keyevent.getKeyCode();
+
 		if (GameController.getGameState() == GameController.State.LEVEL) {
 			switch (code) {
 				case KeyEvent.VK_SHIFT:
@@ -1010,9 +1130,6 @@ public class Lemmini extends JFrame implements KeyListener {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-	 */
 	@Override
 	public void keyTyped(final KeyEvent keyevent) {
 	}
@@ -1034,25 +1151,25 @@ public class Lemmini extends JFrame implements KeyListener {
 		System.exit(0);
 	}
 
-
 	/**
 	 * Listener to inform the GUI of the player's progress.
+	 * 
 	 * @author Volker Oth
 	 */
 	class LevelMenuUpdateListener implements UpdateListener {
-		/* (non-Javadoc)
-		 * @see Game.UpdateListener#update()
-		 */
 		@Override
 		public void update() {
-			if (GameController.getCurLevelPackIdx()!=0) { // 0 is the dummy pack
+			if (GameController.getCurLevelPackIdx() != 0) { // 0 is the dummy pack
 				LevelPack lvlPack = GameController.getLevelPack(GameController.getCurLevelPackIdx());
 				String pack = lvlPack.getName();
 				String diff = lvlPack.getDiffLevels()[GameController.getCurDiffLevel()];
 				// get next level
 				int num = GameController.getCurLevelNumber() + 1;
-				if ( num >= lvlPack.getLevels(GameController.getCurDiffLevel()).length )
+
+				if (num >= lvlPack.getLevels(GameController.getCurDiffLevel()).length) {
 					num = GameController.getCurLevelNumber();
+				}
+
 				// set next level as available
 				GroupBitfield bf = Core.player.setAvailable(pack, diff, num);
 				// update the menu
@@ -1061,9 +1178,9 @@ public class Lemmini extends JFrame implements KeyListener {
 		}
 	}
 
-
 	/**
 	 * Specialized menu item for level selection menus.
+	 * 
 	 * @author Volker Oth
 	 */
 	class LvlMenuItem extends JMenuItem {
@@ -1078,10 +1195,11 @@ public class Lemmini extends JFrame implements KeyListener {
 
 		/**
 		 * Constructor
+		 * 
 		 * @param text level name
 		 * @param pack index level pack
 		 * @param diff index of difficulty level
-		 * @param lvl level number
+		 * @param lvl  level number
 		 */
 		LvlMenuItem(final String text, final int pack, final int diff, final int lvl) {
 			super(text);
@@ -1094,6 +1212,7 @@ public class Lemmini extends JFrame implements KeyListener {
 
 /**
  * A graphics panel in which the actual game contents is displayed.
+ * 
  * @author Volker Oth
  */
 class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotionListener {
@@ -1106,11 +1225,11 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 	/** y coordinate of score display in pixels */
 	final static int scoreY = Level.HEIGHT;
 	/** y coordinate of counter displays in pixels */
-	final static int counterY = scoreY+40;
+	final static int counterY = scoreY + 40;
 	/** y coordinate of icons in pixels */
-	final static int iconsY = counterY+14;
+	final static int iconsY = counterY + 14;
 	/** x coordinate of minimap in pixels */
-	final static int smallX = 640-16/*-32*/-200;
+	final static int smallX = 640 - 16/*-32*/ - 200;
 	/** y coordinate of minimap in pixels */
 	final static int smallY = iconsY;
 
@@ -1164,15 +1283,17 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 	/**
 	 * Set cursor type.
+	 * 
 	 * @param c Cursor
 	 */
 	public void setCursor(final LemmCursor.Type c) {
 		LemmCursor.setType(c);
 		this.setCursor(LemmCursor.getCursor());
 	}
-	
+
 	/**
 	 * Show/hide Mouse cursor.
+	 * 
 	 * @param en true to show the Mouse cursor, false to hide it
 	 */
 	public void enableCursor(boolean en) {
@@ -1180,36 +1301,32 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 		this.setCursor(LemmCursor.getCursor());
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.JComponent#paint(java.awt.Graphics)
-	 */
 	@Override
 	public void paint(final Graphics g) {
-		//super.paint(iconGfx);
+		// super.paint(iconGfx);
 		synchronized (paintSemaphore) {
 			if (offImage != null) {
 				int w = Core.getDrawWidth();
 				int h = Core.getDrawHeight();
 				double scale = Core.getScale();
-				//g.drawImage(offImage[activeBuffer],0,0,null);
-				g.drawImage(offImage[activeBuffer],0,0,(int)Math.round(w*scale),(int)Math.round(h*scale),0,0,w,h,null);
+				// g.drawImage(offImage[activeBuffer],0,0,null);
+				g.drawImage(offImage[activeBuffer], 0, 0, (int) Math.round(w * scale), (int) Math.round(h * scale), 0,
+						0, w, h, null);
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see javax.swing.JComponent#update(java.awt.Graphics)
-	 */
 	@Override
 	public void update(final Graphics g) {
-		//super.update(iconGfx);
+		// super.update(iconGfx);
 		synchronized (paintSemaphore) {
 			if (offImage != null) {
 				int w = Core.getDrawWidth();
 				int h = Core.getDrawHeight();
 				double scale = Core.getScale();
-				//g.drawImage(offImage[activeBuffer],0,0,null);
-				g.drawImage(offImage[activeBuffer],0,0,(int)Math.round(w*scale),(int)Math.round(h*scale),0,0,w,h,null);
+				// g.drawImage(offImage[activeBuffer],0,0,null);
+				g.drawImage(offImage[activeBuffer], 0, 0, (int) Math.round(w * scale), (int) Math.round(h * scale), 0,
+						0, w, h, null);
 			}
 		}
 	}
@@ -1222,8 +1339,8 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 			int w = Core.getDrawWidth();
 			int h = Core.getDrawHeight();
 			double scale = Core.getScale();
-			
-			this.setSize((int)Math.round(scale*w), (int)Math.round(scale*h));
+
+			this.setSize((int) Math.round(scale * w), (int) Math.round(scale * h));
 
 			offImage = new BufferedImage[2];
 			offGraphics = new Graphics2D[2];
@@ -1234,13 +1351,13 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 			outStrImg = ToolBox.createImage(w, LemmFont.getHeight(), Transparency.BITMASK);
 			outStrGfx = outStrImg.createGraphics();
-			outStrGfx.setBackground(new Color(0,0,0));
+			outStrGfx.setBackground(new Color(0, 0, 0));
 
-			TextScreen.init(w, (int)Math.round(this.getHeight()/scale));
+			TextScreen.init(w, (int) Math.round(this.getHeight() / scale));
 			shiftPressed = false;
 		}
 	}
-	
+
 	/**
 	 * Delete offImage to avoid redraw and force init.
 	 */
@@ -1259,69 +1376,82 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 		Graphics2D offGfx;
 
 		synchronized (paintSemaphore) {
-			//if (offImage == null)
-			//	init();
-			drawBuffer = (activeBuffer == 0) ? 1:0;
+			// if (offImage == null)
+			// init();
+			drawBuffer = (activeBuffer == 0) ? 1 : 0;
 			offGfx = offGraphics[drawBuffer];
 
 			BufferedImage bgImage = GameController.getBgImage();
-			
+
 			switch (GameController.getGameState()) {
 				case INTRO:
 					TextScreen.setMode(TextScreen.Mode.INTRO);
 					TextScreen.update();
-					offGfx.drawImage(TextScreen.getScreen(), 0,0,null);
-					//offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x, LemmCursor.y, null);
+					offGfx.drawImage(TextScreen.getScreen(), 0, 0, null);
+					// offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x,
+					// LemmCursor.y, null);
 					break;
 				case BRIEFING:
 					TextScreen.setMode(TextScreen.Mode.BRIEFING);
 					TextScreen.update();
-					offGfx.drawImage(TextScreen.getScreen(), 0,0,null);
-					//offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x, LemmCursor.y, null);
+					offGfx.drawImage(TextScreen.getScreen(), 0, 0, null);
+					// offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x,
+					// LemmCursor.y, null);
 					break;
 				case DEBRIEFING:
 					TextScreen.setMode(TextScreen.Mode.DEBRIEFING);
 					TextScreen.update();
-					offGfx.drawImage(TextScreen.getScreen(), 0,0,null);
-					TextScreen.getDialog().handleMouseMove((int)Math.round(xMouseScreen/scale), (int)Math.round(yMouseScreen/scale));
-					//offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x, LemmCursor.y, null);
+					offGfx.drawImage(TextScreen.getScreen(), 0, 0, null);
+					TextScreen.getDialog().handleMouseMove((int) Math.round(xMouseScreen / scale),
+							(int) Math.round(yMouseScreen / scale));
+					// offGfx.drawImage(LemmCursor.getImage(LemmCursor.TYPE_NORMAL), LemmCursor.x,
+					// LemmCursor.y, null);
 					break;
 				case LEVEL:
 				case LEVEL_END:
 					if (bgImage != null) {
 						GameController.update();
+
 						// mouse movement
-						if (yMouseScreen > 40 && yMouseScreen < scoreY*scale) { // avoid scrolling if menu is selected
+						if (yMouseScreen > 40 && yMouseScreen < scoreY * scale) { // avoid scrolling if menu is selected
 							int xOfsTemp;
-							if (xMouseScreen > this.getWidth() - AUTOSCROLL_RANGE*scale) {
+
+							if (xMouseScreen > this.getWidth() - AUTOSCROLL_RANGE * scale) {
 								xOfsTemp = GameController.getxPos() + ((shiftPressed) ? X_STEP_FAST : X_STEP);
-								if (xOfsTemp < Level.WIDTH-this.getWidth()/scale)
+
+								if (xOfsTemp < Level.WIDTH - this.getWidth() / scale) {
 									GameController.setxPos(xOfsTemp);
-								else
-									GameController.setxPos((int)Math.round(Level.WIDTH-this.getWidth()/scale));
-							} else if (xMouseScreen < AUTOSCROLL_RANGE*scale) {
+								} else {
+									GameController.setxPos((int) Math.round(Level.WIDTH - this.getWidth() / scale));
+								}
+							} else if (xMouseScreen < AUTOSCROLL_RANGE * scale) {
 								xOfsTemp = GameController.getxPos() - ((shiftPressed) ? X_STEP_FAST : X_STEP);
-								if (xOfsTemp > 0)
+
+								if (xOfsTemp > 0) {
 									GameController.setxPos(xOfsTemp);
-								else
+								} else {
 									GameController.setxPos(0);
+								}
 							}
 						}
+
 						// store local copy of xOfs to avoid sync problems with AWT threads
 						// (scrolling by dragging changes xOfs as well)
 						int xOfsTemp = GameController.getxPos();
 
-						//timeBaseRedraw +=GameController.timePerFrame;
+						// timeBaseRedraw +=GameController.timePerFrame;
 						int w = this.getWidth();
 						int h = Level.HEIGHT;
-						if (h>this.getHeight())
+
+						if (h > this.getHeight()) {
 							h = this.getHeight();
+						}
 
 						Level level = GameController.getLevel();
-						if (level != null) {
 
+						if (level != null) {
 							// clear screen
-							offGfx.setClip(0,0,w,h);
+							offGfx.setClip(0, 0, w, h);
 							offGfx.setBackground(level.getBgColor());
 							offGfx.clearRect(0, 0, w, h);
 
@@ -1329,133 +1459,172 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 							GameController.getLevel().drawBehindObjects(offGfx, w, xOfsTemp);
 
 							// draw background
-							offGfx.drawImage(bgImage, 0, 0, w, h, xOfsTemp, 0, xOfsTemp+w, h, this);
+							offGfx.drawImage(bgImage, 0, 0, w, h, xOfsTemp, 0, xOfsTemp + w, h, this);
 
 							// draw "in front" objects
 							GameController.getLevel().drawInFrontObjects(offGfx, w, xOfsTemp);
 						}
+
 						// clear parts of the screen for menu etc.
-						offGfx.setClip(0,Level.HEIGHT,w,this.getHeight());
+						offGfx.setClip(0, Level.HEIGHT, w, this.getHeight());
 						offGfx.setBackground(Color.BLACK);
-						offGfx.clearRect(0,scoreY,w,this.getHeight());
+						offGfx.clearRect(0, scoreY, w, this.getHeight());
 						// draw counter, icons, small level pic
 						// draw menu
-						//Icons icons = GameController.getIcons();
+						// Icons icons = GameController.getIcons();
 						GameController.drawIcons(offGfx, 0, iconsY);
-						offGfx.drawImage(MiscGfx.getImage(MiscGfx.Index.BORDER), smallX-4, smallY-4, null);
+						offGfx.drawImage(MiscGfx.getImage(MiscGfx.Index.BORDER), smallX - 4, smallY - 4, null);
 						MiniMap.draw(offGfx, smallX, smallY, xOfsTemp);
 						// draw counters
-						GameController.drawCounters(offGfx,counterY);
+						GameController.drawCounters(offGfx, counterY);
 
 						// draw lemmings
-						offGfx.setClip(0,0,w,h);
+						offGfx.setClip(0, 0, w, h);
 						GameController.getLemmsUnderCursor().clear();
 						List<Lemming> lemmings = GameController.getLemmings();
+
 						synchronized (GameController.getLemmings()) {
 							Iterator<Lemming> it = lemmings.iterator();
+
 							while (it.hasNext()) {
 								Lemming l = it.next();
 								int lx = l.screenX();
 								int ly = l.screenY();
-								int mx = l.midX()-16;
-								if (lx+l.width() > xOfsTemp && lx < xOfsTemp+w) {
-									offGfx.drawImage(l.getImage(),lx-xOfsTemp,ly,null);
+								int mx = l.midX() - 16;
+
+								if (lx + l.width() > xOfsTemp && lx < xOfsTemp + w) {
+									offGfx.drawImage(l.getImage(), lx - xOfsTemp, ly, null);
+
 									if (LemmCursor.doesCollide(l, xOfsTemp)) {
 										GameController.getLemmsUnderCursor().add(l);
 									}
+
 									BufferedImage cd = l.getCountdown();
-									if (cd!=null)
-										offGfx.drawImage(cd,mx-xOfsTemp,ly-cd.getHeight(),null);
+
+									if (cd != null) {
+										offGfx.drawImage(cd, mx - xOfsTemp, ly - cd.getHeight(), null);
+									}
 
 									BufferedImage sel = l.getSelectImg();
-									if (sel!=null)
-										offGfx.drawImage(sel,mx-xOfsTemp,ly-sel.getHeight(),null);
 
+									if (sel != null) {
+										offGfx.drawImage(sel, mx - xOfsTemp, ly - sel.getHeight(), null);
+									}
 								}
 							}
+
 							// draw pixels in mini map
-							offGfx.setClip(0,0,w,this.getHeight());
+							offGfx.setClip(0, 0, w, this.getHeight());
 							it = lemmings.iterator();
+
 							while (it.hasNext()) {
 								Lemming l = it.next();
 								int lx = l.screenX();
 								int ly = l.screenY();
 								// draw pixel in mini map
-								MiniMap.drawLemming(offGfx,  lx, ly);
+								MiniMap.drawLemming(offGfx, lx, ly);
 							}
 						}
+
 						Lemming lemmUnderCursor = GameController.lemmUnderCursor(LemmCursor.getType());
-						offGfx.setClip(0,0,w,h);
+						offGfx.setClip(0, 0, w, h);
 						// draw explosions
-						GameController.drawExplosions(offGfx,offImage[0].getWidth(), Level.HEIGHT, xOfsTemp);
-						offGfx.setClip(0,0,w,this.getHeight());
+						GameController.drawExplosions(offGfx, offImage[0].getWidth(), Level.HEIGHT, xOfsTemp);
+						offGfx.setClip(0, 0, w, this.getHeight());
 
 						// draw info string
 						outStrGfx.clearRect(0, 0, outStrImg.getWidth(), outStrImg.getHeight());
+
 						if (GameController.isCheat()) {
 							Stencil stencil = GameController.getStencil();
+
 							if (stencil != null) {
-								int stencilVal = stencil.get(xMouse+yMouse*Level.WIDTH);
-								String test = "x: "+xMouse+", y: "+yMouse+", mask: "+(stencilVal&0xffff)+" "+Stencil.getObjectID(stencilVal);
+								int stencilVal = stencil.get(xMouse + yMouse * Level.WIDTH);
+								String test = "x: " + xMouse + ", y: " + yMouse + ", mask: " + (stencilVal & 0xffff)
+										+ " " + Stencil.getObjectID(stencilVal);
 								LemmFont.strImage(outStrGfx, test);
-								offGfx.drawImage(outStrImg,4,Level.HEIGHT+8,null);
+								offGfx.drawImage(outStrImg, 4, Level.HEIGHT + 8, null);
 							}
 						} else {
 							StringBuffer sb = new StringBuffer();
 							sb.append("OUT ");
 							String s = Integer.toString(GameController.getLemmings().size());
 							sb.append(s);
-							if (s.length()==1)
+
+							if (s.length() == 1) {
 								sb.append(" ");
+							}
+
 							sb.append("  IN ");
-							s = Integer.toString(GameController.getNumLeft()*100/GameController.getNumLemmingsMax());
-							if (s.length()==1)
+							s = Integer
+									.toString(GameController.getNumLeft() * 100 / GameController.getNumLemmingsMax());
+
+							if (s.length() == 1) {
 								sb.append("0");
+							}
+
 							sb.append(s);
 							sb.append("%  TIME ").append(GameController.getTimeString());
-							//BufferedImage iout = LemmFont.strImage(out);
-							String n=null;
+							// BufferedImage iout = LemmFont.strImage(out);
+							String n = null;
+
 							if (lemmUnderCursor != null) {
 								n = lemmUnderCursor.getName();
 								// display also the total number of lemmings under the cursor
 								int num = GameController.getLemmsUnderCursor().size();
-								if (num > 1)
+
+								if (num > 1) {
 									n = n + " " + Integer.toString(num);
+								}
 							}
-							if (n!=null) {
+
+							if (n != null) {
 								int ln = n.length();
-								if (ln>14)
+
+								if (ln > 14) {
 									ln = 14;
-								sb.insert(0,"              ".substring(0, 14-ln));
-								sb.insert(0,n);
-							} else
-								sb.insert(0,"              ");
+								}
+
+								sb.insert(0, "              ".substring(0, 14 - ln));
+								sb.insert(0, n);
+							} else {
+								sb.insert(0, "              ");
+							}
+
 							LemmFont.strImage(outStrGfx, sb.toString());
-							offGfx.drawImage(outStrImg,4,Level.HEIGHT+8,null);
+							offGfx.drawImage(outStrImg, 4, Level.HEIGHT + 8, null);
 						}
+
 						// replay icon
 						BufferedImage replayImage = GameController.getReplayImage();
-						if (replayImage != null)
-							offGfx.drawImage(replayImage,this.getWidth()-2*replayImage.getWidth(),replayImage.getHeight(),null);
+
+						if (replayImage != null) {
+							offGfx.drawImage(replayImage, this.getWidth() - 2 * replayImage.getWidth(),
+									replayImage.getHeight(), null);
+						}
+
 						// draw cursor
 						if (lemmUnderCursor != null) {
-							int lx,ly;
+							int lx, ly;
+
 							if (GameController.isClassicalCursor()) {
-	                            lx = (int)Math.round(xMouseScreen/scale);
-	                            ly = (int)Math.round(yMouseScreen/scale);
-	                            enableCursor(false);
+								lx = (int) Math.round(xMouseScreen / scale);
+								ly = (int) Math.round(yMouseScreen / scale);
+								enableCursor(false);
 							} else {
-								lx = lemmUnderCursor.midX()-xOfsTemp;
+								lx = lemmUnderCursor.midX() - xOfsTemp;
 								ly = lemmUnderCursor.midY();
 							}
+
 							BufferedImage cursorImg = LemmCursor.getBoxImage();
-							lx -= cursorImg.getWidth()/2;
-							ly -= cursorImg.getHeight()/2;
-							offGfx.drawImage(cursorImg,lx,ly,null);							
-						} else if (LemmCursor.getEnabled() == false)
+							lx -= cursorImg.getWidth() / 2;
+							ly -= cursorImg.getHeight() / 2;
+							offGfx.drawImage(cursorImg, lx, ly, null);
+						} else if (LemmCursor.getEnabled() == false) {
 							enableCursor(true);
+						}
 					}
-				case INIT:
+
 					break;
 				default:
 					break;
@@ -1471,16 +1640,15 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Runnable#run()
-	 */
 	@Override
 	public void run() {
-		Thread.currentThread().setPriority(Thread.NORM_PRIORITY+1);
+		Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
 		MicrosecondTimer timerRepaint = new MicrosecondTimer();
+
 		try {
 			while (true) {
 				GameController.State gameState = GameController.getGameState();
+
 				// Try to keep the Amiga timing. Note that no frames are skipped
 				// If one frame is too late, the next one will be a little earlier
 				// to compensate. No frames are skipped though!
@@ -1488,58 +1656,65 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 				if (timerRepaint.timePassedAdd(GameController.MICROSEC_PER_FRAME)) {
 					// time passed -> redraw necessary
 					redraw();
-					// special handling for fast forward or super lemming mode only during real gameplay
+
+					// special handling for fast forward or super lemming mode only during real
+					// gameplay
 					if (gameState == GameController.State.LEVEL) {
 						// in fast forward or super lemming modes, update the game mechanics
 						// multiple times per (drawn) frame
 						if (GameController.isFastForward())
-							for (int f=0; f<GameController.FAST_FWD_MULTI-1;f++)
+							for (int f = 0; f < GameController.FAST_FWD_MULTI - 1; f++)
 								GameController.update();
 						else if (GameController.isSuperLemming())
-							for (int f=0; f<GameController.SUPERLEMM_MULTI-1;f++)
+							for (int f = 0; f < GameController.SUPERLEMM_MULTI - 1; f++)
 								GameController.update();
 					}
 				} else {
 					try {
 						// determine time until next frame
 						long diff = GameController.MICROSEC_PER_FRAME - timerRepaint.delta();
+
 						if (diff > GameController.MICROSEC_RESYNC) {
 							timerRepaint.update(); // resync to time base
-							System.out.println("Resynced, diff was "+(diff/1000)+" millis");
-						} else if (diff > Lemmini.THR_SLEEP*1000)
+							System.out.println("Resynced, diff was " + (diff / 1000) + " millis");
+						} else if (diff > Lemmini.THR_SLEEP * 1000) {
 							Thread.sleep(Lemmini.MIN_SLEEP);
-					} catch (InterruptedException ex) {}
-				}				
+						}
+					} catch (InterruptedException ex) {
+					}
+				}
 			}
 		} catch (Exception ex) {
 			ToolBox.showException(ex);
 			System.exit(1);
-		}  catch (Error ex) {
+		} catch (Error ex) {
 			ToolBox.showException(ex);
 			System.exit(1);
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
-	 */
 	@Override
 	public void mouseReleased(final MouseEvent mouseevent) {
 		double scale = Core.getScale();
-		int x = (int)Math.round(mouseevent.getX()/scale);
-		int y = (int)Math.round(mouseevent.getY()/scale);
+		int x = (int) Math.round(mouseevent.getX() / scale);
+		int y = (int) Math.round(mouseevent.getY() / scale);
 		mouseDx = 0;
 		mouseDy = 0;
-		if (mouseevent.getButton() == MouseEvent.BUTTON1)
+
+		if (mouseevent.getButton() == MouseEvent.BUTTON1) {
 			leftMousePressed = false;
+		}
 
 		switch (GameController.getGameState()) {
 			case LEVEL:
-				if (y > iconsY && y < iconsY+Icons.HEIGHT) {
+				if (y > iconsY && y < iconsY + Icons.HEIGHT) {
 					Icons.Type type = GameController.getIconType(x);
-					if (type != Icons.Type.INVALID)
+
+					if (type != Icons.Type.INVALID) {
 						GameController.releaseIcon(type);
+					}
 				}
+
 				// always release icons which don't stay pressed
 				// this is to avoid the icons get stuck when they're pressed,
 				// the the mouse is dragged out and released outside
@@ -1550,43 +1725,30 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 				GameController.releaseIcon(Icons.Type.NUKE);
 				mouseevent.consume();
 				break;
-			case BRIEFING:
-				break;
-			case DEBRIEFING:
-				break;
-			case INIT:
-				break;
-			case INTRO:
-				break;
-			case LEVEL_END:
-				break;
 			default:
 				break;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
-	 */
 	@Override
 	public void mouseClicked(final MouseEvent mouseevent) {
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
-	 */
 	@Override
 	public void mousePressed(final MouseEvent mouseevent) {
 		double scale = Core.getScale();
-		int x = (int)Math.round(mouseevent.getX()/scale);
-		int y = (int)Math.round(mouseevent.getY()/scale);
+		int x = (int) Math.round(mouseevent.getX() / scale);
+		int y = (int) Math.round(mouseevent.getY() / scale);
 		mouseDx = 0;
 		mouseDy = 0;
-		if (mouseevent.getButton() == MouseEvent.BUTTON1)
-			leftMousePressed = true;
 
-		if (Fader.getState() != Fader.State.OFF)
+		if (mouseevent.getButton() == MouseEvent.BUTTON1) {
+			leftMousePressed = true;
+		}
+
+		if (Fader.getState() != Fader.State.OFF) {
 			return;
+		}
 
 		switch (GameController.getGameState()) {
 			case BRIEFING:
@@ -1596,11 +1758,13 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 				mouseevent.consume();
 				break;
 			case DEBRIEFING:
-				int button = TextScreen.getDialog().handleLeftClick(x,y);
+				int button = TextScreen.getDialog().handleLeftClick(x, y);
+
 				switch (button) {
 					case TextScreen.BUTTON_CONTINUE:
 						GameController.nextLevel(); // continue to next level
-						GameController.requestChangeLevel(GameController.getCurLevelPackIdx(), GameController.getCurDiffLevel(),
+						GameController.requestChangeLevel(GameController.getCurLevelPackIdx(),
+								GameController.getCurDiffLevel(),
 								GameController.getCurLevelNumber(), false);
 						break;
 					case TextScreen.BUTTON_RESTART:
@@ -1609,56 +1773,69 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 					case TextScreen.BUTTON_MENU:
 						GameController.setTransition(GameController.TransitionState.TO_INTRO);
 						Fader.setState(Fader.State.OUT);
-						((JFrame)Core.getCmp()).setTitle("Lemmini");
+						((JFrame) Core.getCmp()).setTitle("Lemmini");
 						break;
 					case TextScreen.BUTTON_REPLAY:
 						GameController.requestRestartLevel(true);
 						break;
 					case TextScreen.BUTTON_SAVEREPLAY:
-						String replayPath = ToolBox.getFileName(Lemmini.thisFrame,Core.resourcePath,Core.REPLAY_EXTENSIONS,false);
+						String replayPath = ToolBox.getFileName(Lemmini.thisFrame, Core.resourcePath,
+								Core.REPLAY_EXTENSIONS, false);
+
 						if (replayPath != null) {
 							try {
 								String ext = ToolBox.getExtension(replayPath);
-								if (ext == null)
+
+								if (ext == null) {
 									replayPath += ".rpl";
-								if (GameController.saveReplay(replayPath))
+								}
+
+								if (GameController.saveReplay(replayPath)) {
 									return;
+								}
+
 								// else: no success
-								JOptionPane.showMessageDialog(Core.getCmp(), "Error!", "Saving replay failed", JOptionPane.INFORMATION_MESSAGE);
+								JOptionPane.showMessageDialog(Core.getCmp(), "Error!", "Saving replay failed",
+										JOptionPane.INFORMATION_MESSAGE);
 							} catch (Exception ex) {
 								ToolBox.showException(ex);
 							}
 						}
+
 						break;
 				}
+
 				mouseevent.consume();
 				break;
 			case LEVEL:
-				//  debug drawing
-				debugDraw(x,y,leftMousePressed);
+				// debug drawing
+				debugDraw(x, y, leftMousePressed);
+
 				if (leftMousePressed) {
-					if (y > iconsY && y < iconsY+Icons.HEIGHT) {
+					if (y > iconsY && y < iconsY + Icons.HEIGHT) {
 						Icons.Type type = GameController.getIconType(x);
+
 						if (type != Icons.Type.INVALID) {
 							GameController.handleIconButton(type);
 						}
 					} else {
 						Lemming l = GameController.lemmUnderCursor(LemmCursor.getType());
-						if (l != null)
+
+						if (l != null) {
 							GameController.requestSkill(l);
+						}
 					}
+
 					// check minimap mouse move
-					int ofs = MiniMap.move(x,y,(int)Math.round(this.getWidth()/scale));
-					if (ofs != -1)
+					int ofs = MiniMap.move(x, y, (int) Math.round(this.getWidth() / scale));
+
+					if (ofs != -1) {
 						GameController.setxPos(ofs);
+					}
+
 					mouseevent.consume();
 				}
-			case INIT:
-				break;
-			case INTRO:
-				break;
-			case LEVEL_END:
-				break;
+
 			default:
 				break;
 		}
@@ -1666,8 +1843,9 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 	/**
 	 * Debug routine to draw terrain pixels in stencil and background image.
-	 * @param x x position in pixels
-	 * @param y y position in pixels
+	 * 
+	 * @param x      x position in pixels
+	 * @param y      y position in pixels
 	 * @param doDraw true: draw, false: erase
 	 */
 	private void debugDraw(final int x, final int y, final boolean doDraw) {
@@ -1675,178 +1853,183 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 			int rgbVal = (doDraw) ? 0xffffffff : 0x0;
 			int maskVal = (doDraw) ? Stencil.MSK_BRICK : Stencil.MSK_EMPTY;
 			int xOfs = GameController.getxPos();
-			if (x+xOfs > 0 && x+xOfs<Level.WIDTH-1 && y >0 && y < Level.HEIGHT-1) {
-				GameController.getBgImage().setRGB(x+xOfs, y, rgbVal);
-				GameController.getStencil().set(x+xOfs, y, maskVal);
-				GameController.getBgImage().setRGB(x+xOfs+1, y, rgbVal);
-				GameController.getStencil().set(x+xOfs+1, y, maskVal);
-				GameController.getBgImage().setRGB(x+xOfs, y+1, rgbVal);
-				GameController.getStencil().set(x+xOfs, y+1, maskVal);
-				GameController.getBgImage().setRGB(x+xOfs+1, y+1, rgbVal);
-				GameController.getStencil().set(x+xOfs+1, y+1, maskVal);
+
+			if (x + xOfs > 0 && x + xOfs < Level.WIDTH - 1 && y > 0 && y < Level.HEIGHT - 1) {
+				GameController.getBgImage().setRGB(x + xOfs, y, rgbVal);
+				GameController.getStencil().set(x + xOfs, y, maskVal);
+				GameController.getBgImage().setRGB(x + xOfs + 1, y, rgbVal);
+				GameController.getStencil().set(x + xOfs + 1, y, maskVal);
+				GameController.getBgImage().setRGB(x + xOfs, y + 1, rgbVal);
+				GameController.getStencil().set(x + xOfs, y + 1, maskVal);
+				GameController.getBgImage().setRGB(x + xOfs + 1, y + 1, rgbVal);
+				GameController.getStencil().set(x + xOfs + 1, y + 1, maskVal);
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
-	 */
 	@Override
 	public void mouseEntered(final MouseEvent mouseevent) {
 		double scale = Core.getScale();
 		mouseDx = 0;
 		mouseDy = 0;
-		int x = (int)Math.round(mouseevent.getX()/scale/*-LemmCursor.width/2*/);
-		int y = (int)Math.round(mouseevent.getY()/scale/*-LemmCursor.height/2*/);
+		int x = (int) Math.round(mouseevent.getX() / scale/*-LemmCursor.width/2*/);
+		int y = (int) Math.round(mouseevent.getY() / scale/*-LemmCursor.height/2*/);
 		LemmCursor.setX(x/*-LemmCursor.width/2*/);
 		LemmCursor.setY(y/*-LemmCursor.height/2*/);
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
-	 */
 	@Override
 	public void mouseExited(final MouseEvent mouseevent) {
 		double scale = Core.getScale();
 		int x = xMouseScreen + mouseDx;
-		
+
 		switch (GameController.getGameState()) {
 			case BRIEFING:
 			case DEBRIEFING:
 			case LEVEL:
-				if (x>=this.getWidth())
-					x = this.getWidth()-1;
-				if (x<0)
+				if (x >= this.getWidth()) {
+					x = this.getWidth() - 1;
+				}
+
+				if (x < 0) {
 					x = 0;
+				}
+
 				xMouseScreen = x;
-				x += GameController.getxPos()*scale;
-				if (x>=Level.WIDTH)
-					x = Level.WIDTH-1;
+				x += GameController.getxPos() * scale;
+
+				if (x >= Level.WIDTH) {
+					x = Level.WIDTH - 1;
+				}
+
 				xMouse = x;
-				LemmCursor.setX((int)Math.round(xMouseScreen/scale/*-LemmCursor.width/2*/));
+				LemmCursor.setX((int) Math.round(xMouseScreen / scale/*-LemmCursor.width/2*/));
 
 				int y = yMouseScreen + mouseDy;
-				if (y >= this.getHeight())
-					y = this.getHeight()-1;
-				if (y<0)
-					y = 0;
-				yMouseScreen = y;
 
-				y = yMouse + mouseDy;
-				if (y >= Level.HEIGHT)
-					y = Level.HEIGHT-1;
-				if (y<0)
+				if (y >= this.getHeight()) {
+					y = this.getHeight() - 1;
+				}
+
+				if (y < 0) {
 					y = 0;
+				}
+
+				yMouseScreen = y;
+				y = yMouse + mouseDy;
+
+				if (y >= Level.HEIGHT) {
+					y = Level.HEIGHT - 1;
+				}
+
+				if (y < 0) {
+					y = 0;
+				}
+
 				yMouse = y;
-				LemmCursor.setY((int)Math.round(yMouseScreen/scale/*-LemmCursor.height/2*/));
+				LemmCursor.setY((int) Math.round(yMouseScreen / scale/*-LemmCursor.height/2*/));
 				mouseevent.consume();
-				break;
-			case INIT:
-				break;
-			case INTRO:
-				break;
-			case LEVEL_END:
 				break;
 			default:
 				break;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
-	 */
 	@Override
 	public void mouseDragged(final MouseEvent mouseevent) {
 		double scale = Core.getScale();
 		mouseDx = 0;
 		mouseDy = 0;
-		
+
 		// check minimap mouse move
 		switch (GameController.getGameState()) {
 			case LEVEL:
-				int x = (int)Math.round(mouseevent.getX()/scale);
-				int y = (int)Math.round(mouseevent.getY()/scale);
+				int x = (int) Math.round(mouseevent.getX() / scale);
+				int y = (int) Math.round(mouseevent.getY() / scale);
+
 				if (leftMousePressed) {
-					int ofs = MiniMap.move(x,y,(int)Math.round(this.getWidth()/scale));
-					if (ofs != -1)
+					int ofs = MiniMap.move(x, y, (int) Math.round(this.getWidth() / scale));
+
+					if (ofs != -1) {
 						GameController.setxPos(ofs);
+					}
 				} else {
-					int xOfsTemp = GameController.getxPos() + (x-mouseDragStartX);
-					if (xOfsTemp < 0)
+					int xOfsTemp = GameController.getxPos() + (x - mouseDragStartX);
+
+					if (xOfsTemp < 0) {
 						xOfsTemp = 0;
-					else if (xOfsTemp >= Level.WIDTH-this.getWidth()/scale)
-						GameController.setxPos((int)Math.round(Level.WIDTH-this.getWidth()/scale));
-					else GameController.setxPos(xOfsTemp);
+					} else if (xOfsTemp >= Level.WIDTH - this.getWidth() / scale) {
+						GameController.setxPos((int) Math.round(Level.WIDTH - this.getWidth() / scale));
+					} else {
+						GameController.setxPos(xOfsTemp);
+					}
 				}
+
 				// debug drawing
-				debugDraw(x,y,leftMousePressed);
+				debugDraw(x, y, leftMousePressed);
 				mouseMoved(mouseevent);
 				mouseevent.consume();
-				break;
-			case BRIEFING:
-				break;
-			case DEBRIEFING:
-				break;
-			case INIT:
-				break;
-			case INTRO:
-				break;
-			case LEVEL_END:
 				break;
 			default:
 				break;
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
-	 */
 	@Override
 	public void mouseMoved(final MouseEvent mouseevent) {
-		//long t = System.currentTimeMillis();
+		// long t = System.currentTimeMillis();
 		double scale = Core.getScale();
-		int x,y;
+		int x, y;
 		int oldX = xMouse;
 		int oldY = yMouse;
 
-		x = (int)Math.round((mouseevent.getX()/scale + GameController.getxPos()));
-		y = (int)Math.round(mouseevent.getY()/scale);
-		if (x>=Level.WIDTH)
-			x = Level.WIDTH-1;
-		if (y >= Level.HEIGHT)
-			y = Level.HEIGHT-1;
-		xMouse = (int)Math.round(x*scale);
-		yMouse = (int)Math.round(y*scale);
+		x = (int) Math.round((mouseevent.getX() / scale + GameController.getxPos()));
+		y = (int) Math.round(mouseevent.getY() / scale);
+
+		if (x >= Level.WIDTH) {
+			x = Level.WIDTH - 1;
+		}
+
+		if (y >= Level.HEIGHT) {
+			y = Level.HEIGHT - 1;
+		}
+
+		xMouse = (int) Math.round(x * scale);
+		yMouse = (int) Math.round(y * scale);
 		// LemmCursor
 		xMouseScreen = mouseevent.getX();
-		if (xMouseScreen>=this.getWidth())
+
+		if (xMouseScreen >= this.getWidth()) {
 			xMouseScreen = this.getWidth();
-		else if (xMouseScreen <0)
+		} else if (xMouseScreen < 0) {
 			xMouseScreen = 0;
+		}
+
 		yMouseScreen = mouseevent.getY();
-		if (yMouseScreen>=this.getHeight())
+
+		if (yMouseScreen >= this.getHeight()) {
 			yMouseScreen = this.getHeight();
-		else if (yMouseScreen <0)
+		} else if (yMouseScreen < 0) {
 			yMouseScreen = 0;
-		LemmCursor.setX((int)Math.round(xMouseScreen/scale/*-LemmCursor.width/2*/));
-		LemmCursor.setY((int)Math.round(yMouseScreen/scale/*-LemmCursor.height/2*/));
+		}
+
+		LemmCursor.setX((int) Math.round(xMouseScreen / scale/*-LemmCursor.width/2*/));
+		LemmCursor.setY((int) Math.round(yMouseScreen / scale/*-LemmCursor.height/2*/));
 
 		switch (GameController.getGameState()) {
 			case INTRO:
 			case BRIEFING:
 			case DEBRIEFING:
-				TextScreen.getDialog().handleMouseMove((int)Math.round(xMouseScreen/scale), (int)Math.round(yMouseScreen/scale));
+				TextScreen.getDialog().handleMouseMove((int) Math.round(xMouseScreen / scale),
+						(int) Math.round(yMouseScreen / scale));
 				//$FALL-THROUGH$
 			case LEVEL:
 				mouseDx = (xMouse - oldX);
 				mouseDy = (yMouse - oldY);
-				mouseDragStartX = (int)Math.round(mouseevent.getX()/scale);
+				mouseDragStartX = (int) Math.round(mouseevent.getX() / scale);
 				mouseevent.consume();
 				break;
-			case INIT:
-				break;
-			case LEVEL_END:
-				break;
+
 			default:
 				break;
 		}
@@ -1854,6 +2037,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 	/**
 	 * Get cursor x position in pixels.
+	 * 
 	 * @return cursor x position in pixels
 	 */
 	int getCursorX() {
@@ -1862,6 +2046,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 	/**
 	 * Get cursor y position in pixels.
+	 * 
 	 * @return cursor y position in pixels
 	 */
 	int getCursorY() {
@@ -1870,6 +2055,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 	/**
 	 * Get flag: Shift key is pressed?
+	 * 
 	 * @return true if Shift key is pressed, false otherwise
 	 */
 	boolean isShiftPressed() {
@@ -1878,6 +2064,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 	/**
 	 * Set flag: Shift key is pressed.
+	 * 
 	 * @param p true: Shift key is pressed,false otherwise
 	 */
 	void setShiftPressed(final boolean p) {
@@ -1886,6 +2073,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 	/**
 	 * Get state of debug draw option.
+	 * 
 	 * @return true: debug draw is active, false otherwise
 	 */
 	boolean getDebugDraw() {
@@ -1894,6 +2082,7 @@ class GraphicsPane extends JPanel implements Runnable, MouseListener, MouseMotio
 
 	/**
 	 * Set state of debug draw option.
+	 * 
 	 * @param d true: debug draw is active, false otherwise
 	 */
 	void setDebugDraw(final boolean d) {

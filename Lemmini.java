@@ -8,7 +8,6 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -274,18 +273,19 @@ public class Lemmini extends JFrame implements KeyListener {
 	 * @param lvlPath path of level configuration files
 	 */
 	private void patchLevel(final String lvlPath) {
-		try {
-			final ArrayList<String> lines = new ArrayList<String>();
-			final BufferedReader r = new BufferedReader(new FileReader(lvlPath));
+		final ArrayList<String> lines = new ArrayList<String>();
+
+		try (final BufferedReader r = new BufferedReader(new FileReader(lvlPath));) {
 			String l;
 
 			while ((l = r.readLine()) != null) {
 				lines.add(l);
 			}
+		} catch (final IOException e) {
+			System.out.println("Error reading patchLevel: " + e.getMessage());
+		}
 
-			r.close();
-			final FileWriter sw = new FileWriter(lvlPath);
-
+		try (final FileWriter sw = new FileWriter(lvlPath)) {
 			for (int i = 0; i < lines.size(); i++) {
 				final String s = lines.get(i);
 
@@ -295,10 +295,8 @@ public class Lemmini extends JFrame implements KeyListener {
 					sw.write(s + "\n");
 				}
 			}
-
-			sw.close();
-		} catch (final FileNotFoundException ex) {
 		} catch (final IOException ex) {
+			System.out.println("Error writing position: " + ex.getMessage());
 		}
 	}
 

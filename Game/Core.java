@@ -1,4 +1,5 @@
 package Game;
+
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.MediaTracker;
@@ -37,17 +38,21 @@ import Tools.ToolBox;
  * Well, this started as some kind of core class to collect all global stuff
  * Now lots of the functionality moved to GameController.
  * Would need some cleaning up, maybe remove the whole thing?
+ * 
  * @author Volker Oth
  */
 public class Core {
-	/** The revision string for resource compatibility - not necessarily the version number */
+	/**
+	 * The revision string for resource compatibility - not necessarily the version
+	 * number
+	 */
 	private final static String REVISION = "0.80";
 	/** name of the ini file */
 	private final static String INI_NAME = "lemmings.ini";
 	/** extensions accepted for level files in file dialog */
-	public final static String[] LEVEL_EXTENSIONS = {"ini", "lvl"};
+	public final static String[] LEVEL_EXTENSIONS = { "ini", "lvl" };
 	/** extensions accepted for replay files in file dialog */
-	public final static String[] REPLAY_EXTENSIONS = {"rpl"};
+	public final static String[] REPLAY_EXTENSIONS = { "rpl" };
 	/** height of menu and icon bar in pixels */
 	private final static int WIN_OFS = 120;
 
@@ -80,47 +85,75 @@ public class Core {
 	 */
 	public static void init(final JFrame frame) throws LemmException {
 		// get ini path
-
 		String s = frame.getClass().getName().replace('.', '/') + ".class";
-		URL url = frame.getClass().getClassLoader().getResource(s);
+		final URL url = frame.getClass().getClassLoader().getResource(s);
 		int pos;
+
 		try {
 			programPropsFileStr = URLDecoder.decode(url.getPath(), "UTF-8");
-		} catch (UnsupportedEncodingException ex) {
+		} catch (final UnsupportedEncodingException ex) {
 		}
-		;
+
 		// special handling for JAR
-		if (((pos = programPropsFileStr.toLowerCase().indexOf("file:")) != -1))
+		if (((pos = programPropsFileStr.toLowerCase().indexOf("file:")) != -1)) {
 			programPropsFileStr = programPropsFileStr.substring(pos + 5);
-		if ((pos = programPropsFileStr.toLowerCase().indexOf(s.toLowerCase())) != -1)
-			programPropsFileStr = programPropsFileStr.substring(0, pos);
+		}
 
-		/**
+		if ((pos = programPropsFileStr.toLowerCase().indexOf(s.toLowerCase())) != -1) {
+			programPropsFileStr = programPropsFileStr.substring(0, pos);
+		}
+
+		/*
 		 * @todo doesn't work if JAR is renamed...
-		 *       Maybe it would be a better idea to search only for ".JAR" and then
-		 *       for the first path separator...
+		 * Maybe it would be a better idea to search only for ".JAR" and then
+		 * for the first path separator...
 		 */
-
 		s = (frame.getClass().getName().replace('.', '/') + ".jar").toLowerCase();
-		if ((pos = programPropsFileStr.toLowerCase().indexOf(s)) != -1)
+
+		if ((pos = programPropsFileStr.toLowerCase().indexOf(s)) != -1) {
 			programPropsFileStr = programPropsFileStr.substring(0, pos);
+		}
 
 		programPropsFileStr += INI_NAME;
+		readMainIniFile();
+		scale = Core.programProps.get("scale", 1.0);
+		initializeResources();
+		System.gc(); // force garbage collection here before the game starts
+		final String defaultPlayer = getDefaultPlayer();
+		setPlayer(defaultPlayer);
+		cmp = frame;
+	}
+
+	/**
+	 * Reads main INI file.
+	 * 
+	 * @throws LemmException if user aborts the initialization; that is, if they do
+	 *                       not specify source and destination paths for resources
+	 *                       from original Lemmings game disk.
+	 */
+	private static void readMainIniFile() throws LemmException {
 		// read main ini file
 		programProps = new Props();
 
 		if (!programProps.load(programPropsFileStr)) {// might exist or not - if not, it's created
-			LegalDialog ld = new LegalDialog(null, true);
+			final LegalDialog ld = new LegalDialog(null, true);
 			ld.setVisible(true);
-			if (!ld.isOk())
+
+			if (!ld.isOk()) {
 				throw new LemmException("User abort");
+			}
 		}
+	}
 
-		scale = Core.programProps.get("scale",1.0);
-
+	/**
+	 * Initializes resources.
+	 * 
+	 * @throws LemmException in unable to load resources from files.
+	 */
+	private static void initializeResources() throws LemmException {
 		resourcePath = programProps.get("resourcePath", "");
-		String sourcePath = programProps.get("sourcePath", "");
-		String rev = programProps.get("revision", "");
+		final String sourcePath = programProps.get("sourcePath", "");
+		final String rev = programProps.get("revision", "");
 		GameController.setMusicOn(programProps.get("music", false));
 		GameController.setSoundOn(programProps.get("sound", true));
 		double gain;
@@ -130,7 +163,8 @@ public class Core {
 		GameController.setSoundGain(gain);
 		GameController.setAdvancedSelect(programProps.get("advancedSelect", true));
 		GameController.setClassicalCursor(programProps.get("classicalCursor", false));
-		if (resourcePath.length()==0 || !REVISION.equalsIgnoreCase(rev)) {
+
+		if (resourcePath.length() == 0 || !REVISION.equalsIgnoreCase(rev)) {
 			// extract resources
 			try {
 				Extract.extract(null, sourcePath, resourcePath, null, "patch");
@@ -139,40 +173,59 @@ public class Core {
 				programProps.set("sourcePath", ToolBox.addSeparator(Extract.getSourcePath()));
 				programProps.set("revision", REVISION);
 				programProps.save(programPropsFileStr);
-			} catch (ExtractException ex) {
+			} catch (final ExtractException ex) {
 				programProps.set("resourcePath", ToolBox.addSeparator(Extract.getResourcePath()));
 				programProps.set("sourcePath", ToolBox.addSeparator(Extract.getSourcePath()));
 				programProps.save(programPropsFileStr);
-				throw new LemmException("Ressource extraction failed\n"+ex.getMessage());
+				throw new LemmException("Ressource extraction failed\n" + ex.getMessage());
 			}
 		}
-		System.gc(); // force garbage collection here before the game starts
+	}
 
-		// read player names
-		playerPropsFileStr = Core.resourcePath+"players.ini";
-		playerProps = new Props();
-		playerProps.load(playerPropsFileStr);
-		String defaultPlayer = playerProps.get("defaultPlayer", "default");
-		players = new ArrayList<String>();
-		for (int idx=0; true; idx++) {
-			String p = playerProps.get("player_"+Integer.toString(idx), "");
-			if (p.length() == 0)
-				break;
-			players.add(p);
-		}
+	/**
+	 * Sets the player for the game to use.
+	 * 
+	 * @param defaultPlayer the default player.
+	 */
+	private static void setPlayer(final String defaultPlayer) {
 		if (players.size() == 0) {
 			// no players yet, establish default player
 			players.add("default");
 			Core.playerProps.set("player_0", "default");
 		}
+
 		player = new Player(defaultPlayer);
+	}
 
+	/**
+	 * Reads player name from INI file and returns name of default player.
+	 * 
+	 * @return the name of the default player.
+	 */
+	private static String getDefaultPlayer() {
+		// read player names
+		playerPropsFileStr = Core.resourcePath + "players.ini";
+		playerProps = new Props();
+		playerProps.load(playerPropsFileStr);
+		final String defaultPlayer = playerProps.get("defaultPlayer", "default");
+		players = new ArrayList<String>();
 
-		cmp = frame;
+		for (int idx = 0; true; idx++) {
+			final String p = playerProps.get("player_" + Integer.toString(idx), "");
+
+			if (p.length() == 0) {
+				break;
+			}
+
+			players.add(p);
+		}
+
+		return defaultPlayer;
 	}
 
 	/**
 	 * Get parent component (main frame).
+	 * 
 	 * @return parent component
 	 */
 	public static Component getCmp() {
@@ -181,18 +234,19 @@ public class Core {
 
 	/**
 	 * Get String to resource in resource path.
+	 * 
 	 * @param fname file name (without path)
 	 * @return absolute path to resource
 	 */
 	public static String findResource(final String fname) {
-		return resourcePath+fname;
+		return resourcePath + fname;
 	}
 
 	/**
 	 * Store program properties.
 	 */
 	public static void saveProgramProps() {
-		programProps.set("scale",scale);
+		programProps.set("scale", scale);
 		programProps.save(programPropsFileStr);
 		playerProps.set("defaultPlayer", Core.player.getName());
 		playerProps.save(playerPropsFileStr);
@@ -201,12 +255,13 @@ public class Core {
 
 	/**
 	 * Output error message box in case of a missing resource.
+	 * 
 	 * @param rsrc name missing of resource.
 	 */
 	public static void resourceError(final String rsrc) {
-		String out = "The resource "+rsrc+" is missing\n" +
-		"Please restart to extract all resources.";
-		JOptionPane.showMessageDialog(null,out,"Error",JOptionPane.ERROR_MESSAGE);
+		final String out = "The resource " + rsrc + " is missing\n" +
+				"Please restart to extract all resources.";
+		JOptionPane.showMessageDialog(null, out, "Error", JOptionPane.ERROR_MESSAGE);
 		// invalidate resources
 		programProps.set("revision", "invalid");
 		programProps.save(programPropsFileStr);
@@ -215,78 +270,102 @@ public class Core {
 
 	/**
 	 * Load an image from the resource path.
+	 * 
 	 * @param tracker media tracker
-	 * @param fName file name
+	 * @param fName   file name
 	 * @return Image
 	 * @throws ResourceException
 	 */
 	public static Image loadImage(final MediaTracker tracker, final String fName) throws ResourceException {
-		String fileLoc = findResource(fName);
-		if (fileLoc == null)
+		final String fileLoc = findResource(fName);
+
+		if (fileLoc == null) {
 			return null;
+		}
+
 		return loadImage(tracker, fileLoc, false);
 	}
 
 	/**
-	 * Load an image from either the resource path or from inside the JAR (or the directory of the main class).
+	 * Load an image from either the resource path or from inside the JAR (or the
+	 * directory of the main class).
+	 * 
 	 * @param tracker media tracker
-	 * @param fName file name
-	 * @param jar true: load from the jar/class path, false: load from resource path
+	 * @param fName   file name
+	 * @param jar     true: load from the jar/class path, false: load from resource
+	 *                path
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	private static Image loadImage(final MediaTracker tracker, final String fName, final boolean jar) throws ResourceException {
+	private static Image loadImage(final MediaTracker tracker, final String fName, final boolean jar)
+			throws ResourceException {
 		Image image;
-		if (jar)
+
+		if (jar) {
 			image = Toolkit.getDefaultToolkit().createImage(ToolBox.findFile(fName));
-		else
+		} else {
 			image = Toolkit.getDefaultToolkit().createImage(fName);
+		}
+
 		if (image != null) {
 			tracker.addImage(image, 0);
+
 			try {
 				tracker.waitForID(0);
 				if (tracker.isErrorAny()) {
 					image = null;
 				}
-			} catch (Exception ex) {
+			} catch (final Exception ex) {
 				image = null;
 			}
 		}
-		if (image == null)
+
+		if (image == null) {
 			throw new ResourceException(fName);
+		}
+
 		return image;
 	}
 
 	/**
 	 * Load an image from the resource path.
+	 * 
 	 * @param fname file name
 	 * @return Image
 	 * @throws ResourceException
 	 */
 	public static Image loadImage(final String fname) throws ResourceException {
-		MediaTracker tracker = new MediaTracker(Core.getCmp());
-		Image img = loadImage(tracker, fname);
-		if (img == null)
+		final MediaTracker tracker = new MediaTracker(Core.getCmp());
+		final Image img = loadImage(tracker, fname);
+
+		if (img == null) {
 			throw new ResourceException(fname);
+		}
+
 		return img;
 	}
 
 	/**
 	 * Load an image from inside the JAR or the directory of the main class.
+	 * 
 	 * @param fname
 	 * @return Image
 	 * @throws ResourceException
 	 */
 	public static Image loadImageJar(final String fname) throws ResourceException {
-		MediaTracker tracker = new MediaTracker(Core.getCmp());
-		Image img = loadImage(tracker, fname, true);
-		if (img == null)
+		final MediaTracker tracker = new MediaTracker(Core.getCmp());
+		final Image img = loadImage(tracker, fname, true);
+
+		if (img == null) {
 			throw new ResourceException(fname);
+		}
+
 		return img;
 	}
 
 	/**
 	 * Get player name via index.
+	 * 
 	 * @param idx player index
 	 * @return player name
 	 */
@@ -296,11 +375,14 @@ public class Core {
 
 	/**
 	 * Get number of players.
+	 * 
 	 * @return number of player.
 	 */
 	public static int getPlayerNum() {
-		if (players == null)
+		if (players == null) {
 			return 0;
+		}
+
 		return players.size();
 	}
 
@@ -314,32 +396,35 @@ public class Core {
 
 	/**
 	 * Add player.
+	 * 
 	 * @param name player name
 	 */
 	public static void addPlayer(final String name) {
 		players.add(name);
-		playerProps.set("player_"+(players.size()-1), name);
+		playerProps.set("player_" + (players.size() - 1), name);
 	}
-	
+
 	/**
 	 * Get internal Draw Width
+	 * 
 	 * @return internal draw width
 	 */
 	public static int getDrawWidth() {
 		return 800;
-
 	}
 
 	/**
 	 * Get internal Draw Height
+	 * 
 	 * @return internal draw width
 	 */
 	public static int getDrawHeight() {
-		return Level.HEIGHT+WIN_OFS+90; //Core.programProps.get("frameHeight", Level.height+winOfs+60);
+		return Level.HEIGHT + WIN_OFS + 90; // Core.programProps.get("frameHeight", Level.height+winOfs+60);
 	}
 
 	/**
 	 * Get Zoom scale
+	 * 
 	 * @return zoom scale
 	 */
 	public static double getScale() {
@@ -348,10 +433,10 @@ public class Core {
 
 	/**
 	 * Set zoom scale
+	 * 
 	 * @param s zoom scale
 	 */
-	public static void setScale(double s) {
+	public static void setScale(final double s) {
 		scale = s;
 	}
-
 }

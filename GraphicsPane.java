@@ -6,7 +6,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -302,10 +301,7 @@ public class GraphicsPane extends JPanel implements Runnable, MouseListener, Mou
 						List<Lemming> lemmings = GameController.getLemmings();
 
 						synchronized (GameController.getLemmings()) {
-							Iterator<Lemming> it = lemmings.iterator();
-
-							while (it.hasNext()) {
-								Lemming l = it.next();
+							for (Lemming l : lemmings) {
 								int lx = l.screenX();
 								int ly = l.screenY();
 								int mx = l.midX() - 16;
@@ -333,10 +329,8 @@ public class GraphicsPane extends JPanel implements Runnable, MouseListener, Mou
 
 							// draw pixels in mini map
 							offGfx.setClip(0, 0, w, this.getHeight());
-							it = lemmings.iterator();
 
-							while (it.hasNext()) {
-								Lemming l = it.next();
+							for (Lemming l : lemmings) {
 								int lx = l.screenX();
 								int ly = l.screenY();
 								// draw pixel in mini map

@@ -21,9 +21,9 @@ import GameUtil.Sprite;
 import Tools.MicrosecondTimer;
 import Tools.ToolBox;
 
-
 /**
  * Game controller. Contains all the game logic.
+ * 
  * @author Volker Oth
  */
 public class GameController {
@@ -125,28 +125,37 @@ public class GameController {
 	public final static int FAST_FWD_MULTI = 5;
 	/** updates 3 frames instead of 1 in Superlemming mode */
 	public final static int SUPERLEMM_MULTI = 3;
-	/** time per frame in microseconds - this is the timing everything else is based on */
-	public final static int MICROSEC_PER_FRAME = 30*1000;
-	/** resync if time difference greater than that (in microseconds)*/
-	public final static int MICROSEC_RESYNC = 5*30*1000;
+	/**
+	 * time per frame in microseconds - this is the timing everything else is based
+	 * on
+	 */
+	public final static int MICROSEC_PER_FRAME = 30 * 1000;
+	/** resync if time difference greater than that (in microseconds) */
+	public final static int MICROSEC_RESYNC = 5 * 30 * 1000;
 
 	/** redraw animated level obejcts every 3rd frame (about 100ms) */
-	private final static int MAX_ANIM_CTR = 100*1000/MICROSEC_PER_FRAME;
+	private final static int MAX_ANIM_CTR = 100 * 1000 / MICROSEC_PER_FRAME;
 	/** open Entry after about 1.5 seconds */
-	private final static int MAX_ENTRY_OPEN_CTR = 1500*1000/MICROSEC_PER_FRAME;
+	private final static int MAX_ENTRY_OPEN_CTR = 1500 * 1000 / MICROSEC_PER_FRAME;
 	/** one second is 33.33 ticks (integer would cause error) */
-	private final static double MAX_SECOND_CTR = 1000.0*1000/MICROSEC_PER_FRAME;
+	private final static double MAX_SECOND_CTR = 1000.0 * 1000 / MICROSEC_PER_FRAME;
 	/** maximum release rate */
 	private final static int MAX_RELEASE_RATE = 99;
 
-	/** nuke icon: maximum time between two mouse clicks for double click detection (in microseconds) */
-	private final static long MICROSEC_NUKE_DOUBLE_CLICK = 240*1000;
-	/** +/- icons: maximum time between two mouse clicks for double click detection (in microseconds) */
-	private final static long MICROSEC_RELEASE_DOUBLE_CLICK = 200*1000;
+	/**
+	 * nuke icon: maximum time between two mouse clicks for double click detection
+	 * (in microseconds)
+	 */
+	private final static long MICROSEC_NUKE_DOUBLE_CLICK = 240 * 1000;
+	/**
+	 * +/- icons: maximum time between two mouse clicks for double click detection
+	 * (in microseconds)
+	 */
+	private final static long MICROSEC_RELEASE_DOUBLE_CLICK = 200 * 1000;
 	/** +/- icons: time for key repeat to kick in */
-	private final static long MICROSEC_KEYREPEAT_START = 250*1000;
+	private final static long MICROSEC_KEYREPEAT_START = 250 * 1000;
 	/** +/- icons: time for key repeat rate */
-	private final static long MICROSEC_KEYREPEAT_REPEAT = 67*1000;
+	private final static long MICROSEC_KEYREPEAT_REPEAT = 67 * 1000;
 
 	/** sound object */
 	public static Sound sound;
@@ -166,7 +175,7 @@ public class GameController {
 	/** graphics object for the background image */
 	private static Graphics2D bgGfx;
 	/** color used to erase the background (black) */
-	private static Color blankColor = new Color(0xff,0,0,0);
+	private static Color blankColor = new Color(0xff, 0, 0, 0);
 	/** flag: fast forward mode is active */
 	private static boolean fastForward;
 	/** flag: Superlemming mode is active */
@@ -286,6 +295,7 @@ public class GameController {
 
 	/**
 	 * Initialization.
+	 * 
 	 * @throws ResourceException
 	 */
 	public static void init() throws ResourceException {
@@ -293,7 +303,7 @@ public class GameController {
 		bgGfx = bgImage.createGraphics();
 
 		gameState = State.INIT;
-		sound = new Sound(24,SND_MOUSEPRE);
+		sound = new Sound(24, SND_MOUSEPRE);
 		sound.setGain(soundGain);
 		Icons.init(Core.getCmp());
 		Explosion.init();
@@ -310,27 +320,28 @@ public class GameController {
 		Music.setGain(musicGain);
 		MiscGfx.init();
 
-		plus  = new KeyRepeat(MICROSEC_KEYREPEAT_START, MICROSEC_KEYREPEAT_REPEAT, MICROSEC_RELEASE_DOUBLE_CLICK);
+		plus = new KeyRepeat(MICROSEC_KEYREPEAT_START, MICROSEC_KEYREPEAT_REPEAT, MICROSEC_RELEASE_DOUBLE_CLICK);
 		minus = new KeyRepeat(MICROSEC_KEYREPEAT_START, MICROSEC_KEYREPEAT_REPEAT, MICROSEC_RELEASE_DOUBLE_CLICK);
 		timerNuke = new MicrosecondTimer();
 
 		level = new Level();
 		// read level packs
 
-		File dir = new File(Core.resourcePath+"levels");
+		File dir = new File(Core.resourcePath + "levels");
 		File files[] = dir.listFiles();
 		// now get the names of the directories
 		ArrayList<String> dirs = new ArrayList<String>();
-		for (int i=0; i<files.length; i++)
+		for (int i = 0; i < files.length; i++)
 			if (files[i].isDirectory())
 				dirs.add(files[i].getName());
 		Collections.sort(dirs);
 
-		levelPack = new LevelPack[dirs.size()+1];
+		levelPack = new LevelPack[dirs.size() + 1];
 		levelPack[0] = new LevelPack(); // dummy
-		for (int i=0; i<dirs.size(); i++) {  // read levels
+		for (int i = 0; i < dirs.size(); i++) { // read levels
 			String lvlName = dirs.get(i);
-			levelPack[i+1] = new LevelPack(Core.findResource("levels/"+ToolBox.addSeparator(lvlName)+"levelpack.ini"));
+			levelPack[i + 1] = new LevelPack(
+					Core.findResource("levels/" + ToolBox.addSeparator(lvlName) + "levelpack.ini"));
 		}
 		curDiffLevel = 0;
 		curLevelPack = 1; // since 0 is dummy
@@ -349,6 +360,7 @@ public class GameController {
 
 	/**
 	 * Calculate absolute level number from diff level and relative level number
+	 * 
 	 * @param lvlPack   level pack
 	 * @param diffLevel difficulty level
 	 * @param level     relative level number
@@ -358,13 +370,14 @@ public class GameController {
 		LevelPack lpack = levelPack[lvlPack];
 		// calculate absolute level number
 		int absLvl = level;
-		for (int i=0; i<diffLevel; i++)
+		for (int i = 0; i < diffLevel; i++)
 			absLvl += lpack.getLevels(i).length;
 		return absLvl;
 	}
 
 	/**
 	 * Calculate diffLevel and relative level number from absolute level number
+	 * 
 	 * @param lvlPack level pack
 	 * @param lvlAbs  absolute level number
 	 * @return { difficulty level, relative level number }
@@ -373,10 +386,10 @@ public class GameController {
 		int retval[] = new int[2];
 		LevelPack lpack = levelPack[lvlPack];
 		int diffLevels = lpack.getDiffLevels().length;
-		int lvl=0;
-		int diffLvl=0;
-		int maxLevels=30;
-		for (int i=0, ls = 0; i<diffLevels; i++) {
+		int lvl = 0;
+		int diffLvl = 0;
+		int maxLevels = 30;
+		for (int i = 0, ls = 0; i < diffLevels; i++) {
 			int ls_old = ls;
 			// add number of levels existing in this diff level
 			maxLevels = lpack.getLevels(i).length;
@@ -394,12 +407,13 @@ public class GameController {
 
 	/**
 	 * Proceed to next level.
+	 * 
 	 * @return true: ok, false: no more level in this difficulty level
 	 */
 	public static synchronized boolean nextLevel() {
 		int num = curLevelNumber + 1;
 
-		if ( num < levelPack[curLevelPack].getLevels(curDiffLevel).length ) {
+		if (num < levelPack[curLevelPack].getLevels(curDiffLevel).length) {
 			curLevelNumber = num;
 			return true;
 		} else
@@ -416,7 +430,8 @@ public class GameController {
 	}
 
 	/**
-	 * Level successfully finished, enter debriefing and tell GUI to enable next level.
+	 * Level successfully finished, enter debriefing and tell GUI to enable next
+	 * level.
 	 */
 	static synchronized void finishLevel() {
 		Music.stop();
@@ -425,25 +440,26 @@ public class GameController {
 		replayMode = false;
 
 		if (!wasLost()) {
-			if (curLevelPack!=0)
+			if (curLevelPack != 0)
 				levelMenuUpdateListener.update();
-			//			String pack = levelPack[curLevelPack].getName();
-			//			String diff = levelPack[curLevelPack].getDiffLevels()[curDiffLevel];
-			//			// get next level
-			//			int num = curLevelNumber + 1;
-			//			if ( num >= levelPack[curLevelPack].getLevels(curDiffLevel).length )
-			//				num = curLevelNumber;
-			//			// set next level as available
-			//			GroupBitfield bf = Core.player.setAvailable(pack, diff, num);
-			//			// update the menu
-			//			if (curLevelPack!=0) // 0 is the dummy pack
-			//				((Lemmini)Core.getCmp()).updateLevelMenu(pack, diff, bf);
+			// String pack = levelPack[curLevelPack].getName();
+			// String diff = levelPack[curLevelPack].getDiffLevels()[curDiffLevel];
+			// // get next level
+			// int num = curLevelNumber + 1;
+			// if ( num >= levelPack[curLevelPack].getLevels(curDiffLevel).length )
+			// num = curLevelNumber;
+			// // set next level as available
+			// GroupBitfield bf = Core.player.setAvailable(pack, diff, num);
+			// // update the menu
+			// if (curLevelPack!=0) // 0 is the dummy pack
+			// ((Lemmini)Core.getCmp()).updateLevelMenu(pack, diff, bf);
 		}
 		gameState = State.DEBRIEFING;
 	}
 
 	/**
 	 * Hook for GUI to get informed when a level was successfully finished.
+	 * 
 	 * @param l UpdateListener
 	 */
 	public static void setLevelMenuUpdateListener(final UpdateListener l) {
@@ -452,13 +468,14 @@ public class GameController {
 
 	/**
 	 * Restart level.
+	 * 
 	 * @param doReplay true: replay, false: play
 	 */
 	private static synchronized void restartLevel(final boolean doReplay) {
 		initLevel();
 		if (doReplay) {
 			replayMode = true;
-			replay.save(Core.resourcePath+"/replay.rpl");
+			replay.save(Core.resourcePath + "/replay.rpl");
 			replay.rewind();
 		} else {
 			replayMode = false;
@@ -503,8 +520,8 @@ public class GameController {
 		releaseRate = getLevel().getReleaseRate();
 		numLemmingsMax = getLevel().getNumLemmings();
 		numLemmingsOut = 0;
-		numToRecue  = getLevel().getNumToRescue();
-		time        = getLevel().getTimeLimitSeconds();
+		numToRecue = getLevel().getNumToRescue();
+		time = getLevel().getTimeLimitSeconds();
 		numClimbers = getLevel().getNumClimbers();
 		numFloaters = getLevel().getNumFloaters();
 		numBombers = getLevel().getNumBombers();
@@ -533,6 +550,7 @@ public class GameController {
 
 	/**
 	 * Request the restart of this level.
+	 * 
 	 * @param doReplay
 	 */
 	public static synchronized void requestRestartLevel(final boolean doReplay) {
@@ -545,12 +563,14 @@ public class GameController {
 
 	/**
 	 * Request a new level.
-	 * @param lPack index of level pack
-	 * @param dLevel index of difficulty level
-	 * @param lNum level number
+	 * 
+	 * @param lPack    index of level pack
+	 * @param dLevel   index of difficulty level
+	 * @param lNum     level number
 	 * @param doReplay true: replay, false: play
 	 */
-	public static synchronized void requestChangeLevel(final int lPack, final int dLevel, final int lNum, final boolean doReplay) {
+	public static synchronized void requestChangeLevel(final int lPack, final int dLevel, final int lNum,
+			final boolean doReplay) {
 		nextLevelPack = lPack;
 		nextDiffLevel = dLevel;
 		nextLevelNumber = lNum;
@@ -564,13 +584,15 @@ public class GameController {
 
 	/**
 	 * Start a new level.
-	 * @param lPack index of level pack
-	 * @param dLevel index of difficulty level
-	 * @param lNum level number
+	 * 
+	 * @param lPack    index of level pack
+	 * @param dLevel   index of difficulty level
+	 * @param lNum     level number
 	 * @param doReplay true: replay, false: play
 	 */
-	static private synchronized Level changeLevel(final int lPack, final int dLevel, final int lNum, final boolean doReplay) throws ResourceException, LemmException {
-		//gameState = GAME_ST_INIT;
+	static private synchronized Level changeLevel(final int lPack, final int dLevel, final int lNum,
+			final boolean doReplay) throws ResourceException, LemmException {
+		// gameState = GAME_ST_INIT;
 		curLevelPack = lPack;
 		curDiffLevel = dLevel;
 		curLevelNumber = lNum;
@@ -581,9 +603,11 @@ public class GameController {
 		// loading the level will patch pink lemmings pixels to correct color
 		getLevel().loadLevel(lvlPath);
 
-		// if with and height would be stored inside the level, the bgImage etc. would have to
+		// if with and height would be stored inside the level, the bgImage etc. would
+		// have to
 		// be recreated here
-		// bgImage = gc.createCompatibleImage(Level.width, Level.height, Transparency.BITMASK);
+		// bgImage = gc.createCompatibleImage(Level.width, Level.height,
+		// Transparency.BITMASK);
 		// bgGfx = bgImage.createGraphics();
 
 		initLevel();
@@ -601,6 +625,7 @@ public class GameController {
 
 	/**
 	 * Get level lost state.
+	 * 
 	 * @return true if level was lost, false otherwise
 	 */
 	static synchronized boolean wasLost() {
@@ -611,12 +636,13 @@ public class GameController {
 
 	/**
 	 * Get current replay image.
+	 * 
 	 * @return current replay image
 	 */
 	public synchronized static BufferedImage getReplayImage() {
 		if (!replayMode)
 			return null;
-		if ( (replayFrame & 0x3f) > 0x20)
+		if ((replayFrame & 0x3f) > 0x20)
 			return MiscGfx.getImage(MiscGfx.Index.REPLAY_1);
 		else
 			return MiscGfx.getImage(MiscGfx.Index.REPLAY_2);
@@ -624,15 +650,16 @@ public class GameController {
 
 	/**
 	 * Get a Lemming under the selection cursor.
+	 * 
 	 * @param type cursor type
 	 * @return fitting Lemming or null if none found
 	 */
 	public static synchronized Lemming lemmUnderCursor(final LemmCursor.Type type) {
 		// search for level without the skill
-		for (int i=0; i<getLemmsUnderCursor().size(); i++) {
+		for (int i = 0; i < getLemmsUnderCursor().size(); i++) {
 			Lemming l = getLemmsUnderCursor().get(i);
 			// Walker only cursor: ignore non-walkers
-			if (type == LemmCursor.Type.WALKER && l.getSkill()!=Lemming.Type.WALKER)
+			if (type == LemmCursor.Type.WALKER && l.getSkill() != Lemming.Type.WALKER)
 				continue;
 			if (type == LemmCursor.Type.LEFT && l.getDirection() != Lemming.Direction.LEFT)
 				continue;
@@ -649,7 +676,7 @@ public class GameController {
 					break;
 				default:
 					if (l.canChangeSkill() && l.getSkill() != lemmSkill && l.getName().length() > 0) {
-						//System.out.println(l.getName());
+						// System.out.println(l.getName());
 						return l;
 					}
 			}
@@ -659,7 +686,7 @@ public class GameController {
 			Lemming l = getLemmsUnderCursor().get(0);
 			if (l.getName().length() == 0)
 				return null;
-			//System.out.println(((Lemming)lemmsUnderCursor.get(0)).getName());
+			// System.out.println(((Lemming)lemmsUnderCursor.get(0)).getName());
 			return l;
 		}
 		return null;
@@ -682,13 +709,14 @@ public class GameController {
 
 	/**
 	 * Return time as String "minutes-seconds"
+	 * 
 	 * @return time as String "minutes-seconds"
 	 */
 	public synchronized static String getTimeString() {
-		String t1 = Integer.toString(time/60);
-		String t2 = Integer.toString(time%60);
+		String t1 = Integer.toString(time / 60);
+		String t2 = Integer.toString(time % 60);
 		if (t2.length() < 2)
-			t2 = "0"+t2;
+			t2 = "0" + t2;
 		return t1 + "-" + t2;
 	}
 
@@ -714,7 +742,8 @@ public class GameController {
 					releaseRate += 1;
 				calcReleaseBase();
 				sound.playPitched(releaseRate);
-			} else sound.play(SND_TING);
+			} else
+				sound.play(SND_TING);
 		}
 
 		fired = minus.fired();
@@ -726,15 +755,15 @@ public class GameController {
 					releaseRate -= 1;
 				calcReleaseBase();
 				sound.playPitched(releaseRate);
-			} else sound.play(SND_TING);
+			} else
+				sound.play(SND_TING);
 		}
-
 
 		if (isPaused())
 			return;
 
 		// test for end of replay mode
-		if ( replayMode && stopReplayMode ) {
+		if (replayMode && stopReplayMode) {
 			replay.clearFrom(replayFrame);
 			replayMode = false;
 			stopReplayMode = false;
@@ -762,20 +791,21 @@ public class GameController {
 					replay.addSelectSkillEvent(replayFrame, lemmSkill);
 					lemmSkillOld = lemmSkill;
 				}
-			} else replay.clear();
+			} else
+				replay.clear();
 		} else {
 			// replay mode
 			ReplayEvent r;
-			while ( (r=replay.getNext(replayFrame)) != null) {
+			while ((r = replay.getNext(replayFrame)) != null) {
 				switch (r.type) {
 					case ReplayStream.ASSIGN_SKILL: {
-						ReplayAssignSkillEvent rs = (ReplayAssignSkillEvent)r;
+						ReplayAssignSkillEvent rs = (ReplayAssignSkillEvent) r;
 						synchronized (lemmings) {
 							Lemming l = lemmings.get(rs.lemming);
 							l.setSkill(rs.skill);
 							l.setSelected();
 						}
-						
+
 						switch (rs.skill) {
 							case FLOATER:
 								numFloaters -= 1;
@@ -801,19 +831,7 @@ public class GameController {
 							case STOPPER:
 								numBlockers -= 1;
 								break;
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
+
 							default:
 								break;
 						}
@@ -821,7 +839,7 @@ public class GameController {
 						break;
 					}
 					case ReplayStream.SET_RELEASE_RATE:
-						ReplayReleaseRateEvent rr = (ReplayReleaseRateEvent)r;
+						ReplayReleaseRateEvent rr = (ReplayReleaseRateEvent) r;
 						releaseRate = rr.releaseRate;
 						calcReleaseBase();
 						sound.playPitched(releaseRate);
@@ -830,14 +848,14 @@ public class GameController {
 						nuke = true;
 						break;
 					case ReplayStream.MOVE_XPOS: {
-						ReplayMoveXPosEvent rx = (ReplayMoveXPosEvent)r;
+						ReplayMoveXPosEvent rx = (ReplayMoveXPosEvent) r;
 						setxPos(rx.xPos);
 						break;
 					}
 					case ReplayStream.SELECT_SKILL: {
-						ReplaySelectSkillEvent rs = (ReplaySelectSkillEvent)r;
+						ReplaySelectSkillEvent rs = (ReplaySelectSkillEvent) r;
 						lemmSkill = rs.skill;
-						
+
 						switch (lemmSkill) {
 							case FLOATER:
 								Icons.press(Icons.Type.FLOAT);
@@ -863,19 +881,7 @@ public class GameController {
 							case STOPPER:
 								Icons.press(Icons.Type.BLOCK);
 								break;
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
-							
+
 							default:
 								break;
 						}
@@ -891,7 +897,7 @@ public class GameController {
 		boolean nukeTemp = nuke;
 
 		// time
-		secondCtr+=1.0;
+		secondCtr += 1.0;
 		if (secondCtr > MAX_SECOND_CTR) {
 			// one second passed
 			secondCtr -= MAX_SECOND_CTR;
@@ -902,29 +908,29 @@ public class GameController {
 			}
 		}
 		// release
-		if (entryOpened && !nukeTemp && !isPaused() && numLemmingsOut < getNumLemmingsMax() && ++releaseCtr >= releaseBase) {
+		if (entryOpened && !nukeTemp && !isPaused() && numLemmingsOut < getNumLemmingsMax()
+				&& ++releaseCtr >= releaseBase) {
 			releaseCtr = 0;
-			//LemmingResource ls = Lemming.getResource(Lemming.TYPE_FALLER);
+			// LemmingResource ls = Lemming.getResource(Lemming.TYPE_FALLER);
 			try {
 				if (getLevel().getEntryNum() != 0) {
 					Entry e = getLevel().getEntry(TrapDoor.getNext());
-					Lemming l = new Lemming(e.xPos+2, e.yPos+20);
+					Lemming l = new Lemming(e.xPos + 2, e.yPos + 20);
 					synchronized (lemmings) {
 						lemmings.add(l);
 					}
 					numLemmingsOut++;
 				}
-			} catch (ArrayIndexOutOfBoundsException ex) {}
+			} catch (ArrayIndexOutOfBoundsException ex) {
+			}
 		}
 		// nuking
-		if (nukeTemp && ((updateCtr&1)==1)) {
+		if (nukeTemp && ((updateCtr & 1) == 1)) {
 			synchronized (lemmings) {
-				Iterator<Lemming> it = lemmings.iterator();
-				while (it.hasNext()) {
-					Lemming l = it.next();
+				for (Lemming l : lemmings) {
 					if (!l.nuke() && !l.hasDied() && !l.hasLeft()) {
 						l.setSkill(Lemming.Type.NUKE);
-						//System.out.println("nuked!");
+						// System.out.println("nuked!");
 						break;
 					}
 				}
@@ -933,11 +939,11 @@ public class GameController {
 		// open trap doors ?
 		if (!entryOpened) {
 			if (++entryOpenCtr == MAX_ENTRY_OPEN_CTR) {
-				for (int i=0; i<getLevel().getEntryNum(); i++)
+				for (int i = 0; i < getLevel().getEntryNum(); i++)
 					getLevel().getSprObject(getLevel().getEntry(i).id).setAnimMode(Sprite.Animation.ONCE);
 				sound.play(SND_DOOR);
-			} else if (entryOpenCtr == MAX_ENTRY_OPEN_CTR+10*MAX_ANIM_CTR) {
-				//System.out.println("opened");
+			} else if (entryOpenCtr == MAX_ENTRY_OPEN_CTR + 10 * MAX_ANIM_CTR) {
+				// System.out.println("opened");
 				entryOpened = true;
 				releaseCtr = releaseBase; // first lemming to enter at once
 				if (musicOn)
@@ -945,12 +951,13 @@ public class GameController {
 			}
 		}
 		// end of game conditions
-		if ((nukeTemp || numLemmingsOut == getNumLemmingsMax()) && explosions.size()==0 && lemmings.size()==0) {
+		if ((nukeTemp || numLemmingsOut == getNumLemmingsMax()) && explosions.size() == 0 && lemmings.size() == 0) {
 			endLevel();
 		}
 
 		synchronized (lemmings) {
 			Iterator<Lemming> it = lemmings.iterator();
+			
 			while (it.hasNext()) {
 				Lemming l = it.next();
 				if (l.hasDied() || l.hasLeft()) {
@@ -975,7 +982,7 @@ public class GameController {
 		// animate level objects
 		if (++animCtr > MAX_ANIM_CTR) {
 			animCtr -= MAX_ANIM_CTR;
-			for (int n=0; n<getLevel().getSprObjectNum(); n++) {
+			for (int n = 0; n < getLevel().getSprObjectNum(); n++) {
 				SpriteObject spr = getLevel().getSprObject(n);
 				spr.getImageAnim(); // just to animate
 			}
@@ -984,11 +991,12 @@ public class GameController {
 		if (!replayMode)
 			assignSkill(true); // 2nd try to assign skill
 
-		replayFrame ++;
+		replayFrame++;
 	}
 
 	/**
 	 * Request a skill change for a Lemming (currently selected skill).
+	 * 
 	 * @param lemm Lemming
 	 */
 	public synchronized static void requestSkill(final Lemming lemm) {
@@ -999,6 +1007,7 @@ public class GameController {
 
 	/**
 	 * Assign the selected skill to the selected Lemming.
+	 * 
 	 * @param delete flag: reset the current skill request
 	 */
 	private synchronized static void assignSkill(final boolean delete) {
@@ -1064,19 +1073,7 @@ public class GameController {
 						canSet = true;
 					}
 					break;
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
+
 				default:
 					break;
 			}
@@ -1091,9 +1088,9 @@ public class GameController {
 			// add to replay stream
 			if (!wasCheated)
 				synchronized (lemmings) {
-					for (int i=0; i<lemmings.size(); i++)
+					for (int i = 0; i < lemmings.size(); i++)
 						if (lemmings.get(i) == lemm) // if 2nd try (delete==true) assign to next frame
-							replay.addAssignSkillEvent(replayFrame+((delete) ? 1:0), lemmSkill, i);
+							replay.addAssignSkillEvent(replayFrame + ((delete) ? 1 : 0), lemmSkill, i);
 				}
 		} else if (delete)
 			sound.play(SND_TING);
@@ -1112,50 +1109,51 @@ public class GameController {
 
 	/**
 	 * Handle pressing of an icon button.
+	 * 
 	 * @param type icon type
 	 */
 	public static synchronized void handleIconButton(final Icons.Type type) {
 		Lemming.Type lemmSkillOld = lemmSkill;
 		boolean ok = false;
-		
+
 		switch (type) {
 			case FLOAT:
-				if (isCheat() || numFloaters>0)
+				if (isCheat() || numFloaters > 0)
 					lemmSkill = Lemming.Type.FLOATER;
 				stopReplayMode();
 				break;
 			case CLIMB:
-				if (isCheat() || numClimbers>0)
+				if (isCheat() || numClimbers > 0)
 					lemmSkill = Lemming.Type.CLIMBER;
 				stopReplayMode();
 				break;
 			case BOMB:
-				if (isCheat() || numBombers>0)
+				if (isCheat() || numBombers > 0)
 					lemmSkill = Lemming.Type.BOMBER;
 				stopReplayMode();
 				break;
 			case DIG:
-				if (isCheat() || numDiggers>0)
+				if (isCheat() || numDiggers > 0)
 					lemmSkill = Lemming.Type.DIGGER;
 				stopReplayMode();
 				break;
 			case BASH:
-				if (isCheat() || numBashers>0)
+				if (isCheat() || numBashers > 0)
 					lemmSkill = Lemming.Type.BASHER;
 				stopReplayMode();
 				break;
 			case BUILD:
-				if (isCheat() || numBuilders>0)
+				if (isCheat() || numBuilders > 0)
 					lemmSkill = Lemming.Type.BUILDER;
 				stopReplayMode();
 				break;
 			case MINE:
-				if (isCheat() || numMiners>0)
+				if (isCheat() || numMiners > 0)
 					lemmSkill = Lemming.Type.MINER;
 				stopReplayMode();
 				break;
 			case BLOCK:
-				if (isCheat() || numBlockers>0)
+				if (isCheat() || numBlockers > 0)
 					lemmSkill = Lemming.Type.STOPPER;
 				stopReplayMode();
 				break;
@@ -1167,8 +1165,10 @@ public class GameController {
 						nuke = true;
 						sound.play(SND_OHNO);
 					}
-				} else timerNuke.deltaUpdate();
-				break;}
+				} else
+					timerNuke.deltaUpdate();
+				break;
+			}
 			case PAUSE:
 				setPaused(!isPaused());
 				ok = true;
@@ -1187,15 +1187,14 @@ public class GameController {
 				minus.pressed(KEYREPEAT_ICON);
 				stopReplayMode();
 				break;
-			
-			
+
 			default:
 				break;
 		}
 		if (ok || lemmSkill != lemmSkillOld) {
 			switch (type) {
 				case PLUS:
-				 // supress sound
+					// supress sound
 				default:
 					sound.play(SND_CHANGE_OP);
 			}
@@ -1206,6 +1205,7 @@ public class GameController {
 
 	/**
 	 * Fade in/out.
+	 * 
 	 * @param g graphics object
 	 */
 	public static void fade(final Graphics g) {
@@ -1226,12 +1226,14 @@ public class GameController {
 				case TO_LEVEL:
 					GameController.sound.play(SND_LETSGO);
 					try {
-						Music.load("music/"+GameController.levelPack[GameController.curLevelPack].getInfo(GameController.curDiffLevel,
-								GameController.curLevelNumber).getMusic());
+						Music.load("music/" + GameController.levelPack[GameController.curLevelPack]
+								.getInfo(GameController.curDiffLevel,
+										GameController.curLevelNumber)
+								.getMusic());
 					} catch (ResourceException ex) {
 						Core.resourceError(ex.getMessage());
 					} catch (LemmException ex) {
-						JOptionPane.showMessageDialog( null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE );
+						JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 						System.exit(1);
 					}
 					gameState = State.LEVEL;
@@ -1243,16 +1245,17 @@ public class GameController {
 				case LOAD_LEVEL:
 				case LOAD_REPLAY:
 					try {
-						changeLevel(nextLevelPack, nextDiffLevel, nextLevelNumber, transitionState == TransitionState.LOAD_REPLAY);
-						((JFrame)Core.getCmp()).setTitle("Lemmini - "+getLevel().getLevelName());
+						changeLevel(nextLevelPack, nextDiffLevel, nextLevelNumber,
+								transitionState == TransitionState.LOAD_REPLAY);
+						((JFrame) Core.getCmp()).setTitle("Lemmini - " + getLevel().getLevelName());
 					} catch (ResourceException ex) {
 						Core.resourceError(ex.getMessage());
 					} catch (LemmException ex) {
-						JOptionPane.showMessageDialog( null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE );
+						JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 						System.exit(1);
 					}
 					break;
-				
+
 				default:
 					break;
 			}
@@ -1264,10 +1267,11 @@ public class GameController {
 
 	/**
 	 * Draw the explosions
-	 * @param g graphics object
-	 * @param width width of screen in pixels
+	 * 
+	 * @param g      graphics object
+	 * @param width  width of screen in pixels
 	 * @param height height of screen in pixels
-	 * @param xOfs horizontal level offset in pixels
+	 * @param xOfs   horizontal level offset in pixels
 	 */
 	public static void drawExplosions(final Graphics2D g, final int width, final int height, final int xOfs) {
 		synchronized (explosions) {
@@ -1281,6 +1285,7 @@ public class GameController {
 
 	/**
 	 * Add a new explosion.
+	 * 
 	 * @param x x coordinate in pixels.
 	 * @param y y coordinate in pixels.
 	 */
@@ -1293,23 +1298,25 @@ public class GameController {
 
 	/**
 	 * Draw icon bar.
+	 * 
 	 * @param g graphics object
 	 * @param x x coordinate in pixels
 	 * @param y y coordinate in pixels
 	 */
 	public static void drawIcons(final Graphics2D g, final int x, final int y) {
-		g.drawImage(Icons.getImg(),x,y,null);
+		g.drawImage(Icons.getImg(), x, y, null);
 	}
 
 	/**
 	 * Draw the skill/release rate values
+	 * 
 	 * @param g graphics object
 	 * @param y y offset in pixels
 	 */
 	public static void drawCounters(final Graphics2D g, final int y) {
 		// draw counters
 		int val = 0;
-		for (int i=0; i<10;i++) {
+		for (int i = 0; i < 10; i++) {
 			switch (i) {
 				case 0:
 					val = level.getReleaseRate();
@@ -1342,13 +1349,14 @@ public class GameController {
 					val = numDiggers;
 					break;
 			}
-			g.drawImage(NumFont.numImage(val),Icons.WIDTH*i+8,y,null);
+			g.drawImage(NumFont.numImage(val), Icons.WIDTH * i + 8, y, null);
 		}
 
 	}
 
 	/**
 	 * Get index of current level pack.
+	 * 
 	 * @return index of current level pack
 	 */
 	public static int getCurLevelPackIdx() {
@@ -1357,6 +1365,7 @@ public class GameController {
 
 	/**
 	 * Get current level pack.
+	 * 
 	 * @return current level pack
 	 */
 	public static LevelPack getCurLevelPack() {
@@ -1365,6 +1374,7 @@ public class GameController {
 
 	/**
 	 * get number of level packs
+	 * 
 	 * @return number of level packs
 	 */
 	public static int getLevelPackNum() {
@@ -1373,6 +1383,7 @@ public class GameController {
 
 	/**
 	 * Get level pack via index.
+	 * 
 	 * @param i index of level pack
 	 * @return LevelPack
 	 */
@@ -1382,6 +1393,7 @@ public class GameController {
 
 	/**
 	 * Get index of current difficulty level.
+	 * 
 	 * @return index of current difficulty level
 	 */
 	public static int getCurDiffLevel() {
@@ -1390,15 +1402,16 @@ public class GameController {
 
 	/**
 	 * Get number of current level.
+	 * 
 	 * @return number of current leve
 	 */
 	public static int getCurLevelNumber() {
 		return curLevelNumber;
 	}
 
-
 	/**
 	 * Set horizontal scrolling offset.
+	 * 
 	 * @param x horizontal scrolling offset in pixels
 	 */
 	public static void setxPos(final int x) {
@@ -1407,6 +1420,7 @@ public class GameController {
 
 	/**
 	 * Get horizontal scrolling offset.
+	 * 
 	 * @return horizontal scrolling offset in pixels
 	 */
 	public static int getxPos() {
@@ -1415,6 +1429,7 @@ public class GameController {
 
 	/**
 	 * Set game state.
+	 * 
 	 * @param s new game state
 	 */
 	public static void setGameState(final State s) {
@@ -1423,6 +1438,7 @@ public class GameController {
 
 	/**
 	 * Get game state.
+	 * 
 	 * @return game state
 	 */
 	public static State getGameState() {
@@ -1431,6 +1447,7 @@ public class GameController {
 
 	/**
 	 * Enable/disable cheat mode.
+	 * 
 	 * @param c true: enable, false: disable
 	 */
 	public static void setCheat(final boolean c) {
@@ -1439,6 +1456,7 @@ public class GameController {
 
 	/**
 	 * Get state of cheat mode.
+	 * 
 	 * @return true if cheat mode enabled, false otherwise
 	 */
 	public static boolean isCheat() {
@@ -1447,15 +1465,16 @@ public class GameController {
 
 	/**
 	 * Set transition state.
+	 * 
 	 * @param ts TransitionState
 	 */
 	public static void setTransition(final TransitionState ts) {
 		transitionState = ts;
 	}
 
-
 	/**
 	 * Load a replay.
+	 * 
 	 * @param fn file name
 	 * @return replay level info object
 	 */
@@ -1465,6 +1484,7 @@ public class GameController {
 
 	/**
 	 * Save a replay.
+	 * 
 	 * @param fn file name
 	 * @return true if saved successfully, false otherwise
 	 */
@@ -1474,6 +1494,7 @@ public class GameController {
 
 	/**
 	 * Activate/deactivate Superlemming mode.
+	 * 
 	 * @param sl true: activate, false: deactivate
 	 */
 	public static void setSuperLemming(final boolean sl) {
@@ -1482,6 +1503,7 @@ public class GameController {
 
 	/**
 	 * Get Superlemming state.
+	 * 
 	 * @return true is Superlemming mode is active, false otherwise
 	 */
 	public static boolean isSuperLemming() {
@@ -1490,6 +1512,7 @@ public class GameController {
 
 	/**
 	 * Set cheated detection.
+	 * 
 	 * @param c true: cheat mode was activated, false otherwise
 	 */
 	public static void setWasCheated(final boolean c) {
@@ -1498,6 +1521,7 @@ public class GameController {
 
 	/**
 	 * Enable pause mode.
+	 * 
 	 * @param p true: pause is active, false otherwise
 	 */
 	public static void setPaused(final boolean p) {
@@ -1506,6 +1530,7 @@ public class GameController {
 
 	/**
 	 * Get pause state.
+	 * 
 	 * @return true if pause is active, false otherwise
 	 */
 	public static boolean isPaused() {
@@ -1514,6 +1539,7 @@ public class GameController {
 
 	/**
 	 * Enable fast forward mode.
+	 * 
 	 * @param ff true: fast forward is active, false otherwise
 	 */
 	public static void setFastForward(final boolean ff) {
@@ -1522,13 +1548,16 @@ public class GameController {
 
 	/**
 	 * Get fast forward state.
+	 * 
 	 * @return true if fast forward is active, false otherwise
 	 */
 	public static boolean isFastForward() {
 		return fastForward;
 	}
 
-	/** get number of lemmings left in the game
+	/**
+	 * get number of lemmings left in the game
+	 * 
 	 * @return number of lemmings left in the game
 	 */
 	public static int getNumLeft() {
@@ -1537,6 +1566,7 @@ public class GameController {
 
 	/**
 	 * Set number of Lemmings left in the game.
+	 * 
 	 * @param n number of Lemmings left in the game
 	 */
 	public static void setNumLeft(final int n) {
@@ -1545,6 +1575,7 @@ public class GameController {
 
 	/**
 	 * Get level object.
+	 * 
 	 * @return level object
 	 */
 	public static Level getLevel() {
@@ -1553,6 +1584,7 @@ public class GameController {
 
 	/**
 	 * Get maximum number of Lemmings for this level.
+	 * 
 	 * @return maximum number of Lemmings for this level
 	 */
 	public static int getNumLemmingsMax() {
@@ -1561,6 +1593,7 @@ public class GameController {
 
 	/**
 	 * Get icon type from x position.
+	 * 
 	 * @param x x position in pixels
 	 * @return icon type
 	 */
@@ -1570,6 +1603,7 @@ public class GameController {
 
 	/**
 	 * Icon was pressed.
+	 * 
 	 * @param t icon type
 	 */
 	public static void pressIcon(final Icons.Type t) {
@@ -1578,6 +1612,7 @@ public class GameController {
 
 	/**
 	 * Icon was released.
+	 * 
 	 * @param t icon type
 	 */
 	public static void releaseIcon(final Icons.Type t) {
@@ -1586,6 +1621,7 @@ public class GameController {
 
 	/**
 	 * Plus was pressed.
+	 * 
 	 * @param d bitmask: key or icon
 	 */
 	public static void pressPlus(final int d) {
@@ -1594,6 +1630,7 @@ public class GameController {
 
 	/**
 	 * Plus was released.
+	 * 
 	 * @param d bitmask: key or icon
 	 */
 	public static void releasePlus(final int d) {
@@ -1602,6 +1639,7 @@ public class GameController {
 
 	/**
 	 * Minus was pressed.
+	 * 
 	 * @param d bitmask: key or icon
 	 */
 	public static void pressMinus(final int d) {
@@ -1610,6 +1648,7 @@ public class GameController {
 
 	/**
 	 * Minus was released.
+	 * 
 	 * @param d bitmask: key or icon
 	 */
 	public static void releaseMinus(final int d) {
@@ -1618,6 +1657,7 @@ public class GameController {
 
 	/**
 	 * Get list of all Lemmings under the mouse cursor.
+	 * 
 	 * @return list of all Lemmings under the mouse cursor
 	 */
 	public static ArrayList<Lemming> getLemmsUnderCursor() {
@@ -1626,6 +1666,7 @@ public class GameController {
 
 	/**
 	 * Get list of all Lemmings in this level.
+	 * 
 	 * @return list of all Lemmings in this level
 	 */
 	public static LinkedList<Lemming> getLemmings() {
@@ -1634,6 +1675,7 @@ public class GameController {
 
 	/**
 	 * Set sound gain.
+	 * 
 	 * @param g gain (0..1.0)
 	 */
 	public static void setSoundGain(final double g) {
@@ -1644,6 +1686,7 @@ public class GameController {
 
 	/**
 	 * Set music gain.
+	 * 
 	 * @param g gain (0..1.0)
 	 */
 	public static void setMusicGain(final double g) {
@@ -1654,6 +1697,7 @@ public class GameController {
 
 	/**
 	 * Set advanced mouse selection mode.
+	 * 
 	 * @param sel true: advanced selection mode active, false otherwise
 	 */
 	public static void setAdvancedSelect(final boolean sel) {
@@ -1662,6 +1706,7 @@ public class GameController {
 
 	/**
 	 * Get state of advanced mouse selection mode.
+	 * 
 	 * @return true if advanced selection mode activated, false otherwise
 	 */
 	public static boolean isAdvancedSelect() {
@@ -1670,6 +1715,7 @@ public class GameController {
 
 	/**
 	 * Set classical cursor mode.
+	 * 
 	 * @param sel true: classical cursor mode active, false otherwise
 	 */
 	public static void setClassicalCursor(final boolean sel) {
@@ -1678,14 +1724,16 @@ public class GameController {
 
 	/**
 	 * Get state of classical cursor mode.
+	 * 
 	 * @return true if classical cursor mode activated, false otherwise
 	 */
 	public static boolean isClassicalCursor() {
 		return classicalCursor;
 	}
-	
+
 	/**
 	 * Get background image of level.
+	 * 
 	 * @return background image of level
 	 */
 	public static BufferedImage getBgImage() {
@@ -1694,6 +1742,7 @@ public class GameController {
 
 	/**
 	 * Get background stencil of level.
+	 * 
 	 * @return background stencil of level
 	 */
 	public static Stencil getStencil() {
@@ -1702,6 +1751,7 @@ public class GameController {
 
 	/**
 	 * Enable music.
+	 * 
 	 * @param on true: music on, false otherwise
 	 */
 	public static void setMusicOn(final boolean on) {
@@ -1710,6 +1760,7 @@ public class GameController {
 
 	/**
 	 * Get music enable state.
+	 * 
 	 * @return true: music is on, false otherwise
 	 */
 	public static boolean isMusicOn() {
@@ -1718,6 +1769,7 @@ public class GameController {
 
 	/**
 	 * Enable sound.
+	 * 
 	 * @param on true: sound on, false otherwise
 	 */
 	public static void setSoundOn(final boolean on) {
@@ -1726,6 +1778,7 @@ public class GameController {
 
 	/**
 	 * Get sound enable state.
+	 * 
 	 * @return true: sound is on, false otherwise
 	 */
 	public static boolean isSoundOn() {
@@ -1734,6 +1787,7 @@ public class GameController {
 
 	/**
 	 * Get small preview image of level.
+	 * 
 	 * @return small preview image of level
 	 */
 	public static BufferedImage getMapPreview() {
@@ -1742,14 +1796,16 @@ public class GameController {
 
 	/**
 	 * Get number of Lemmings to rescue.
+	 * 
 	 * @return number of Lemmings to rescue
 	 */
-	public static int  getNumToRecue() {
+	public static int getNumToRecue() {
 		return numToRecue;
 	}
 
 	/**
 	 * Get time left in seconds.
+	 * 
 	 * @return time left in seconds
 	 */
 	public static int getTime() {
@@ -1757,18 +1813,19 @@ public class GameController {
 	}
 }
 
-
 /**
  * Trapdoor/Entry class
- * Trapdoor logic: for numbers >1, just take the next door for each lemming and wrap around to 1 when
+ * Trapdoor logic: for numbers >1, just take the next door for each lemming and
+ * wrap around to 1 when
  * the last one is reached.
- * Special rule for 3 trapdoors: the order is 1, 2, 3, 2 (loop), not 1, 2, 3 (loop)
+ * Special rule for 3 trapdoors: the order is 1, 2, 3, 2 (loop), not 1, 2, 3
+ * (loop)
  *
  * @author Volker Oth
  */
 class TrapDoor {
 	/** pattern for three entries */
-	private final static int[] PATTERN3 = {0,1,2,1};
+	private final static int[] PATTERN3 = { 0, 1, 2, 1 };
 
 	/** number of entries */
 	private static int entries;
@@ -1777,6 +1834,7 @@ class TrapDoor {
 
 	/**
 	 * Reset to new number of entries.
+	 * 
 	 * @param e number of entries
 	 */
 	static void reset(final int e) {
@@ -1786,6 +1844,7 @@ class TrapDoor {
 
 	/**
 	 * Get index of next entry.
+	 * 
 	 * @return index of next entry
 	 */
 	static int getNext() {

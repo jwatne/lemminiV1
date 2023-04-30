@@ -88,6 +88,7 @@ public class Lemmini extends JFrame implements KeyListener {
 	private String lvlPath;
 	/** HashMap to store menu items for difficulty levels */
 	private HashMap<String, ArrayList<LvlMenuItem>> diffLevelMenus;
+
 	public HashMap<String, ArrayList<LvlMenuItem>> getDiffLevelMenus() {
 		return diffLevelMenus;
 	}
@@ -180,20 +181,6 @@ public class Lemmini extends JFrame implements KeyListener {
 	}
 
 	/**
-	 * Convert String to int.
-	 * 
-	 * @param s String with decimal integer value
-	 * @return integer value (0 if no valid number)
-	 */
-	private static int getInt(final String s) {
-		try {
-			return Integer.parseInt(s);
-		} catch (final NumberFormatException ex) {
-			return 0;
-		}
-	}
-
-	/**
 	 * The main function. Entry point of the program.
 	 * 
 	 * @param args
@@ -210,10 +197,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		 * Apple menu bar for MacOS
 		 */
 		System.setProperty("apple.laf.useScreenMenuBar", "true");
-		/*
-		 * Check JVM version
-		 */
-		checkJvmVersion();
+
 		// check free memory
 		final long free = Runtime.getRuntime().maxMemory();
 
@@ -243,27 +227,6 @@ public class Lemmini extends JFrame implements KeyListener {
 
 		Toolkit.getDefaultToolkit().setDynamicLayout(true);
 		thisFrame = new Lemmini();
-	}
-
-	/**
-	 * Checks to ensure that the Java version is at least 1.5, and exits with an
-	 * error in the now unlikely event that it is.
-	 */
-	private static void checkJvmVersion() {
-		final String jreStr = System.getProperty("java.version");
-		final String vs[] = jreStr.split("[._]");
-		double vnum;
-
-		if (vs.length >= 3) {
-			vnum = (getInt(vs[0]))
-					+ (getInt(vs[1])) * 0.1
-					+ (getInt(vs[2])) * 0.01;
-
-			if (vnum < 1.5) {
-				JOptionPane.showMessageDialog(null, "Run this with JVM >= 1.5", "Error", JOptionPane.ERROR_MESSAGE);
-				System.exit(1);
-			}
-		}
 	}
 
 	public void setScale(final double scale) {

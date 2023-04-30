@@ -1,4 +1,5 @@
 package Game;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Transparency;
@@ -57,23 +58,22 @@ public class TextScreen {
 	public final static int BUTTON_SAVEREPLAY = 4;
 
 	/** y position of scroll text - pixels relative to center */
-	private final static int SCROLL_Y = 140;
+	private final static int SCROLL_Y = 150;
 	/** width of scroll text in characters */
 	private final static int SCROLL_WIDTH = 39;
 	/** height of scroll text in pixels */
-	private final static int SCROLL_HEIGHT = LemmFont.getHeight()*2;
+	private final static int SCROLL_HEIGHT = LemmFont.getHeight() * 2;
 	/** step width of scroll text in pixels */
 	private final static int SCROLL_STEP = 2;
 	/** scroll text */
-	private final static String SCROLL_TEXT =
-		"                                           "+
-		"Lemmini - a game engine for Lemmings (tm) in Java. "+
-		"Thanks to Martin Cameron for his MicroMod Library, "+
-		"Jef Poskanzer for his GifEncoder Library, "+
-		"Mindless for his MOD conversions of the original Amiga Lemmings tunes, "+
-		"the guys of DMA Design for writing the original Lemmings, "+
-		"ccexplore and the other nice folks at the Lemmingswelt Forum for discussion and advice "+
-		"and to Sun for maintaining Java and providing the community with a free development environment.";
+	private final static String SCROLL_TEXT = "                                           " +
+			"Lemmini - a game engine for Lemmings (tm) in Java. " +
+			"Thanks to Martin Cameron for his MicroMod Library, " +
+			"Jef Poskanzer for his GifEncoder Library, " +
+			"Mindless for his MOD conversions of the original Amiga Lemmings tunes, " +
+			"the guys of DMA Design for writing the original Lemmings, " +
+			"ccexplore and the other nice folks at the Lemmingswelt Forum for discussion and advice " +
+			"and to Sun for maintaining Java and providing the community with a free development environment.";
 
 	/** TextDialog used as base component */
 	private static TextDialog textScreen;
@@ -91,11 +91,19 @@ public class TextScreen {
 	private static boolean flip;
 	/** affine transformation used for rotation animation */
 	private static AffineTransform at;
-	/** counter used to trigger the rotation animation (in animation update frames) */
+	/**
+	 * counter used to trigger the rotation animation (in animation update frames)
+	 */
 	private static int rotCtr;
-	/** counter threshold used to trigger the rotation animation (in animation update frames) */
+	/**
+	 * counter threshold used to trigger the rotation animation (in animation update
+	 * frames)
+	 */
 	private static final int maxRotCtr = 99;
-	/** used to stop the rotation only after it was flipped twice -> original direction */
+	/**
+	 * used to stop the rotation only after it was flipped twice -> original
+	 * direction
+	 */
 	private static int flipCtr;
 	/** counter for scrolled characters */
 	private static int scrollCharCtr;
@@ -109,11 +117,12 @@ public class TextScreen {
 	private static Mode mode;
 	/** synchronization monitor */
 	private static Object monitor = new Object();
-	
+
 	private static double oldScale = Core.getScale();
 
 	/**
 	 * Set mode.
+	 * 
 	 * @param m mode.
 	 */
 	public static void setMode(final Mode m) {
@@ -125,11 +134,11 @@ public class TextScreen {
 						textScreen.init();
 						textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_BROWN));
 						textScreen.printCentered("A game engine for Lemmings(tm) in Java", 0, RED);
-						textScreen.printCentered("Release 0.87 08/2017", 1, BLUE);
+						textScreen.printCentered("Release 1.00 04/2021", 1, BLUE);
 						textScreen.printCentered("Coded by Volker Oth 2005-2017", 2, VIOLET);
-						textScreen.printCentered("www.lemmini.de", 3, GREEN);
+						textScreen.printCentered("Updated by John Watne 2023", 3, BLUE);
+						textScreen.printCentered("www.lemmini.de", 4, GREEN);
 						textScreen.copyToBackBuffer();
-						//textScreen.addTextButton(-4, 3, 1, "  Start ", "Let's go", BLUE, RED);
 						break;
 					case BRIEFING:
 						initBriefing();
@@ -153,22 +162,25 @@ public class TextScreen {
 		textScreen.init();
 		textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_GREEN));
 		Level level = GameController.getLevel();
-		//LevelInfo li;
+		// LevelInfo li;
 		textScreen.restore();
-		//li = GameController.levelPack[GameController.curLevelPack].getInfo(GameController.curDiffLevel, GameController.curLevelNumber);
+		// li =
+		// GameController.levelPack[GameController.curLevelPack].getInfo(GameController.curDiffLevel,
+		// GameController.curLevelNumber);
 		String rating = GameController.getCurLevelPack().getDiffLevels()[GameController.getCurDiffLevel()];
 		textScreen.drawImage(GameController.getMapPreview(), -200);
-		textScreen.printCentered("Level "+(GameController.getCurLevelNumber()+1)+" "+level.getLevelName(), -2, RED);
-		textScreen.print("Number of Lemmings "+level.getNumLemmings(), -9, 0, BLUE);
-		textScreen.print(""+(level.getNumToRescue()*100/level.getNumLemmings())+"% to be saved", -9, 1, GREEN);
-		textScreen.print("Release Rate "+level.getReleaseRate(), -9, 2, BROWN);
+		textScreen.printCentered("Level " + (GameController.getCurLevelNumber() + 1) + " " + level.getLevelName(), -2,
+				RED);
+		textScreen.print("Number of Lemmings " + level.getNumLemmings(), -9, 0, BLUE);
+		textScreen.print("" + (level.getNumToRescue() * 100 / level.getNumLemmings()) + "% to be saved", -9, 1, GREEN);
+		textScreen.print("Release Rate " + level.getReleaseRate(), -9, 2, BROWN);
 		int minutes = level.getTimeLimitSeconds() / 60;
 		int seconds = level.getTimeLimitSeconds() % 60;
 		if (seconds == 0)
-			textScreen.print("Time         "+minutes+" Minutes", -9, 3, TURQUOISE);
+			textScreen.print("Time         " + minutes + " Minutes", -9, 3, TURQUOISE);
 		else
-			textScreen.print("Time         "+minutes+"-"+seconds+" Minutes", -9, 3, TURQUOISE);
-		textScreen.print("Rating       "+rating, -9, 4, VIOLET);
+			textScreen.print("Time         " + minutes + "-" + seconds + " Minutes", -9, 3, TURQUOISE);
+		textScreen.print("Rating       " + rating, -9, 4, VIOLET);
 		textScreen.copyToBackBuffer(); // though not really needed
 	}
 
@@ -178,24 +190,27 @@ public class TextScreen {
 	static void initDebriefing() {
 		textScreen.init();
 		textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_GREEN));
-		int toRescue = GameController.getNumToRecue()*100/GameController.getNumLemmingsMax(); // % to rescue of total number
-		int rescued =  GameController.getNumLeft()*100/GameController.getNumLemmingsMax();    // % rescued of total number
-		int rescuedOfToRescue = GameController.getNumLeft()*100/GameController.getNumToRecue(); // % rescued of no. to rescue
+		int toRescue = GameController.getNumToRecue() * 100 / GameController.getNumLemmingsMax(); // % to rescue of
+																									// total number
+		int rescued = GameController.getNumLeft() * 100 / GameController.getNumLemmingsMax(); // % rescued of total
+																								// number
+		int rescuedOfToRescue = GameController.getNumLeft() * 100 / GameController.getNumToRecue(); // % rescued of no.
+																									// to rescue
 		textScreen.restore();
-		if (GameController.getTime()==0)
+		if (GameController.getTime() == 0)
 			textScreen.printCentered("Time is up.", -7, TURQUOISE);
 		else
 			textScreen.printCentered("All lemmings accounted for.", -7, TURQUOISE);
-		textScreen.print("You needed:  "+Integer.toString(toRescue)+"%", -7, -5, VIOLET);
-		textScreen.print("You rescued: "+Integer.toString(rescued)+"%", -7, -4, VIOLET);
+		textScreen.print("You needed:  " + Integer.toString(toRescue) + "%", -7, -5, VIOLET);
+		textScreen.print("You rescued: " + Integer.toString(rescued) + "%", -7, -4, VIOLET);
 		if (GameController.wasLost()) {
 			if (rescued == 0) {
 				textScreen.printCentered("ROCK BOTTOM! I hope for your sake", -2, RED);
 				textScreen.printCentered("that you nuked that level", -1, RED);
-			} else if (rescuedOfToRescue < 50){
+			} else if (rescuedOfToRescue < 50) {
 				textScreen.printCentered("Better rethink your strategy before", -2, RED);
 				textScreen.printCentered("you try this level again!", -1, RED);
-			}  else if (rescuedOfToRescue < 95){
+			} else if (rescuedOfToRescue < 95) {
 				textScreen.printCentered("A little more practice on this level", -2, RED);
 				textScreen.printCentered("is definitely recommended.", -1, RED);
 			} else {
@@ -219,26 +234,30 @@ public class TextScreen {
 			}
 			LevelPack lp = GameController.getCurLevelPack();
 			int ln = GameController.getCurLevelNumber();
-			if (lp.getLevels(GameController.getCurDiffLevel()).length > ln+1) {
-				textScreen.printCentered("Your access code for level "+(ln+2), 1, BROWN);
-				int absLevel = GameController.absLevelNum(GameController.getCurLevelPackIdx(), GameController.getCurDiffLevel(), ln+1);
-				String code = LevelCode.create(lp.getCodeSeed(), absLevel, rescued, 0,lp.getCodeOffset());
-				textScreen.printCentered("is "+code, 2, BROWN);
+			if (lp.getLevels(GameController.getCurDiffLevel()).length > ln + 1) {
+				textScreen.printCentered("Your access code for level " + (ln + 2), 1, BROWN);
+				int absLevel = GameController.absLevelNum(GameController.getCurLevelPackIdx(),
+						GameController.getCurDiffLevel(), ln + 1);
+				String code = LevelCode.create(lp.getCodeSeed(), absLevel, rescued, 0, lp.getCodeOffset());
+				textScreen.printCentered("is " + code, 2, BROWN);
 				textScreen.addTextButton(-4, 5, BUTTON_CONTINUE, "Continue", "Continue", BLUE, BROWN);
 			} else {
 				textScreen.printCentered("Congratulations!", 1, BROWN);
-				textScreen.printCentered("You finished all the "+lp.getDiffLevels()[GameController.getCurDiffLevel()]+" levels!",2, GREEN);
+				textScreen.printCentered(
+						"You finished all the " + lp.getDiffLevels()[GameController.getCurDiffLevel()] + " levels!", 2,
+						GREEN);
 			}
 		}
 		textScreen.copyToBackBuffer(); // though not really needed
 		textScreen.addTextButton(-12, 4, BUTTON_REPLAY, "Replay", "Replay", BLUE, BROWN);
 		if (GameController.getCurLevelPackIdx() != 0) // not for single levels started via "load level"
-			textScreen.addTextButton( -4, 4, BUTTON_SAVEREPLAY, "Save Replay", "Save Replay", BLUE, BROWN);
-		textScreen.addTextButton( 9, 4, BUTTON_MENU, "Menu", "Menu", BLUE, BROWN);
+			textScreen.addTextButton(-4, 4, BUTTON_SAVEREPLAY, "Save Replay", "Save Replay", BLUE, BROWN);
+		textScreen.addTextButton(9, 4, BUTTON_MENU, "Menu", "Menu", BLUE, BROWN);
 	}
 
 	/**
 	 * Get text dialog.
+	 * 
 	 * @return text dialog.
 	 */
 	public static TextDialog getDialog() {
@@ -249,7 +268,8 @@ public class TextScreen {
 
 	/**
 	 * Initialize text screen.
-	 * @param width width in pixels
+	 * 
+	 * @param width  width in pixels
 	 * @param height height in pixels
 	 */
 	public static void init(final int width, final int height) {
@@ -259,19 +279,20 @@ public class TextScreen {
 			imgSrc = MiscGfx.getImage(MiscGfx.Index.LEMMINI);
 			at = new AffineTransform();
 			flip = false;
-			rotCtr = 0 ;
+			rotCtr = 0;
 			flipCtr = 0;
-			imgTrg = ToolBox.createImage(imgSrc.getWidth(),imgSrc.getHeight(), Transparency.TRANSLUCENT);
+			imgTrg = ToolBox.createImage(imgSrc.getWidth(), imgSrc.getHeight(), Transparency.TRANSLUCENT);
 			imgGfx = imgTrg.createGraphics();
-			imgGfx.setBackground(new Color(0,0,0,0)); // invisible
+			imgGfx.setBackground(new Color(0, 0, 0, 0)); // invisible
 			scrollCharCtr = 0;
 			scrollPixCtr = 0;
 
-			scrollerImg = ToolBox.createImage(LemmFont.getWidth()*(1+SCROLL_WIDTH),SCROLL_HEIGHT, Transparency.BITMASK);
+			scrollerImg = ToolBox.createImage(LemmFont.getWidth() * (1 + SCROLL_WIDTH), SCROLL_HEIGHT,
+					Transparency.BITMASK);
 			scrollerGfx = scrollerImg.createGraphics();
-			scrollerGfx.setBackground(new Color(0,0,0,0));
+			scrollerGfx.setBackground(new Color(0, 0, 0, 0));
 
-			textScreen  = new TextDialog(width, height);
+			textScreen = new TextDialog(width, height);
 		}
 	}
 
@@ -281,7 +302,7 @@ public class TextScreen {
 	public static void update() {
 		synchronized (monitor) {
 			textScreen.restore();
-			
+
 			switch (mode) {
 				case INTRO:
 					update_intro();
@@ -321,38 +342,39 @@ public class TextScreen {
 			}
 			if (flip) {
 				at.setToScale(1, -rotFact);
-				at.translate(1,-imgSrc.getHeight());
-			} else at.setToScale(1, rotFact);
+				at.translate(1, -imgSrc.getHeight());
+			} else
+				at.setToScale(1, rotFact);
 			AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 			imgGfx.clearRect(0, 0, imgTrg.getWidth(), imgTrg.getHeight());
 			op.filter(imgSrc, imgTrg);
-			textScreen.drawImage(imgTrg, -120 - (int)(imgSrc.getHeight()/2*Math.abs(rotFact)+0.5));
+			textScreen.drawImage(imgTrg, -120 - (int) (imgSrc.getHeight() / 2 * Math.abs(rotFact) + 0.5));
 		} else {
 			// display original image
-			flipCtr=0;
-			textScreen.drawImage(imgSrc, -120 - imgSrc.getHeight()/2);
+			flipCtr = 0;
+			textScreen.drawImage(imgSrc, -120 - imgSrc.getHeight() / 2);
 		}
 		// manage scroller
 		String out;
 		boolean wrapAround = false;
-		int endIdx = scrollCharCtr+SCROLL_WIDTH+1;
+		int endIdx = scrollCharCtr + SCROLL_WIDTH + 1;
 		if (endIdx > SCROLL_TEXT.length()) {
 			endIdx = SCROLL_TEXT.length();
 			wrapAround = true;
 		}
 		out = SCROLL_TEXT.substring(scrollCharCtr, endIdx);
 		if (wrapAround)
-			out += SCROLL_TEXT.substring(0,scrollCharCtr+SCROLL_WIDTH+1-SCROLL_TEXT.length());
+			out += SCROLL_TEXT.substring(0, scrollCharCtr + SCROLL_WIDTH + 1 - SCROLL_TEXT.length());
 		scrollerGfx.clearRect(0, 0, scrollerImg.getWidth(), scrollerImg.getHeight());
 		LemmFont.strImage(scrollerGfx, out, BLUE);
-		int w = SCROLL_WIDTH*LemmFont.getWidth();
-		int dx = (textScreen.getScreen().getWidth()-w)/2;
-		int dy = (textScreen.getScreen().getHeight()/2)+SCROLL_Y;
+		int w = SCROLL_WIDTH * LemmFont.getWidth();
+		int dx = (textScreen.getScreen().getWidth() - w) / 2;
+		int dy = (textScreen.getScreen().getHeight() / 2) + SCROLL_Y;
 		textScreen.getScreen().createGraphics().drawImage(
-				scrollerImg, dx, dy, dx+w, dy+SCROLL_HEIGHT, scrollPixCtr,0,scrollPixCtr+w,SCROLL_HEIGHT/2, null
-		);
+				scrollerImg, dx, dy, dx + w, dy + SCROLL_HEIGHT, scrollPixCtr, 0, scrollPixCtr + w, SCROLL_HEIGHT / 2,
+				null);
 
-		scrollPixCtr+=SCROLL_STEP;
+		scrollPixCtr += SCROLL_STEP;
 		if (scrollPixCtr >= LemmFont.getWidth()) {
 			scrollCharCtr++;
 			scrollPixCtr = 0;
@@ -376,6 +398,7 @@ public class TextScreen {
 
 	/**
 	 * Get image of text screen
+	 * 
 	 * @return image of text screen
 	 */
 	public static BufferedImage getScreen() {

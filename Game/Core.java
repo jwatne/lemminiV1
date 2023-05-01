@@ -167,15 +167,15 @@ public class Core {
 		if (resourcePath.length() == 0 || !REVISION.equalsIgnoreCase(rev)) {
 			// extract resources
 			try {
-				Extract.extract(null, sourcePath, resourcePath, null, "patch");
+				Extract.extract(null, sourcePath, resourcePath, null);
 				resourcePath = Extract.getResourcePath();
 				programProps.set("resourcePath", ToolBox.addSeparator(Extract.getResourcePath()));
-				programProps.set("sourcePath", ToolBox.addSeparator(Extract.getSourcePath()));
+				programProps.set("sourcePath", ToolBox.addSeparator(Extract.getSOURCE_PATH()));
 				programProps.set("revision", REVISION);
 				programProps.save(programPropsFileStr);
 			} catch (final ExtractException ex) {
 				programProps.set("resourcePath", ToolBox.addSeparator(Extract.getResourcePath()));
-				programProps.set("sourcePath", ToolBox.addSeparator(Extract.getSourcePath()));
+				programProps.set("sourcePath", ToolBox.addSeparator(Extract.getSOURCE_PATH()));
 				programProps.save(programPropsFileStr);
 				throw new LemmException("Ressource extraction failed\n" + ex.getMessage());
 			}

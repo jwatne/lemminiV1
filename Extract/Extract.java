@@ -4,20 +4,18 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.rmi.server.ExportException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.zip.Adler32;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import Tools.PatchService;
 import Tools.Props;
 
 /*
@@ -44,36 +42,20 @@ import Tools.Props;
 public class Extract extends Thread {
 	/** file name of extraction configuration */
 	final private static String iniName = "extract.ini";
-	/** file name of patching configuration */
-	final private static String patchIniName = "patch.ini";
 	/** file name of resource CRCs (WINLEMM) */
-	final private static String crcIniName = "crc.ini";
-	/** allows to use this module for creation of the CRC.ini */
-	final private static boolean doCreateCRC = false;
-	/** index for files to be checked - static since multiple runs are possible */
-	private static int checkNo = 0;
-	/** index for CRCs - static since multiple runs are possible */
-	private static int crcNo = 0;
-	/** index for files to be extracted - static since multiple runs are possible */
-	private static int extractNo = 0;
-	/** index for files to be patched - static since multiple runs are possible */
-	private static int patchNo = 0;
-	/** array of extensions to be ignored - read from ini */
-	private static String ignoreExt[] = { null };
+	final public static String CRC_INI_NAME = "crc.ini";
 	/** output dialog */
 	private static OutputDialog outputDiag;
 	/** monitor the files created without erasing the target dir */
 	private static HashMap<String, Object> createdFiles;
 	/** source path (WINLEMM) for extraction */
-	private static String sourcePath;
+	public static String SOURCE_PATH;
 	/** destination path (Lemmini resource) for extraction */
 	private static String destinationPath;
 	/** reference path for creation of DIF files */
 	private static String referencePath;
-	/** path of the DIF files */
-	private static String patchPath;
 	/** path of the CRC ini (without the file name) */
-	private static String crcPath;
+	public static String CRC_PATH;
 	/** exception caught in the thread */
 	private static ExtractException threadException = null;
 	/** static self reference to access thread from outside */
@@ -123,7 +105,6 @@ public class Extract extends Thread {
 				throw new ExtractException("File " + iniName + " not found or error while reading");
 			}
 
-			ignoreExt = props.get("ignore_ext", ignoreExt);
 			// prolog_ check CRC
 			validateWINLEMM();
 			extractLevels(props);
@@ -134,8 +115,9 @@ public class Extract extends Thread {
 			createDirectories(props);
 			copyStuff(props);
 			cloneFiles(props);
-			createDifFiles(props);
-			patchAllFiles();
+			PatchService patchService = new PatchService();
+			patchService.createDifFiles(props, referencePath, destinationPath, createdFiles);
+			patchService.patchAllFiles(destinationPath);
 			// } // debug only
 
 			// finished
@@ -161,11 +143,11 @@ public class Extract extends Thread {
 	 */
 	private void validateWINLEMM() throws ExtractException {
 		out("\nValidating WINLEMM");
-		final URL fncrc = findFile(crcIniName);
+		final URL fncrc = findFile(CRC_INI_NAME);
 		final Props cprops = new Props();
 
 		if (fncrc == null || !cprops.load(fncrc)) {
-			throw new ExtractException("File " + crcIniName + " not found or error while reading");
+			throw new ExtractException("File " + CRC_INI_NAME + " not found or error while reading");
 		}
 
 		for (int i = 0; true; i++) {
@@ -178,18 +160,18 @@ public class Extract extends Thread {
 			}
 
 			out(crcbuf[0]);
-			final long len = new File(sourcePath + crcbuf[0]).length();
+			final long len = new File(SOURCE_PATH + crcbuf[0]).length();
 
 			if (len != Long.parseLong(crcbuf[1])) {
-				throw new ExtractException("CRC error for file " + sourcePath + crcbuf[0] + ".\n");
+				throw new ExtractException("CRC error for file " + SOURCE_PATH + crcbuf[0] + ".\n");
 			}
 
-			final byte src[] = readFile(sourcePath + crcbuf[0]);
+			final byte src[] = readFile(SOURCE_PATH + crcbuf[0]);
 			final Adler32 crc32 = new Adler32();
 			crc32.update(src);
 
 			if (Long.toHexString(crc32.getValue()).compareToIgnoreCase(crcbuf[2].substring(2)) != 0) {
-				throw new ExtractException("CRC error for file " + sourcePath + crcbuf[0] + ".\n");
+				throw new ExtractException("CRC error for file " + SOURCE_PATH + crcbuf[0] + ".\n");
 			}
 
 			checkCancel();
@@ -228,166 +210,6 @@ public class Extract extends Thread {
 	}
 
 	/**
-	 * Create DIF and CRC files, if enabled.
-	 * 
-	 * @param props the Properties for the game.
-	 * @throws ExtractException if an extraction error occurs.
-	 * @throws ExportException  if an attempt to export a remote object fails.
-	 */
-	private void createDifFiles(final Props props) throws ExtractException, ExportException {
-		if (referencePath != null) {
-			// this is not needed by Lemmini, but to create the DIF files (and CRCs)
-			if (doCreateCRC) {
-				// create crc.ini
-				out("\nCreate CRC ini");
-
-				try (FileWriter fCRCList = new FileWriter(crcPath + crcIniName);) {
-					for (int i = 0; true; i++) {
-						String ppath;
-						ppath = props.get("pcrc_" + Integer.toString(i), "");
-
-						if (ppath.length() == 0) {
-							break;
-						}
-
-						createCRCs(sourcePath, ppath, fCRCList);
-					}
-				} catch (final IOException ex) {
-					throw new ExportException("Error processing " + crcPath + crcIniName + ": " + ex.getMessage());
-				}
-
-				checkCancel();
-			}
-
-			createPatches(props);
-		}
-	}
-
-	/**
-	 * Step 7 of Extract thread run: create patches and patch.ini.
-	 * 
-	 * @param props the Properties for the game.
-	 * @throws ExtractException if unable to create patches or patch.ini.
-	 */
-	private void createPatches(final Props props) throws ExtractException {
-		// step seven: create patches and patch.ini
-		(new File(patchPath)).mkdirs();
-		out("\nCreate patch ini");
-
-		try (FileWriter fPatchList = new FileWriter(patchPath + patchIniName);) {
-			for (int i = 0; true; i++) {
-				String ppath;
-				ppath = props.get("ppatch_" + Integer.toString(i), "");
-
-				if (ppath.length() == 0) {
-					break;
-				}
-
-				createPatches(referencePath, destinationPath, ppath, patchPath, fPatchList);
-			}
-		} catch (final IOException ex) {
-			throw new ExtractException("Error processing " + patchPath + patchIniName + ": " + ex.getMessage());
-		}
-
-		checkCancel();
-	}
-
-	/**
-	 * Step 8 of Extract thread run: use patch.ini to extract/patch all files.
-	 * 
-	 * @throws ExtractException if unable to use patch.ini to extract/patch all
-	 *                          files.
-	 */
-	private void patchAllFiles() throws ExtractException {
-		// step eight: use patch.ini to extract/patch all files
-		// read patch.ini file
-		final Props pprops = new Props();
-		final URL fnp = findFile(patchPath + patchIniName/* , this */); // if it's in the JAR or local directory
-
-		if (!pprops.load(fnp)) {
-			throw new ExtractException("File " + patchIniName + " not found or error while reading");
-		}
-
-		// copy
-		out("\nExtract files");
-
-		for (int i = 0; true; i++) {
-			String copy[] = { null, null };
-			// 0: name 1: crc
-			copy = pprops.get("extract_" + Integer.toString(i), copy);
-
-			if (copy[0] == null) {
-				break;
-			}
-
-			out(copy[0]);
-			final String fnDecorated = copy[0].replace('/', '@');
-			final URL fnc = findFile(patchPath + fnDecorated /* , pprops */);
-
-			try {
-				copyFile(fnc, destinationPath + copy[0]);
-			} catch (final Exception ex) {
-				throw new ExtractException("Copying " + patchPath + getFileName(copy[0]) + " to " + destinationPath
-						+ copy[0] + " failed");
-			}
-
-			checkCancel();
-		}
-
-		patchFiles(pprops);
-	}
-
-	/**
-	 * Patch files, if enabled.
-	 * 
-	 * @param pprops Properties from the patch.ini file.
-	 * @throws ExtractException if unable to patch files.
-	 */
-	private void patchFiles(final Props pprops) throws ExtractException {
-		// patch
-		out("\nPatch files");
-
-		for (int i = 0; true; i++) {
-			String ppath[] = { null, null };
-			// 0: name 1: crc
-			ppath = pprops.get("patch_" + Integer.toString(i), ppath);
-
-			if (ppath[0] == null) {
-				break;
-			}
-
-			out(ppath[0]);
-			String fnDif = ppath[0].replace('/', '@'); // getFileName(ppath[0]);
-			int pos = fnDif.toLowerCase().lastIndexOf('.');
-
-			if (pos == -1) {
-				pos = fnDif.length();
-			}
-
-			fnDif = fnDif.substring(0, pos) + ".dif";
-			final URL urlDif = findFile(patchPath + fnDif);
-
-			if (urlDif == null) {
-				throw new ExtractException("Patching of file " + destinationPath + ppath[0] + " failed.\n");
-			}
-
-			final byte dif[] = readFile(urlDif);
-			final byte src[] = readFile(destinationPath + ppath[0]);
-
-			try {
-				final byte trg[] = Diff.patchbuffers(src, dif);
-				// write new file
-				writeFile(destinationPath + ppath[0], trg);
-			} catch (final DiffException ex) {
-				throw new ExtractException("Patching of file " + destinationPath + ppath[0] + " failed.\n" +
-						ex.getMessage());
-			}
-
-			checkCancel();
-		}
-	}
-
-	/**
 	 * Step 5 of Extract thread run: copy stuff.
 	 * 
 	 * @param props the Properties for the game.
@@ -407,11 +229,11 @@ public class Extract extends Thread {
 			}
 
 			try {
-				copyFile(sourcePath + copy[0], destinationPath + copy[1]);
+				copyFile(SOURCE_PATH + copy[0], destinationPath + copy[1]);
 				createdFiles.put((destinationPath + copy[1]).toLowerCase(), null);
 			} catch (final Exception ex) {
 				throw new ExtractException(
-						"Copying " + sourcePath + copy[0] + " to " + destinationPath + copy[1] + " failed");
+						"Copying " + SOURCE_PATH + copy[0] + " to " + destinationPath + copy[1] + " failed");
 			}
 
 			checkCancel();
@@ -467,8 +289,8 @@ public class Extract extends Thread {
 			final File dest = new File(destinationPath + object[3]);
 			dest.mkdirs();
 			// load palette and sprite
-			sprite.loadPalette(sourcePath + object[1]);
-			sprite.loadSPR(sourcePath + object[0]);
+			sprite.loadPalette(SOURCE_PATH + object[1]);
+			sprite.loadSPR(SOURCE_PATH + object[0]);
 
 			for (int j = 0; true; j++) {
 				String member[] = { null, null, null };
@@ -514,8 +336,8 @@ public class Extract extends Thread {
 			final File dest = new File(destinationPath + styles[2]);
 			dest.mkdirs();
 			// load palette and sprite
-			sprite.loadPalette(sourcePath + styles[1]);
-			sprite.loadSPR(sourcePath + styles[0]);
+			sprite.loadPalette(SOURCE_PATH + styles[1]);
+			sprite.loadSPR(SOURCE_PATH + styles[0]);
 			final String files[] = sprite.saveAll(destinationPath + addSeparator(styles[2]) + styles[3], false);
 
 			for (int j = 0; j < files.length; j++) {
@@ -547,7 +369,7 @@ public class Extract extends Thread {
 				break;
 			}
 
-			extractLevels(sourcePath + lvls[0], destinationPath + lvls[1]);
+			extractLevels(SOURCE_PATH + lvls[0], destinationPath + lvls[1]);
 			checkCancel();
 		}
 	}
@@ -557,8 +379,8 @@ public class Extract extends Thread {
 	 * 
 	 * @return source path (WINLEMM) for extraction
 	 */
-	public static String getSourcePath() {
-		return sourcePath;
+	public static String getSOURCE_PATH() {
+		return SOURCE_PATH;
 	}
 
 	/**
@@ -578,42 +400,40 @@ public class Extract extends Thread {
 	 * @param dstPath target (installation) directory. May also be a relative path
 	 *                inside JAR
 	 * @param refPath the reference path with the original (wanted) files
-	 * @param pPath   the path to store the patch files to
 	 * @throws ExtractException
 	 */
-	public static void extract(final JFrame frame, final String srcPath, final String dstPath, final String refPath,
-			final String pPath) throws ExtractException {
-		sourcePath = exchangeSeparators(addSeparator(srcPath));
+	public static void extract(final JFrame frame, final String srcPath, final String dstPath, final String refPath)
+			throws ExtractException {
+		SOURCE_PATH = exchangeSeparators(addSeparator(srcPath));
 		destinationPath = exchangeSeparators(addSeparator(dstPath));
 
 		if (refPath != null) {
 			referencePath = exchangeSeparators(addSeparator(refPath));
 		}
 
-		patchPath = exchangeSeparators(addSeparator(pPath));
-		crcPath = destinationPath; // ok, this is the wrong path, but this is executed once in a lifetime
+		CRC_PATH = destinationPath; // ok, this is the wrong path, but this is executed once in a lifetime
 		loader = Extract.class.getClassLoader();
 		FolderDialog fDiag;
 
 		do {
 			fDiag = new FolderDialog(frame, true);
-			fDiag.setParameters(sourcePath, destinationPath);
+			fDiag.setParameters(SOURCE_PATH, destinationPath);
 			fDiag.setVisible(true);
 
 			if (!fDiag.getSuccess()) {
 				throw new ExtractException("Extraction cancelled by user");
 			}
 
-			sourcePath = exchangeSeparators(addSeparator(fDiag.getSource()));
+			SOURCE_PATH = exchangeSeparators(addSeparator(fDiag.getSource()));
 			destinationPath = exchangeSeparators(addSeparator(fDiag.getTarget()));
 			// check if source path exists
-			final File fSrc = new File(sourcePath);
+			final File fSrc = new File(SOURCE_PATH);
 
 			if (fSrc.exists()) {
 				break;
 			}
 
-			JOptionPane.showMessageDialog(frame, "Source path " + sourcePath + " doesn't exist!", "Error",
+			JOptionPane.showMessageDialog(frame, "Source path " + SOURCE_PATH + " doesn't exist!", "Error",
 					JOptionPane.ERROR_MESSAGE);
 		} while (true);
 
@@ -685,267 +505,12 @@ public class Extract extends Thread {
 	}
 
 	/**
-	 * Create the DIF files from reference files and the extracted files
-	 * (development).
-	 * 
-	 * @param sPath      The path with the original (wanted) files
-	 * @param dPath      The patch with the differing (to be patched) files
-	 * @param subDir     SubDir to create patches for
-	 * @param pPath      The patch to write the patches to
-	 * @param fPatchList FileWriter to create patch.ini
-	 * @throws ExtractException if an extraction error occurs.
-	 */
-	private static void createPatches(final String sPath, final String dPath, final String sDir, final String pPath,
-			final FileWriter fPatchList) throws ExtractException {
-		// add separators and create missing directories
-		sourcePath = addSeparator(sPath + sDir);
-		final File fSource = new File(sourcePath);
-		final String destPath = addSeparator(dPath + sDir);
-		final File fDest = new File(destPath);
-		fDest.mkdirs();
-		patchPath = addSeparator(pPath);
-		final File fPatch = new File(patchPath);
-		fPatch.mkdirs();
-		patchFiles(sDir, fPatchList, fSource, destPath);
-	}
-
-	/**
-	 * Loop through the List of Files to patch and patch them.
-	 * 
-	 * @param sDir       The path with the original (wanted) files
-	 * @param fPatchList FileWriter to create patch.ini
-	 * @param fSource    a File representation of the folder containing the source
-	 *                   files.
-	 * @param destPath   the folder to which the patch files are to be written.
-	 * @throws ExtractException if an extraction error occurs.
-	 */
-	private static void patchFiles(final String sDir, final FileWriter fPatchList, final File fSource,
-			final String destPath) throws ExtractException {
-		String out;
-		final File[] files = fSource.listFiles();
-
-		if (files == null) {
-			throw new ExtractException("Path " + sourcePath + " doesn't exist or IO error occured.");
-		}
-
-		Diff.setParameters(512, 4);
-		final String subDir = addSeparator(sDir);
-		final String subDirDecorated = subDir.replace('/', '@');
-
-		outerLoop: for (int i = 0; i < files.length; i++) {
-			int pos;
-
-			// ignore directories
-			if (files[i].isDirectory()) {
-				continue;
-			}
-
-			// check extension
-			pos = files[i].getName().lastIndexOf('.');
-
-			if (pos > -1) {
-				final String ext = files[i].getName().substring(pos + 1);
-
-				for (int n = 0; n < ignoreExt.length; n++) {
-					if (ignoreExt[n].equalsIgnoreCase(ext)) {
-						continue outerLoop;
-					}
-				}
-			}
-
-			final String fnIn = sourcePath + files[i].getName();
-			final String fnOut = destPath + files[i].getName();
-			String fnPatch = files[i].getName();
-			pos = fnPatch.toLowerCase().lastIndexOf('.');
-
-			if (pos == -1) {
-				pos = fnPatch.length();
-			}
-
-			fnPatch = patchPath + subDirDecorated + (fnPatch.substring(0, pos) + ".dif").toLowerCase();
-
-			try {
-				out(fnIn);
-				// read src file
-				final byte src[] = readFile(fnIn);
-				byte trg[] = null;
-				// read target file
-				boolean fileExists = targetFileExists(fnOut);
-
-				if (fileExists) {
-					try {
-						trg = readFile(fnOut);
-					} catch (final ExtractException ex) {
-						fileExists = false;
-					}
-				}
-
-				if (!fileExists) {
-					out = copyMissingFilesToPatchDirectory(fPatchList, files, subDirDecorated, i, src);
-					continue;
-				}
-
-				// create diff
-				final byte patch[] = Diff.diffBuffers(trg, src);
-				final int crc = Diff.targetCRC; // crc of target buffer
-				out = subDir + files[i].getName() + ", 0x" + Integer.toHexString(crc);
-				writePatchFileIfPatchExists(fPatchList, out, fnPatch, trg, patch);
-			} catch (final Exception ex) {
-				String msg = ex.getMessage();
-
-				if (msg == null) {
-					msg = ex.toString();
-				}
-
-				throw new ExtractException(ex.getMessage());
-			}
-		}
-	}
-
-	/**
-	 * Indicates whether the target files exists.
-	 * 
-	 * @param fnOut the name of the target file.
-	 * @return <code>true</code> if the target file exists.
-	 */
-	private static boolean targetFileExists(final String fnOut) {
-		boolean fileExists;
-
-		if (createdFiles.containsKey(fnOut.toLowerCase())) {
-			fileExists = true;
-		} else {
-			fileExists = false;
-		}
-		return fileExists;
-	}
-
-	/**
-	 * Given that the specified file does not exist, mark it as missing and needing
-	 * to be extracted from the JAR file. Then, copy missing files to the patch dir.
-	 * 
-	 * @param fPatchList FileWriter to create patch.ini.
-	 * @param files      A List of Files in the source path.
-	 * @param subDir     SubDir to create patches for.
-	 * @param filesIndex Index into <code>files</code> for the File currently being
-	 *                   processed.
-	 * @param src        The bytes read from the source file being processed.
-	 */
-	private static String copyMissingFilesToPatchDirectory(final FileWriter fPatchList, final File[] files,
-			final String subDir, final int filesIndex, final byte[] src)
-			throws IOException, FileNotFoundException {
-		final String subDirDecorated = subDir.replace('/', '@');
-		final String fnIn = sourcePath + files[filesIndex].getName();
-		String out;
-		// mark missing files: needs to be extracted from JAR
-		final Adler32 crc = new Adler32();
-		crc.update(src);
-		out = subDir + files[filesIndex].getName() + ", 0x" + Integer.toHexString((int) crc.getValue());
-		fPatchList.write("extract_" + (Integer.toString(extractNo++)) + " = " + out + "\n");
-		// copy missing files to patch dir
-		copyFile(fnIn, patchPath + subDirDecorated + files[filesIndex].getName());
-		return out;
-	}
-
-	/**
-	 * Writes the patch file if the patch is not null, or writes the appropriate
-	 * check Property if it is null.
-	 * 
-	 * @param fPatchList FileWriter to create patch.ini.
-	 * @param out        String with full path and filename + CRC for patch file.
-	 * @param fnPatch    Path and filename for .DIF file.
-	 * @param trg        Bytes read from existing destination file.
-	 * @param patch      Buffer with differences between source and target buffer.
-	 * @throws IOException      if an I/O error occurs.
-	 * @throws DiffException    if a Diff error occurs.
-	 * @throws ExtractException if an extraction error occurs.
-	 */
-	private static void writePatchFileIfPatchExists(final FileWriter fPatchList, final String out, final String fnPatch,
-			final byte[] trg,
-			final byte[] patch) throws IOException, DiffException, ExtractException {
-		if (patch == null) {
-			// out("src and trg are identical");
-			fPatchList.write("check_" + (Integer.toString(checkNo++)) + " = " + out + "\n");
-		} else {
-			// apply patch to test it's ok
-			Diff.patchbuffers(trg, patch);
-			// write patch file
-			writeFile(fnPatch, patch);
-			fPatchList.write("patch_" + (Integer.toString(patchNo++)) + " = " + out + "\n");
-		}
-	}
-
-	/**
-	 * Create CRCs for resources (development).
-	 * 
-	 * @param rPath    The root path with the files to create CRCs for
-	 * @param sDir     SubDir to create patches for
-	 * @param fCRCList FileWriter to create crc.ini
-	 * @throws ExtractException
-	 */
-	private static void createCRCs(final String rPath, final String sDir, final FileWriter fCRCList)
-			throws ExtractException {
-		// add separators and create missing directories
-		final String rootPath = addSeparator(rPath + sDir);
-		final File fSource = new File(rootPath);
-		String out;
-		final File[] files = fSource.listFiles();
-
-		if (files == null) {
-			throw new ExtractException("Path " + rootPath + " doesn't exist or IO error occured.");
-		}
-
-		final String subDir = addSeparator(sDir);
-
-		outerLoop: for (int i = 0; i < files.length; i++) {
-			int pos;
-
-			// ignore directories
-			if (files[i].isDirectory()) {
-				continue;
-			}
-
-			// check extension
-			pos = files[i].getName().lastIndexOf('.');
-
-			if (pos > -1) {
-				final String ext = files[i].getName().substring(pos + 1);
-
-				for (int n = 0; n < ignoreExt.length; n++) {
-					if (ignoreExt[n].equalsIgnoreCase(ext)) {
-						continue outerLoop;
-					}
-				}
-			}
-
-			final String fnIn = rootPath + files[i].getName();
-
-			try {
-				out(fnIn);
-				// read src file
-				final byte src[] = readFile(fnIn);
-				final Adler32 crc32 = new Adler32();
-				crc32.update(src);
-				out = subDir + files[i].getName() + ", " + src.length + ", 0x" + Long.toHexString(crc32.getValue());
-				fCRCList.write("crc_" + (Integer.toString(crcNo++)) + " = " + out + "\n");
-			} catch (final Exception ex) {
-				String msg = ex.getMessage();
-
-				if (msg == null) {
-					msg = ex.toString();
-				}
-
-				throw new ExtractException(ex.getMessage());
-			}
-		}
-	}
-
-	/**
 	 * Add separator "/" to path name (if there isn't one yet)
 	 * 
 	 * @param fName path name with or without separator
 	 * @return path name with separator
 	 */
-	private static String addSeparator(final String fName) {
+	public static String addSeparator(final String fName) {
 		int pos = fName.lastIndexOf(File.separator);
 
 		if (pos != fName.length() - 1) {
@@ -966,7 +531,7 @@ public class Extract extends Thread {
 	 * @param fName file name
 	 * @return file name with only Unix style separators
 	 */
-	private static String exchangeSeparators(final String fName) {
+	public static String exchangeSeparators(final String fName) {
 		int pos;
 		final StringBuffer sb = new StringBuffer(fName);
 
@@ -978,44 +543,6 @@ public class Extract extends Thread {
 	}
 
 	/**
-	 * Get only the name of the file from an absolute path.
-	 * 
-	 * @param path absolute path of a file
-	 * @return file name without the path
-	 */
-	private static String getFileName(final String path) {
-		int p1 = path.lastIndexOf("/");
-		final int p2 = path.lastIndexOf("\\");
-
-		if (p2 > p1) {
-			p1 = p2;
-		}
-
-		if (p1 < 0) {
-			p1 = 0;
-		} else {
-			p1++;
-		}
-
-		return path.substring(p1);
-	}
-
-	/**
-	 * Copy a file.
-	 * 
-	 * @param source      URL of source file
-	 * @param destination full destination file name including path
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private static void copyFile(final URL source, final String destination) throws FileNotFoundException, IOException {
-		try (final InputStream fSrc = source.openStream();
-				final FileOutputStream fDest = new FileOutputStream(destination);) {
-			writeFromInputStreamToOutputStream(fSrc, fDest);
-		}
-	}
-
-	/**
 	 * Copy a file.
 	 * 
 	 * @param source      full source file name including path
@@ -1023,7 +550,7 @@ public class Extract extends Thread {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private static void copyFile(final String source, final String destination)
+	public static void copyFile(final String source, final String destination)
 			throws FileNotFoundException, IOException {
 		try (final FileInputStream fSrc = new FileInputStream(source);
 				final FileOutputStream fDest = new FileOutputStream(destination);) {
@@ -1040,7 +567,7 @@ public class Extract extends Thread {
 	 * @param destination the destination output stream.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	private static void writeFromInputStreamToOutputStream(final InputStream source, final FileOutputStream destination)
+	public static void writeFromInputStreamToOutputStream(final InputStream source, final FileOutputStream destination)
 			throws IOException {
 		final byte buffer[] = new byte[4096];
 		int len;
@@ -1057,7 +584,7 @@ public class Extract extends Thread {
 	 * @return array of byte
 	 * @throws ExtractException
 	 */
-	private static byte[] readFile(final String fname) throws ExtractException {
+	public static byte[] readFile(final String fname) throws ExtractException {
 		byte buf[] = null;
 
 		try {
@@ -1073,58 +600,6 @@ public class Extract extends Thread {
 			throw new ExtractException("File " + fname + " not found");
 		} catch (final IOException ex) {
 			throw new ExtractException("IO exception while reading file " + fname);
-		}
-	}
-
-	/**
-	 * Read file into an array of byte.
-	 * 
-	 * @param fname file name as URL
-	 * @return array of byte
-	 * @throws ExtractException
-	 */
-	private static byte[] readFile(final URL fname) throws ExtractException {
-		byte buf[] = null;
-
-		try (final InputStream f = fname.openStream();) {
-			final byte buffer[] = new byte[4096];
-			// URLs/InputStreams suck: we can't read a length
-			int len;
-			final ArrayList<Byte> lbuf = new ArrayList<Byte>();
-
-			while ((len = f.read(buffer)) != -1) {
-				for (int i = 0; i < len; i++) {
-					lbuf.add(buffer[i]);
-				}
-			}
-
-			// reconstruct byte array from ArrayList
-			buf = new byte[lbuf.size()];
-
-			for (int i = 0; i < lbuf.size(); i++) {
-				buf[i] = lbuf.get(i).byteValue();
-			}
-		} catch (final FileNotFoundException ex) {
-			throw new ExtractException("File " + fname + " not found");
-		} catch (final IOException ex) {
-			throw new ExtractException("IO exception while reading file " + fname);
-		}
-
-		return buf;
-	}
-
-	/**
-	 * Write array of byte to file.
-	 * 
-	 * @param fname file name
-	 * @param buf   array of byte
-	 * @throws ExtractException
-	 */
-	private static void writeFile(final String fname, final byte buf[]) throws ExtractException {
-		try (final FileOutputStream f = new FileOutputStream(fname);) {
-			f.write(buf);
-		} catch (final IOException ex) {
-			throw new ExtractException("IO exception while writing file " + fname);
 		}
 	}
 
@@ -1154,7 +629,7 @@ public class Extract extends Thread {
 	 * 
 	 * @param s string to print
 	 */
-	private static void out(final String s) {
+	public static void out(final String s) {
 		// System.out.println(s);
 		if (outputDiag != null) {
 			outputDiag.print(s + "\n");
@@ -1166,7 +641,7 @@ public class Extract extends Thread {
 	 * 
 	 * @throws ExtractException
 	 */
-	private static void checkCancel() throws ExtractException {
+	public static void checkCancel() throws ExtractException {
 		if (outputDiag.isCancelled()) {
 			throw new ExtractException("Extraction cancelled by user");
 		}

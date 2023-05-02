@@ -301,7 +301,6 @@ public class GameController {
 	public static void init() throws ResourceException {
 		bgImage = ToolBox.createImage(Level.WIDTH, Level.HEIGHT, Transparency.BITMASK);
 		bgGfx = bgImage.createGraphics();
-
 		gameState = State.INIT;
 		sound = new Sound(24, SND_MOUSEPRE);
 		sound.setGain(soundGain);
@@ -312,50 +311,51 @@ public class GameController {
 		explosions = new LinkedList<Explosion>();
 		lemmsUnderCursor = new ArrayList<Lemming>(10);
 		lemmSkillRequest = null;
-
 		LemmFont.init();
 		NumFont.init();
 		LemmCursor.init();
 		Music.init();
 		Music.setGain(musicGain);
 		MiscGfx.init();
-
 		plus = new KeyRepeat(MICROSEC_KEYREPEAT_START, MICROSEC_KEYREPEAT_REPEAT, MICROSEC_RELEASE_DOUBLE_CLICK);
 		minus = new KeyRepeat(MICROSEC_KEYREPEAT_START, MICROSEC_KEYREPEAT_REPEAT, MICROSEC_RELEASE_DOUBLE_CLICK);
 		timerNuke = new MicrosecondTimer();
-
 		level = new Level();
 		// read level packs
-
-		File dir = new File(Core.resourcePath + "levels");
-		File files[] = dir.listFiles();
+		final File dir = new File(Core.resourcePath + "levels");
+		final File files[] = dir.listFiles();
 		// now get the names of the directories
-		ArrayList<String> dirs = new ArrayList<String>();
-		for (int i = 0; i < files.length; i++)
-			if (files[i].isDirectory())
-				dirs.add(files[i].getName());
-		Collections.sort(dirs);
+		final ArrayList<String> dirs = new ArrayList<String>();
 
+		for (int i = 0; i < files.length; i++) {
+			if (files[i].isDirectory()) {
+				dirs.add(files[i].getName());
+			}
+		}
+
+		Collections.sort(dirs);
 		levelPack = new LevelPack[dirs.size() + 1];
 		levelPack[0] = new LevelPack(); // dummy
+
 		for (int i = 0; i < dirs.size(); i++) { // read levels
-			String lvlName = dirs.get(i);
+			final String lvlName = dirs.get(i);
 			levelPack[i + 1] = new LevelPack(
 					Core.findResource("levels/" + ToolBox.addSeparator(lvlName) + "levelpack.ini"));
 		}
+
 		curDiffLevel = 0;
 		curLevelPack = 1; // since 0 is dummy
 		curLevelNumber = 0;
-
 		replayFrame = 0;
 		replay = new ReplayStream();
 		replayMode = false;
 		stopReplayMode = false;
 
-		if (isCheat())
+		if (isCheat()) {
 			wasCheated = true;
-		else
+		} else {
 			wasCheated = false;
+		}
 	}
 
 	/**
@@ -367,11 +367,14 @@ public class GameController {
 	 * @return absolute level number (0..127)
 	 */
 	static int absLevelNum(final int lvlPack, final int diffLevel, final int level) {
-		LevelPack lpack = levelPack[lvlPack];
+		final LevelPack lpack = levelPack[lvlPack];
 		// calculate absolute level number
 		int absLvl = level;
-		for (int i = 0; i < diffLevel; i++)
+
+		for (int i = 0; i < diffLevel; i++) {
 			absLvl += lpack.getLevels(i).length;
+		}
+
 		return absLvl;
 	}
 
@@ -383,23 +386,26 @@ public class GameController {
 	 * @return { difficulty level, relative level number }
 	 */
 	public static int[] relLevelNum(final int lvlPack, final int lvlAbs) {
-		int retval[] = new int[2];
-		LevelPack lpack = levelPack[lvlPack];
-		int diffLevels = lpack.getDiffLevels().length;
+		final int retval[] = new int[2];
+		final LevelPack lpack = levelPack[lvlPack];
+		final int diffLevels = lpack.getDiffLevels().length;
 		int lvl = 0;
 		int diffLvl = 0;
 		int maxLevels = 30;
+
 		for (int i = 0, ls = 0; i < diffLevels; i++) {
-			int ls_old = ls;
+			final int ls_old = ls;
 			// add number of levels existing in this diff level
 			maxLevels = lpack.getLevels(i).length;
 			ls += maxLevels;
+
 			if (lvlAbs < ls) {
 				diffLvl = i;
 				lvl = lvlAbs - ls_old; // relative level mumber
 				break;
 			}
 		}
+
 		retval[0] = diffLvl;
 		retval[1] = lvl;
 		return retval;
@@ -411,13 +417,14 @@ public class GameController {
 	 * @return true: ok, false: no more level in this difficulty level
 	 */
 	public static synchronized boolean nextLevel() {
-		int num = curLevelNumber + 1;
+		final int num = curLevelNumber + 1;
 
 		if (num < levelPack[curLevelPack].getLevels(curDiffLevel).length) {
 			curLevelNumber = num;
 			return true;
-		} else
+		} else {
 			return false; // congrats - difficulty level done
+		}
 	}
 
 	/**
@@ -439,21 +446,10 @@ public class GameController {
 		setSuperLemming(false);
 		replayMode = false;
 
-		if (!wasLost()) {
-			if (curLevelPack != 0)
-				levelMenuUpdateListener.update();
-			// String pack = levelPack[curLevelPack].getName();
-			// String diff = levelPack[curLevelPack].getDiffLevels()[curDiffLevel];
-			// // get next level
-			// int num = curLevelNumber + 1;
-			// if ( num >= levelPack[curLevelPack].getLevels(curDiffLevel).length )
-			// num = curLevelNumber;
-			// // set next level as available
-			// GroupBitfield bf = Core.player.setAvailable(pack, diff, num);
-			// // update the menu
-			// if (curLevelPack!=0) // 0 is the dummy pack
-			// ((Lemmini)Core.getCmp()).updateLevelMenu(pack, diff, bf);
+		if (!wasLost() && (curLevelPack != 0)) {
+			levelMenuUpdateListener.update();
 		}
+
 		gameState = State.DEBRIEFING;
 	}
 
@@ -473,6 +469,7 @@ public class GameController {
 	 */
 	private static synchronized void restartLevel(final boolean doReplay) {
 		initLevel();
+
 		if (doReplay) {
 			replayMode = true;
 			replay.save(Core.resourcePath + "/replay.rpl");
@@ -488,34 +485,25 @@ public class GameController {
 	 */
 	private static void initLevel() {
 		Music.stop();
-
 		setFastForward(false);
 		setPaused(false);
 		nuke = false;
-
 		lemmSkillRequest = null;
-
 		TextScreen.setMode(TextScreen.Mode.INIT);
-
 		bgGfx.setBackground(blankColor);
 		bgGfx.clearRect(0, 0, bgImage.getWidth(), bgImage.getHeight());
-
 		stencil = getLevel().paintLevel(bgImage, Core.getCmp(), stencil);
-
 		lemmings.clear();
 		explosions.clear();
 		Icons.reset();
-
 		TrapDoor.reset(getLevel().getEntryNum());
 		entryOpened = false;
 		entryOpenCtr = 0;
 		secondCtr = 0;
 		releaseCtr = 0;
 		lemmSkill = Lemming.Type.UNDEFINED;
-
 		plus.init();
 		minus.init();
-
 		numLeft = 0;
 		releaseRate = getLevel().getReleaseRate();
 		numLemmingsMax = getLevel().getNumLemmings();
@@ -531,20 +519,15 @@ public class GameController {
 		numMiners = getLevel().getNumMiners();
 		numDiggers = getLevel().getMumDiggers();
 		setxPos(getLevel().getXpos());
-
 		calcReleaseBase();
-
 		mapPreview = getLevel().createMiniMap(mapPreview, bgImage, 4, 4, false);
-
 		setSuperLemming(getLevel().isSuperLemming());
-
 		replayFrame = 0;
 		stopReplayMode = false;
 		releaseRateOld = releaseRate;
 		lemmSkillOld = lemmSkill;
 		nukeOld = false;
 		xPosOld = getLevel().getXpos();
-
 		gameState = State.BRIEFING;
 	}
 
@@ -554,10 +537,12 @@ public class GameController {
 	 * @param doReplay
 	 */
 	public static synchronized void requestRestartLevel(final boolean doReplay) {
-		if (doReplay)
+		if (doReplay) {
 			transitionState = TransitionState.REPLAY_LEVEL;
-		else
+		} else {
 			transitionState = TransitionState.RESTART_LEVEL;
+		}
+
 		Fader.setState(Fader.State.OUT);
 	}
 
@@ -575,10 +560,12 @@ public class GameController {
 		nextDiffLevel = dLevel;
 		nextLevelNumber = lNum;
 
-		if (doReplay)
+		if (doReplay) {
 			transitionState = TransitionState.LOAD_REPLAY;
-		else
+		} else {
 			transitionState = TransitionState.LOAD_LEVEL;
+		}
+
 		Fader.setState(Fader.State.OUT);
 	}
 
@@ -596,8 +583,7 @@ public class GameController {
 		curLevelPack = lPack;
 		curDiffLevel = dLevel;
 		curLevelNumber = lNum;
-
-		String lvlPath = levelPack[curLevelPack].getInfo(curDiffLevel, curLevelNumber).getFileName();
+		final String lvlPath = levelPack[curLevelPack].getInfo(curDiffLevel, curLevelNumber).getFileName();
 		// lemmings need to be reloaded to contain pink color
 		Lemming.loadLemmings(Core.getCmp());
 		// loading the level will patch pink lemmings pixels to correct color
@@ -629,8 +615,10 @@ public class GameController {
 	 * @return true if level was lost, false otherwise
 	 */
 	static synchronized boolean wasLost() {
-		if (gameState != State.LEVEL && numLeft >= numToRecue)
+		if (gameState != State.LEVEL && numLeft >= numToRecue) {
 			return false;
+		}
+
 		return true;
 	}
 
@@ -640,12 +628,15 @@ public class GameController {
 	 * @return current replay image
 	 */
 	public synchronized static BufferedImage getReplayImage() {
-		if (!replayMode)
+		if (!replayMode) {
 			return null;
-		if ((replayFrame & 0x3f) > 0x20)
+		}
+
+		if ((replayFrame & 0x3f) > 0x20) {
 			return MiscGfx.getImage(MiscGfx.Index.REPLAY_1);
-		else
+		} else {
 			return MiscGfx.getImage(MiscGfx.Index.REPLAY_2);
+		}
 	}
 
 	/**
@@ -657,14 +648,21 @@ public class GameController {
 	public static synchronized Lemming lemmUnderCursor(final LemmCursor.Type type) {
 		// search for level without the skill
 		for (int i = 0; i < getLemmsUnderCursor().size(); i++) {
-			Lemming l = getLemmsUnderCursor().get(i);
+			final Lemming l = getLemmsUnderCursor().get(i);
+
 			// Walker only cursor: ignore non-walkers
-			if (type == LemmCursor.Type.WALKER && l.getSkill() != Lemming.Type.WALKER)
+			if (type == LemmCursor.Type.WALKER && l.getSkill() != Lemming.Type.WALKER) {
 				continue;
-			if (type == LemmCursor.Type.LEFT && l.getDirection() != Lemming.Direction.LEFT)
+			}
+
+			if (type == LemmCursor.Type.LEFT && l.getDirection() != Lemming.Direction.LEFT) {
 				continue;
-			if (type == LemmCursor.Type.RIGHT && l.getDirection() != Lemming.Direction.RIGHT)
+			}
+
+			if (type == LemmCursor.Type.RIGHT && l.getDirection() != Lemming.Direction.RIGHT) {
 				continue;
+			}
+
 			switch (lemmSkill) {
 				case CLIMBER:
 					if (!l.canClimb())
@@ -680,15 +678,20 @@ public class GameController {
 						return l;
 					}
 			}
+
 			break;
 		}
+
 		if (type == LemmCursor.Type.NORMAL && getLemmsUnderCursor().size() > 0) {
-			Lemming l = getLemmsUnderCursor().get(0);
-			if (l.getName().length() == 0)
+			final Lemming l = getLemmsUnderCursor().get(0);
+
+			if (l.getName().length() == 0) {
 				return null;
-			// System.out.println(((Lemming)lemmsUnderCursor.get(0)).getName());
+			}
+
 			return l;
 		}
+
 		return null;
 	}
 
@@ -703,8 +706,9 @@ public class GameController {
 	 * Stop replay.
 	 */
 	private static void stopReplayMode() {
-		if (replayMode)
+		if (replayMode) {
 			stopReplayMode = true;
+		}
 	}
 
 	/**
@@ -713,10 +717,13 @@ public class GameController {
 	 * @return time as String "minutes-seconds"
 	 */
 	public synchronized static String getTimeString() {
-		String t1 = Integer.toString(time / 60);
+		final String t1 = Integer.toString(time / 60);
 		String t2 = Integer.toString(time % 60);
-		if (t2.length() < 2)
+
+		if (t2.length() < 2) {
 			t2 = "0" + t2;
+		}
+
 		return t1 + "-" + t2;
 	}
 
@@ -724,43 +731,54 @@ public class GameController {
 	 * Update the whole game state by one frame.
 	 */
 	public static synchronized void update() {
-		if (gameState != State.LEVEL)
+		if (gameState != State.LEVEL) {
 			return;
+		}
 
 		updateCtr++;
 
-		if (!replayMode)
+		if (!replayMode) {
 			assignSkill(false); // first try to assign skill
+		}
 
 		// check +/- buttons also if paused
 		KeyRepeat.Event fired = plus.fired();
+
 		if (fired != KeyRepeat.Event.NONE) {
 			if (releaseRate < MAX_RELEASE_RATE) {
-				if (fired == KeyRepeat.Event.DOUBLE_CLICK)
+				if (fired == KeyRepeat.Event.DOUBLE_CLICK) {
 					releaseRate = MAX_RELEASE_RATE;
-				else
+				} else {
 					releaseRate += 1;
+				}
+
 				calcReleaseBase();
 				sound.playPitched(releaseRate);
-			} else
+			} else {
 				sound.play(SND_TING);
+			}
 		}
 
 		fired = minus.fired();
+
 		if (fired != KeyRepeat.Event.NONE) {
 			if (releaseRate > getLevel().getReleaseRate()) {
-				if (fired == KeyRepeat.Event.DOUBLE_CLICK)
+				if (fired == KeyRepeat.Event.DOUBLE_CLICK) {
 					releaseRate = getLevel().getReleaseRate();
-				else
+				} else {
 					releaseRate -= 1;
+				}
+
 				calcReleaseBase();
 				sound.playPitched(releaseRate);
-			} else
+			} else {
 				sound.play(SND_TING);
+			}
 		}
 
-		if (isPaused())
+		if (isPaused()) {
 			return;
+		}
 
 		// test for end of replay mode
 		if (replayMode && stopReplayMode) {
@@ -776,32 +794,37 @@ public class GameController {
 					replay.addReleaseRateEvent(replayFrame, releaseRate);
 					releaseRateOld = releaseRate;
 				}
+
 				// replay: nuked?
 				if (nuke != nukeOld) {
 					replay.addNukeEvent(replayFrame);
 					nukeOld = nuke;
 				}
+
 				// replay: xPos changed?
 				if (getxPos() != xPosOld) {
 					replay.addXPosEvent(replayFrame, getxPos());
 					xPosOld = getxPos();
 				}
+
 				// skill changed
 				if (lemmSkill != lemmSkillOld) {
 					replay.addSelectSkillEvent(replayFrame, lemmSkill);
 					lemmSkillOld = lemmSkill;
 				}
-			} else
+			} else {
 				replay.clear();
+			}
 		} else {
 			// replay mode
 			ReplayEvent r;
+
 			while ((r = replay.getNext(replayFrame)) != null) {
 				switch (r.type) {
 					case ReplayStream.ASSIGN_SKILL: {
-						ReplayAssignSkillEvent rs = (ReplayAssignSkillEvent) r;
+						final ReplayAssignSkillEvent rs = (ReplayAssignSkillEvent) r;
 						synchronized (lemmings) {
-							Lemming l = lemmings.get(rs.lemming);
+							final Lemming l = lemmings.get(rs.lemming);
 							l.setSkill(rs.skill);
 							l.setSelected();
 						}
@@ -835,11 +858,13 @@ public class GameController {
 							default:
 								break;
 						}
+
 						sound.play(SND_CHANGE_OP);
 						break;
 					}
+
 					case ReplayStream.SET_RELEASE_RATE:
-						ReplayReleaseRateEvent rr = (ReplayReleaseRateEvent) r;
+						final ReplayReleaseRateEvent rr = (ReplayReleaseRateEvent) r;
 						releaseRate = rr.releaseRate;
 						calcReleaseBase();
 						sound.playPitched(releaseRate);
@@ -847,13 +872,12 @@ public class GameController {
 					case ReplayStream.NUKE:
 						nuke = true;
 						break;
-					case ReplayStream.MOVE_XPOS: {
-						ReplayMoveXPosEvent rx = (ReplayMoveXPosEvent) r;
+					case ReplayStream.MOVE_XPOS:
+						final ReplayMoveXPosEvent rx = (ReplayMoveXPosEvent) r;
 						setxPos(rx.xPos);
 						break;
-					}
-					case ReplayStream.SELECT_SKILL: {
-						ReplaySelectSkillEvent rs = (ReplaySelectSkillEvent) r;
+					case ReplayStream.SELECT_SKILL:
+						final ReplaySelectSkillEvent rs = (ReplaySelectSkillEvent) r;
 						lemmSkill = rs.skill;
 
 						switch (lemmSkill) {
@@ -885,49 +909,53 @@ public class GameController {
 							default:
 								break;
 						}
+
 						break;
-					}
 				}
 			}
 		}
 
 		// replay: xpos changed
-
 		// store locally to avoid it's overwritten amidst function
-		boolean nukeTemp = nuke;
-
+		final boolean nukeTemp = nuke;
 		// time
 		secondCtr += 1.0;
+
 		if (secondCtr > MAX_SECOND_CTR) {
 			// one second passed
 			secondCtr -= MAX_SECOND_CTR;
 			time--;
+
 			if (!isCheat() && time == 0) {
 				// level failed
 				endLevel();
 			}
 		}
+
 		// release
 		if (entryOpened && !nukeTemp && !isPaused() && numLemmingsOut < getNumLemmingsMax()
 				&& ++releaseCtr >= releaseBase) {
 			releaseCtr = 0;
+
 			// LemmingResource ls = Lemming.getResource(Lemming.TYPE_FALLER);
 			try {
 				if (getLevel().getEntryNum() != 0) {
-					Entry e = getLevel().getEntry(TrapDoor.getNext());
-					Lemming l = new Lemming(e.xPos + 2, e.yPos + 20);
+					final Entry e = getLevel().getEntry(TrapDoor.getNext());
+					final Lemming l = new Lemming(e.xPos + 2, e.yPos + 20);
+
 					synchronized (lemmings) {
 						lemmings.add(l);
 					}
+
 					numLemmingsOut++;
 				}
-			} catch (ArrayIndexOutOfBoundsException ex) {
+			} catch (final ArrayIndexOutOfBoundsException ex) {
 			}
 		}
 		// nuking
 		if (nukeTemp && ((updateCtr & 1) == 1)) {
 			synchronized (lemmings) {
-				for (Lemming l : lemmings) {
+				for (final Lemming l : lemmings) {
 					if (!l.nuke() && !l.hasDied() && !l.hasLeft()) {
 						l.setSkill(Lemming.Type.NUKE);
 						// System.out.println("nuked!");
@@ -936,18 +964,23 @@ public class GameController {
 				}
 			}
 		}
+
 		// open trap doors ?
 		if (!entryOpened) {
 			if (++entryOpenCtr == MAX_ENTRY_OPEN_CTR) {
-				for (int i = 0; i < getLevel().getEntryNum(); i++)
+				for (int i = 0; i < getLevel().getEntryNum(); i++) {
 					getLevel().getSprObject(getLevel().getEntry(i).id).setAnimMode(Sprite.Animation.ONCE);
+				}
+
 				sound.play(SND_DOOR);
 			} else if (entryOpenCtr == MAX_ENTRY_OPEN_CTR + 10 * MAX_ANIM_CTR) {
 				// System.out.println("opened");
 				entryOpened = true;
 				releaseCtr = releaseBase; // first lemming to enter at once
-				if (musicOn)
+
+				if (musicOn) {
 					Music.play();
+				}
 			}
 		}
 		// end of game conditions
@@ -956,40 +989,47 @@ public class GameController {
 		}
 
 		synchronized (lemmings) {
-			Iterator<Lemming> it = lemmings.iterator();
-			
+			final Iterator<Lemming> it = lemmings.iterator();
+
 			while (it.hasNext()) {
-				Lemming l = it.next();
+				final Lemming l = it.next();
+
 				if (l.hasDied() || l.hasLeft()) {
 					it.remove();
 					continue;
 				}
+
 				l.animate();
 			}
 		}
 
 		synchronized (explosions) {
-			Iterator<Explosion> it = explosions.iterator();
+			final Iterator<Explosion> it = explosions.iterator();
+
 			while (it.hasNext()) {
-				Explosion e = it.next();
-				if (e.isFinished())
+				final Explosion e = it.next();
+
+				if (e.isFinished()) {
 					it.remove();
-				else
+				} else {
 					e.update();
+				}
 			}
 		}
 
 		// animate level objects
 		if (++animCtr > MAX_ANIM_CTR) {
 			animCtr -= MAX_ANIM_CTR;
+
 			for (int n = 0; n < getLevel().getSprObjectNum(); n++) {
-				SpriteObject spr = getLevel().getSprObject(n);
+				final SpriteObject spr = getLevel().getSprObject(n);
 				spr.getImageAnim(); // just to animate
 			}
 		}
 
-		if (!replayMode)
+		if (!replayMode) {
 			assignSkill(true); // 2nd try to assign skill
+		}
 
 		replayFrame++;
 	}
@@ -1011,12 +1051,15 @@ public class GameController {
 	 * @param delete flag: reset the current skill request
 	 */
 	private synchronized static void assignSkill(final boolean delete) {
-		if (lemmSkillRequest == null || lemmSkill == Lemming.Type.UNDEFINED)
+		if (lemmSkillRequest == null || lemmSkill == Lemming.Type.UNDEFINED) {
 			return;
+		}
 
-		Lemming lemm = lemmSkillRequest;
-		if (delete)
+		final Lemming lemm = lemmSkillRequest;
+
+		if (delete) {
 			lemmSkillRequest = null;
+		}
 
 		boolean canSet = false;
 		stopReplayMode();
@@ -1030,50 +1073,57 @@ public class GameController {
 						numBashers -= 1;
 						canSet = true;
 					}
+
 					break;
 				case BOMBER:
 					if (numBombers > 0 && lemm.setSkill(lemmSkill)) {
 						numBombers -= 1;
 						canSet = true;
 					}
+
 					break;
 				case BUILDER:
 					if (numBuilders > 0 && lemm.setSkill(lemmSkill)) {
 						numBuilders -= 1;
 						canSet = true;
 					}
+
 					break;
 				case CLIMBER:
 					if (numClimbers > 0 && lemm.setSkill(lemmSkill)) {
 						numClimbers -= 1;
 						canSet = true;
 					}
+
 					break;
 				case DIGGER:
 					if (numDiggers > 0 && lemm.setSkill(lemmSkill)) {
 						numDiggers -= 1;
 						canSet = true;
 					}
+
 					break;
 				case FLOATER:
 					if (numFloaters > 0 && lemm.setSkill(lemmSkill)) {
 						numFloaters -= 1;
 						canSet = true;
 					}
+
 					break;
 				case MINER:
 					if (numMiners > 0 && lemm.setSkill(lemmSkill)) {
 						numMiners -= 1;
 						canSet = true;
 					}
+
 					break;
 				case STOPPER:
 					if (numBlockers > 0 && lemm.setSkill(lemmSkill)) {
 						numBlockers -= 1;
 						canSet = true;
 					}
-					break;
 
+					break;
 				default:
 					break;
 			}
@@ -1081,19 +1131,25 @@ public class GameController {
 		if (canSet) {
 			lemmSkillRequest = null; // erase request
 			sound.play(SND_MOUSEPRE);
+
 			if (isPaused()) {
 				setPaused(false);
 				Icons.press(Icons.Type.PAUSE);
 			}
+
 			// add to replay stream
-			if (!wasCheated)
+			if (!wasCheated) {
 				synchronized (lemmings) {
-					for (int i = 0; i < lemmings.size(); i++)
-						if (lemmings.get(i) == lemm) // if 2nd try (delete==true) assign to next frame
+					for (int i = 0; i < lemmings.size(); i++) {
+						if (lemmings.get(i) == lemm) { // if 2nd try (delete==true) assign to next frame
 							replay.addAssignSkillEvent(replayFrame + ((delete) ? 1 : 0), lemmSkill, i);
+						}
+					}
 				}
-		} else if (delete)
+			}
+		} else if (delete) {
 			sound.play(SND_TING);
+		}
 	}
 
 	/**
@@ -1113,62 +1169,80 @@ public class GameController {
 	 * @param type icon type
 	 */
 	public static synchronized void handleIconButton(final Icons.Type type) {
-		Lemming.Type lemmSkillOld = lemmSkill;
+		final Lemming.Type lemmSkillOld = lemmSkill;
 		boolean ok = false;
 
 		switch (type) {
 			case FLOAT:
-				if (isCheat() || numFloaters > 0)
+				if (isCheat() || numFloaters > 0) {
 					lemmSkill = Lemming.Type.FLOATER;
+				}
+
 				stopReplayMode();
 				break;
 			case CLIMB:
-				if (isCheat() || numClimbers > 0)
+				if (isCheat() || numClimbers > 0) {
 					lemmSkill = Lemming.Type.CLIMBER;
+				}
+
 				stopReplayMode();
 				break;
 			case BOMB:
-				if (isCheat() || numBombers > 0)
+				if (isCheat() || numBombers > 0) {
 					lemmSkill = Lemming.Type.BOMBER;
+				}
+
 				stopReplayMode();
 				break;
 			case DIG:
-				if (isCheat() || numDiggers > 0)
+				if (isCheat() || numDiggers > 0) {
 					lemmSkill = Lemming.Type.DIGGER;
+				}
+
 				stopReplayMode();
 				break;
 			case BASH:
-				if (isCheat() || numBashers > 0)
+				if (isCheat() || numBashers > 0) {
 					lemmSkill = Lemming.Type.BASHER;
+				}
+
 				stopReplayMode();
 				break;
 			case BUILD:
-				if (isCheat() || numBuilders > 0)
+				if (isCheat() || numBuilders > 0) {
 					lemmSkill = Lemming.Type.BUILDER;
+				}
+
 				stopReplayMode();
 				break;
 			case MINE:
-				if (isCheat() || numMiners > 0)
+				if (isCheat() || numMiners > 0) {
 					lemmSkill = Lemming.Type.MINER;
+				}
+
 				stopReplayMode();
 				break;
 			case BLOCK:
-				if (isCheat() || numBlockers > 0)
+				if (isCheat() || numBlockers > 0) {
 					lemmSkill = Lemming.Type.STOPPER;
+				}
+
 				stopReplayMode();
 				break;
-			case NUKE: {
+			case NUKE:
 				ok = true;
 				stopReplayMode();
+
 				if (timerNuke.delta() < MICROSEC_NUKE_DOUBLE_CLICK) {
 					if (!nuke) {
 						nuke = true;
 						sound.play(SND_OHNO);
 					}
-				} else
+				} else {
 					timerNuke.deltaUpdate();
+				}
+
 				break;
-			}
 			case PAUSE:
 				setPaused(!isPaused());
 				ok = true;
@@ -1187,10 +1261,10 @@ public class GameController {
 				minus.pressed(KEYREPEAT_ICON);
 				stopReplayMode();
 				break;
-
 			default:
 				break;
 		}
+
 		if (ok || lemmSkill != lemmSkillOld) {
 			switch (type) {
 				case PLUS:
@@ -1198,9 +1272,11 @@ public class GameController {
 				default:
 					sound.play(SND_CHANGE_OP);
 			}
+
 			Icons.press(type);
-		} else
+		} else {
 			sound.play(SND_TING);
+		}
 	}
 
 	/**
@@ -1225,17 +1301,19 @@ public class GameController {
 					break;
 				case TO_LEVEL:
 					GameController.sound.play(SND_LETSGO);
+
 					try {
 						Music.load("music/" + GameController.levelPack[GameController.curLevelPack]
 								.getInfo(GameController.curDiffLevel,
 										GameController.curLevelNumber)
 								.getMusic());
-					} catch (ResourceException ex) {
+					} catch (final ResourceException ex) {
 						Core.resourceError(ex.getMessage());
-					} catch (LemmException ex) {
+					} catch (final LemmException ex) {
 						JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 						System.exit(1);
 					}
+
 					gameState = State.LEVEL;
 					break;
 				case RESTART_LEVEL:
@@ -1248,20 +1326,22 @@ public class GameController {
 						changeLevel(nextLevelPack, nextDiffLevel, nextLevelNumber,
 								transitionState == TransitionState.LOAD_REPLAY);
 						((JFrame) Core.getCmp()).setTitle("Lemmini - " + getLevel().getLevelName());
-					} catch (ResourceException ex) {
+					} catch (final ResourceException ex) {
 						Core.resourceError(ex.getMessage());
-					} catch (LemmException ex) {
+					} catch (final LemmException ex) {
 						JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 						System.exit(1);
 					}
-					break;
 
+					break;
 				default:
 					break;
 			}
+
 			Fader.setState(Fader.State.IN);
 			transitionState = TransitionState.NONE;
 		}
+
 		Fader.fade(g);
 	}
 
@@ -1275,9 +1355,7 @@ public class GameController {
 	 */
 	public static void drawExplosions(final Graphics2D g, final int width, final int height, final int xOfs) {
 		synchronized (explosions) {
-			Iterator<Explosion> it = explosions.iterator();
-			while (it.hasNext()) {
-				Explosion e = it.next();
+			for (final Explosion e : explosions) {
 				e.draw(g, width, height, xOfs);
 			}
 		}
@@ -1316,6 +1394,7 @@ public class GameController {
 	public static void drawCounters(final Graphics2D g, final int y) {
 		// draw counters
 		int val = 0;
+
 		for (int i = 0; i < 10; i++) {
 			switch (i) {
 				case 0:
@@ -1349,6 +1428,7 @@ public class GameController {
 					val = numDiggers;
 					break;
 			}
+
 			g.drawImage(NumFont.numImage(val), Icons.WIDTH * i + 8, y, null);
 		}
 
@@ -1680,8 +1760,10 @@ public class GameController {
 	 */
 	public static void setSoundGain(final double g) {
 		soundGain = g;
-		if (sound != null)
+
+		if (sound != null) {
 			sound.setGain(soundGain);
+		}
 	}
 
 	/**
@@ -1691,8 +1773,10 @@ public class GameController {
 	 */
 	public static void setMusicGain(final double g) {
 		musicGain = g;
-		if (Music.getType() != null)
+
+		if (Music.getType() != null) {
 			Music.setGain(musicGain);
+		}
 	}
 
 	/**
@@ -1811,54 +1895,4 @@ public class GameController {
 	public static int getTime() {
 		return time;
 	}
-}
-
-/**
- * Trapdoor/Entry class
- * Trapdoor logic: for numbers >1, just take the next door for each lemming and
- * wrap around to 1 when
- * the last one is reached.
- * Special rule for 3 trapdoors: the order is 1, 2, 3, 2 (loop), not 1, 2, 3
- * (loop)
- *
- * @author Volker Oth
- */
-class TrapDoor {
-	/** pattern for three entries */
-	private final static int[] PATTERN3 = { 0, 1, 2, 1 };
-
-	/** number of entries */
-	private static int entries;
-	/** entry counter */
-	private static int counter;
-
-	/**
-	 * Reset to new number of entries.
-	 * 
-	 * @param e number of entries
-	 */
-	static void reset(final int e) {
-		entries = e;
-		counter = 0;
-	}
-
-	/**
-	 * Get index of next entry.
-	 * 
-	 * @return index of next entry
-	 */
-	static int getNext() {
-		int retVal = counter;
-		counter++;
-		if (entries != 3) {
-			if (counter >= entries)
-				counter = 0;
-			return retVal;
-		}
-		// special case: 3
-		if (counter >= 4)
-			counter = 0;
-		return PATTERN3[retVal];
-	}
-
 }

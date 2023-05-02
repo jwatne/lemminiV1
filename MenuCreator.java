@@ -1,9 +1,7 @@
 import java.awt.Dimension;
 import java.awt.Point;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -16,7 +14,6 @@ import javax.swing.JRadioButtonMenuItem;
 
 import GUI.GainDialog;
 import GUI.LevelCodeDialog;
-import GUI.PlayerDialog;
 import Game.Core;
 import Game.GameController;
 import Game.GroupBitfield;
@@ -46,9 +43,9 @@ public class MenuCreator {
     private JMenu jMenuFile = null;
     private JMenu jMenuPlayer = null;
     private JMenuItem jMenuItemExit = null;
-    private JMenu jMenuSelectPlayer = null;
+    JMenu jMenuSelectPlayer = null;
     private JMenuItem jMenuItemManagePlayer = null;
-    private ButtonGroup playerGroup = null;
+    ButtonGroup playerGroup = null;
     private ButtonGroup zoomGroup = null;
     private JMenu jMenuOptions = null;
     private JMenuItem jMenuItemClassicalCursor = null;
@@ -144,69 +141,8 @@ public class MenuCreator {
      */
     private void getManagePlayerMenuItem() {
         jMenuItemManagePlayer = new JMenuItem("Manage Players");
-        jMenuItemManagePlayer.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(final java.awt.event.ActionEvent e) {
-                Core.player.store(); // save player in case it is changed
-                final PlayerDialog d = new PlayerDialog((JFrame) Core.getCmp(), true);
-                d.setVisible(true);
-                // blocked until dialog returns
-                final List<String> players = d.getPlayers();
 
-                if (players != null) {
-                    String player = Core.player.getName(); // old player
-                    final int playerIdx = d.getSelection();
-
-                    if (playerIdx != -1) {
-                        player = players.get(playerIdx); // remember selected player
-                    }
-
-                    // check for players to delete
-                    for (int i = 0; i < Core.getPlayerNum(); i++) {
-                        final String p = Core.getPlayer(i);
-
-                        if (!players.contains(p)) {
-                            final File f = new File(Core.resourcePath + "players/" + p + ".ini");
-                            f.delete();
-
-                            if (p.equals(player)) {
-                                player = "default";
-                            }
-                        }
-                    }
-
-                    // rebuild players list
-                    Core.clearPlayers();
-
-                    // add default player if missing
-                    if (!players.contains("default")) {
-                        players.add("default");
-                    }
-
-                    // now copy all player and create properties
-                    for (int i = 0; i < players.size(); i++) {
-                        Core.addPlayer(players.get(i));
-                    }
-
-                    // select new default player
-                    Core.player = new Player(player);
-
-                    // rebuild players menu
-                    playerGroup = new ButtonGroup();
-                    jMenuSelectPlayer.removeAll();
-
-                    for (int idx = 0; idx < Core.getPlayerNum(); idx++) {
-                        final JCheckBoxMenuItem item = addPlayerItem(Core.getPlayer(idx));
-
-                        if (Core.player.getName().equals(Core.getPlayer(idx))) {
-                            item.setSelected(true);
-                        }
-                    }
-
-                    updateLevelMenus();
-                }
-            }
-        });
+        jMenuItemManagePlayer.addActionListener(new ManagePlayerMenuItemActionListener(this));
     }
 
     /**
@@ -215,7 +151,7 @@ public class MenuCreator {
      * @param name player name
      * @return JCheckBoxMenuItem
      */
-    private JCheckBoxMenuItem addPlayerItem(final String name) {
+    JCheckBoxMenuItem addPlayerItem(final String name) {
         final JCheckBoxMenuItem item = new JCheckBoxMenuItem(name);
         item.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -755,7 +691,7 @@ public class MenuCreator {
     /**
      * Update the level menus according to the progress of the current player.
      */
-    private void updateLevelMenus() {
+    void updateLevelMenus() {
         // update level menus
         for (int lp = 1; lp < GameController.getLevelPackNum(); lp++) { // skip dummy level pack
             final LevelPack lPack = GameController.getLevelPack(lp);

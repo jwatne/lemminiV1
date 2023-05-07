@@ -46,6 +46,7 @@ public class Props {
 
 	/**
 	 * Set the property file header
+	 * 
 	 * @param h String containing Header information
 	 */
 	public void setHeader(final String h) {
@@ -61,6 +62,7 @@ public class Props {
 
 	/**
 	 * Remove key
+	 * 
 	 * @param key Name of key
 	 */
 	public void remove(final String key) {
@@ -69,7 +71,8 @@ public class Props {
 
 	/**
 	 * Set string property
-	 * @param key Name of the key to set value for
+	 * 
+	 * @param key   Name of the key to set value for
 	 * @param value Value to set
 	 */
 	public void set(final String key, final String value) {
@@ -78,7 +81,8 @@ public class Props {
 
 	/**
 	 * Set integer property
-	 * @param key Name of the key to set value for
+	 * 
+	 * @param key   Name of the key to set value for
 	 * @param value Value to set
 	 */
 	public void set(final String key, final int value) {
@@ -87,7 +91,8 @@ public class Props {
 
 	/**
 	 * Set boolean property
-	 * @param key Name of the key to set value for
+	 * 
+	 * @param key   Name of the key to set value for
 	 * @param value Value to set
 	 */
 	public void set(final String key, final boolean value) {
@@ -96,7 +101,8 @@ public class Props {
 
 	/**
 	 * Set double property
-	 * @param key Name of the key to set value for
+	 * 
+	 * @param key   Name of the key to set value for
 	 * @param value Value to set
 	 */
 	public void set(final String key, final double value) {
@@ -105,17 +111,19 @@ public class Props {
 
 	/**
 	 * Get string property
+	 * 
 	 * @param key Name of the key to get value for
 	 * @param def Default value in case key is not found
 	 * @return Value of key as String
 	 */
 	public String get(final String key, final String def) {
-		String s = hash.getProperty(key,def);
+		final String s = hash.getProperty(key, def);
 		return removeComment(s);
 	}
 
 	/**
 	 * Get integer property
+	 * 
 	 * @param key Name of the key to get value for
 	 * @param def Default value in case key is not found
 	 * @return Value of key as int
@@ -130,6 +138,7 @@ public class Props {
 
 	/**
 	 * Get integer array property
+	 * 
 	 * @param key Name of the key to get value for
 	 * @param def Default value in case key is not found
 	 * @return Value of key as array of int
@@ -139,14 +148,14 @@ public class Props {
 		if (s == null)
 			return def;
 		s = removeComment(s);
-		String members[] = s.split(",");
+		final String members[] = s.split(",");
 		// remove trailing and leading spaces
-		for (int i=0; i<members.length; i++)
+		for (int i = 0; i < members.length; i++)
 			members[i] = trim(members[i]);
 
 		int ret[];
 		ret = new int[members.length];
-		for (int i=0; i<members.length; i++)
+		for (int i = 0; i < members.length; i++)
 			ret[i] = parseString(members[i]);
 
 		return ret;
@@ -154,6 +163,7 @@ public class Props {
 
 	/**
 	 * Get string array property
+	 * 
 	 * @param key Name of the key to get value for
 	 * @param def Default value in case key is not found
 	 * @return Value of key as array of string
@@ -163,9 +173,9 @@ public class Props {
 		if (s == null)
 			return def;
 		s = removeComment(s);
-		String members[] = s.split(",");
+		final String members[] = s.split(",");
 		// remove trailing and leading spaces
-		for (int i=0; i<members.length; i++)
+		for (int i = 0; i < members.length; i++)
 			members[i] = trim(members[i]);
 
 		return members;
@@ -173,6 +183,7 @@ public class Props {
 
 	/**
 	 * Get boolean property
+	 * 
 	 * @param key Name of the key to get value for
 	 * @param def Default value in case key is not found
 	 * @return Value of key as boolean
@@ -187,6 +198,7 @@ public class Props {
 
 	/**
 	 * Get double property
+	 * 
 	 * @param key Name of the key to get value for
 	 * @param def default value in case key is not found
 	 * @return value of key as double
@@ -201,78 +213,79 @@ public class Props {
 
 	/**
 	 * Save property file
+	 * 
 	 * @param fname File name of property file
 	 * @return True if OK, false if exception occurred
 	 */
 	public boolean save(final String fname) {
 		try {
-			FileOutputStream f = new FileOutputStream(fname);
+			final FileOutputStream f = new FileOutputStream(fname);
 			hash.store(f, header);
 			return true;
-		} catch(FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			return false;
-		} catch(IOException e) {
+		} catch (final IOException e) {
 			return false;
 		}
 	}
 
 	/**
 	 * Load property file
+	 * 
 	 * @param file File handle of property file
 	 * @return True if OK, false if exception occurred
 	 */
 	public boolean load(final URL file) {
-		try {
-			InputStream f = file.openStream();
+		try (final InputStream f = file.openStream()) {
 			hash.load(f);
-			f.close();
 			return true;
-		} catch(FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			return false;
-		} catch(IOException e) {
+		} catch (final IOException e) {
 			return false;
 		}
 	}
 
 	/**
 	 * Load property file
+	 * 
 	 * @param fname File name of property file
 	 * @return True if OK, false if exception occurred
 	 */
 	public boolean load(final String fname) {
-		try {
-			FileInputStream f = new FileInputStream(fname);
+		try (final FileInputStream f = new FileInputStream(fname)) {
 			hash.load(f);
-			f.close();
 			return true;
-		} catch(FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			return false;
-		} catch(IOException e) {
+		} catch (final IOException e) {
 			return false;
 		}
 	}
 
 	/**
 	 * Parse hex, binary or octal number
+	 * 
 	 * @param s String that contains one number
 	 * @return Integer value of string
 	 */
 	private static int parseString(final String s) {
-		if (s==null || s.length()==0)
+		if (s == null || s.length() == 0)
 			return -1;
 		if (s.charAt(0) == '0') {
 			if (s.length() == 1)
 				return 0;
 			else if (s.length() > 2 && s.charAt(1) == 'x')
-				return Integer.parseInt(s.substring(2),16); // hex
-			else if (s.charAt(1) == 'b')  // binary
-				return Integer.parseInt(s.substring(2),2);
-			else return Integer.parseInt(s.substring(0),8); // octal
+				return Integer.parseInt(s.substring(2), 16); // hex
+			else if (s.charAt(1) == 'b') // binary
+				return Integer.parseInt(s.substring(2), 2);
+			else
+				return Integer.parseInt(s.substring(0), 8); // octal
 		}
 		int retval;
 		try {
 			retval = Integer.parseInt(s);
-		} catch (NumberFormatException ex) {
+		} catch (final NumberFormatException ex) {
 			retval = 0;
 		}
 		return retval;
@@ -281,32 +294,34 @@ public class Props {
 	/**
 	 * Remove comment from line. Comment character is "#".
 	 * Everything behind (including "#") will be removed
+	 * 
 	 * @param s String to search for comment
 	 * @return String without comment
 	 */
 	private String removeComment(final String s) {
-		int pos = s.indexOf('#');
+		final int pos = s.indexOf('#');
 		if (pos != -1)
-			return s.substring(0,pos);
+			return s.substring(0, pos);
 		else
 			return s;
 	}
 
 	/**
 	 * Remove trailing and leading spaces from a string
+	 * 
 	 * @param s String to process
 	 * @return String without leading and trailing spaces
 	 */
 	private static String trim(final String s) {
 		// search first character that is not a space
 		int spos;
-		for (spos=0; spos<s.length(); spos++)
+		for (spos = 0; spos < s.length(); spos++)
 			if (s.charAt(spos) != ' ')
 				break;
 		int epos;
-		for (epos=s.length()-1; epos > spos; epos--)
+		for (epos = s.length() - 1; epos > spos; epos--)
 			if (s.charAt(epos) != ' ')
 				break;
-		return s.substring(spos, epos+1);
+		return s.substring(spos, epos + 1);
 	}
 }

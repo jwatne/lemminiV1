@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 /**
  * Handle replays.
+ * 
  * @author Volker Oth
  */
 public class ReplayStream {
@@ -56,14 +57,16 @@ public class ReplayStream {
 
 	/**
 	 * Get next replay event
+	 * 
 	 * @param ctr frame counter
 	 * @return replay event
 	 */
 	public ReplayEvent getNext(final int ctr) {
 		if (replayIndex >= events.size())
 			return null;
-		ReplayEvent r = events.get(replayIndex);
-		/* Note: there can be multiple replay events for one frame.
+		final ReplayEvent r = events.get(replayIndex);
+		/*
+		 * Note: there can be multiple replay events for one frame.
 		 * return the next stored event if was stored for a frame
 		 * smaller or equal to the given frame counter.
 		 */
@@ -83,55 +86,66 @@ public class ReplayStream {
 
 	/**
 	 * Clear the replay buffer from a certain frame counter.
+	 * 
 	 * @param ctr frame counter
 	 */
 	public void clearFrom(final int ctr) {
 		/* Note: there can be multiple replay events for one frame. */
-		for (int i=events.size()-1; i>0; i--) {
-			ReplayEvent r = events.get(i);
+		for (int i = events.size() - 1; i > 0; i--) {
+			final ReplayEvent r = events.get(i);
 			if (r.frameCtr > ctr // clearly behind ctr -> erase
 					|| r.frameCtr == ctr && i > replayIndex) // equal to ctr, but after replayIndex -> erase
 				events.remove(i);
-			else break;
+			else
+				break;
 		}
 		replayIndex = 0;
 	}
 
 	/**
 	 * Load replay buffer from file.
+	 * 
 	 * @param fname file name
 	 * @return replay information
 	 */
 	public ReplayLevelInfo load(final String fname) {
-		try {
-			ArrayList<ReplayEvent> ev = new ArrayList<ReplayEvent>();
-			BufferedReader f = new BufferedReader(new FileReader(fname));
+		final ArrayList<ReplayEvent> ev = new ArrayList<ReplayEvent>();
+
+		try (final BufferedReader f = new BufferedReader(new FileReader(fname))) {
 			String line = f.readLine();
+
 			if (!line.equals("#REPLAY")) {
-				f.close();
 				return null;
 			}
+
 			// read level info
 			line = f.readLine();
 			String e[] = line.split(",");
-			for (int j=0; j<e.length; j++)
+
+			for (int j = 0; j < e.length; j++) {
 				e[j] = e[j].trim();
-			ReplayLevelInfo rli = new ReplayLevelInfo();
+			}
+
+			final ReplayLevelInfo rli = new ReplayLevelInfo();
+
 			if (e[0].charAt(0) != '#') {
-				f.close();
 				return null;
 			}
+
 			rli.setLevelPack(e[0].substring(1));
 			rli.setDiffLevel(Integer.parseInt(e[1]));
 			rli.setLvlNumber(Integer.parseInt(e[2]));
-			// read events
-			while ( (line=f.readLine()) != null) {
-				e = line.split(",");
-				int i[] = new int[e.length];
-				for (int j=0; j<e.length; j++)
-					i[j] = Integer.parseInt(e[j].trim());
 
-				switch (i[1] /* type*/) {
+			// read events
+			while ((line = f.readLine()) != null) {
+				e = line.split(",");
+				final int i[] = new int[e.length];
+
+				for (int j = 0; j < e.length; j++) {
+					i[j] = Integer.parseInt(e[j].trim());
+				}
+
+				switch (i[1] /* type */) {
 					case ASSIGN_SKILL:
 						ev.add(new ReplayAssignSkillEvent(i[0], Lemming.Type.get(i[2]), i[3]));
 						break;
@@ -151,103 +165,106 @@ public class ReplayStream {
 						return null;
 				}
 			}
-			f.close();
+
 			events = ev;
 			return rli;
-		} catch(FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			return null;
-		}
-		catch(IOException e) {
+		} catch (final IOException e) {
 			return null;
-		}
-		catch(NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			return null;
-		}
-		catch(ArrayIndexOutOfBoundsException e) {
+		} catch (final ArrayIndexOutOfBoundsException e) {
 			return null;
 		}
 	}
 
 	/**
 	 * Store replay info in a file.
+	 * 
 	 * @param fname file name
 	 * @return true if save ok, false otherwise
 	 */
 	public boolean save(final String fname) {
-		try {
-			FileWriter f = new FileWriter(new File(fname));
+		try (final FileWriter f = new FileWriter(new File(fname))) {
 			f.write("#REPLAY\n");
-			LevelPack lp = GameController.getCurLevelPack();
-			f.write("#"+lp.getName()+", "+GameController.getCurDiffLevel()+", "+GameController.getCurLevelNumber()+"\n");
-			for (int i=0; i < events.size(); i++) {
-				ReplayEvent r = events.get(i);
-				f.write(r.toString()+"\n"); // will use toString of the correct child object
+			final LevelPack lp = GameController.getCurLevelPack();
+			f.write("#" + lp.getName() + ", " + GameController.getCurDiffLevel() + ", "
+					+ GameController.getCurLevelNumber() + "\n");
+			
+					for (int i = 0; i < events.size(); i++) {
+				final ReplayEvent r = events.get(i);
+				f.write(r.toString() + "\n"); // will use toString of the correct child object
 			}
-			f.close();
 
 			return true;
-		} catch(FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			return false;
-		}
-		catch(IOException e) {
+		} catch (final IOException e) {
 			return false;
 		}
 	}
 
 	/**
 	 * Add a NUKE event (all lemmings nuked).
+	 * 
 	 * @param ctr frame counter
 	 */
 	public void addNukeEvent(final int ctr) {
-		ReplayEvent event = new ReplayEvent(ctr, NUKE);
+		final ReplayEvent event = new ReplayEvent(ctr, NUKE);
 		events.add(event);
 	}
 
 	/**
 	 * Add ASSIGN_SKILL event (one lemming was assigned a skill).
-	 * @param ctr frame counter
-	 * @param skill skill assigned
+	 * 
+	 * @param ctr     frame counter
+	 * @param skill   skill assigned
 	 * @param lemming Lemming the skill was assigned to
 	 */
-	public void addAssignSkillEvent(final int ctr, final Lemming.Type skill, final int lemming ) {
-		ReplayAssignSkillEvent event = new ReplayAssignSkillEvent(ctr, skill, lemming);
+	public void addAssignSkillEvent(final int ctr, final Lemming.Type skill, final int lemming) {
+		final ReplayAssignSkillEvent event = new ReplayAssignSkillEvent(ctr, skill, lemming);
 		events.add(event);
 	}
 
 	/**
 	 * Add SELECT_SKILL event (skill selection button was pressed).
-	 * @param ctr frame counter
+	 * 
+	 * @param ctr   frame counter
 	 * @param skill skill selected
 	 */
 	public void addSelectSkillEvent(final int ctr, final Lemming.Type skill) {
 
-		ReplaySelectSkillEvent event = new ReplaySelectSkillEvent(ctr, skill);
+		final ReplaySelectSkillEvent event = new ReplaySelectSkillEvent(ctr, skill);
 		events.add(event);
 	}
 
 	/**
 	 * Add MOVE_XPOS event (screen moved left/right).
-	 * @param ctr frame counter
+	 * 
+	 * @param ctr  frame counter
 	 * @param xPos new screen position
 	 */
-	public void addXPosEvent(final int ctr, final int xPos ) {
-		ReplayMoveXPosEvent event = new ReplayMoveXPosEvent(ctr, xPos);
+	public void addXPosEvent(final int ctr, final int xPos) {
+		final ReplayMoveXPosEvent event = new ReplayMoveXPosEvent(ctr, xPos);
 		events.add(event);
 	}
 
 	/**
 	 * Add SET_RELEASE_RATE event (release rate was changed).
-	 * @param ctr frame counter
+	 * 
+	 * @param ctr         frame counter
 	 * @param releaserate new release rate
 	 */
-	public void addReleaseRateEvent(final int ctr, final int releaserate ) {
-		ReplayReleaseRateEvent event = new ReplayReleaseRateEvent(ctr, releaserate);
+	public void addReleaseRateEvent(final int ctr, final int releaserate) {
+		final ReplayReleaseRateEvent event = new ReplayReleaseRateEvent(ctr, releaserate);
 		events.add(event);
 	}
 }
 
 /**
  * Storage class for one replay event.
+ * 
  * @author Volker Oth
  */
 class ReplayEvent {
@@ -258,25 +275,29 @@ class ReplayEvent {
 
 	/**
 	 * Constructor
+	 * 
 	 * @param ctr frame counter
-	 * @param t type
+	 * @param t   type
 	 */
 	public ReplayEvent(final int ctr, final int t) {
 		frameCtr = ctr;
 		type = t;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
 	public String toString() {
-		return ""+frameCtr+", "+type;
+		return "" + frameCtr + ", " + type;
 	}
 }
 
 /**
  * Storage class for ASSIGN_SKILL event
+ * 
  * @author Volker Oth
  */
 class ReplayAssignSkillEvent extends ReplayEvent {
@@ -287,8 +308,9 @@ class ReplayAssignSkillEvent extends ReplayEvent {
 
 	/**
 	 * Skill assigned
+	 * 
 	 * @param ctr Frame counter
-	 * @param s skill selected
+	 * @param s   skill selected
 	 * @param lem lemming no. that the skill was assigned
 	 */
 	public ReplayAssignSkillEvent(final int ctr, final Lemming.Type s, final int lem) {
@@ -297,17 +319,20 @@ class ReplayAssignSkillEvent extends ReplayEvent {
 		lemming = lem;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see Game.ReplayEvent#toString()
 	 */
 	@Override
 	public String toString() {
-		return super.toString()+", "+skill.ordinal()+", "+lemming;
+		return super.toString() + ", " + skill.ordinal() + ", " + lemming;
 	}
 }
 
 /**
  * Storage class for SELECT_SKILL event.
+ * 
  * @author Volker Oth
  */
 class ReplaySelectSkillEvent extends ReplayEvent {
@@ -315,25 +340,29 @@ class ReplaySelectSkillEvent extends ReplayEvent {
 
 	/**
 	 * Skill selected
+	 * 
 	 * @param ctr Frame counter
-	 * @param s skill selected
+	 * @param s   skill selected
 	 */
 	public ReplaySelectSkillEvent(final int ctr, final Lemming.Type s) {
 		super(ctr, ReplayStream.SELECT_SKILL);
 		skill = s;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see Game.ReplayEvent#toString()
 	 */
 	@Override
 	public String toString() {
-		return super.toString()+", "+skill.ordinal();
+		return super.toString() + ", " + skill.ordinal();
 	}
 }
 
 /**
  * Storage class for MOVE_XPOS event.
+ * 
  * @author Volker Oth
  */
 class ReplayMoveXPosEvent extends ReplayEvent {
@@ -342,25 +371,29 @@ class ReplayMoveXPosEvent extends ReplayEvent {
 
 	/**
 	 * Screen X position changed event
+	 * 
 	 * @param ctr Frame counter
-	 * @param x release x position
+	 * @param x   release x position
 	 */
 	public ReplayMoveXPosEvent(final int ctr, final int x) {
 		super(ctr, ReplayStream.MOVE_XPOS);
 		xPos = x;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see Game.ReplayEvent#toString()
 	 */
 	@Override
 	public String toString() {
-		return super.toString()+", "+xPos;
+		return super.toString() + ", " + xPos;
 	}
 }
 
 /**
  * Storage class for SET_RELEASE_RATE event.
+ * 
  * @author Volker Oth
  */
 class ReplayReleaseRateEvent extends ReplayEvent {
@@ -368,7 +401,8 @@ class ReplayReleaseRateEvent extends ReplayEvent {
 
 	/**
 	 * Release Rate changed event
-	 * @param ctr Frame counter
+	 * 
+	 * @param ctr  Frame counter
 	 * @param rate release rate value
 	 */
 	public ReplayReleaseRateEvent(final int ctr, final int rate) {
@@ -376,11 +410,13 @@ class ReplayReleaseRateEvent extends ReplayEvent {
 		releaseRate = rate;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see Game.ReplayEvent#toString()
 	 */
 	@Override
 	public String toString() {
-		return super.toString()+", "+releaseRate;
+		return super.toString() + ", " + releaseRate;
 	}
 }

@@ -1,4 +1,5 @@
 package Game;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,32 +44,35 @@ public class MidiMusic {
 
 	/**
 	 * Constructor.
+	 * 
 	 * @param fName file name
 	 * @throws ResourceException
 	 * @throws LemmException
 	 */
 	public MidiMusic(final String fName) throws ResourceException, LemmException {
-		try {
-			FileInputStream f = new FileInputStream(Core.findResource(fName));
+		try (FileInputStream f = new FileInputStream(Core.findResource(fName))) {
 			canPlay = false;
 			sequencer = MidiSystem.getSequencer();
+
 			if (sequencer == null) {
-				f.close();;
 				throw new LemmException("Midi not supported");
 			} else {
 				// Acquire resources and make operational.
 				sequencer.open();
 			}
-			Sequence mySeq = MidiSystem.getSequence(f);
+
+			final Sequence mySeq = MidiSystem.getSequence(f);
+
 			if (sequencer != null) {
 				setGain(Music.getGain());
 				sequencer.setSequence(mySeq);
 				canPlay = true;
 				sequencer.addMetaEventListener(new MetaEventListener() {
 					@Override
-					public void meta(MetaMessage event) {
-						int type = event.getType();
-						//System.out.println("midi message: "+type+" "+event.toString());
+					public void meta(final MetaMessage event) {
+						final int type = event.getType();
+						// System.out.println("midi message: "+type+" "+event.toString());
+
 						if (type == 47) {
 							sequencer.setTickPosition(0);
 							sequencer.start();
@@ -76,16 +80,15 @@ public class MidiMusic {
 					}
 				});
 			}
-		} catch (MidiUnavailableException ex) {
+		} catch (final MidiUnavailableException ex) {
 			throw new LemmException("Midi not supported");
-		} catch (InvalidMidiDataException ex) {
-			throw new ResourceException(fName+" (Invalid midi data)");
-		} catch (FileNotFoundException ex) {
+		} catch (final InvalidMidiDataException ex) {
+			throw new ResourceException(fName + " (Invalid midi data)");
+		} catch (final FileNotFoundException ex) {
 			throw new ResourceException(fName);
-		} catch (IOException ex) {
-			throw new ResourceException(fName+" (IO exception)");
+		} catch (final IOException ex) {
+			throw new ResourceException(fName + " (IO exception)");
 		}
-
 	}
 
 	/**
@@ -109,15 +112,18 @@ public class MidiMusic {
 	 */
 	public void close() {
 		stop();
-		if (sequencer != null)
+
+		if (sequencer != null) {
 			sequencer.close();
+		}
 	}
 
 	/**
 	 * Set gain (volume) of midi output
+	 * 
 	 * @param gn gain factor: 0.0 (off) .. 1.0 (full volume)
 	 */
-	public void setGain(double gn) {
+	public void setGain(final double gn) {
 		double gain;
 		if (gn > 1.0)
 			gain = 1.0;
@@ -126,11 +132,11 @@ public class MidiMusic {
 		else
 			gain = gn;
 		if (sequencer != null && sequencer instanceof Synthesizer) {
-			Synthesizer synthesizer = (Synthesizer)sequencer;
-			MidiChannel[] channels = synthesizer.getChannels();
+			final Synthesizer synthesizer = (Synthesizer) sequencer;
+			final MidiChannel[] channels = synthesizer.getChannels();
 
-			for (int i=0; i<channels.length; i++) {
-				channels[i].controlChange(7, (int)(gain * 127.0));
+			for (int i = 0; i < channels.length; i++) {
+				channels[i].controlChange(7, (int) (gain * 127.0));
 			}
 		}
 	}

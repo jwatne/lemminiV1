@@ -268,7 +268,6 @@ public class Lemming {
 	 * Update animation, move Lemming, check state transitions.
 	 */
 	public void animate() {
-		int free;
 		final Type oldType = type;
 		Type newType = type;
 		final int oldX = x;
@@ -281,6 +280,143 @@ public class Lemming {
 		flipDirBorder();
 
 		// lemming state machine
+		newType = executeLemmingStateMachine(newType, oldX, explode);
+
+		// check collision with exit and traps
+		newType = processTrapMasks(newType);
+
+		// animate
+		if (oldType == newType) {
+			final boolean trigger = animateLoopOrOnce();
+			newType = animateIfTriggerConditionReached(newType, trigger);
+		}
+
+		changeType(oldType, newType);
+	}
+
+	/**
+	 * Animates the Lemming's current type if the trigger condition is reached.
+	 * 
+	 * @param initialNewType the original new Type to be assigned to the Lemming
+	 *                       before the call to this method.
+	 * @param trigger        <code>true</code> if trigger condition reached.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
+	private Type animateIfTriggerConditionReached(final Type initialNewType, final boolean trigger) {
+		Type newType = initialNewType;
+
+		if (trigger) {
+			// Trigger condition reached?
+			switch (type) {
+				case BOMBER_STOPPER: {
+					final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
+					m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
+				}
+
+				//$FALL-THROUGH$
+				case BOMBER:
+					explode();
+					break;
+				case SPLAT:
+				case DROWNING:
+				case TRAPPED:
+					hasDied = true;
+					break;
+				case EXITING:
+					hasLeft = true;
+					GameController.increaseLeft();
+					break;
+				case FLOATER_START:
+					type = Type.FLOATER; // should never happen
+					//$FALL-THROUGH$
+				case FLOATER:
+					frameIdx -= 5 * TIME_SCALE; // rewind 5 frames
+					break;
+				case CLIMBER_TO_WALKER:
+					newType = Type.WALKER;
+					y -= 10; // why is this needed? could be done via foot coordinates?
+					break;
+				case DIGGER:
+					// the dig mask must be applied to the bottom of the lemming
+					newType = applyDigMaskToBottomOfLemming(newType);
+					break;
+				case BUILDER_END:
+					newType = Type.WALKER;
+					break;
+				default:
+					break;
+			}
+		}
+
+		return newType;
+	}
+
+	/**
+	 * Performs the proper animation for a LOOP or ONCE animation mode.
+	 * 
+	 * @return <code>true</code> if the trigger condition is reached by executing
+	 *         the animation.
+	 */
+	private boolean animateLoopOrOnce() {
+		boolean trigger = false;
+
+		switch (lemRes.animMode) {
+			case LOOP:
+				trigger = animateLoop(trigger);
+				break;
+			case ONCE:
+				trigger = animateOnce(trigger);
+				break;
+			default:
+				break;
+		}
+
+		return trigger;
+	}
+
+	/**
+	 * Perform special animations if the {@link Stencil} for the pixel in the middle
+	 * of the Lemming indicates a trap or level exit.
+	 * 
+	 * @param initialNewType the original new Type to be assigned to the Lemming
+	 *                       before the call to this method.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
+	private Type processTrapMasks(final Type initialNewType) {
+		Type newType = initialNewType;
+		final int s = stencilMid();
+
+		switch (s & (Stencil.MSK_TRAP | Stencil.MSK_EXIT)) {
+			case Stencil.MSK_TRAP_DROWN:
+				newType = animateDrowning(newType, s);
+				break;
+			case Stencil.MSK_TRAP_DIE:
+				newType = animateNormalDeath(newType, s);
+				break;
+			case Stencil.MSK_TRAP_REPLACE:
+				replaceLemmingWithSpecialDeathAnimation(s);
+				break;
+			case Stencil.MSK_EXIT:
+				newType = animateExitLevel(newType, s);
+				break;
+		}
+
+		return newType;
+	}
+
+	/**
+	 * Executes the Lemming state machine.
+	 * 
+	 * @param initialNewType the original new Type to be assigned to the Lemming
+	 *                       before the call to this method.
+	 * @param oldX           the old X value of the foot in pixels.
+	 * @param explode        <code>true</code> if the Lemming is to explode.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
+	private Type executeLemmingStateMachine(final Type initialNewType, final int oldX, final boolean explode) {
+		Type newType = initialNewType;
+		int free;
+
 		switch (type) {
 			case CLIMBER_TO_WALKER:
 				if (explode) {
@@ -292,26 +428,22 @@ public class Lemming {
 				if (explode) {
 					explode();
 				} else {
-					newType = handleFaller(newType);
+					newType = animateFaller(newType);
 				}
 
 				break;
-			case JUMPER: {
+			case JUMPER:
 				if (explode) {
 					newType = Type.BOMBER;
 					playOhNoIfNotToBeNuked();
 				} else if (!turnedByStopper()) {
-					newType = handleJumper(newType);
+					newType = animateJumper(newType);
 				}
 
 				break;
-			}
-
-			case WALKER: {
+			case WALKER:
 				newType = animateWalker(newType, oldX, explode);
 				break;
-			}
-
 			case FLOATER_START:
 				animateFloaterStart(explode);
 				//$FALL-THROUGH$
@@ -373,86 +505,16 @@ public class Lemming {
 				}
 		}
 
-		// check collision with exit and traps
-		final int s = stencilMid();
-
-		switch (s & (Stencil.MSK_TRAP | Stencil.MSK_EXIT)) {
-			case Stencil.MSK_TRAP_DROWN:
-				newType = animateDrowning(newType, s);
-				break;
-			case Stencil.MSK_TRAP_DIE:
-				newType = animateNormalDeath(newType, s);
-				break;
-			case Stencil.MSK_TRAP_REPLACE:
-				replaceLemmingWithSpecialDeathAnimation(s);
-				break;
-			case Stencil.MSK_EXIT:
-				newType = animateExitLevel(newType, s);
-				break;
-		}
-
-		// animate
-		if (oldType == newType) {
-			boolean trigger = false;
-
-			switch (lemRes.animMode) {
-				case LOOP:
-					trigger = animateLoop(trigger);
-					break;
-				case ONCE:
-					trigger = animateOnce(trigger);
-					break;
-				default:
-					break;
-			}
-
-			if (trigger) {
-				// Trigger condition reached?
-				switch (type) {
-					case BOMBER_STOPPER: {
-						final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
-						m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
-					}
-
-					//$FALL-THROUGH$
-					case BOMBER:
-						explode();
-						break;
-					case SPLAT:
-					case DROWNING:
-					case TRAPPED:
-						hasDied = true;
-						break;
-					case EXITING:
-						hasLeft = true;
-						GameController.increaseLeft();
-						break;
-					case FLOATER_START:
-						type = Type.FLOATER; // should never happen
-						//$FALL-THROUGH$
-					case FLOATER:
-						frameIdx -= 5 * TIME_SCALE; // rewind 5 frames
-						break;
-					case CLIMBER_TO_WALKER:
-						newType = Type.WALKER;
-						y -= 10; // why is this needed? could be done via foot coordinates?
-						break;
-					case DIGGER:
-						// the dig mask must be applied to the bottom of the lemming
-						newType = applyDigMaskToBottomOfLemming(newType);
-						break;
-					case BUILDER_END:
-						newType = Type.WALKER;
-						break;
-					default:
-						break;
-				}
-			}
-		}
-
-		changeType(oldType, newType);
+		return newType;
 	}
 
+	/**
+	 * Applies dig mask to bottom of Lemming.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type applyDigMaskToBottomOfLemming(final Type startingNewType) {
 		Type newType = startingNewType;
 		int free;
@@ -509,6 +571,13 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Animates once.
+	 * 
+	 * @param startingTrigger the initial value of the trigger before calling this
+	 *                        method.
+	 * @return the updated value of the trigger.
+	 */
 	private boolean animateOnce(final boolean startingTrigger) {
 		boolean trigger = startingTrigger;
 
@@ -521,6 +590,13 @@ public class Lemming {
 		return trigger;
 	}
 
+	/**
+	 * Animates loop.
+	 * 
+	 * @param startingTrigger the initial value of the trigger before calling this
+	 *                        method.
+	 * @return the updated value of the trigger.
+	 */
 	private boolean animateLoop(final boolean startingTrigger) {
 		boolean trigger = startingTrigger;
 
@@ -535,6 +611,14 @@ public class Lemming {
 		return trigger;
 	}
 
+	/**
+	 * Animates exiting the level.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @param s               {@link Stencil} value from the middle of the Lemming.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type animateExitLevel(final Type startingNewType, final int s) {
 		Type newType = startingNewType;
 
@@ -556,6 +640,11 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Replaces the Lemming with the special death animation.
+	 * 
+	 * @param s {@link Stencil} value from the middle of the Lemming.
+	 */
 	private void replaceLemmingWithSpecialDeathAnimation(final int s) {
 		final SpriteObject spr = GameController.getLevel().getSprObject(Stencil.getObjectID(s));
 
@@ -576,6 +665,14 @@ public class Lemming {
 		}
 	}
 
+	/**
+	 * Animates normal death.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @param s               {@link Stencil} value from the middle of the Lemming.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type animateNormalDeath(final Type startingNewType, final int s) {
 		Type newType = startingNewType;
 
@@ -602,6 +699,14 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Animates drowning.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @param s               {@link Stencil} value from the middle of the Lemming.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type animateDrowning(final Type startingNewType, final int s) {
 		Type newType = startingNewType;
 
@@ -614,6 +719,9 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Animates bomber.
+	 */
 	private void animateBomber() {
 		int free;
 		free = freeBelow(FLOATER_STEP);
@@ -627,12 +735,23 @@ public class Lemming {
 		crossedLowerBorder();
 	}
 
+	/**
+	 * Erases mask and converts to normal stopper.
+	 */
 	private void eraseMaskAndConvertToNormalStopper() {
 		final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
 		m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
 		type = Type.BOMBER;
 	}
 
+	/**
+	 * Animates stopper.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @param explode         <code>true</code> if the Lemming is to explode.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type animateStopper(final Type startingNewType, final boolean explode) {
 		Type newType = startingNewType;
 		int free;
@@ -671,6 +790,15 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Animates builder.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @param oldX            the old X value of the foot in pixels.
+	 * @param explode         <code>true</code> if the Lemming is to explode.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type animateBuilder(final Type startingNewType, final int oldX, final boolean explode) {
 		Type newType = startingNewType;
 
@@ -729,6 +857,14 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Animates miner.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @param explode         <code>true</code> if the Lemming is to explode.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type animateMiner(final Type startingNewType, final boolean explode) {
 		Type newType = startingNewType;
 		int free;
@@ -793,6 +929,14 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Animates basher.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @param explode         <code>true</code> if the Lemming is to explode.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type animateBasher(final Type startingNewType, final boolean explode) {
 		Type newType = startingNewType;
 		int free;
@@ -909,6 +1053,11 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Animates splat.
+	 * 
+	 * @param explode <code>true</code> if the Lemming is to explode.
+	 */
 	private void animateSplat(final boolean explode) {
 		if (explode) {
 			explode();
@@ -917,6 +1066,14 @@ public class Lemming {
 		}
 	}
 
+	/**
+	 * Animates climber.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @param explode         <code>true</code> if the Lemming is to explode.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type animateClimber(final Type startingNewType, final boolean explode) {
 		Type newType = startingNewType;
 
@@ -940,6 +1097,14 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Animates floater.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @param explode         <code>true</code> if the Lemming is to explode.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type animateFloater(final Type startingNewType, final boolean explode) {
 		Type newType = startingNewType;
 		int free;
@@ -969,6 +1134,11 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Starts animating floater.
+	 * 
+	 * @param explode <code>true</code> if the Lemming is to explode.
+	 */
 	private void animateFloaterStart(final boolean explode) {
 		if (explode) {
 			explode();
@@ -994,6 +1164,15 @@ public class Lemming {
 		}
 	}
 
+	/**
+	 * Animates walker.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @param oldX            the old X value of the foot in pixels.
+	 * @param explode         <code>true</code> if the Lemming is to explode.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
 	private Type animateWalker(final Type startingNewType, final int oldX, final boolean explode) {
 		Type newType = startingNewType;
 		int free;
@@ -1055,7 +1234,14 @@ public class Lemming {
 		return newType;
 	}
 
-	private Type handleJumper(final Type startingNewType) {
+	/**
+	 * Animates jumper.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
+	private Type animateJumper(final Type startingNewType) {
 		Type newType = startingNewType;
 		final int levitation = aboveGround();
 
@@ -1070,7 +1256,14 @@ public class Lemming {
 		return newType;
 	}
 
-	private Type handleFaller(final Type startingNewType) {
+	/**
+	 * Animates faller.
+	 * 
+	 * @param startingNewType the original new Type to be assigned to the Lemming
+	 *                        before the call to this method.
+	 * @return the updated new Type to be assigned to the Lemming.
+	 */
+	private Type animateFaller(final Type startingNewType) {
 		Type newType = startingNewType;
 		int free;
 		free = freeBelow(FALLER_STEP);
@@ -1102,12 +1295,20 @@ public class Lemming {
 		return newType;
 	}
 
+	/**
+	 * Plays &quot;oh no&quot; sound if Lemming is not (already) to be nuked.
+	 */
 	private void playOhNoIfNotToBeNuked() {
 		if (!nuke) {
 			GameController.sound.play(GameController.SND_OHNO);
 		}
 	}
 
+	/**
+	 * Indicates whether the Lemming has finished exploding.
+	 * 
+	 * @return <code>true</code> if the Lemming has finished exploding.
+	 */
 	private boolean checkExplodeState() {
 		boolean explode = false;
 
@@ -1852,158 +2053,4 @@ public class Lemming {
 		return canChangeSkill;
 	}
 
-}
-
-/**
- * Storage class for a Lemming.
- * 
- * @author Volker Oth
- */
-class LemmingResource {
-	/** relative foot X position in pixels inside bitmap */
-	int footX;
-	/** relative foot Y position in pixels inside bitmap */
-	int footY;
-	/** mask collision ("mid") position above foot in pixels */
-	int size;
-	/** width of image in pixels */
-	int width;
-	/** height of image in pixels */
-	int height;
-	/** number of animation frames */
-	int frames;
-	/** animation mode */
-	Lemming.Animation animMode;
-	/** number of directions (1 or 2) */
-	int dirs;
-	int maskStep;
-	/** array of images to store the animation [Direction][AnimationFrame] */
-	private final BufferedImage img[][];
-	/**
-	 * array of removal masks used for digging/bashing/mining/explosions etc.
-	 * [Direction]
-	 */
-	private final Mask mask[];
-	/** array of check masks for indestructible pixels [Direction] */
-	private final Mask iMask[];
-
-	/**
-	 * Constructor.
-	 * 
-	 * @param sourceImg  image containing animation frames (one above the other)
-	 * @param animFrames number of animation frames.
-	 * @param directions number of directions (1 or 2)
-	 */
-	LemmingResource(final BufferedImage sourceImg, final int animFrames, final int directions) {
-		img = new BufferedImage[directions][];
-		mask = new Mask[directions];
-		iMask = new Mask[directions];
-		frames = animFrames;
-		width = sourceImg.getWidth(null);
-		height = sourceImg.getHeight(null) / animFrames;
-		dirs = directions;
-		animMode = Lemming.Animation.NONE;
-		img[Lemming.Direction.RIGHT.ordinal()] = ToolBox.getAnimation(sourceImg, animFrames, Transparency.BITMASK);
-		if (dirs > 1)
-			img[Lemming.Direction.LEFT.ordinal()] = ToolBox.getAnimation(ToolBox.flipImageX(sourceImg), animFrames,
-					Transparency.BITMASK);
-	}
-
-	/**
-	 * Get the mask for stencil manipulation.
-	 * 
-	 * @param dir Direction
-	 * @return mask for stencil manipulation
-	 */
-	Mask getMask(final Lemming.Direction dir) {
-		if (dirs > 1)
-			return mask[dir.ordinal()];
-		else
-			return mask[0];
-	}
-
-	/**
-	 * Set the mask for stencil manipulation.
-	 * 
-	 * @param dir Direction
-	 * @param m   mask for stencil manipulation
-	 */
-	void setMask(final Lemming.Direction dir, final Mask m) {
-		if (dirs > 1)
-			mask[dir.ordinal()] = m;
-		else
-			mask[0] = m;
-	}
-
-	/**
-	 * Get the mask for checking of indestructible pixels.
-	 * 
-	 * @param dir Direction
-	 * @return mask for checking of indestructible pixels
-	 */
-	Mask getImask(final Lemming.Direction dir) {
-		if (dirs > 1)
-			return iMask[dir.ordinal()];
-		else
-			return iMask[0];
-	}
-
-	/**
-	 * Set the mask for checking of indestructible pixels
-	 * 
-	 * @param dir Direction
-	 * @param m   mask for checking of indestructible pixels
-	 */
-	void setImask(final Lemming.Direction dir, final Mask m) {
-		if (dirs > 1)
-			iMask[dir.ordinal()] = m;
-		else
-			iMask[0] = m;
-	}
-
-	/**
-	 * Get specific animation frame.
-	 * 
-	 * @param dir   Direction.
-	 * @param frame Index of animation frame.
-	 * @return specific animation frame
-	 */
-	BufferedImage getImage(final Lemming.Direction dir, final int frame) {
-		if (dirs > 1)
-			return img[dir.ordinal()][frame];
-		else
-			return img[0][frame];
-	}
-}
-
-/**
- * Used to manage the font for the explosion counter.
- * 
- * @author Volker Oth
- */
-class ExplodeFont {
-
-	/**
-	 * Constructor.
-	 * 
-	 * @param cmp parent component
-	 * @throws ResourceException
-	 */
-	ExplodeFont(final Component cmp) throws ResourceException {
-		final Image sourceImg = Core.loadImage("misc/countdown.gif");
-		img = ToolBox.getAnimation(sourceImg, 5, Transparency.BITMASK);
-	}
-
-	/**
-	 * Get image for a counter value (0..9)
-	 * 
-	 * @param num counter value (0..9)
-	 * @return
-	 */
-	BufferedImage getImage(final int num) {
-		return img[num];
-	}
-
-	/** array of images for each counter value */
-	private final BufferedImage img[];
 }

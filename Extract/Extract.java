@@ -115,7 +115,7 @@ public class Extract extends Thread {
 			createDirectories(props);
 			copyStuff(props);
 			cloneFiles(props);
-			PatchService patchService = new PatchService();
+			final PatchService patchService = new PatchService();
 			patchService.createDifFiles(props, referencePath, destinationPath, createdFiles);
 			patchService.patchAllFiles(destinationPath);
 			// } // debug only
@@ -259,8 +259,14 @@ public class Extract extends Thread {
 			}
 
 			out(path);
-			final File dest = new File(destinationPath + path);
-			dest.mkdirs();
+			final String destFolder = destinationPath + path;
+			final File dest = new File(destFolder);
+			final boolean mkdirs = dest.mkdirs();
+
+			if (!mkdirs) {
+				System.out.println("Unable to make dir " + dest);
+			}
+
 			checkCancel();
 		}
 	}
@@ -286,8 +292,14 @@ public class Extract extends Thread {
 			}
 
 			out(object[0]);
-			final File dest = new File(destinationPath + object[3]);
-			dest.mkdirs();
+			final String pathname = destinationPath + object[3];
+			final File dest = new File(pathname);
+			final boolean mkdirs = dest.mkdirs();
+
+			if (!mkdirs) {
+				System.out.println("Unable to make dir " + pathname);
+			}
+
 			// load palette and sprite
 			sprite.loadPalette(SOURCE_PATH + object[1]);
 			sprite.loadSPR(SOURCE_PATH + object[0]);
@@ -333,8 +345,14 @@ public class Extract extends Thread {
 			}
 
 			out(styles[3]);
-			final File dest = new File(destinationPath + styles[2]);
-			dest.mkdirs();
+			final String pathname = destinationPath + styles[2];
+			final File dest = new File(pathname);
+			final boolean mkdirs = dest.mkdirs();
+
+			if (!mkdirs) {
+				System.out.println("Unable to make dir " + pathname);
+			}
+
 			// load palette and sprite
 			sprite.loadPalette(SOURCE_PATH + styles[1]);
 			sprite.loadSPR(SOURCE_PATH + styles[0]);
@@ -472,7 +490,12 @@ public class Extract extends Thread {
 		final String root = addSeparator(r);
 		final String destination = addSeparator(destin);
 		final File dest = new File(destination);
-		dest.mkdirs();
+		final boolean mkdirs = dest.mkdirs();
+
+		if (!mkdirs) {
+			System.out.println("Unable to make dir " + destination);
+		}
+
 		final File[] levels = fRoot.listFiles(ff);
 
 		if (levels == null) {

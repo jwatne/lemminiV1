@@ -88,7 +88,7 @@ public class Lemming {
 		private static final Map<Integer, Type> lookup = new HashMap<Integer, Type>();
 
 		static {
-			for (Type s : EnumSet.allOf(Type.class))
+			for (final Type s : EnumSet.allOf(Type.class))
 				lookup.put(s.ordinal(), s);
 		}
 
@@ -112,7 +112,7 @@ public class Lemming {
 		private static final Map<Integer, Direction> lookup = new HashMap<Integer, Direction>();
 
 		static {
-			for (Direction s : EnumSet.allOf(Direction.class))
+			for (final Direction s : EnumSet.allOf(Direction.class))
 				lookup.put(s.ordinal(), s);
 		}
 
@@ -269,10 +269,10 @@ public class Lemming {
 	 */
 	public void animate() {
 		int free;
-		Type oldType = type;
+		final Type oldType = type;
 		Type newType = type;
-		int oldX = x;
-		boolean explode = checkExplodeState();
+		final int oldX = x;
+		final boolean explode = checkExplodeState();
 
 		if (selectCtr > 0) {
 			selectCtr--;
@@ -308,143 +308,21 @@ public class Lemming {
 			}
 
 			case WALKER: {
-				if (explode) {
-					newType = Type.BOMBER;
-					playOhNoIfNotToBeNuked();
-					break;
-				} else if (!turnedByStopper()) {
-					if (dir == Direction.RIGHT) {
-						x += WALKER_STEP;
-					} else if (dir == Direction.LEFT) {
-						x -= WALKER_STEP;
-					}
-
-					boolean doBreak = false;
-
-					// check
-					free = freeBelow(FALL_DISTANCE_FALL);
-
-					if (free >= FALL_DISTANCE_FALL) {
-						y += FALLER_STEP;
-					} else {
-						y += free;
-						counter = free;
-					}
-
-					int levitation = aboveGround();
-
-					// check for flip direction
-					if (levitation < WALKER_OBSTACLE_HEIGHT && (y + lemRes.height / 2) > 0) {
-						if (levitation >= JUMPER_JUMP) {
-							y -= JUMPER_STEP;
-							newType = Type.JUMPER;
-							doBreak = true; // Stop processing after enclosing if/else.
-						} else {
-							y -= levitation;
-						}
-					} else {
-						x = oldX;
-
-						if (canClimb) {
-							newType = Type.CLIMBER;
-							doBreak = true; // Stop processing after enclosing if/else.
-						} else {
-							dir = (dir == Direction.RIGHT) ? Direction.LEFT : Direction.RIGHT;
-						}
-					}
-
-					if (!doBreak && (free > 0)) {
-						// check for conversion to faller
-						counter += FALLER_STEP; // @check: is this ok? increasing counter, but using free???
-
-						if (free >= FALL_DISTANCE_FALL) {
-							newType = Type.FALLER;
-						}
-					}
-				}
-
+				newType = animateWalker(newType, oldX, explode);
 				break;
 			}
 
 			case FLOATER_START:
-				if (explode) {
-					explode();
-					break;
-				} else {
-					switch (counter2++) {
-						case 0:
-						case 1: // keep falling with faller speed
-						case 2:
-							y += FALLER_STEP - FLOATER_STEP;
-							break;
-						case 3:
-							y -= FLOATER_STEP - 1; // decelerate a little
-							break;
-						case 4:
-						case 5:
-						case 6:
-						case 7:
-							y -= FLOATER_STEP; // decelerate some more
-							break;
-						default:
-							type = Type.FLOATER;
-					}
-				}
-
+				animateFloaterStart(explode);
 				//$FALL-THROUGH$
 			case FLOATER:
-				if (explode) {
-					explode();
-					break;
-				} else {
-					free = freeBelow(FLOATER_STEP);
-
-					if (free == FALL_DISTANCE_FORCE_FALL) {
-						y += FLOATER_STEP;
-					} else {
-						y += free; // max: FLOATER_STEP
-					}
-
-					if (!crossedLowerBorder()) {
-						counter += free; // fall counter
-
-						// check ground hit
-						if (free == 0) {
-							newType = Type.WALKER;
-							counter = 0;
-						}
-					}
-				}
-
+				newType = animateFloater(newType, explode);
 				break;
 			case CLIMBER:
-				if (explode) {
-					explode();
-					break;
-				} else {
-					if ((++counter & 1) == 1) { // only every other step
-						y -= CLIMBER_STEP;
-					}
-
-					if (midY() < 0 || freeAbove(2) < 2) {
-						dir = (dir == Direction.RIGHT) ? Direction.LEFT : Direction.RIGHT;
-						newType = Type.FALLER;
-						counter = 0;
-					} else if (reachedPlateau()) {
-						counter = 0;
-						newType = Type.CLIMBER_TO_WALKER;
-					}
-				}
-
+				newType = animateClimber(newType, explode);
 				break;
 			case SPLAT:
-				if (explode) {
-					explode();
-					break;
-				} else if (frameIdx == 0) { // looped once
-					GameController.sound.play(GameController.SND_SPLAT);
-				}
-
+				animateSplat(explode);
 				break;
 			case DIGGER:
 				if (explode) {
@@ -453,180 +331,12 @@ public class Lemming {
 				}
 
 				break;
-			case BASHER: {
-				if (explode) {
-					newType = Type.BOMBER;
-					playOhNoIfNotToBeNuked();
-				} else {
-					// check for conversion to faller
-					// check collision with stopper
-					if (turnedByStopper()) {
-						newType = Type.WALKER;
-					} else {
-						free = freeBelow(FLOATER_STEP);
-
-						if (free == FALL_DISTANCE_FORCE_FALL) {
-							y += FALLER_STEP;
-						} else {
-							y += free;
-						}
-
-						if (free != 0) {
-							counter += free;
-
-							if (counter >= BASHER_FALL_DISTANCE) {
-								newType = Type.FALLER;
-							}
-						} else {
-							counter = 0;
-						}
-
-						Mask m;
-						int checkMask;
-						int idx = frameIdx + 1;
-
-						if (idx >= lemRes.frames * TIME_SCALE) {
-							idx = 0;
-						}
-
-						switch (idx) {
-							case 2 * TIME_SCALE:
-							case 3 * TIME_SCALE:
-							case 4 * TIME_SCALE:
-							case 5 * TIME_SCALE: {
-								// bash mask should have the same height as the lemming
-								m = lemRes.getMask(dir);
-								int sx = screenX();
-								int sy = screenY();
-								checkMask = Stencil.MSK_STEEL
-										| ((dir == Direction.LEFT) ? Stencil.MSK_NO_DIG_LEFT
-												: Stencil.MSK_NO_DIG_RIGHT);
-								m.eraseMask(sx, sy, idx / TIME_SCALE - 2, checkMask);
-
-								// check for conversion to walker because there are indestructible pixels
-								if (lemRes.getImask(dir).checkType(sx, sy, 0, checkMask)) {
-									GameController.sound.play(GameController.SND_CHINK);
-									newType = Type.WALKER;
-								}
-
-								if (idx == 5 * TIME_SCALE) {
-									// check for conversion to walker because there are no bricks left
-									if (!canBash()) {
-										// no bricks any more
-										newType = Type.WALKER;
-									}
-								}
-
-								break;
-							}
-
-							case 18 * TIME_SCALE:
-							case 19 * TIME_SCALE:
-							case 20 * TIME_SCALE:
-							case 21 * TIME_SCALE: {
-								// bash mask should have the same height as the lemming
-								m = lemRes.getMask(dir);
-								int sx = screenX();
-								int sy = screenY();
-								checkMask = Stencil.MSK_STEEL
-										| ((dir == Direction.LEFT) ? Stencil.MSK_NO_DIG_LEFT
-												: Stencil.MSK_NO_DIG_RIGHT);
-								m.eraseMask(sx, sy, idx / TIME_SCALE - 18, checkMask);
-
-								// check for conversion to walker because there are indestructible pixels
-								if (lemRes.getImask(dir).checkType(sx, sy, 0, checkMask)) {
-									GameController.sound.play(GameController.SND_CHINK);
-									newType = Type.WALKER;
-								}
-
-								break;
-							}
-
-							case 10 * TIME_SCALE:
-							case 11 * TIME_SCALE:
-							case 12 * TIME_SCALE:
-							case 13 * TIME_SCALE:
-							case 14 * TIME_SCALE:
-							case 26 * TIME_SCALE:
-							case 27 * TIME_SCALE:
-							case 28 * TIME_SCALE:
-							case 29 * TIME_SCALE:
-							case 30 * TIME_SCALE:
-								if (dir == Direction.RIGHT) {
-									x += 2;
-								} else {
-									x -= 2;
-								}
-
-								break;
-						}
-					}
-				}
-
+			case BASHER:
+				newType = animateBasher(newType, explode);
 				break;
-			}
-
-			case MINER: {
-				if (explode) {
-					newType = Type.BOMBER;
-					playOhNoIfNotToBeNuked();
-				} else if (!turnedByStopper()) {
-					Mask m;
-					int sx;
-					int sy;
-					int idx = frameIdx + 1;
-
-					if (idx >= lemRes.frames * TIME_SCALE) {
-						idx = 0;
-					}
-
-					switch (idx) {
-						case 1 * TIME_SCALE:
-						case 2 * TIME_SCALE:
-							// check for steel in mask
-							m = lemRes.getMask(dir);
-							sx = screenX();
-							sy = screenY();
-							int checkMask = Stencil.MSK_STEEL
-									| ((dir == Direction.LEFT) ? Stencil.MSK_NO_DIG_LEFT : Stencil.MSK_NO_DIG_RIGHT);
-							m.eraseMask(sx, sy, idx / TIME_SCALE - 1, checkMask);
-
-							if (lemRes.getImask(dir).checkType(sx, sy, 0, checkMask)) {
-								GameController.sound.play(GameController.SND_CHINK);
-								newType = Type.WALKER;
-							}
-
-							break;
-						case 3 * TIME_SCALE:
-						case 15 * TIME_SCALE:
-							if (dir == Direction.RIGHT) {
-								x += 4;
-							} else {
-								x -= 4;
-							}
-
-							// check for conversion to faller
-							free = freeBelow(MINER_FALL_DISTANCE);
-
-							if (free >= MINER_FALL_DISTANCE) {
-								if (free == FALL_DISTANCE_FORCE_FALL) {
-									y += FALLER_STEP;
-								} else {
-									y += free;
-								}
-
-								newType = Type.FALLER;
-							} else if (idx == 15 * TIME_SCALE) {
-								y += 4;
-							}
-
-							break;
-					}
-
-					break;
-				}
-			}
-
+			case MINER:
+				newType = animateMiner(newType, explode);
+				break;
 			case BUILDER_END:
 				if (explode) {
 					newType = Type.BOMBER;
@@ -634,106 +344,19 @@ public class Lemming {
 				}
 
 				break;
-			case BUILDER: {
-				if (explode) {
-					newType = Type.BOMBER;
-					playOhNoIfNotToBeNuked();
-				} else if (!turnedByStopper()) {
-					int idx = frameIdx + 1;
-
-					if (idx >= lemRes.frames * TIME_SCALE) {
-						// step created -> move up
-						idx = 0;
-						counter++; // step counter;
-
-						if (dir == Direction.RIGHT) {
-							x += 4; // step forward
-						} else {
-							x -= 4;
-						}
-
-						y -= 2; // step up
-						int levitation = aboveGround(); // should be 0, if not, we built into a wall -> stop
-						// check for conversion to walker
-						int fa = freeAbove(8); // check if builder is too close to ceiling
-
-						if (fa < 8 || levitation > 0) {
-							newType = Type.WALKER;
-
-							// a lemming can jump through the ceiling like in Mayhem2-Boiler Room
-							if (levitation >= WALKER_OBSTACLE_HEIGHT) {
-								// avoid getting stuck
-								x = oldX;
-								y += 2;
-							}
-
-							dir = (dir == Direction.RIGHT) ? Direction.LEFT : Direction.RIGHT;
-						} else
-						// check for last step used
-						if (counter >= STEPS_MAX) {
-							newType = Type.BUILDER_END;
-						}
-					} else if (idx == 9 * TIME_SCALE) {
-						// stair mask is the same heigth as a lemming
-						Mask m;
-						m = lemRes.getMask(dir);
-						int sx = screenX();
-						int sy = screenY();
-						m.paintStep(sx, sy, 0, GameController.getLevel().getDebrisColor());
-
-						if (counter >= STEPS_WARNING) {
-							GameController.sound.play(GameController.SND_TING);
-						}
-					}
-				}
-
+			case BUILDER:
+				newType = animateBuilder(newType, oldX, explode);
 				break;
-			}
-
-			case STOPPER: {
-				if (explode) {
-					// don't erase stopper mask!
-					newType = Type.BOMBER_STOPPER;
-					playOhNoIfNotToBeNuked();
-				} else {
-					// check for conversion to faller
-					free = freeBelow(FLOATER_STEP);
-
-					if (free > 0) {
-						if (free == FALL_DISTANCE_FORCE_FALL) {
-							y += FALLER_STEP;
-						} else {
-							y += free;
-						}
-
-						counter += free;
-
-						if (counter >= FALL_DISTANCE_FALL) {
-							newType = Type.FALLER;
-						} else {
-							newType = Type.WALKER;
-						}
-
-						// conversion to faller or walker -> erase stopper mask
-						Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
-						m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
-					} else {
-						counter = 0;
-					}
-				}
-
+			case STOPPER:
+				newType = animateStopper(newType, explode);
 				break;
-			}
-
 			case BOMBER_STOPPER:
 				// don't erase stopper mask before stopper finally explodes or falls
 				free = freeBelow(FLOATER_STEP);
 
 				if (free > 0) {
 					// stopper falls -> erase mask and convert to normal stopper.
-					Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
-					m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
-					type = Type.BOMBER;
+					eraseMaskAndConvertToNormalStopper();
 					// fall through
 				} else {
 					break;
@@ -741,98 +364,30 @@ public class Lemming {
 
 				//$FALL-THROUGH$
 			case BOMBER:
-				free = freeBelow(FLOATER_STEP);
-
-				if (free == FALL_DISTANCE_FORCE_FALL) {
-					y += FALLER_STEP;
-				} else {
-					y += free;
-				}
-
-				crossedLowerBorder();
+				animateBomber();
 				break;
 			default:
 				// all cases not explicitly checked above should at least explode
 				if (explode) {
 					explode();
-					break;
 				}
-
-				break;
 		}
 
 		// check collision with exit and traps
-		int s = stencilMid();
+		final int s = stencilMid();
 
 		switch (s & (Stencil.MSK_TRAP | Stencil.MSK_EXIT)) {
 			case Stencil.MSK_TRAP_DROWN:
-				if (type != Type.DROWNING) {
-					newType = Type.DROWNING;
-					SpriteObject spr = GameController.getLevel().getSprObject(Stencil.getObjectID(s));
-					GameController.sound.play(spr.getSound());
-				}
-
+				newType = animateDrowning(newType, s);
 				break;
 			case Stencil.MSK_TRAP_DIE:
-				if (type != Type.TRAPPED) {
-					SpriteObject spr = GameController.getLevel().getSprObject(Stencil.getObjectID(s));
-
-					if (spr.canBeTriggered()) {
-						if (spr.trigger()) {
-							GameController.sound.play(spr.getSound());
-							newType = Type.TRAPPED;
-						}
-					} else {
-						GameController.sound.play(spr.getSound());
-						newType = Type.TRAPPED;
-					}
-
-					if (type == Type.STOPPER || type == Type.BOMBER_STOPPER) {
-						// erase stopper mask
-						Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
-						m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
-					}
-				}
-
+				newType = animateNormalDeath(newType, s);
 				break;
-			case Stencil.MSK_TRAP_REPLACE: {
-				SpriteObject spr = GameController.getLevel().getSprObject(Stencil.getObjectID(s));
-
-				if (spr.canBeTriggered()) {
-					if (spr.trigger()) {
-						GameController.sound.play(spr.getSound());
-						hasDied = true;
-					}
-				} else {
-					GameController.sound.play(spr.getSound());
-					hasDied = true;
-				}
-
-				if (type == Type.STOPPER || type == Type.BOMBER_STOPPER) {
-					// erase stopper mask
-					Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
-					m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
-				}
-
+			case Stencil.MSK_TRAP_REPLACE:
+				replaceLemmingWithSpecialDeathAnimation(s);
 				break;
-			}
-
 			case Stencil.MSK_EXIT:
-				switch (type) {
-					case WALKER:
-					case JUMPER:
-					case BASHER:
-					case MINER:
-					case BUILDER:
-					case DIGGER:
-						SpriteObject spr = GameController.getLevel().getSprObject(Stencil.getObjectID(s));
-						newType = Type.EXITING;
-						GameController.sound.play(spr.getSound());
-						break;
-					default:
-						break;
-				}
-
+				newType = animateExitLevel(newType, s);
 				break;
 		}
 
@@ -842,22 +397,10 @@ public class Lemming {
 
 			switch (lemRes.animMode) {
 				case LOOP:
-					if (++frameIdx >= lemRes.frames * TIME_SCALE) {
-						frameIdx = 0;
-					}
-
-					if (lemRes.maskStep > 0 && frameIdx % (lemRes.maskStep * TIME_SCALE) == 0) {
-						trigger = true;
-					}
-
+					trigger = animateLoop(trigger);
 					break;
 				case ONCE:
-					if (frameIdx < lemRes.frames * TIME_SCALE - 1) {
-						frameIdx++;
-					} else {
-						trigger = true;
-					}
-
+					trigger = animateOnce(trigger);
 					break;
 				default:
 					break;
@@ -867,7 +410,7 @@ public class Lemming {
 				// Trigger condition reached?
 				switch (type) {
 					case BOMBER_STOPPER: {
-						Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
+						final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
 						m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
 					}
 
@@ -895,61 +438,9 @@ public class Lemming {
 						y -= 10; // why is this needed? could be done via foot coordinates?
 						break;
 					case DIGGER:
-					// the dig mask must be applied to the bottom of the lemming
-					{
-						Mask m = lemRes.getMask(dir);
-						int sx = screenX();
-						int sy = screenY();
-						m.eraseMask(sx, sy, 0, Stencil.MSK_STEEL);
-
-						// check for conversion to walker when hitting steel
-						if (lemRes.getImask(dir).checkType(sx, sy, 0, Stencil.MSK_STEEL)) {
-							GameController.sound.play(GameController.SND_CHINK);
-							newType = Type.WALKER;
-						} else {
-							y += 2; // move down
-						}
-
-						// check for conversion to faller
-						int freeMin = Integer.MAX_VALUE;
-						free = 0;
-						int xOld = x;
-
-						for (int i = -6; i < 6; i++) { // should be 14 pixels, here it's more like 12
-							x = xOld + i;
-
-							if (x < 0) {
-								x = 0;
-							} else if (x >= Level.WIDTH) {
-								x = Level.WIDTH;
-							}
-
-							if ((free = freeBelow(FLOATER_STEP)) < freeMin) {
-								freeMin = free;
-							}
-						}
-
-						x = xOld;
-						free = freeMin;
-
-						if (free > 0) {
-							// convert to faller or walker
-							if (free >= FALL_DISTANCE_FALL) {
-								newType = Type.FALLER;
-							} else {
-								newType = Type.FALLER;
-							}
-
-							if (free >= FALLER_STEP) {
-								y += FALLER_STEP;
-							} else {
-								y += free;
-							}
-						}
-
+						// the dig mask must be applied to the bottom of the lemming
+						newType = applyDigMaskToBottomOfLemming(newType);
 						break;
-					}
-
 					case BUILDER_END:
 						newType = Type.WALKER;
 						break;
@@ -962,8 +453,611 @@ public class Lemming {
 		changeType(oldType, newType);
 	}
 
-	private Type handleJumper(Type newType) {
-		int levitation = aboveGround();
+	private Type applyDigMaskToBottomOfLemming(final Type startingNewType) {
+		Type newType = startingNewType;
+		int free;
+		final Mask m = lemRes.getMask(dir);
+		final int sx = screenX();
+		final int sy = screenY();
+		m.eraseMask(sx, sy, 0, Stencil.MSK_STEEL);
+
+		// check for conversion to walker when hitting steel
+		if (lemRes.getImask(dir).checkType(sx, sy, 0, Stencil.MSK_STEEL)) {
+			GameController.sound.play(GameController.SND_CHINK);
+			newType = Type.WALKER;
+		} else {
+			y += 2; // move down
+		}
+
+		// check for conversion to faller
+		int freeMin = Integer.MAX_VALUE;
+		free = 0;
+		final int xOld = x;
+
+		for (int i = -6; i < 6; i++) { // should be 14 pixels, here it's more like 12
+			x = xOld + i;
+
+			if (x < 0) {
+				x = 0;
+			} else if (x >= Level.WIDTH) {
+				x = Level.WIDTH;
+			}
+
+			if ((free = freeBelow(FLOATER_STEP)) < freeMin) {
+				freeMin = free;
+			}
+		}
+
+		x = xOld;
+		free = freeMin;
+
+		if (free > 0) {
+			// convert to faller or walker
+			if (free >= FALL_DISTANCE_FALL) {
+				newType = Type.FALLER;
+			} else {
+				newType = Type.FALLER;
+			}
+
+			if (free >= FALLER_STEP) {
+				y += FALLER_STEP;
+			} else {
+				y += free;
+			}
+		}
+
+		return newType;
+	}
+
+	private boolean animateOnce(final boolean startingTrigger) {
+		boolean trigger = startingTrigger;
+
+		if (frameIdx < lemRes.frames * TIME_SCALE - 1) {
+			frameIdx++;
+		} else {
+			trigger = true;
+		}
+
+		return trigger;
+	}
+
+	private boolean animateLoop(final boolean startingTrigger) {
+		boolean trigger = startingTrigger;
+
+		if (++frameIdx >= lemRes.frames * TIME_SCALE) {
+			frameIdx = 0;
+		}
+
+		if (lemRes.maskStep > 0 && frameIdx % (lemRes.maskStep * TIME_SCALE) == 0) {
+			trigger = true;
+		}
+
+		return trigger;
+	}
+
+	private Type animateExitLevel(final Type startingNewType, final int s) {
+		Type newType = startingNewType;
+
+		switch (type) {
+			case WALKER:
+			case JUMPER:
+			case BASHER:
+			case MINER:
+			case BUILDER:
+			case DIGGER:
+				final SpriteObject spr = GameController.getLevel().getSprObject(Stencil.getObjectID(s));
+				newType = Type.EXITING;
+				GameController.sound.play(spr.getSound());
+				break;
+			default:
+				break;
+		}
+
+		return newType;
+	}
+
+	private void replaceLemmingWithSpecialDeathAnimation(final int s) {
+		final SpriteObject spr = GameController.getLevel().getSprObject(Stencil.getObjectID(s));
+
+		if (spr.canBeTriggered()) {
+			if (spr.trigger()) {
+				GameController.sound.play(spr.getSound());
+				hasDied = true;
+			}
+		} else {
+			GameController.sound.play(spr.getSound());
+			hasDied = true;
+		}
+
+		if (type == Type.STOPPER || type == Type.BOMBER_STOPPER) {
+			// erase stopper mask
+			final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
+			m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
+		}
+	}
+
+	private Type animateNormalDeath(final Type startingNewType, final int s) {
+		Type newType = startingNewType;
+
+		if (type != Type.TRAPPED) {
+			final SpriteObject spr = GameController.getLevel().getSprObject(Stencil.getObjectID(s));
+
+			if (spr.canBeTriggered()) {
+				if (spr.trigger()) {
+					GameController.sound.play(spr.getSound());
+					newType = Type.TRAPPED;
+				}
+			} else {
+				GameController.sound.play(spr.getSound());
+				newType = Type.TRAPPED;
+			}
+
+			if (type == Type.STOPPER || type == Type.BOMBER_STOPPER) {
+				// erase stopper mask
+				final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
+				m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
+			}
+		}
+
+		return newType;
+	}
+
+	private Type animateDrowning(final Type startingNewType, final int s) {
+		Type newType = startingNewType;
+
+		if (type != Type.DROWNING) {
+			newType = Type.DROWNING;
+			final SpriteObject spr = GameController.getLevel().getSprObject(Stencil.getObjectID(s));
+			GameController.sound.play(spr.getSound());
+		}
+
+		return newType;
+	}
+
+	private void animateBomber() {
+		int free;
+		free = freeBelow(FLOATER_STEP);
+
+		if (free == FALL_DISTANCE_FORCE_FALL) {
+			y += FALLER_STEP;
+		} else {
+			y += free;
+		}
+
+		crossedLowerBorder();
+	}
+
+	private void eraseMaskAndConvertToNormalStopper() {
+		final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
+		m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
+		type = Type.BOMBER;
+	}
+
+	private Type animateStopper(final Type startingNewType, final boolean explode) {
+		Type newType = startingNewType;
+		int free;
+
+		if (explode) {
+			// don't erase stopper mask!
+			newType = Type.BOMBER_STOPPER;
+			playOhNoIfNotToBeNuked();
+		} else {
+			// check for conversion to faller
+			free = freeBelow(FLOATER_STEP);
+
+			if (free > 0) {
+				if (free == FALL_DISTANCE_FORCE_FALL) {
+					y += FALLER_STEP;
+				} else {
+					y += free;
+				}
+
+				counter += free;
+
+				if (counter >= FALL_DISTANCE_FALL) {
+					newType = Type.FALLER;
+				} else {
+					newType = Type.WALKER;
+				}
+
+				// conversion to faller or walker -> erase stopper mask
+				final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
+				m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
+			} else {
+				counter = 0;
+			}
+		}
+
+		return newType;
+	}
+
+	private Type animateBuilder(final Type startingNewType, final int oldX, final boolean explode) {
+		Type newType = startingNewType;
+
+		if (explode) {
+			newType = Type.BOMBER;
+			playOhNoIfNotToBeNuked();
+		} else if (!turnedByStopper()) {
+			int idx = frameIdx + 1;
+
+			if (idx >= lemRes.frames * TIME_SCALE) {
+				// step created -> move up
+				idx = 0;
+				counter++; // step counter;
+
+				if (dir == Direction.RIGHT) {
+					x += 4; // step forward
+				} else {
+					x -= 4;
+				}
+
+				y -= 2; // step up
+				final int levitation = aboveGround(); // should be 0, if not, we built into a wall -> stop
+				// check for conversion to walker
+				final int fa = freeAbove(8); // check if builder is too close to ceiling
+
+				if (fa < 8 || levitation > 0) {
+					newType = Type.WALKER;
+
+					// a lemming can jump through the ceiling like in Mayhem2-Boiler Room
+					if (levitation >= WALKER_OBSTACLE_HEIGHT) {
+						// avoid getting stuck
+						x = oldX;
+						y += 2;
+					}
+
+					dir = (dir == Direction.RIGHT) ? Direction.LEFT : Direction.RIGHT;
+				} else
+				// check for last step used
+				if (counter >= STEPS_MAX) {
+					newType = Type.BUILDER_END;
+				}
+			} else if (idx == 9 * TIME_SCALE) {
+				// stair mask is the same heigth as a lemming
+				Mask m;
+				m = lemRes.getMask(dir);
+				final int sx = screenX();
+				final int sy = screenY();
+				m.paintStep(sx, sy, 0, GameController.getLevel().getDebrisColor());
+
+				if (counter >= STEPS_WARNING) {
+					GameController.sound.play(GameController.SND_TING);
+				}
+			}
+		}
+
+		return newType;
+	}
+
+	private Type animateMiner(final Type startingNewType, final boolean explode) {
+		Type newType = startingNewType;
+		int free;
+
+		if (explode) {
+			newType = Type.BOMBER;
+			playOhNoIfNotToBeNuked();
+		} else if (!turnedByStopper()) {
+			Mask m;
+			int sx;
+			int sy;
+			int idx = frameIdx + 1;
+
+			if (idx >= lemRes.frames * TIME_SCALE) {
+				idx = 0;
+			}
+
+			switch (idx) {
+				case 1 * TIME_SCALE:
+				case 2 * TIME_SCALE:
+					// check for steel in mask
+					m = lemRes.getMask(dir);
+					sx = screenX();
+					sy = screenY();
+					final int checkMask = Stencil.MSK_STEEL
+							| ((dir == Direction.LEFT) ? Stencil.MSK_NO_DIG_LEFT : Stencil.MSK_NO_DIG_RIGHT);
+					m.eraseMask(sx, sy, idx / TIME_SCALE - 1, checkMask);
+
+					if (lemRes.getImask(dir).checkType(sx, sy, 0, checkMask)) {
+						GameController.sound.play(GameController.SND_CHINK);
+						newType = Type.WALKER;
+					}
+
+					break;
+				case 3 * TIME_SCALE:
+				case 15 * TIME_SCALE:
+					if (dir == Direction.RIGHT) {
+						x += 4;
+					} else {
+						x -= 4;
+					}
+
+					// check for conversion to faller
+					free = freeBelow(MINER_FALL_DISTANCE);
+
+					if (free >= MINER_FALL_DISTANCE) {
+						if (free == FALL_DISTANCE_FORCE_FALL) {
+							y += FALLER_STEP;
+						} else {
+							y += free;
+						}
+
+						newType = Type.FALLER;
+					} else if (idx == 15 * TIME_SCALE) {
+						y += 4;
+					}
+
+					break;
+			}
+		}
+
+		return newType;
+	}
+
+	private Type animateBasher(final Type startingNewType, final boolean explode) {
+		Type newType = startingNewType;
+		int free;
+
+		if (explode) {
+			newType = Type.BOMBER;
+			playOhNoIfNotToBeNuked();
+		} else {
+			// check for conversion to faller
+			// check collision with stopper
+			if (turnedByStopper()) {
+				newType = Type.WALKER;
+			} else {
+				free = freeBelow(FLOATER_STEP);
+
+				if (free == FALL_DISTANCE_FORCE_FALL) {
+					y += FALLER_STEP;
+				} else {
+					y += free;
+				}
+
+				if (free != 0) {
+					counter += free;
+
+					if (counter >= BASHER_FALL_DISTANCE) {
+						newType = Type.FALLER;
+					}
+				} else {
+					counter = 0;
+				}
+
+				Mask m;
+				int checkMask;
+				int idx = frameIdx + 1;
+
+				if (idx >= lemRes.frames * TIME_SCALE) {
+					idx = 0;
+				}
+
+				switch (idx) {
+					case 2 * TIME_SCALE:
+					case 3 * TIME_SCALE:
+					case 4 * TIME_SCALE:
+					case 5 * TIME_SCALE: {
+						// bash mask should have the same height as the lemming
+						m = lemRes.getMask(dir);
+						final int sx = screenX();
+						final int sy = screenY();
+						checkMask = Stencil.MSK_STEEL
+								| ((dir == Direction.LEFT) ? Stencil.MSK_NO_DIG_LEFT
+										: Stencil.MSK_NO_DIG_RIGHT);
+						m.eraseMask(sx, sy, idx / TIME_SCALE - 2, checkMask);
+
+						// check for conversion to walker because there are indestructible pixels
+						if (lemRes.getImask(dir).checkType(sx, sy, 0, checkMask)) {
+							GameController.sound.play(GameController.SND_CHINK);
+							newType = Type.WALKER;
+						}
+
+						if (idx == 5 * TIME_SCALE) {
+							// check for conversion to walker because there are no bricks left
+							if (!canBash()) {
+								// no bricks any more
+								newType = Type.WALKER;
+							}
+						}
+
+						break;
+					}
+
+					case 18 * TIME_SCALE:
+					case 19 * TIME_SCALE:
+					case 20 * TIME_SCALE:
+					case 21 * TIME_SCALE: {
+						// bash mask should have the same height as the lemming
+						m = lemRes.getMask(dir);
+						final int sx = screenX();
+						final int sy = screenY();
+						checkMask = Stencil.MSK_STEEL
+								| ((dir == Direction.LEFT) ? Stencil.MSK_NO_DIG_LEFT
+										: Stencil.MSK_NO_DIG_RIGHT);
+						m.eraseMask(sx, sy, idx / TIME_SCALE - 18, checkMask);
+
+						// check for conversion to walker because there are indestructible pixels
+						if (lemRes.getImask(dir).checkType(sx, sy, 0, checkMask)) {
+							GameController.sound.play(GameController.SND_CHINK);
+							newType = Type.WALKER;
+						}
+
+						break;
+					}
+
+					case 10 * TIME_SCALE:
+					case 11 * TIME_SCALE:
+					case 12 * TIME_SCALE:
+					case 13 * TIME_SCALE:
+					case 14 * TIME_SCALE:
+					case 26 * TIME_SCALE:
+					case 27 * TIME_SCALE:
+					case 28 * TIME_SCALE:
+					case 29 * TIME_SCALE:
+					case 30 * TIME_SCALE:
+						if (dir == Direction.RIGHT) {
+							x += 2;
+						} else {
+							x -= 2;
+						}
+
+						break;
+				}
+			}
+		}
+
+		return newType;
+	}
+
+	private void animateSplat(final boolean explode) {
+		if (explode) {
+			explode();
+		} else if (frameIdx == 0) { // looped once
+			GameController.sound.play(GameController.SND_SPLAT);
+		}
+	}
+
+	private Type animateClimber(final Type startingNewType, final boolean explode) {
+		Type newType = startingNewType;
+
+		if (explode) {
+			explode();
+		} else {
+			if ((++counter & 1) == 1) { // only every other step
+				y -= CLIMBER_STEP;
+			}
+
+			if (midY() < 0 || freeAbove(2) < 2) {
+				dir = (dir == Direction.RIGHT) ? Direction.LEFT : Direction.RIGHT;
+				newType = Type.FALLER;
+				counter = 0;
+			} else if (reachedPlateau()) {
+				counter = 0;
+				newType = Type.CLIMBER_TO_WALKER;
+			}
+		}
+
+		return newType;
+	}
+
+	private Type animateFloater(final Type startingNewType, final boolean explode) {
+		Type newType = startingNewType;
+		int free;
+
+		if (explode) {
+			explode();
+		} else {
+			free = freeBelow(FLOATER_STEP);
+
+			if (free == FALL_DISTANCE_FORCE_FALL) {
+				y += FLOATER_STEP;
+			} else {
+				y += free; // max: FLOATER_STEP
+			}
+
+			if (!crossedLowerBorder()) {
+				counter += free; // fall counter
+
+				// check ground hit
+				if (free == 0) {
+					newType = Type.WALKER;
+					counter = 0;
+				}
+			}
+		}
+
+		return newType;
+	}
+
+	private void animateFloaterStart(final boolean explode) {
+		if (explode) {
+			explode();
+		} else {
+			switch (counter2++) {
+				case 0:
+				case 1: // keep falling with faller speed
+				case 2:
+					y += FALLER_STEP - FLOATER_STEP;
+					break;
+				case 3:
+					y -= FLOATER_STEP - 1; // decelerate a little
+					break;
+				case 4:
+				case 5:
+				case 6:
+				case 7:
+					y -= FLOATER_STEP; // decelerate some more
+					break;
+				default:
+					type = Type.FLOATER;
+			}
+		}
+	}
+
+	private Type animateWalker(final Type startingNewType, final int oldX, final boolean explode) {
+		Type newType = startingNewType;
+		int free;
+
+		if (explode) {
+			newType = Type.BOMBER;
+			playOhNoIfNotToBeNuked();
+		} else if (!turnedByStopper()) {
+			if (dir == Direction.RIGHT) {
+				x += WALKER_STEP;
+			} else if (dir == Direction.LEFT) {
+				x -= WALKER_STEP;
+			}
+
+			boolean doBreak = false;
+
+			// check
+			free = freeBelow(FALL_DISTANCE_FALL);
+
+			if (free >= FALL_DISTANCE_FALL) {
+				y += FALLER_STEP;
+			} else {
+				y += free;
+				counter = free;
+			}
+
+			final int levitation = aboveGround();
+
+			// check for flip direction
+			if (levitation < WALKER_OBSTACLE_HEIGHT && (y + lemRes.height / 2) > 0) {
+				if (levitation >= JUMPER_JUMP) {
+					y -= JUMPER_STEP;
+					newType = Type.JUMPER;
+					doBreak = true; // Stop processing after enclosing if/else.
+				} else {
+					y -= levitation;
+				}
+			} else {
+				x = oldX;
+
+				if (canClimb) {
+					newType = Type.CLIMBER;
+					doBreak = true; // Stop processing after enclosing if/else.
+				} else {
+					dir = (dir == Direction.RIGHT) ? Direction.LEFT : Direction.RIGHT;
+				}
+			}
+
+			if (!doBreak && (free > 0)) {
+				// check for conversion to faller
+				counter += FALLER_STEP; // @check: is this ok? increasing counter, but using free???
+
+				if (free >= FALL_DISTANCE_FALL) {
+					newType = Type.FALLER;
+				}
+			}
+		}
+
+		return newType;
+	}
+
+	private Type handleJumper(final Type startingNewType) {
+		Type newType = startingNewType;
+		final int levitation = aboveGround();
 
 		if (levitation > JUMPER_STEP) {
 			y -= JUMPER_STEP;
@@ -972,10 +1066,12 @@ public class Lemming {
 			y -= levitation;
 			newType = Type.WALKER;
 		}
+
 		return newType;
 	}
 
-	private Type handleFaller(Type newType) {
+	private Type handleFaller(final Type startingNewType) {
+		Type newType = startingNewType;
 		int free;
 		free = freeBelow(FALLER_STEP);
 
@@ -1002,6 +1098,7 @@ public class Lemming {
 				}
 			}
 		}
+
 		return newType;
 	}
 
@@ -1035,7 +1132,7 @@ public class Lemming {
 	 * @return true if Lemming is to be turned, false otherwise
 	 */
 	private boolean turnedByStopper() {
-		int s = (stencilMid() & Stencil.MSK_STOPPER);
+		final int s = (stencilMid() & Stencil.MSK_STOPPER);
 
 		if (s == Stencil.MSK_STOPPER_LEFT && dir == Direction.RIGHT) {
 			dir = Direction.LEFT;
@@ -1090,9 +1187,9 @@ public class Lemming {
 		hasDied = true;
 		changeType(type, Type.BOMBER);
 		// consider height difference between lemming and mask
-		Mask m = lemRes.getMask(Direction.RIGHT);
+		final Mask m = lemRes.getMask(Direction.RIGHT);
 		// check if lemming is standing on steel
-		int sy = y + 1;
+		final int sy = y + 1;
 		if (x > 0 && x < Level.WIDTH && sy > 0 && sy < Level.HEIGHT)
 			m.eraseMask(x - m.getWidth() / 2, midY() - m.getHeight() / 2 + 3, 0, Stencil.MSK_STEEL);
 		// if ((Core.stencil.get(x + sy*Level.width) & Stencil.MSK_STEEL) == 0)
@@ -1105,8 +1202,8 @@ public class Lemming {
 	 * @return stencil value from the middle of the lemming
 	 */
 	private int stencilMid() {
-		int xm = x;
-		int ym = y - lemRes.size;
+		final int xm = x;
+		final int ym = y - lemRes.size;
 		int retval;
 		if (xm > 0 && xm < Level.WIDTH && ym > 0 && ym < Level.HEIGHT)
 			retval = GameController.getStencil().get(xm + Level.WIDTH * ym);
@@ -1121,8 +1218,8 @@ public class Lemming {
 	 * @return true if bashing is possible, false otherwise.
 	 */
 	private boolean canBash() {
-		int xm = midX();
-		int ypos = Level.WIDTH * (y - BASHER_CHECK_STEP);
+		final int xm = midX();
+		final int ypos = Level.WIDTH * (y - BASHER_CHECK_STEP);
 		int xb;
 		int bricks = 0;
 		for (int i = 16; i < 25; i++) {
@@ -1130,7 +1227,7 @@ public class Lemming {
 				xb = xm + i;
 			else
 				xb = xm - i;
-			int sval = GameController.getStencil().get(xb + ypos);
+			final int sval = GameController.getStencil().get(xb + ypos);
 			if ((sval & Stencil.MSK_NO_DIG_LEFT) != 0 && dir == Direction.LEFT)
 				return false;
 			if ((sval & Stencil.MSK_NO_DIG_RIGHT) != 0 && dir == Direction.RIGHT)
@@ -1152,9 +1249,9 @@ public class Lemming {
 	 * @return true if digging is possible, false otherwise.
 	 */
 	private boolean canDig() {
-		int ypos = Level.WIDTH * (y + 1);
-		int xm = x;
-		int sval = GameController.getStencil().get(xm + ypos);
+		final int ypos = Level.WIDTH * (y + 1);
+		final int xm = x;
+		final int sval = GameController.getStencil().get(xm + ypos);
 		if ((sval & Stencil.MSK_WALK_ON) == Stencil.MSK_BRICK)
 			return true;
 		return false;
@@ -1166,7 +1263,7 @@ public class Lemming {
 	 * @return true if mining is possible, false otherwise.
 	 */
 	private boolean canMine() {
-		int ypos = Level.WIDTH * (y + 1);
+		final int ypos = Level.WIDTH * (y + 1);
 		int bricks = 0;
 		int xMin;
 		int xMax;
@@ -1178,7 +1275,7 @@ public class Lemming {
 			xMax = x;
 		}
 		for (int xb = xMin; xb < xMax; xb++) {
-			int sval = GameController.getStencil().get(xb + ypos);
+			final int sval = GameController.getStencil().get(xb + ypos);
 			if ((sval & Stencil.MSK_NO_DIG_LEFT) != 0 && dir == Direction.LEFT)
 				return false;
 			if ((sval & Stencil.MSK_NO_DIG_RIGHT) != 0 && dir == Direction.RIGHT)
@@ -1204,13 +1301,13 @@ public class Lemming {
 			return 0;
 		int free = 0;
 		int pos = x;
-		Stencil stencil = GameController.getStencil();
-		int yb = y + 1;
+		final Stencil stencil = GameController.getStencil();
+		final int yb = y + 1;
 		pos = x + yb * Level.WIDTH; // line below the lemming
 		for (int i = 0; i < step; i++) {
 			if (yb + i >= Level.HEIGHT)
 				return FALL_DISTANCE_FORCE_FALL; // convert most skill to faller
-			int s = stencil.get(pos);
+			final int s = stencil.get(pos);
 			if ((s & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY)
 				free++;
 			else
@@ -1253,8 +1350,8 @@ public class Lemming {
 
 		int free = 0;
 		int pos;
-		int ym = midY();
-		Stencil stencil = GameController.getStencil();
+		final int ym = midY();
+		final Stencil stencil = GameController.getStencil();
 		pos = x + ym * Level.WIDTH;
 		for (int i = 0; i < step; i++) {
 			if (ym - i <= 0)
@@ -1297,7 +1394,7 @@ public class Lemming {
 		if (ym >= Level.HEIGHT)
 			return Level.HEIGHT - 1;
 		int pos = x;
-		Stencil stencil = GameController.getStencil();
+		final Stencil stencil = GameController.getStencil();
 		pos += ym * Level.WIDTH;
 		int levitation;
 		for (levitation = 0; levitation < WALKER_OBSTACLE_HEIGHT; levitation++, pos -= Level.WIDTH, ym--) {
@@ -1317,7 +1414,7 @@ public class Lemming {
 	private boolean reachedPlateau() {
 		if (x < 2 || x >= Level.WIDTH - 2)
 			return false;
-		int ym = midY();
+		final int ym = midY();
 		if (ym >= Level.HEIGHT || ym < 0)
 			return false;
 		int pos = x;
@@ -1341,12 +1438,12 @@ public class Lemming {
 	 */
 	public static void patchColors(final int findCol, final int replaceCol) {
 		for (int l = 0; l < NUM_RESOURCES; l++) { // go through all the lemmings
-			LemmingResource lr = lemmings[l];
+			final LemmingResource lr = lemmings[l];
 			for (int f = 0; f < lr.frames; f++) // go through all frames
 				for (int d = 0; d < lr.dirs; d++) // go though all dirs
 					for (int xp = 0; xp < lr.width; xp++)
 						for (int yp = 0; yp < lr.height; yp++) {
-							BufferedImage i = lr.getImage(Direction.get(d), f);
+							final BufferedImage i = lr.getImage(Direction.get(d), f);
 							if (i.getRGB(xp, yp) == findCol)
 								i.setRGB(xp, yp, replaceCol);
 						}
@@ -1361,15 +1458,15 @@ public class Lemming {
 	 */
 	public static void loadLemmings(final Component cmp) throws ResourceException {
 		explodeFont = new ExplodeFont(cmp);
-		MediaTracker tracker = new MediaTracker(cmp);
+		final MediaTracker tracker = new MediaTracker(cmp);
 		// read lemmings definition file
-		String fn = Core.findResource(LEMM_INI_STR);
-		Props p = new Props();
+		final String fn = Core.findResource(LEMM_INI_STR);
+		final Props p = new Props();
 		if (!p.load(fn))
 			throw new ResourceException(LEMM_INI_STR);
 		lemmings = new LemmingResource[NUM_RESOURCES];
 		// read lemmings
-		int def[] = { -1 };
+		final int def[] = { -1 };
 		for (int i = 0; true; i++) {
 			int[] val = p.get("lemm_" + i, def);
 			int type;
@@ -1377,11 +1474,11 @@ public class Lemming {
 				// frames, directions, animation type
 				type = i;
 				if (lemmings[type] == null) {
-					BufferedImage sourceImg = ToolBox.ImageToBuffered(
+					final BufferedImage sourceImg = ToolBox.ImageToBuffered(
 							Core.loadImage(tracker, "misc/lemm_" + i + ".gif"), Transparency.BITMASK);
 					try {
 						tracker.waitForAll();
-					} catch (InterruptedException ex) {
+					} catch (final InterruptedException ex) {
 					}
 					lemmings[type] = new LemmingResource(sourceImg, val[0], val[1]);
 					lemmings[type].animMode = (val[2] == 0) ? Animation.LOOP : Animation.ONCE;
@@ -1393,12 +1490,12 @@ public class Lemming {
 			if (val.length == 3) {
 				// mask_Y: frames, directions, step
 				type = i;
-				Image sourceImg = Core.loadImage(tracker, "misc/mask_" + i + ".gif");
-				Mask mask = new Mask(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
+				final Image sourceImg = Core.loadImage(tracker, "misc/mask_" + i + ".gif");
+				final Mask mask = new Mask(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
 				lemmings[type].setMask(Direction.RIGHT, mask);
-				int dirs = val[1];
+				final int dirs = val[1];
 				if (dirs > 1) {
-					Mask maskLeft = new Mask(
+					final Mask maskLeft = new Mask(
 							ToolBox.flipImageX(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK)), val[0]);
 					lemmings[type].setMask(Direction.LEFT, maskLeft);
 				}
@@ -1409,12 +1506,12 @@ public class Lemming {
 			if (val.length == 2) {
 				// mask_Y: type, frames, directions, step
 				type = i;
-				Image sourceImg = Core.loadImage(tracker, "misc/imask_" + i + ".gif");
-				Mask mask = new Mask(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
+				final Image sourceImg = Core.loadImage(tracker, "misc/imask_" + i + ".gif");
+				final Mask mask = new Mask(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
 				lemmings[type].setImask(Direction.RIGHT, mask);
-				int dirs = val[1];
+				final int dirs = val[1];
 				if (dirs > 1) {
-					Mask maskLeft = new Mask(
+					final Mask maskLeft = new Mask(
 							ToolBox.flipImageX(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK)), val[0]);
 					lemmings[type].setImask(Direction.LEFT, maskLeft);
 				}
@@ -1557,7 +1654,7 @@ public class Lemming {
 				// } else return false;
 				case BUILDER: {
 					// int fa = freeAbove(4);
-					int fb = freeBelow(FALLER_STEP);
+					final int fb = freeBelow(FALLER_STEP);
 					if (/* fa <= 0 || */ fb != 0)
 						return false;
 					// x = x & ~1; // start building at even positions
@@ -1566,7 +1663,7 @@ public class Lemming {
 					return true;
 				}
 				case STOPPER: {
-					Mask m = Lemming.getResource(Type.STOPPER).getMask(Direction.LEFT);
+					final Mask m = Lemming.getResource(Type.STOPPER).getMask(Direction.LEFT);
 					maskX = screenX();
 					maskY = screenY();
 					if (m.checkType(maskX, maskY, 0, Stencil.MSK_STOPPER))
@@ -1781,14 +1878,14 @@ class LemmingResource {
 	int dirs;
 	int maskStep;
 	/** array of images to store the animation [Direction][AnimationFrame] */
-	private BufferedImage img[][];
+	private final BufferedImage img[][];
 	/**
 	 * array of removal masks used for digging/bashing/mining/explosions etc.
 	 * [Direction]
 	 */
-	private Mask mask[];
+	private final Mask mask[];
 	/** array of check masks for indestructible pixels [Direction] */
-	private Mask iMask[];
+	private final Mask iMask[];
 
 	/**
 	 * Constructor.
@@ -1893,7 +1990,7 @@ class ExplodeFont {
 	 * @throws ResourceException
 	 */
 	ExplodeFont(final Component cmp) throws ResourceException {
-		Image sourceImg = Core.loadImage("misc/countdown.gif");
+		final Image sourceImg = Core.loadImage("misc/countdown.gif");
 		img = ToolBox.getAnimation(sourceImg, 5, Transparency.BITMASK);
 	}
 
@@ -1908,5 +2005,5 @@ class ExplodeFont {
 	}
 
 	/** array of images for each counter value */
-	private BufferedImage img[];
+	private final BufferedImage img[];
 }

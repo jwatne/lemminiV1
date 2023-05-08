@@ -224,7 +224,12 @@ public class PatchService {
             final String destinationPath, final Map<String, Object> createdFiles)
             throws ExtractException {
         // step seven: create patches and patch.ini
-        (new File(patchPath)).mkdirs();
+        final boolean mkdirs = (new File(patchPath)).mkdirs();
+
+        if (!mkdirs) {
+            System.out.println("UNABLE TO MAKE DIR " + patchPath);
+        }
+
         Extract.out("\nCreate patch ini");
 
         try (FileWriter fPatchList = new FileWriter(patchPath + PATCH_INI_NAME);) {
@@ -264,10 +269,20 @@ public class PatchService {
         final File fSource = new File(Extract.SOURCE_PATH);
         final String destPath = Extract.addSeparator(dPath + sDir);
         final File fDest = new File(destPath);
-        fDest.mkdirs();
+        final boolean destPathMade = fDest.mkdirs();
+
+        if (!destPathMade) {
+            System.out.println("UNABLE TO MAKE DIR " + destPath);
+        }
+
         patchPath = Extract.addSeparator(pPath);
         final File fPatch = new File(patchPath);
-        fPatch.mkdirs();
+        final boolean patchPathMade = fPatch.mkdirs();
+
+        if (!patchPathMade) {
+            System.out.println("UNABLE TO MAKE DIR " + fPatch);
+        }
+
         patchFiles(sDir, fPatchList, fSource, destPath, createdFiles);
     }
 

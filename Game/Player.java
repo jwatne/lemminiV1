@@ -25,41 +25,49 @@ import Tools.Props;
 
 /**
  * Stores player progress.
+ * 
  * @author Volker Oth
  */
 public class Player {
 
 	/** property class to store player settings persistently */
-	private Props props;
+	private final Props props;
 	/** name of the INI file used for persistence */
-	private String iniFileStr;
+	private final String iniFileStr;
 	/** used to store level progress */
-	private HashMap<String,GroupBitfield> lvlGroup;
+	private final HashMap<String, GroupBitfield> lvlGroup;
 	/** cheat mode enabled? */
 	private boolean cheat;
 	/** player's name */
-	private String name;
+	private final String name;
 
 	/**
 	 * Constructor.
+	 * 
 	 * @param n player's name
 	 */
 	public Player(final String n) {
 		name = n;
-		lvlGroup = new HashMap<String,GroupBitfield>();
+		lvlGroup = new HashMap<String, GroupBitfield>();
 		// read main ini file
 		props = new Props();
 		// create players directory if it doesn't exist
-		File dest = new File(Core.resourcePath+"players");
-		dest.mkdirs();
-		iniFileStr = Core.resourcePath+"players/"+name+".ini";
+		final String pathname = Core.resourcePath + "players";
+		final File dest = new File(pathname);
+		final boolean mkdirs = dest.mkdirs();
+
+		if (!mkdirs) {
+			System.out.println("UNABLE TO MAKE DIR " + pathname);
+		}
+
+		iniFileStr = Core.resourcePath + "players/" + name + ".ini";
 
 		if (props.load(iniFileStr)) {// might exist or not - if not, it's created
 			// file existed, now extract entries
-			String sdef[] = { null, null};
-			for (int idx = 0;true;idx++) {
-				String s[] = props.get("group"+Integer.toString(idx), sdef);
-				if (s == null || s.length != 2 || s[0] == null )
+			final String sdef[] = { null, null };
+			for (int idx = 0; true; idx++) {
+				final String s[] = props.get("group" + Integer.toString(idx), sdef);
+				if (s == null || s.length != 2 || s[0] == null)
 					break;
 				// first string is the level group key identifier
 				// second string is a GroupBitfield used as bitfield to store won levels
@@ -82,30 +90,31 @@ public class Player {
 	 * Store player's progress.
 	 */
 	public void store() {
-		Set<String> k = lvlGroup.keySet();
-		Iterator<String> it = k.iterator();
-		int idx=0;
+		final Set<String> k = lvlGroup.keySet();
+		final Iterator<String> it = k.iterator();
+		int idx = 0;
 		while (it.hasNext()) {
-			String s = it.next();
-			GroupBitfield bf = lvlGroup.get(s);
-			String sout = s+", "+bf.toString();
-			props.set("group"+Integer.toString(idx++), sout);
+			final String s = it.next();
+			final GroupBitfield bf = lvlGroup.get(s);
+			final String sout = s + ", " + bf.toString();
+			props.set("group" + Integer.toString(idx++), sout);
 		}
 		props.save(iniFileStr);
 	}
 
 	/**
 	 * Allow a level to be played.
+	 * 
 	 * @param pack level pack
 	 * @param diff difficulty level
-	 * @param num level number
+	 * @param num  level number
 	 * @return updated bitfield
 	 */
 	public GroupBitfield setAvailable(final String pack, final String diff, final int num) {
 		// get current bitfield
-		String id = LevelPack.getID(pack, diff);
+		final String id = LevelPack.getID(pack, diff);
 		GroupBitfield bf = lvlGroup.get(id);
-		if (bf==null)
+		if (bf == null)
 			bf = GroupBitfield.ONE; // first level is always available
 		bf = new GroupBitfield(bf.setBit(num)); // set bit in bitfield (just overwrite existing bit)
 		// store new value
@@ -115,25 +124,28 @@ public class Player {
 
 	/**
 	 * Check if player is allowed to play a level.
+	 * 
 	 * @param pack level pack
 	 * @param diff difficulty level
-	 * @param num level number
+	 * @param num  level number
 	 * @return true if allowed, false if not
 	 */
 	public boolean isAvailable(final String pack, final String diff, final int num) {
 		if (isCheat())
 			return true;
 		// get current bitfield
-		String id = LevelPack.getID(pack, diff);
+		final String id = LevelPack.getID(pack, diff);
 		GroupBitfield bf = lvlGroup.get(id);
-		if (bf==null)
+		if (bf == null)
 			bf = GroupBitfield.ONE; // first level is always available
 		return (bf.testBit(num));
 	}
 
 	/**
 	 * Check if player is allowed to play a level.
-	 * @param bf bitfield containing the approval information for all levels of this pack/difficulty
+	 * 
+	 * @param bf  bitfield containing the approval information for all levels of
+	 *            this pack/difficulty
 	 * @param num number of level
 	 * @return true if allowed, false if not
 	 */
@@ -144,24 +156,28 @@ public class Player {
 	}
 
 	/**
-	 * Get bitfield containing the approval information for all levels of this pack/difficulty.
+	 * Get bitfield containing the approval information for all levels of this
+	 * pack/difficulty.
+	 * 
 	 * @param pack level pack
 	 * @param diff difficulty level
-	 * @return bitfield containing the approval information for all levels of this pack/difficulty
+	 * @return bitfield containing the approval information for all levels of this
+	 *         pack/difficulty
 	 */
 	public GroupBitfield getBitField(final String pack, final String diff) {
 		if (isCheat())
 			return new GroupBitfield("18446744073709551615"); // 0xffffffffffffffff (8 bytes with all bits set)
 
-		String id = LevelPack.getID(pack, diff);
-		GroupBitfield bf = lvlGroup.get(id);
-		if (bf==null)
+		final String id = LevelPack.getID(pack, diff);
+		final GroupBitfield bf = lvlGroup.get(id);
+		if (bf == null)
 			return GroupBitfield.ONE;
 		return bf;
 	}
 
 	/**
 	 * Get player's name.
+	 * 
 	 * @return player's name
 	 */
 	public String getName() {
@@ -170,6 +186,7 @@ public class Player {
 
 	/**
 	 * Get cheat state.
+	 * 
 	 * @return true if cheat is enabled
 	 */
 	public boolean isCheat() {

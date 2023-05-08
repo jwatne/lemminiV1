@@ -1,4 +1,5 @@
 package lemmini;
+
 import java.io.File;
 import java.util.List;
 
@@ -90,8 +91,13 @@ public final class ManagePlayerMenuItemActionListener implements java.awt.event.
             final String p = Core.getPlayer(i);
 
             if (!players.contains(p)) {
-                final File f = new File(Core.resourcePath + "players/" + p + ".ini");
-                f.delete();
+                final String pathname = Core.resourcePath + "players/" + p + ".ini";
+                final File f = new File(pathname);
+                final boolean deleted = f.delete();
+
+                if (!deleted) {
+                    System.out.println("ERROR: " + pathname + " NOT DELETED!");
+                }
 
                 if (p.equals(player)) {
                     player = "default";

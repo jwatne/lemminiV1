@@ -1,3 +1,4 @@
+package lemmini;
 import javax.swing.JMenuItem;
 
 /**

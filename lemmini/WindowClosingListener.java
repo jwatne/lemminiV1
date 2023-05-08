@@ -1,3 +1,4 @@
+package lemmini;
 /**
  * A customized {@link java.awt.event.WindowAdapter} that handles closing a
  * {@link Lemmini} window.

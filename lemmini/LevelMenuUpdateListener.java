@@ -1,3 +1,5 @@
+package lemmini;
+
 import Game.Core;
 import Game.GameController;
 import Game.GroupBitfield;

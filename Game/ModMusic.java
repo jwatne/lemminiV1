@@ -68,7 +68,11 @@ public class ModMusic implements Runnable {
 
 		try (FileInputStream f = new FileInputStream(fName)) {
 			final byte[] songdata = new byte[datalen];
-			f.read(songdata);
+
+			if (f.read(songdata) < 1) {
+				System.out.println("No bytes read from file " + fName);
+			}
+
 			micromod = new Micromod(songdata, SAMPLE_RATE);
 			setloop(true);
 		} catch (final FileNotFoundException ex) {

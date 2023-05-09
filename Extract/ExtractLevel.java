@@ -105,7 +105,11 @@ public class ExtractLevel {
 
 			try (final FileInputStream fi = new FileInputStream(fnIn)) {
 				final byte buffer[] = new byte[(int) f.length()];
-				fi.read(buffer);
+
+				if (fi.read(buffer) < 1) {
+					System.out.println("0 bytes read from file " + fnIn);
+				}
+
 				b = new LevelBuffer(buffer);
 			}
 		} catch (final FileNotFoundException e) {

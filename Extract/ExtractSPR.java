@@ -58,7 +58,10 @@ public class ExtractSPR {
 
 		try (FileInputStream fi = new FileInputStream(fname)) {
 			buffer = new byte[(int) f.length()];
-			fi.read(buffer);
+
+			if (fi.read(buffer) < 1) {
+				System.out.println("0 bytes read from file " + fname);
+			}
 		} catch (final FileNotFoundException e) {
 			throw new ExtractException("File " + fname + " not found");
 		} catch (final IOException e) {
@@ -157,7 +160,10 @@ public class ExtractSPR {
 		final File f = new File(fname);
 		try (final FileInputStream fi = new FileInputStream(fname)) {
 			buffer = new byte[(int) f.length()];
-			fi.read(buffer);
+
+			if (fi.read(buffer) < 1) {
+				System.out.println("0 bytes read from file " + fname);
+			}
 		} catch (final FileNotFoundException e) {
 			throw new ExtractException("File " + fname + " not found");
 		} catch (final IOException e) {

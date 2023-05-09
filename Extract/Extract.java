@@ -615,7 +615,10 @@ public class Extract extends Thread {
 
 			try (final FileInputStream f = new FileInputStream(fname);) {
 				buf = new byte[len];
-				f.read(buf);
+
+				if (f.read(buf) < 1) {
+					System.out.println("0 bytes read from file " + fname);
+				}
 			}
 
 			return buf;

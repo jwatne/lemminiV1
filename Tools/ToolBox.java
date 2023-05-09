@@ -216,7 +216,9 @@ public class ToolBox {
 		}
 
 		try (final FileInputStream fi = new FileInputStream(fname)) {
-			fi.read(buf);
+			if (fi.read(buf) < 1) {
+				System.out.println("0 bytes read from file " + fname);
+			}
 		} catch (final Exception ex) {
 			return null;
 		}

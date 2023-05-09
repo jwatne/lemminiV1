@@ -112,7 +112,10 @@ public class Sound {
 					format[i] = f.getFormat();
 					info[i] = new DataLine.Info(Clip.class, format[i]);
 					soundBuffer8 = new byte[(int) f.getFrameLength() * format[i].getFrameSize()];
-					f.read(soundBuffer8);
+
+					if (f.read(soundBuffer8) < 1) {
+						System.out.println("0 bytes read from file " + fName);
+					}
 				}
 
 				// convert samples with frequencies < 8kHz no work around bug in JDK6

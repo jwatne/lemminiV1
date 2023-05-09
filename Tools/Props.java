@@ -218,8 +218,7 @@ public class Props {
 	 * @return True if OK, false if exception occurred
 	 */
 	public boolean save(final String fname) {
-		try {
-			final FileOutputStream f = new FileOutputStream(fname);
+		try (final FileOutputStream f = new FileOutputStream(fname)) {
 			hash.store(f, header);
 			return true;
 		} catch (final FileNotFoundException e) {

@@ -208,27 +208,10 @@ public class Lemmini extends JFrame implements KeyListener {
 			System.exit(1);
 		}
 
-		// workaround to adjust time base to 1ms under XP
-		// see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6435126
-		new Thread() {
-			{
-				this.setDaemon(true);
-				this.start();
-			}
-
-			@Override
-			public void run() {
-				while (true) {
-					try {
-						Thread.sleep(Integer.MAX_VALUE);
-					} catch (final InterruptedException ex) {
-					}
-				}
-			}
-		};
-
 		Toolkit.getDefaultToolkit().setDynamicLayout(true);
+
 		thisFrame = new Lemmini();
+
 	}
 
 	public void setScale(final double scale) {

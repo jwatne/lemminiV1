@@ -93,7 +93,7 @@ public class KeyRepeat {
 	/**
 	 * Initialize/Reset all states.
 	 */
-	public void init() {
+	public final void init() {
 		state = State.OFF;
 		ddstate = DcState.OFF;
 		mask = 0;

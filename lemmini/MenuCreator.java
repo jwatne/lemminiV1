@@ -62,7 +62,7 @@ public class MenuCreator {
      * 
      * @return the initialized menu bar for the Lemmini window.
      */
-    public JMenuBar getLemminiMenuBar(final Lemmini lemmini) {
+    public final JMenuBar getLemminiMenuBar(final Lemmini lemmini) {
         this.lemmini = lemmini;
         // create Menu
         jMenuFile = new JMenu("File");

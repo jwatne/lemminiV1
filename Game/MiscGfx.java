@@ -59,13 +59,13 @@ public class MiscGfx {
 		ArrayList<BufferedImage> images = new ArrayList<BufferedImage>();
 		BufferedImage img;
 		/* 0: BORDER */
-		img = ToolBox.ImageToBuffered(Core.loadImage("misc/border.gif"),Transparency.OPAQUE);
+		img = ToolBox.imageToBuffered(Core.loadImage("misc/border.gif"),Transparency.OPAQUE);
 		images.add(img);
 		/* 1: LEMMINI */
-		img = ToolBox.ImageToBuffered(Core.loadImageJar("lemmini.png"), Transparency.TRANSLUCENT);
+		img = ToolBox.imageToBuffered(Core.loadImageJar("lemmini.png"), Transparency.TRANSLUCENT);
 		images.add(img);
 		/* 2: TILE_GREEN */
-		img = ToolBox.ImageToBuffered(Core.loadImageJar("background.gif"), Transparency.OPAQUE);
+		img = ToolBox.imageToBuffered(Core.loadImageJar("background.gif"), Transparency.OPAQUE);
 		images.add(img);
 		/* 3: TILE_BROWN */
 		//patch brown version of tile
@@ -90,7 +90,7 @@ public class MiscGfx {
 		/* 5: REPLAY_2 */
 		images.add(anim[1]);
 		/* 6: SELECT */
-		img = ToolBox.ImageToBuffered(Core.loadImage("misc/select.gif"),Transparency.BITMASK);
+		img = ToolBox.imageToBuffered(Core.loadImage("misc/select.gif"),Transparency.BITMASK);
 		images.add(img);
 
 		image = new BufferedImage[images.size()];

@@ -1675,7 +1675,7 @@ public class Lemming {
 				// frames, directions, animation type
 				type = i;
 				if (lemmings[type] == null) {
-					final BufferedImage sourceImg = ToolBox.ImageToBuffered(
+					final BufferedImage sourceImg = ToolBox.imageToBuffered(
 							Core.loadImage(tracker, "misc/lemm_" + i + ".gif"), Transparency.BITMASK);
 					try {
 						tracker.waitForAll();
@@ -1692,12 +1692,12 @@ public class Lemming {
 				// mask_Y: frames, directions, step
 				type = i;
 				final Image sourceImg = Core.loadImage(tracker, "misc/mask_" + i + ".gif");
-				final Mask mask = new Mask(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
+				final Mask mask = new Mask(ToolBox.imageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
 				lemmings[type].setMask(Direction.RIGHT, mask);
 				final int dirs = val[1];
 				if (dirs > 1) {
 					final Mask maskLeft = new Mask(
-							ToolBox.flipImageX(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK)), val[0]);
+							ToolBox.flipImageX(ToolBox.imageToBuffered(sourceImg, Transparency.BITMASK)), val[0]);
 					lemmings[type].setMask(Direction.LEFT, maskLeft);
 				}
 				lemmings[type].maskStep = val[2];
@@ -1708,12 +1708,12 @@ public class Lemming {
 				// mask_Y: type, frames, directions, step
 				type = i;
 				final Image sourceImg = Core.loadImage(tracker, "misc/imask_" + i + ".gif");
-				final Mask mask = new Mask(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
+				final Mask mask = new Mask(ToolBox.imageToBuffered(sourceImg, Transparency.BITMASK), val[0]);
 				lemmings[type].setImask(Direction.RIGHT, mask);
 				final int dirs = val[1];
 				if (dirs > 1) {
 					final Mask maskLeft = new Mask(
-							ToolBox.flipImageX(ToolBox.ImageToBuffered(sourceImg, Transparency.BITMASK)), val[0]);
+							ToolBox.flipImageX(ToolBox.imageToBuffered(sourceImg, Transparency.BITMASK)), val[0]);
 					lemmings[type].setImask(Direction.LEFT, maskLeft);
 				}
 			}

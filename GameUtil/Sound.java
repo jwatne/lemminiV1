@@ -230,6 +230,7 @@ public class Sound {
 			c.start();
 			simulSounds++;
 		} catch (final Exception ex) {
+			System.out.println("Error playing sound " + idx + ": " + ex.getMessage());
 		}
 	}
 
@@ -357,6 +358,7 @@ public class Sound {
 			c.start();
 			simulSounds++;
 		} catch (final Exception ex) {
+			System.out.println("Error playing pitched sample: " + ex.getMessage());
 		}
 	}
 

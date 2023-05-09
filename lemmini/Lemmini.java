@@ -1,4 +1,5 @@
 package lemmini;
+
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
@@ -85,7 +86,7 @@ public class Lemmini extends JFrame implements KeyListener {
 
 	/** path for loading single level files */
 	@SuppressWarnings("unused")
-	private String lvlPath;
+	private final String lvlPath;
 	/** HashMap to store menu items for difficulty levels */
 	private HashMap<String, ArrayList<LvlMenuItem>> diffLevelMenus;
 
@@ -93,12 +94,12 @@ public class Lemmini extends JFrame implements KeyListener {
 		return diffLevelMenus;
 	}
 
-	public void setDiffLevelMenus(HashMap<String, ArrayList<LvlMenuItem>> diffLevelMenus) {
+	public void setDiffLevelMenus(final HashMap<String, ArrayList<LvlMenuItem>> diffLevelMenus) {
 		this.diffLevelMenus = diffLevelMenus;
 	}
 
 	/** panel for the game graphics */
-	private GraphicsPane gp;
+	private final GraphicsPane gp;
 
 	/**
 	 * Returns the panel for the game graphics.
@@ -192,6 +193,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (final Exception e) {
+			System.out.println("Unable to set look and feel to system: " + e.getMessage());
 			/* don't care */}
 		/*
 		 * Apple menu bar for MacOS
@@ -489,6 +491,7 @@ public class Lemmini extends JFrame implements KeyListener {
 						GameController.getBgImage(), 1, 1, false);
 				ImageIO.write(tmp, "png", file);
 			} catch (final Exception ex) {
+				System.out.println("I/O error: " + ex.getMessage());
 			}
 		}
 	}

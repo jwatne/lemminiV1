@@ -48,7 +48,7 @@ public class LemmFont {
 	/** default width of one character in pixels */
 	private final static int SPACING = 18;
 	/** character map */
-	private final static String CHARS = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_´abcdefghijklmnopqrstuvwxyz{|}~";
+	private final static String CHARS = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_ï¿½abcdefghijklmnopqrstuvwxyz{|}~";
 
 	/** width of one character in pixels */
 	private static int width;
@@ -62,7 +62,7 @@ public class LemmFont {
 	 * @throws ResourceException
 	 */
 	static public void init() throws ResourceException {
-		BufferedImage sourceImg = ToolBox.ImageToBuffered(Core.loadImage("misc/lemmfont.gif"),Transparency.BITMASK);
+		BufferedImage sourceImg = ToolBox.imageToBuffered(Core.loadImage("misc/lemmfont.gif"),Transparency.BITMASK);
 
 		width = SPACING; //sourceImg.getWidth(null);
 		height = sourceImg.getHeight(null)/CHARS.length();

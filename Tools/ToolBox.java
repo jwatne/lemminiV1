@@ -62,7 +62,7 @@ public class ToolBox {
 	 * @param transparency {@link java.awt.Transparency}
 	 * @return compatible buffered image
 	 */
-	public static BufferedImage ImageToBuffered(final Image img, final int transparency) {
+	public static BufferedImage imageToBuffered(final Image img, final int transparency) {
 		final BufferedImage bImg = createImage(img.getWidth(null), img.getHeight(null), transparency);
 		final Graphics2D g = bImg.createGraphics();
 		g.drawImage(img, 0, 0, null);

@@ -118,7 +118,6 @@ public class Core {
 		readMainIniFile();
 		scale = Core.programProps.get("scale", 1.0);
 		initializeResources();
-		System.gc(); // force garbage collection here before the game starts
 		final String defaultPlayer = getDefaultPlayer();
 		setPlayer(defaultPlayer);
 		cmp = frame;

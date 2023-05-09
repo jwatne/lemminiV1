@@ -2,8 +2,7 @@ package Game;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 
 import Tools.Props;
 
@@ -35,7 +34,7 @@ public class Player {
 	/** name of the INI file used for persistence */
 	private final String iniFileStr;
 	/** used to store level progress */
-	private final HashMap<String, GroupBitfield> lvlGroup;
+	private final Map<String, GroupBitfield> lvlGroup;
 	/** cheat mode enabled? */
 	private boolean cheat;
 	/** player's name */
@@ -90,15 +89,15 @@ public class Player {
 	 * Store player's progress.
 	 */
 	public void store() {
-		final Set<String> k = lvlGroup.keySet();
-		final Iterator<String> it = k.iterator();
 		int idx = 0;
-		while (it.hasNext()) {
-			final String s = it.next();
-			final GroupBitfield bf = lvlGroup.get(s);
+
+		for (final var entry : lvlGroup.entrySet()) {
+			final String s = entry.getKey();
+			final GroupBitfield bf = entry.getValue();
 			final String sout = s + ", " + bf.toString();
 			props.set("group" + Integer.toString(idx++), sout);
 		}
+
 		props.save(iniFileStr);
 	}
 

@@ -41,7 +41,7 @@ public class Props {
 	 */
 	public Props() {
 		hash = new Properties();
-		header = new String();
+		header = "";
 	}
 
 	/**

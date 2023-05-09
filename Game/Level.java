@@ -257,7 +257,6 @@ public class Level {
 		sprObjBehind = null;
 		sprObjects = null;
 		entries = null;
-		System.gc();
 		// the screenBuffer should be big enough to hold the level
 		// returns stencil buffer;
 		final int bgWidth = bgImage.getWidth();

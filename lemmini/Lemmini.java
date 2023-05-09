@@ -15,6 +15,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -87,18 +89,8 @@ public class Lemmini extends JFrame implements KeyListener {
 	/** path for loading single level files */
 	@SuppressWarnings("unused")
 	private final String lvlPath;
-	/** HashMap to store menu items for difficulty levels */
-	private final HashMap<String, ArrayList<LvlMenuItem>> diffLevelMenus = new HashMap<>();
-
-	// public HashMap<String, ArrayList<LvlMenuItem>> getDiffLevelMenus() {
-	// return diffLevelMenus;
-	// }
-
-	// public void setDiffLevelMenus(final HashMap<String, ArrayList<LvlMenuItem>>
-	// diffLevelMenus) {
-	// this.diffLevelMenus = diffLevelMenus;
-	// }
-
+	/** Map to store menu items for difficulty levels */
+	private final Map<String, ArrayList<LvlMenuItem>> diffLevelMenus = new HashMap<>();
 	/** panel for the game graphics */
 	private final GraphicsPane gp;
 
@@ -227,7 +219,7 @@ public class Lemmini extends JFrame implements KeyListener {
 	 * @param bf   bitmap containing availability flags for each level
 	 */
 	public void updateLevelMenu(final String pack, final String diff, final GroupBitfield bf) {
-		final ArrayList<LvlMenuItem> menuItems = diffLevelMenus.get(LevelPack.getID(pack, diff));
+		final List<LvlMenuItem> menuItems = diffLevelMenus.get(LevelPack.getID(pack, diff));
 
 		for (int k = 0; k < menuItems.size(); k++) {
 			// select level, e.g. "All fall down"

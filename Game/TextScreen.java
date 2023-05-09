@@ -127,7 +127,7 @@ public class TextScreen {
 	 */
 	public static void setMode(final Mode m) {
 		synchronized (monitor) {
-			double scale = Core.getScale();
+			final double scale = Core.getScale();
 			if (mode != m || oldScale != scale) {
 				switch (m) {
 					case INTRO:
@@ -161,21 +161,21 @@ public class TextScreen {
 	static void initBriefing() {
 		textScreen.init();
 		textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_GREEN));
-		Level level = GameController.getLevel();
+		final Level level = GameController.getLevel();
 		// LevelInfo li;
 		textScreen.restore();
 		// li =
 		// GameController.levelPack[GameController.curLevelPack].getInfo(GameController.curDiffLevel,
 		// GameController.curLevelNumber);
-		String rating = GameController.getCurLevelPack().getDiffLevels()[GameController.getCurDiffLevel()];
+		final String rating = GameController.getCurLevelPack().getDiffLevels()[GameController.getCurDiffLevel()];
 		textScreen.drawImage(GameController.getMapPreview(), -200);
 		textScreen.printCentered("Level " + (GameController.getCurLevelNumber() + 1) + " " + level.getLevelName(), -2,
 				RED);
 		textScreen.print("Number of Lemmings " + level.getNumLemmings(), -9, 0, BLUE);
 		textScreen.print("" + (level.getNumToRescue() * 100 / level.getNumLemmings()) + "% to be saved", -9, 1, GREEN);
 		textScreen.print("Release Rate " + level.getReleaseRate(), -9, 2, BROWN);
-		int minutes = level.getTimeLimitSeconds() / 60;
-		int seconds = level.getTimeLimitSeconds() % 60;
+		final int minutes = level.getTimeLimitSeconds() / 60;
+		final int seconds = level.getTimeLimitSeconds() % 60;
 		if (seconds == 0)
 			textScreen.print("Time         " + minutes + " Minutes", -9, 3, TURQUOISE);
 		else
@@ -190,12 +190,15 @@ public class TextScreen {
 	static void initDebriefing() {
 		textScreen.init();
 		textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_GREEN));
-		int toRescue = GameController.getNumToRecue() * 100 / GameController.getNumLemmingsMax(); // % to rescue of
-																									// total number
-		int rescued = GameController.getNumLeft() * 100 / GameController.getNumLemmingsMax(); // % rescued of total
-																								// number
-		int rescuedOfToRescue = GameController.getNumLeft() * 100 / GameController.getNumToRecue(); // % rescued of no.
-																									// to rescue
+		final int toRescue = GameController.getNumToRecue() * 100 / GameController.getNumLemmingsMax(); // % to rescue
+																										// of
+		// total number
+		final int rescued = GameController.getNumLeft() * 100 / GameController.getNumLemmingsMax(); // % rescued of
+																									// total
+		// number
+		final int rescuedOfToRescue = GameController.getNumLeft() * 100 / GameController.getNumToRecue(); // % rescued
+																											// of no.
+		// to rescue
 		textScreen.restore();
 		if (GameController.getTime() == 0)
 			textScreen.printCentered("Time is up.", -7, TURQUOISE);
@@ -232,13 +235,13 @@ public class TextScreen {
 				textScreen.printCentered("That level seemed no problem to you on", -2, RED);
 				textScreen.printCentered("that attempt. Onto the next....       ", -1, RED);
 			}
-			LevelPack lp = GameController.getCurLevelPack();
-			int ln = GameController.getCurLevelNumber();
+			final LevelPack lp = GameController.getCurLevelPack();
+			final int ln = GameController.getCurLevelNumber();
 			if (lp.getLevels(GameController.getCurDiffLevel()).length > ln + 1) {
 				textScreen.printCentered("Your access code for level " + (ln + 2), 1, BROWN);
-				int absLevel = GameController.absLevelNum(GameController.getCurLevelPackIdx(),
+				final int absLevel = GameController.absLevelNum(GameController.getCurLevelPackIdx(),
 						GameController.getCurDiffLevel(), ln + 1);
-				String code = LevelCode.create(lp.getCodeSeed(), absLevel, rescued, 0, lp.getCodeOffset());
+				final String code = LevelCode.create(lp.getCodeSeed(), absLevel, rescued, 0, lp.getCodeOffset());
 				textScreen.printCentered("is " + code, 2, BROWN);
 				textScreen.addTextButton(-4, 5, BUTTON_CONTINUE, "Continue", "Continue", BLUE, BROWN);
 			} else {
@@ -345,7 +348,7 @@ public class TextScreen {
 				at.translate(1, -imgSrc.getHeight());
 			} else
 				at.setToScale(1, rotFact);
-			AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+			final AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 			imgGfx.clearRect(0, 0, imgTrg.getWidth(), imgTrg.getHeight());
 			op.filter(imgSrc, imgTrg);
 			textScreen.drawImage(imgTrg, -120 - (int) (imgSrc.getHeight() / 2 * Math.abs(rotFact) + 0.5));
@@ -367,9 +370,9 @@ public class TextScreen {
 			out += SCROLL_TEXT.substring(0, scrollCharCtr + SCROLL_WIDTH + 1 - SCROLL_TEXT.length());
 		scrollerGfx.clearRect(0, 0, scrollerImg.getWidth(), scrollerImg.getHeight());
 		LemmFont.strImage(scrollerGfx, out, BLUE);
-		int w = SCROLL_WIDTH * LemmFont.getWidth();
-		int dx = (textScreen.getScreen().getWidth() - w) / 2;
-		int dy = (textScreen.getScreen().getHeight() / 2) + SCROLL_Y;
+		final int w = SCROLL_WIDTH * LemmFont.getWidth();
+		final int dx = (textScreen.getScreen().getWidth() - w) / 2;
+		final int dy = (textScreen.getScreen().getHeight() / 2) + SCROLL_Y;
 		textScreen.getScreen().createGraphics().drawImage(
 				scrollerImg, dx, dy, dx + w, dy + SCROLL_HEIGHT, scrollPixCtr, 0, scrollPixCtr + w, SCROLL_HEIGHT / 2,
 				null);

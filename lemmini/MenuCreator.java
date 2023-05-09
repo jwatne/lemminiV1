@@ -1,8 +1,9 @@
 package lemmini;
+
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
@@ -39,7 +40,6 @@ public class MenuCreator {
     private JMenuItem jMenuItemReplay = null;
     private JCheckBoxMenuItem jMenuItemMusic = null;
     private JCheckBoxMenuItem jMenuItemSound = null;
-    private JMenuBar jMenuBar = null;
     private JMenu jMenuLevel = null;
     private JMenu jMenuFile = null;
     private JMenu jMenuPlayer = null;
@@ -56,13 +56,21 @@ public class MenuCreator {
     /** path for loading single level files */
     private String lvlPath;
     private Lemmini lemmini;
+    protected GraphicsPane graphicsPane;
 
     /**
      * Returns the initialized menu bar for the Lemmini window.
      * 
+     * @param lemmini              the calling {@link Lemmini} window.
+     * @param graphicsPane         the {@link GraphicsPane} associated with the
+     *                             Lemmini
+     *                             window.
+     * @param difficultyLevelMenus
+     * 
      * @return the initialized menu bar for the Lemmini window.
      */
-    public final JMenuBar getLemminiMenuBar(final Lemmini lemmini) {
+    public final JMenuBar getLemminiMenuBar(final Lemmini lemmini, final GraphicsPane graphicsPane,
+            final Map<String, ArrayList<LvlMenuItem>> difficultyLevelMenus) {
         this.lemmini = lemmini;
         // create Menu
         jMenuFile = new JMenu("File");
@@ -84,7 +92,7 @@ public class MenuCreator {
 
         jMenuPlayer.add(jMenuItemManagePlayer);
         jMenuPlayer.add(jMenuSelectPlayer);
-        loadLevelPacksAndCreateLevelMenu();
+        loadLevelPacksAndCreateLevelMenu(difficultyLevelMenus);
         initializeRestartLevelMenuItem();
         initializeLoadLevelMenuItem();
         initializeLoadReplayMenuItem();
@@ -96,8 +104,8 @@ public class MenuCreator {
         jMenuLevel.add(jMenuItemReplay);
         jMenuLevel.add(jMenuItemLevelCode);
         initializeSoundMenu();
-        initializeOptionsMenu();
-        jMenuBar = new JMenuBar();
+        initializeOptionsMenu(graphicsPane);
+        final JMenuBar jMenuBar = new JMenuBar();
         jMenuBar.add(jMenuFile);
         jMenuBar.add(jMenuPlayer);
         jMenuBar.add(jMenuLevel);
@@ -302,9 +310,12 @@ public class MenuCreator {
 
     /**
      * Initializes the Options menu.
+     * 
+     * @param graphicsPane the {@link GraphicsPane} to which the Options menu is
+     *                     assigned.
      */
-    private void initializeOptionsMenu() {
-        initializeAdvancedSelectCheckboxMenuItem();
+    private void initializeOptionsMenu(final GraphicsPane graphicsPane) {
+        initializeAdvancedSelectCheckboxMenuItem(graphicsPane);
         jMenuItemClassicalCursor = new JCheckBoxMenuItem("Classical Cursor", false);
         jMenuItemClassicalCursor.addActionListener(new java.awt.event.ActionListener() {
 
@@ -331,8 +342,12 @@ public class MenuCreator {
 
     /**
      * Initializes Advanced select checkbox menu item.
+     * 
+     * @param the {@link GraphicsPane} whose cursor is set to normal if this
+     *            checkbox is not selected.
      */
-    private void initializeAdvancedSelectCheckboxMenuItem() {
+    private void initializeAdvancedSelectCheckboxMenuItem(final GraphicsPane graphicsPane) {
+        this.graphicsPane = graphicsPane;
         jMenuItemCursor = new JCheckBoxMenuItem("Advanced select", false);
         jMenuItemCursor.addActionListener(new java.awt.event.ActionListener() {
 
@@ -344,7 +359,7 @@ public class MenuCreator {
                     GameController.setAdvancedSelect(true);
                 } else {
                     GameController.setAdvancedSelect(false);
-                    lemmini.getGp().setCursor(LemmCursor.Type.NORMAL);
+                    graphicsPane.setCursor(LemmCursor.Type.NORMAL);
                 }
 
                 Core.programProps.set("advancedSelect", GameController.isAdvancedSelect());
@@ -640,8 +655,10 @@ public class MenuCreator {
 
     /**
      * Loads level packs and creates the level menu.
+     * 
+     * @param difficultyLevelMenus
      */
-    private void loadLevelPacksAndCreateLevelMenu() {
+    private void loadLevelPacksAndCreateLevelMenu(final Map<String, ArrayList<LvlMenuItem>> difficultyLevelMenus) {
         final java.awt.event.ActionListener lvlListener = new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(final java.awt.event.ActionEvent e) {
@@ -650,7 +667,6 @@ public class MenuCreator {
             }
         };
 
-        lemmini.setDiffLevelMenus(new HashMap<String, ArrayList<LvlMenuItem>>()); // store menus to access them later
         jMenuSelect = new JMenu("Select Level");
 
         for (int lp = 1; lp < GameController.getLevelPackNum(); lp++) { // skip dummy level pack
@@ -682,7 +698,7 @@ public class MenuCreator {
 
                 jMenuPack.add(jMenuDiff);
                 // store menus to access them later
-                lemmini.getDiffLevelMenus().put(LevelPack.getID(lPack.getName(), difficulties[i]), menuItems);
+                difficultyLevelMenus.put(LevelPack.getID(lPack.getName(), difficulties[i]), menuItems);
             }
 
             jMenuSelect.add(jMenuPack);

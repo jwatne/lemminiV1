@@ -88,27 +88,19 @@ public class Lemmini extends JFrame implements KeyListener {
 	@SuppressWarnings("unused")
 	private final String lvlPath;
 	/** HashMap to store menu items for difficulty levels */
-	private HashMap<String, ArrayList<LvlMenuItem>> diffLevelMenus;
+	private final HashMap<String, ArrayList<LvlMenuItem>> diffLevelMenus = new HashMap<>();
 
-	public HashMap<String, ArrayList<LvlMenuItem>> getDiffLevelMenus() {
-		return diffLevelMenus;
-	}
+	// public HashMap<String, ArrayList<LvlMenuItem>> getDiffLevelMenus() {
+	// return diffLevelMenus;
+	// }
 
-	public void setDiffLevelMenus(final HashMap<String, ArrayList<LvlMenuItem>> diffLevelMenus) {
-		this.diffLevelMenus = diffLevelMenus;
-	}
+	// public void setDiffLevelMenus(final HashMap<String, ArrayList<LvlMenuItem>>
+	// diffLevelMenus) {
+	// this.diffLevelMenus = diffLevelMenus;
+	// }
 
 	/** panel for the game graphics */
 	private final GraphicsPane gp;
-
-	/**
-	 * Returns the panel for the game graphics.
-	 * 
-	 * @return the panel for the game graphics.
-	 */
-	public GraphicsPane getGp() {
-		return gp;
-	}
 
 	/**
 	 * Constructor of the main frame.
@@ -145,8 +137,7 @@ public class Lemmini extends JFrame implements KeyListener {
 		this.validate(); // force redraw
 		this.setTitle("Lemmini");
 		final MenuCreator menuCreator = new MenuCreator();
-		// getLemminiMenuBar();
-		this.setJMenuBar(menuCreator.getLemminiMenuBar(this));
+		this.setJMenuBar(menuCreator.getLemminiMenuBar(this, this.gp, this.diffLevelMenus));
 		this.addWindowListener(new WindowClosingListener(this));
 		this.setVisible(true);
 		gp.init();
@@ -248,7 +239,6 @@ public class Lemmini extends JFrame implements KeyListener {
 				level.setEnabled(false);
 			}
 		}
-
 	}
 
 	/**

@@ -6,6 +6,7 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -35,6 +36,7 @@ import Game.Core;
 
 /**
  * Dialog for managing players.
+ * 
  * @author Volker Oth
  */
 public class PlayerDialog extends JDialog {
@@ -59,17 +61,19 @@ public class PlayerDialog extends JDialog {
 	// own stuff
 	private Vector<String> players;
 
-
 	/**
 	 * Get list of players.
+	 * 
 	 * @return list of players.
 	 */
 	public List<String> getPlayers() {
-		return players;
+		// Return copy to avoid malicious code vulnerability of exposed mutable object.
+		return players.stream().collect(Collectors.toList());
 	}
 
 	/**
 	 * Get selected list index.
+	 * 
 	 * @return selected list index
 	 */
 	public int getSelection() {
@@ -82,7 +86,7 @@ public class PlayerDialog extends JDialog {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void init() {
 		players = new Vector<String>();
-		for (int i=0; i<Core.getPlayerNum(); i++)
+		for (int i = 0; i < Core.getPlayerNum(); i++)
 			players.add(Core.getPlayer(i));
 		jList = new JList(players);
 		jScrollPane.setViewportView(jList);
@@ -90,6 +94,7 @@ public class PlayerDialog extends JDialog {
 
 	/**
 	 * Constructor for modal dialog in parent frame.
+	 * 
 	 * @param frame parent frame
 	 * @param modal create modal dialog?
 	 */
@@ -98,8 +103,8 @@ public class PlayerDialog extends JDialog {
 		initialize();
 
 		// own stuff
-		Point p = frame.getLocation();
-		this.setLocation(p.x+frame.getWidth()/2-getWidth()/2, p.y+frame.getHeight()/2-getHeight()/2);
+		final Point p = frame.getLocation();
+		this.setLocation(p.x + frame.getWidth() / 2 - getWidth() / 2, p.y + frame.getHeight() / 2 - getHeight() / 2);
 		init();
 	}
 
@@ -119,31 +124,31 @@ public class PlayerDialog extends JDialog {
 	 */
 	private JPanel getJContentPane() {
 		if (jContentPane == null) {
-			GridBagConstraints gridBagButtonNew = new GridBagConstraints();
+			final GridBagConstraints gridBagButtonNew = new GridBagConstraints();
 			gridBagButtonNew.fill = GridBagConstraints.HORIZONTAL;
 			gridBagButtonNew.insets = new Insets(0, 0, 0, 0);
-			GridBagConstraints gridBagButtonCancel = new GridBagConstraints();
+			final GridBagConstraints gridBagButtonCancel = new GridBagConstraints();
 			gridBagButtonCancel.gridx = 0;
 			gridBagButtonCancel.insets = new Insets(0, 0, 0, 0);
 			gridBagButtonCancel.anchor = GridBagConstraints.WEST;
 			gridBagButtonCancel.gridy = 5;
-			GridBagConstraints gridBagButtonOk = new GridBagConstraints();
+			final GridBagConstraints gridBagButtonOk = new GridBagConstraints();
 			gridBagButtonOk.gridx = 1;
 			gridBagButtonOk.fill = GridBagConstraints.HORIZONTAL;
 			gridBagButtonOk.insets = new Insets(0, 0, 0, 0);
 			gridBagButtonOk.gridy = 5;
-			GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
+			final GridBagConstraints gridBagConstraints2 = new GridBagConstraints();
 			gridBagConstraints2.gridx = 1;
 			gridBagConstraints2.insets = new Insets(0, 2, 2, 2);
 			gridBagConstraints2.fill = GridBagConstraints.HORIZONTAL;
 			gridBagConstraints2.anchor = GridBagConstraints.NORTH;
 			gridBagConstraints2.gridy = 3;
-			GridBagConstraints gridBagButtonDelete = new GridBagConstraints();
+			final GridBagConstraints gridBagButtonDelete = new GridBagConstraints();
 			gridBagButtonDelete.gridx = 1;
 			gridBagButtonDelete.insets = new Insets(0, 0, 0, 0);
 			gridBagButtonDelete.fill = GridBagConstraints.HORIZONTAL;
 			gridBagButtonDelete.gridy = 2;
-			GridBagConstraints gridBagScrollPane = new GridBagConstraints();
+			final GridBagConstraints gridBagScrollPane = new GridBagConstraints();
 			gridBagScrollPane.fill = GridBagConstraints.BOTH;
 			gridBagScrollPane.gridy = 0;
 			gridBagScrollPane.weightx = 1.0;
@@ -200,15 +205,15 @@ public class PlayerDialog extends JDialog {
 			jButtonNew.addActionListener(new java.awt.event.ActionListener() {
 				@SuppressWarnings("unchecked")
 				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					String player = JOptionPane.showInputDialog(
 							Core.getCmp(), "Enter Player Name", "Input", JOptionPane.QUESTION_MESSAGE);
 					if (player != null) {
 						// check if this player already exists
 						// it it alread exists, reset the existing profile
-						boolean found= false;
-						for (int pli=0; pli < players.size(); pli++) {
-							if ( players.get(pli).equalsIgnoreCase(player) ) {
+						boolean found = false;
+						for (int pli = 0; pli < players.size(); pli++) {
+							if (players.get(pli).equalsIgnoreCase(player)) {
 								player = players.get(pli);
 								found = true;
 								break;
@@ -218,8 +223,8 @@ public class PlayerDialog extends JDialog {
 						if (!found) {
 							players.add(player);
 							jList.setListData(players);
-							int i = players.size()-1;
-							if (i>=0)
+							final int i = players.size() - 1;
+							if (i >= 0)
 								jList.setSelectedIndex(i);
 						}
 					}
@@ -241,8 +246,8 @@ public class PlayerDialog extends JDialog {
 			jButtonDelete.addActionListener(new java.awt.event.ActionListener() {
 				@SuppressWarnings("unchecked")
 				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					int idx =jList.getSelectedIndex();
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
+					final int idx = jList.getSelectedIndex();
 					if (idx != -1) {
 						players.remove(idx);
 						jList.setListData(players);
@@ -264,7 +269,7 @@ public class PlayerDialog extends JDialog {
 			jButtonOK.setText("Ok");
 			jButtonOK.addActionListener(new java.awt.event.ActionListener() {
 				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					dispose();
 				}
 			});
@@ -283,7 +288,7 @@ public class PlayerDialog extends JDialog {
 			jButtonCancel.setText("Cancel");
 			jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
 				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
+				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					players.clear();
 					players = null;
 					dispose();
@@ -293,4 +298,4 @@ public class PlayerDialog extends JDialog {
 		return jButtonCancel;
 	}
 
-}  //  @jve:decl-index=0:visual-constraint="10,10"
+} // @jve:decl-index=0:visual-constraint="10,10"

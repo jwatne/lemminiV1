@@ -479,8 +479,6 @@ public class Level {
 		sprObjFront = oFront.toArray(sprObjFront);
 		sprObjBehind = new SpriteObject[oBehind.size()];
 		sprObjBehind = oBehind.toArray(sprObjBehind);
-		System.gc();
-
 		return stencil;
 	}
 

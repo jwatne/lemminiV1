@@ -1,9 +1,9 @@
 package Game;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import Tools.FileUtils;
 import Tools.Props;
 
 /*
@@ -52,12 +52,7 @@ public class Player {
 		props = new Props();
 		// create players directory if it doesn't exist
 		final String pathname = Core.resourcePath + "players";
-		final File dest = new File(pathname);
-		final boolean mkdirs = dest.mkdirs();
-
-		if (!mkdirs) {
-			System.out.println("UNABLE TO MAKE DIR " + pathname);
-		}
+		FileUtils.makeDirIfItDoesNotExist(pathname);
 
 		iniFileStr = Core.resourcePath + "players/" + name + ".ini";
 

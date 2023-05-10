@@ -15,6 +15,7 @@ import java.util.zip.Adler32;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import Tools.FileUtils;
 import Tools.PatchService;
 import Tools.Props;
 
@@ -260,13 +261,7 @@ public class Extract extends Thread {
 
 			out(path);
 			final String destFolder = destinationPath + path;
-			final File dest = new File(destFolder);
-			final boolean mkdirs = dest.mkdirs();
-
-			if (!mkdirs) {
-				System.out.println("Unable to make dir " + dest);
-			}
-
+			FileUtils.makeDirIfItDoesNotExist(destFolder);
 			checkCancel();
 		}
 	}
@@ -293,12 +288,7 @@ public class Extract extends Thread {
 
 			out(object[0]);
 			final String pathname = destinationPath + object[3];
-			final File dest = new File(pathname);
-			final boolean mkdirs = dest.mkdirs();
-
-			if (!mkdirs) {
-				System.out.println("Unable to make dir " + pathname);
-			}
+			FileUtils.makeDirIfItDoesNotExist(pathname);
 
 			// load palette and sprite
 			sprite.loadPalette(SOURCE_PATH + object[1]);
@@ -346,12 +336,7 @@ public class Extract extends Thread {
 
 			out(styles[3]);
 			final String pathname = destinationPath + styles[2];
-			final File dest = new File(pathname);
-			final boolean mkdirs = dest.mkdirs();
-
-			if (!mkdirs) {
-				System.out.println("Unable to make dir " + pathname);
-			}
+			FileUtils.makeDirIfItDoesNotExist(pathname);
 
 			// load palette and sprite
 			sprite.loadPalette(SOURCE_PATH + styles[1]);
@@ -489,12 +474,7 @@ public class Extract extends Thread {
 		final FilenameFilter ff = new LvlFilter();
 		final String root = addSeparator(r);
 		final String destination = addSeparator(destin);
-		final File dest = new File(destination);
-		final boolean mkdirs = dest.mkdirs();
-
-		if (!mkdirs) {
-			System.out.println("Unable to make dir " + destination);
-		}
+		FileUtils.makeDirIfItDoesNotExist(destination);
 
 		final File[] levels = fRoot.listFiles(ff);
 

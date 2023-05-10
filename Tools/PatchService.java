@@ -224,11 +224,7 @@ public class PatchService {
             final String destinationPath, final Map<String, Object> createdFiles)
             throws ExtractException {
         // step seven: create patches and patch.ini
-        final boolean mkdirs = (new File(patchPath)).mkdirs();
-
-        if (!mkdirs) {
-            System.out.println("UNABLE TO MAKE DIR " + patchPath);
-        }
+        FileUtils.makeDirIfItDoesNotExist(destinationPath);
 
         Extract.out("\nCreate patch ini");
 
@@ -268,21 +264,9 @@ public class PatchService {
         Extract.SOURCE_PATH = Extract.addSeparator(sPath + sDir);
         final File fSource = new File(Extract.SOURCE_PATH);
         final String destPath = Extract.addSeparator(dPath + sDir);
-        final File fDest = new File(destPath);
-        final boolean destPathMade = fDest.mkdirs();
-
-        if (!destPathMade) {
-            System.out.println("UNABLE TO MAKE DIR " + destPath);
-        }
-
+        FileUtils.makeDirIfItDoesNotExist(destPath);
         patchPath = Extract.addSeparator(pPath);
-        final File fPatch = new File(patchPath);
-        final boolean patchPathMade = fPatch.mkdirs();
-
-        if (!patchPathMade) {
-            System.out.println("UNABLE TO MAKE DIR " + fPatch);
-        }
-
+        FileUtils.makeDirIfItDoesNotExist(patchPath);
         patchFiles(sDir, fPatchList, fSource, destPath, createdFiles);
     }
 

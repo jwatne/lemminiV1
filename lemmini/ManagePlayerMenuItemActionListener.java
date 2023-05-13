@@ -1,5 +1,6 @@
 package lemmini;
 
+import java.awt.Component;
 import java.io.File;
 import java.util.List;
 
@@ -16,18 +17,28 @@ public final class ManagePlayerMenuItemActionListener implements java.awt.event.
      * The calling {@link MenuCreator}.
      */
     private final MenuCreator menuCreator;
+    private Component frame;
 
     /**
      * @param menuCreator
      */
-    ManagePlayerMenuItemActionListener(final MenuCreator menuCreator) {
+    ManagePlayerMenuItemActionListener(final MenuCreator menuCreator, final Component frame) {
         this.menuCreator = menuCreator;
+        this.frame = frame;
+    }
+
+    /**
+     * Private default no-args constructor: not used.
+     */
+    @SuppressWarnings("unused")
+    private ManagePlayerMenuItemActionListener() {
+        this.menuCreator = null;
     }
 
     @Override
     public void actionPerformed(final java.awt.event.ActionEvent e) {
         Core.player.store(); // save player in case it is changed
-        final PlayerDialog d = new PlayerDialog((JFrame) Core.getCmp(), true);
+        final PlayerDialog d = new PlayerDialog((JFrame) frame, true);
         d.setVisible(true);
         // blocked until dialog returns
         final List<String> players = d.getPlayers();

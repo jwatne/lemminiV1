@@ -1,6 +1,7 @@
 package lemmini;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Transparency;
@@ -86,18 +87,29 @@ public class GraphicsPane extends JPanel implements Runnable, MouseListener, Mou
 	private int activeBuffer;
 	/** monitoring object used for synchronized painting */
 	private final Object paintSemaphore;
+	private Component frame;
 
 	/**
 	 * Constructor.
+	 * 
+	 * @param frame the parent component (main frame of the application).
 	 */
-	public GraphicsPane() {
+	public GraphicsPane(final Component frame) {
 		super();
-
+		this.frame = frame;
 		paintSemaphore = new Object();
 		this.requestFocus();
 		this.setCursor(LemmCursor.getCursor());
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+	}
+
+	@SuppressWarnings("unused")
+	private GraphicsPane() {
+		// Private default no-args constructor - not used.
+		super();
+		frame = null;
+		paintSemaphore = null;
 	}
 
 	/**
@@ -446,7 +458,7 @@ public class GraphicsPane extends JPanel implements Runnable, MouseListener, Mou
 			}
 
 			// fader
-			GameController.fade(offGfx);
+			GameController.fade(offGfx, frame);
 			// and all onto screen
 			activeBuffer = drawBuffer;
 
@@ -588,7 +600,7 @@ public class GraphicsPane extends JPanel implements Runnable, MouseListener, Mou
 					case TextScreen.BUTTON_MENU:
 						GameController.setTransition(GameController.TransitionState.TO_INTRO);
 						Fader.setState(Fader.State.OUT);
-						((JFrame) Core.getCmp()).setTitle("Lemmini");
+						((JFrame) frame).setTitle("Lemmini");
 						break;
 					case TextScreen.BUTTON_REPLAY:
 						GameController.requestRestartLevel(true);
@@ -610,7 +622,7 @@ public class GraphicsPane extends JPanel implements Runnable, MouseListener, Mou
 								}
 
 								// else: no success
-								JOptionPane.showMessageDialog(Core.getCmp(), "Error!", "Saving replay failed",
+								JOptionPane.showMessageDialog(frame, "Error!", "Saving replay failed",
 										JOptionPane.INFORMATION_MESSAGE);
 							} catch (final Exception ex) {
 								ToolBox.showException(ex);

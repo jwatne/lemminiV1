@@ -57,6 +57,21 @@ public class MenuCreator {
     private String lvlPath;
     private Lemmini lemmini;
     protected GraphicsPane graphicsPane;
+    private JFrame frame;
+
+    /**
+     * Initializes the MenuCreator.
+     * 
+     * @param frame the parent component (main frame of the application).
+     */
+    public MenuCreator(final JFrame frame) {
+        this.frame = frame;
+    }
+
+    @SuppressWarnings("unused")
+    private MenuCreator() {
+        // Make default no-args constructor private so not callable.
+    }
 
     /**
      * Returns the initialized menu bar for the Lemmini window.
@@ -151,7 +166,7 @@ public class MenuCreator {
     private void getManagePlayerMenuItem() {
         jMenuItemManagePlayer = new JMenuItem("Manage Players");
 
-        jMenuItemManagePlayer.addActionListener(new ManagePlayerMenuItemActionListener(this));
+        jMenuItemManagePlayer.addActionListener(new ManagePlayerMenuItemActionListener(this, frame));
     }
 
     /**
@@ -380,7 +395,7 @@ public class MenuCreator {
         jMenuItemVolume.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(final java.awt.event.ActionEvent e) {
-                final GainDialog v = new GainDialog((JFrame) Core.getCmp(), true);
+                final GainDialog v = new GainDialog((JFrame) frame, true);
                 v.setVisible(true);
             }
         });
@@ -508,7 +523,7 @@ public class MenuCreator {
         jMenuItemLevelCode.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(final java.awt.event.ActionEvent e) {
-                final LevelCodeDialog lcd = new LevelCodeDialog((JFrame) Core.getCmp(), true);
+                final LevelCodeDialog lcd = new LevelCodeDialog((JFrame) frame, true);
                 lcd.setVisible(true);
                 String levelCode = lcd.getCode();
                 final int lvlPack = lcd.getLevelPack();
@@ -518,7 +533,7 @@ public class MenuCreator {
 
                     // cheat mode
                     if (levelCode.equals("0xdeadbeef")) {
-                        JOptionPane.showMessageDialog(Core.getCmp(), "All levels and debug mode enabled", "Cheater!",
+                        JOptionPane.showMessageDialog(frame, "All levels and debug mode enabled", "Cheater!",
                                 JOptionPane.INFORMATION_MESSAGE);
                         Core.player.enableCheatMode();
                         updateLevelMenus();
@@ -543,7 +558,7 @@ public class MenuCreator {
                 }
 
                 // not found
-                JOptionPane.showMessageDialog(Core.getCmp(), "Invalid Level Code", "Error",
+                JOptionPane.showMessageDialog(frame, "Invalid Level Code", "Error",
                         JOptionPane.WARNING_MESSAGE);
             }
         });
@@ -584,7 +599,7 @@ public class MenuCreator {
                         }
 
                         // else: no success
-                        JOptionPane.showMessageDialog(Core.getCmp(), "Wrong format!", "Loading replay failed",
+                        JOptionPane.showMessageDialog(frame, "Wrong format!", "Loading replay failed",
                                 JOptionPane.INFORMATION_MESSAGE);
                     } catch (final Exception ex) {
                         ToolBox.showException(ex);
@@ -625,7 +640,7 @@ public class MenuCreator {
                             }
                         }
 
-                        JOptionPane.showMessageDialog(Core.getCmp(), "Wrong format!", "Loading level failed",
+                        JOptionPane.showMessageDialog(frame, "Wrong format!", "Loading level failed",
                                 JOptionPane.INFORMATION_MESSAGE);
                     } catch (final Exception ex) {
                         ToolBox.showException(ex);

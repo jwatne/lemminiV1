@@ -1,6 +1,7 @@
 package Game;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
@@ -68,10 +69,12 @@ public class Explosion {
 	 * Load explosion image as static resource.
 	 * Mainly outside constructor for easier handling of ResourceException.
 	 * 
+	 * @param frame the parent component (main frame of the application).
+	 * 
 	 * @throws ResourceException
 	 */
-	static void init() throws ResourceException {
-		expImg = ToolBox.imageToBuffered(Core.loadImage("misc/explode.gif"), Transparency.BITMASK);
+	static void init(final Component frame) throws ResourceException {
+		expImg = ToolBox.imageToBuffered(Core.loadImage("misc/explode.gif", frame), Transparency.BITMASK);
 	}
 
 	/**

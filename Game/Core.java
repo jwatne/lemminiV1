@@ -64,7 +64,7 @@ public class Core {
 	public static Player player;
 
 	/** parent component (main frame) */
-	private static Component cmp;
+	// private static Component cmp;
 	/** name of program properties file */
 	private static String programPropsFileStr;
 	/** name of player properties file */
@@ -120,7 +120,7 @@ public class Core {
 		initializeResources();
 		final String defaultPlayer = getDefaultPlayer();
 		setPlayer(defaultPlayer);
-		cmp = frame;
+		// cmp = frame;
 	}
 
 	/**
@@ -222,14 +222,14 @@ public class Core {
 		return defaultPlayer;
 	}
 
-	/**
-	 * Get parent component (main frame).
-	 * 
-	 * @return parent component
-	 */
-	public static Component getCmp() {
-		return cmp;
-	}
+	// /**
+	// * Get parent component (main frame).
+	// *
+	// * @return parent component
+	// */
+	// public static Component getCmp() {
+	// return cmp;
+	// }
 
 	/**
 	 * Get String to resource in resource path.
@@ -330,11 +330,12 @@ public class Core {
 	 * Load an image from the resource path.
 	 * 
 	 * @param fname file name
+	 * @param frame the parent component (main frame of the application).
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	public static Image loadImage(final String fname) throws ResourceException {
-		final MediaTracker tracker = new MediaTracker(Core.getCmp());
+	public static Image loadImage(final String fname, final Component frame) throws ResourceException {
+		final MediaTracker tracker = new MediaTracker(frame);// Core.getCmp());
 		final Image img = loadImage(tracker, fname);
 
 		if (img == null) {
@@ -348,11 +349,12 @@ public class Core {
 	 * Load an image from inside the JAR or the directory of the main class.
 	 * 
 	 * @param fname
+	 * @param frame the parent component (main frame of the application).
 	 * @return Image
 	 * @throws ResourceException
 	 */
-	public static Image loadImageJar(final String fname) throws ResourceException {
-		final MediaTracker tracker = new MediaTracker(Core.getCmp());
+	public static Image loadImageJar(final String fname, final Component frame) throws ResourceException {
+		final MediaTracker tracker = new MediaTracker(frame);// Core.getCmp());
 		final Image img = loadImage(tracker, fname, true);
 
 		if (img == null) {

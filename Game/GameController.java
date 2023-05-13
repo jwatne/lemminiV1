@@ -1,6 +1,7 @@
 package Game;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Transparency;
@@ -296,27 +297,29 @@ public class GameController {
 	/**
 	 * Initialization.
 	 * 
+	 * @param frame the parent component (main frame of the application).
+	 * 
 	 * @throws ResourceException
 	 */
-	public static void init() throws ResourceException {
+	public static void init(final Component frame) throws ResourceException {
 		bgImage = ToolBox.createImage(Level.WIDTH, Level.HEIGHT, Transparency.BITMASK);
 		bgGfx = bgImage.createGraphics();
 		gameState = State.INIT;
 		sound = new Sound(24, SND_MOUSEPRE);
 		sound.setGain(soundGain);
-		Icons.init(Core.getCmp());
-		Explosion.init();
-		Lemming.loadLemmings(Core.getCmp());
+		Icons.init(frame);// Core.getCmp());
+		Explosion.init(frame);
+		Lemming.loadLemmings(frame); // Core.getCmp());
 		lemmings = new LinkedList<Lemming>();
 		explosions = new LinkedList<Explosion>();
 		lemmsUnderCursor = new ArrayList<Lemming>(10);
 		lemmSkillRequest = null;
-		LemmFont.init();
-		NumFont.init();
-		LemmCursor.init();
+		LemmFont.init(frame);
+		NumFont.init(frame);
+		LemmCursor.init(frame);
 		Music.init();
 		Music.setGain(musicGain);
-		MiscGfx.init();
+		MiscGfx.init(frame);
 		plus = new KeyRepeat(MICROSEC_KEYREPEAT_START, MICROSEC_KEYREPEAT_REPEAT, MICROSEC_RELEASE_DOUBLE_CLICK);
 		minus = new KeyRepeat(MICROSEC_KEYREPEAT_START, MICROSEC_KEYREPEAT_REPEAT, MICROSEC_RELEASE_DOUBLE_CLICK);
 		timerNuke = new MicrosecondTimer();
@@ -472,9 +475,10 @@ public class GameController {
 	 * Restart level.
 	 * 
 	 * @param doReplay true: replay, false: play
+	 * @param frame    the parent component (main frame of the application).
 	 */
-	private static synchronized void restartLevel(final boolean doReplay) {
-		initLevel();
+	private static synchronized void restartLevel(final boolean doReplay, final Component frame) {
+		initLevel(frame);
 
 		if (doReplay) {
 			replayMode = true;
@@ -488,8 +492,10 @@ public class GameController {
 
 	/**
 	 * Initialize a level after it was loaded.
+	 * 
+	 * @param frame the parent component (main frame of the application).
 	 */
-	private static void initLevel() {
+	private static void initLevel(final Component frame) {
 		Music.stop();
 		setFastForward(false);
 		setPaused(false);
@@ -498,7 +504,7 @@ public class GameController {
 		TextScreen.setMode(TextScreen.Mode.INIT);
 		bgGfx.setBackground(blankColor);
 		bgGfx.clearRect(0, 0, bgImage.getWidth(), bgImage.getHeight());
-		stencil = getLevel().paintLevel(bgImage, Core.getCmp(), stencil);
+		stencil = getLevel().paintLevel(bgImage, /* Core.getCmp() */ frame, stencil);
 		lemmings.clear();
 		explosions.clear();
 		Icons.reset();
@@ -582,18 +588,19 @@ public class GameController {
 	 * @param dLevel   index of difficulty level
 	 * @param lNum     level number
 	 * @param doReplay true: replay, false: play
+	 * @param frame    the parent component (main frame of the application).
 	 */
 	static private synchronized Level changeLevel(final int lPack, final int dLevel, final int lNum,
-			final boolean doReplay) throws ResourceException, LemmException {
+			final boolean doReplay, final Component frame) throws ResourceException, LemmException {
 		// gameState = GAME_ST_INIT;
 		curLevelPack = lPack;
 		curDiffLevel = dLevel;
 		curLevelNumber = lNum;
 		final String lvlPath = levelPack[curLevelPack].getInfo(curDiffLevel, curLevelNumber).getFileName();
 		// lemmings need to be reloaded to contain pink color
-		Lemming.loadLemmings(Core.getCmp());
+		Lemming.loadLemmings(frame/* Core.getCmp() */);
 		// loading the level will patch pink lemmings pixels to correct color
-		getLevel().loadLevel(lvlPath);
+		getLevel().loadLevel(lvlPath, frame);
 
 		// if with and height would be stored inside the level, the bgImage etc. would
 		// have to
@@ -602,7 +609,7 @@ public class GameController {
 		// Transparency.BITMASK);
 		// bgGfx = bgImage.createGraphics();
 
-		initLevel();
+		initLevel(frame);
 
 		if (doReplay) {
 			replayMode = true;
@@ -1422,9 +1429,10 @@ public class GameController {
 	/**
 	 * Fade in/out.
 	 * 
-	 * @param g graphics object
+	 * @param g     graphics object
+	 * @param frame the parent component (main frame of the application).
 	 */
-	public static void fade(final Graphics g) {
+	public static void fade(final Graphics g, final Component frame) {
 		if (Fader.getState() == Fader.State.OFF && transitionState != TransitionState.NONE) {
 			switch (transitionState) {
 				case END_LEVEL:
@@ -1444,14 +1452,14 @@ public class GameController {
 					break;
 				case RESTART_LEVEL:
 				case REPLAY_LEVEL:
-					restartLevel(transitionState == TransitionState.REPLAY_LEVEL);
+					restartLevel(transitionState == TransitionState.REPLAY_LEVEL, frame);
 					break;
 				case LOAD_LEVEL:
 				case LOAD_REPLAY:
 					try {
 						changeLevel(nextLevelPack, nextDiffLevel, nextLevelNumber,
-								transitionState == TransitionState.LOAD_REPLAY);
-						((JFrame) Core.getCmp()).setTitle("Lemmini - " + getLevel().getLevelName());
+								transitionState == TransitionState.LOAD_REPLAY, frame);
+						((JFrame) frame /* Core.getCmp() */).setTitle("Lemmini - " + getLevel().getLevelName());
 					} catch (final ResourceException ex) {
 						Core.resourceError(ex.getMessage());
 					} catch (final LemmException ex) {

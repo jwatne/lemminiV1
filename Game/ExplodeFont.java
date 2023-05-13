@@ -16,11 +16,11 @@ public class ExplodeFont {
     /**
      * Constructor.
      * 
-     * @param cmp parent component
+     * @param cmp the parent component (main frame of the application).
      * @throws ResourceException
      */
     ExplodeFont(final Component cmp) throws ResourceException {
-        final Image sourceImg = Core.loadImage("misc/countdown.gif");
+        final Image sourceImg = Core.loadImage("misc/countdown.gif", cmp);
         img = ToolBox.getAnimation(sourceImg, 5, Transparency.BITMASK);
     }
 

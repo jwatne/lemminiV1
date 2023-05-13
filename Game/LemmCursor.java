@@ -1,5 +1,6 @@
 package Game;
 
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -29,9 +30,11 @@ import Tools.ToolBox;
  *
  * @author Volker Oth
  */
-public class LemmCursor  {
+public class LemmCursor {
 
-	/** distance from center of cursor to be used to detect Lemmings under the cursor */
+	/**
+	 * distance from center of cursor to be used to detect Lemmings under the cursor
+	 */
 	private final static int HIT_DISTANCE = 12;
 
 	/** cursor type */
@@ -71,51 +74,62 @@ public class LemmCursor  {
 
 	/**
 	 * Initialization.
+	 * 
+	 * @param frame the parent component (main frame of the application).
 	 * @throws ResourceException
 	 */
-	public static void init() throws ResourceException {
-		img = ToolBox.getAnimation(Core.loadImage("misc/cursor.gif"), 8, Transparency.BITMASK);
+	public static void init(final Component frame) throws ResourceException {
+		img = ToolBox.getAnimation(Core.loadImage("misc/cursor.gif", frame), 8, Transparency.BITMASK);
 		cursor = new Cursor[5];
-		int w = getImage(Type.NORMAL).getWidth()/2;
-		int h = getImage(Type.NORMAL).getHeight()/2;
-		cursor[Type.HIDDEN.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "");
-		cursor[Type.NORMAL.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.NORMAL), new Point(w,h), "" );
-		cursor[Type.LEFT.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.LEFT),   new Point(w,h), "" );
-		cursor[Type.RIGHT.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.RIGHT),  new Point(w,h), "" );
-		cursor[Type.WALKER.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor( LemmCursor.getImage(Type.WALKER), new Point(w,h), "" );
+		final int w = getImage(Type.NORMAL).getWidth() / 2;
+		final int h = getImage(Type.NORMAL).getHeight() / 2;
+		cursor[Type.HIDDEN.ordinal()] = Toolkit.getDefaultToolkit()
+				.createCustomCursor(new BufferedImage(3, 3, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "");
+		cursor[Type.NORMAL.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor(LemmCursor.getImage(Type.NORMAL),
+				new Point(w, h), "");
+		cursor[Type.LEFT.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor(LemmCursor.getImage(Type.LEFT),
+				new Point(w, h), "");
+		cursor[Type.RIGHT.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor(LemmCursor.getImage(Type.RIGHT),
+				new Point(w, h), "");
+		cursor[Type.WALKER.ordinal()] = Toolkit.getDefaultToolkit().createCustomCursor(LemmCursor.getImage(Type.WALKER),
+				new Point(w, h), "");
 		type = Type.NORMAL;
 		setX(0);
 		setY(0);
 		enabled = true;
 	}
-	
+
 	/**
 	 * Set enable state for Mouse cursor.
+	 * 
 	 * @param en true to show, false to hide
 	 */
-	public static void setEnabled(boolean en) {
+	public static void setEnabled(final boolean en) {
 		enabled = en;
 	}
-	
+
 	/**
 	 * Get enable state.
+	 * 
 	 * @return true if shows, false if hidden
 	 */
 	public static boolean getEnabled() {
 		return enabled;
 	}
-	
+
 	/**
 	 * Get image for a certain cursor type.
+	 * 
 	 * @param t cursor type
 	 * @return image for the given cursor type
 	 */
 	public static BufferedImage getImage(final Type t) {
-		return img[t.ordinal()-1];
+		return img[t.ordinal() - 1];
 	}
 
 	/**
 	 * Get image for current cursor type.
+	 * 
 	 * @return image for current cursor type
 	 */
 	public static BufferedImage getImage() {
@@ -124,6 +138,7 @@ public class LemmCursor  {
 
 	/**
 	 * Get boxed version of image for the current cursor type.
+	 * 
 	 * @return boxed version of image for the current cursor type
 	 */
 	public static BufferedImage getBoxImage() {
@@ -149,6 +164,7 @@ public class LemmCursor  {
 
 	/**
 	 * Get current cursor as AWT cursor object.
+	 * 
 	 * @return current cursor as AWT cursor object
 	 */
 	public static Cursor getCursor() {
@@ -160,6 +176,7 @@ public class LemmCursor  {
 
 	/**
 	 * Get current cursor type.
+	 * 
 	 * @return current cursor type
 	 */
 	public static Type getType() {
@@ -168,6 +185,7 @@ public class LemmCursor  {
 
 	/**
 	 * Set current cursor type.
+	 * 
 	 * @param t cursor type
 	 */
 	public static void setType(final Type t) {
@@ -176,22 +194,23 @@ public class LemmCursor  {
 
 	/**
 	 * Check if a Lemming is under the cursor.
-	 * @param l Lemming to check
+	 * 
+	 * @param l    Lemming to check
 	 * @param xOfs screen x offset
 	 * @return true if the Lemming is under the Cursor, else false.
 	 */
 	public static boolean doesCollide(final Lemming l, final int xOfs) {
 		// get center of lemming
-		int lx = l.midX() - xOfs;
-		int ly = l.midY();
+		final int lx = l.midX() - xOfs;
+		final int ly = l.midY();
 
 		// calculate center of cursor
-		int cx = getX();
-		int cy = getY();
+		final int cx = getX();
+		final int cy = getY();
 
 		// calculate distance
-		int dx = Math.abs(lx-cx);
-		int dy = Math.abs(ly-cy);
+		final int dx = Math.abs(lx - cx);
+		final int dy = Math.abs(ly - cy);
 
 		if (dx <= HIT_DISTANCE && dy <= HIT_DISTANCE)
 			return true;
@@ -201,6 +220,7 @@ public class LemmCursor  {
 
 	/**
 	 * Set x position in pixels.
+	 * 
 	 * @param x x position in pixels.
 	 */
 	public static void setX(final int x) {
@@ -209,6 +229,7 @@ public class LemmCursor  {
 
 	/**
 	 * Get x position in pixels.
+	 * 
 	 * @return x position in pixels
 	 */
 	public static int getX() {
@@ -217,6 +238,7 @@ public class LemmCursor  {
 
 	/**
 	 * Set y position in pixels.
+	 * 
 	 * @param y y position in pixels
 	 */
 	public static void setY(final int y) {
@@ -225,6 +247,7 @@ public class LemmCursor  {
 
 	/**
 	 * Get y position in pixels.
+	 * 
 	 * @return y position in pixels
 	 */
 	public static int getY() {

@@ -131,10 +131,11 @@ public class Level {
 	 * Load a level and all level resources.
 	 * 
 	 * @param fname file name
+	 * @param frame the parent component (main frame of the application).
 	 * @throws ResourceException
 	 * @throws LemmException
 	 */
-	void loadLevel(final String fname) throws ResourceException, LemmException {
+	void loadLevel(final String fname, final Component frame) throws ResourceException, LemmException {
 		ready = false;
 		// read level properties from file
 		final Props p = new Props();
@@ -238,8 +239,8 @@ public class Level {
 				throw new LemmException("Style " + strStyle + " not existing.");
 		}
 		// load blockset
-		tiles = loadTileSet(strStyle, Core.getCmp());
-		sprObjAvailable = loadObjects(strStyle, Core.getCmp());
+		tiles = loadTileSet(strStyle, frame /* Core.getCmp() */);
+		sprObjAvailable = loadObjects(strStyle, frame /* Core.getCmp() */);
 		ready = true;
 	}
 

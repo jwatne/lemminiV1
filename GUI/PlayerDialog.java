@@ -1,5 +1,6 @@
 package GUI;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -61,6 +62,8 @@ public class PlayerDialog extends JDialog {
 	// own stuff
 	private Vector<String> players;
 
+	private Component frame;
+
 	/**
 	 * Get list of players.
 	 * 
@@ -100,6 +103,7 @@ public class PlayerDialog extends JDialog {
 	 */
 	public PlayerDialog(final JFrame frame, final boolean modal) {
 		super(frame, modal);
+		this.frame = frame;
 		initialize();
 
 		// own stuff
@@ -207,7 +211,7 @@ public class PlayerDialog extends JDialog {
 				@Override
 				public void actionPerformed(final java.awt.event.ActionEvent e) {
 					String player = JOptionPane.showInputDialog(
-							Core.getCmp(), "Enter Player Name", "Input", JOptionPane.QUESTION_MESSAGE);
+							frame, "Enter Player Name", "Input", JOptionPane.QUESTION_MESSAGE);
 					if (player != null) {
 						// check if this player already exists
 						// it it alread exists, reset the existing profile

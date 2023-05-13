@@ -100,7 +100,7 @@ public class Lemmini extends JFrame implements KeyListener {
 	Lemmini() {
 		try {
 			Core.init(this); // initialize Core object
-			GameController.init();
+			GameController.init(this);
 			GameController.setLevelMenuUpdateListener(new LevelMenuUpdateListener(this));
 		} catch (final ResourceException ex) {
 			Core.resourceError(ex.getMessage());
@@ -122,13 +122,13 @@ public class Lemmini extends JFrame implements KeyListener {
 		final Image img = Toolkit.getDefaultToolkit().getImage(loader.getResource("icon_32.png"));
 		setIconImage(img);
 		// set component pane
-		gp = new GraphicsPane();
+		gp = new GraphicsPane(this);
 		gp.setDoubleBuffered(false);
 		this.setContentPane(gp);
 		this.pack();
 		this.validate(); // force redraw
 		this.setTitle("Lemmini");
-		final MenuCreator menuCreator = new MenuCreator();
+		final MenuCreator menuCreator = new MenuCreator(this);
 		this.setJMenuBar(menuCreator.getLemminiMenuBar(this, this.gp, this.diffLevelMenus));
 		this.addWindowListener(new WindowClosingListener(this));
 		this.setVisible(true);

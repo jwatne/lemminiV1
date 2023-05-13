@@ -62,9 +62,6 @@ public class Core {
 	public static String resourcePath;
 	/** current player */
 	public static Player player;
-
-	/** parent component (main frame) */
-	// private static Component cmp;
 	/** name of program properties file */
 	private static String programPropsFileStr;
 	/** name of player properties file */
@@ -120,7 +117,7 @@ public class Core {
 		initializeResources();
 		final String defaultPlayer = getDefaultPlayer();
 		setPlayer(defaultPlayer);
-		// cmp = frame;
+
 	}
 
 	/**
@@ -221,15 +218,6 @@ public class Core {
 
 		return defaultPlayer;
 	}
-
-	// /**
-	// * Get parent component (main frame).
-	// *
-	// * @return parent component
-	// */
-	// public static Component getCmp() {
-	// return cmp;
-	// }
 
 	/**
 	 * Get String to resource in resource path.
@@ -335,7 +323,7 @@ public class Core {
 	 * @throws ResourceException
 	 */
 	public static Image loadImage(final String fname, final Component frame) throws ResourceException {
-		final MediaTracker tracker = new MediaTracker(frame);// Core.getCmp());
+		final MediaTracker tracker = new MediaTracker(frame);
 		final Image img = loadImage(tracker, fname);
 
 		if (img == null) {
@@ -354,7 +342,7 @@ public class Core {
 	 * @throws ResourceException
 	 */
 	public static Image loadImageJar(final String fname, final Component frame) throws ResourceException {
-		final MediaTracker tracker = new MediaTracker(frame);// Core.getCmp());
+		final MediaTracker tracker = new MediaTracker(frame);
 		final Image img = loadImage(tracker, fname, true);
 
 		if (img == null) {

@@ -239,8 +239,8 @@ public class Level {
 				throw new LemmException("Style " + strStyle + " not existing.");
 		}
 		// load blockset
-		tiles = loadTileSet(strStyle, frame /* Core.getCmp() */);
-		sprObjAvailable = loadObjects(strStyle, frame /* Core.getCmp() */);
+		tiles = loadTileSet(strStyle, frame);
+		sprObjAvailable = loadObjects(strStyle, frame);
 		ready = true;
 	}
 

@@ -117,7 +117,7 @@ public class Micromod {
 			if (pat >= numpatterns)
 				numpatterns = pat + 1;
 		}
-		switch ((mod[1082] << 8) | mod[1083]) {
+		switch ((mod[1082] << 8) | mod[1083] & 0xff) {
 			case 0x4b2e: // M.K.
 			case 0x4b21: // M!K!
 			case 0x5434: // FLT4

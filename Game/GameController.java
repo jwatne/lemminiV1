@@ -227,7 +227,7 @@ public class GameController {
 	/** list of all active explosions */
 	private static LinkedList<Explosion> explosions;
 	/** list of all Lemmings under the mouse cursor */
-	private static ArrayList<Lemming> lemmsUnderCursor;
+	private static List<Lemming> lemmsUnderCursor;
 	/** array of available level packs */
 	private static LevelPack levelPack[];
 	/** small preview version of level used in briefing screen */
@@ -1898,7 +1898,7 @@ public class GameController {
 	 * 
 	 * @return list of all Lemmings under the mouse cursor
 	 */
-	public static ArrayList<Lemming> getLemmsUnderCursor() {
+	public static List<Lemming> getLemmsUnderCursor() {
 		return lemmsUnderCursor;
 	}
 

@@ -8,6 +8,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -50,9 +53,9 @@ public class Core {
 	/** name of the ini file */
 	private final static String INI_NAME = "lemmings.ini";
 	/** extensions accepted for level files in file dialog */
-	public final static String[] LEVEL_EXTENSIONS = { "ini", "lvl" };
+	public static final List<String> LEVEL_EXTENSIONS = Collections.unmodifiableList(Arrays.asList("ini", "lvl"));
 	/** extensions accepted for replay files in file dialog */
-	public final static String[] REPLAY_EXTENSIONS = { "rpl" };
+	public static final List<String> REPLAY_EXTENSIONS = Collections.unmodifiableList(Arrays.asList("rpl"));
 	/** height of menu and icon bar in pixels */
 	private final static int WIN_OFS = 120;
 

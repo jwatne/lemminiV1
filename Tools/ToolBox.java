@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -271,27 +272,40 @@ public class ToolBox {
 	 * @param load   true: load, false: save
 	 * @return absolute file name of selected file or null
 	 */
-	public static String getFileName(final Component parent, final String path, final String ext[],
+	public static String getFileName(final Component parent, final String path, final List<String> ext,
 			final boolean load) {
 		String p = path;
-		if (p.length() == 0)
+		if (p.length() == 0) {
 			p = ".";
+		}
+
 		final JFileChooser jf = new JFileChooser(p);
+		final JFileFilter filter = new JFileFilter();
+
 		if (ext != null) {
-			final JFileFilter filter = new JFileFilter();
-			for (int i = 0; i < ext.length; i++)
-				filter.addExtension(ext[i]);
+			for (final String s : ext) {
+				filter.addExtension(s);
+			}
+
 			jf.setFileFilter(filter);
 		}
+
 		jf.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		if (!load)
+
+		if (!load) {
 			jf.setDialogType(JFileChooser.SAVE_DIALOG);
+		}
+
 		final int returnVal = jf.showDialog(parent, null);
+
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			final File f = jf.getSelectedFile();
-			if (f != null)
+
+			if (f != null) {
 				return f.getAbsolutePath();
+			}
 		}
+
 		return null;
 	}
 }

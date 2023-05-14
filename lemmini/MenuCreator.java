@@ -31,6 +31,41 @@ import Tools.ToolBox;
  * This service class creates the menu system for the lemmini application.
  */
 public class MenuCreator {
+    private static final class SFXMixerActionListener implements java.awt.event.ActionListener {
+        @Override
+        public void actionPerformed(final java.awt.event.ActionEvent e) {
+            final String mixerNames[] = GameController.sound.getMixers();
+            final String mixerName = e.getActionCommand();
+
+            for (int i = 0; i < mixerNames.length; i++) {
+                if (mixerNames[i].equals(mixerName)) {
+                    GameController.sound.setMixer(i);
+                    Core.programProps.set("mixerName", mixerName);
+                    break;
+                }
+            }
+        }
+    }
+
+    private static final class RestartLevelActionListener implements java.awt.event.ActionListener {
+        @Override
+        public void actionPerformed(final java.awt.event.ActionEvent e) {
+            if (!GameController.getLevel().isReady())
+                GameController.requestChangeLevel(GameController.getCurLevelPackIdx(),
+                        GameController.getCurDiffLevel(), GameController.getCurLevelNumber(), false);
+            else
+                GameController.requestRestartLevel(false);
+        }
+    }
+
+    private static final class LevelMenuActionListener implements java.awt.event.ActionListener {
+        @Override
+        public void actionPerformed(final java.awt.event.ActionEvent e) {
+            final LvlMenuItem item = (LvlMenuItem) e.getSource();
+            GameController.requestChangeLevel(item.levelPack, item.diffLevel, item.level, false);
+        }
+    }
+
     // Swing stuff
     private JMenuItem jMenuItemRestart = null;
     private JMenuItem jMenuItemLevelCode = null;
@@ -434,21 +469,7 @@ public class MenuCreator {
         for (int i = 0; i < mixerNames.length; i++) {
             final JCheckBoxMenuItem item = new JCheckBoxMenuItem();
             item.setText(mixerNames[i]);
-            item.addActionListener(new java.awt.event.ActionListener() {
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent e) {
-                    final String mixerNames[] = GameController.sound.getMixers();
-                    final String mixerName = e.getActionCommand();
-
-                    for (int i = 0; i < mixerNames.length; i++) {
-                        if (mixerNames[i].equals(mixerName)) {
-                            GameController.sound.setMixer(i);
-                            Core.programProps.set("mixerName", mixerName);
-                            break;
-                        }
-                    }
-                }
-            });
+            item.addActionListener(new SFXMixerActionListener());
 
             if (mixerNames[i].equals(lastMixerName)) { // default setting
                 item.setState(true);
@@ -656,16 +677,7 @@ public class MenuCreator {
     private void initializeRestartLevelMenuItem() {
         jMenuItemRestart = new JMenuItem();
         jMenuItemRestart.setText("Restart Level");
-        jMenuItemRestart.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(final java.awt.event.ActionEvent e) {
-                if (!GameController.getLevel().isReady())
-                    GameController.requestChangeLevel(GameController.getCurLevelPackIdx(),
-                            GameController.getCurDiffLevel(), GameController.getCurLevelNumber(), false);
-                else
-                    GameController.requestRestartLevel(false);
-            }
-        });
+        jMenuItemRestart.addActionListener(new RestartLevelActionListener());
     }
 
     /**
@@ -674,13 +686,7 @@ public class MenuCreator {
      * @param difficultyLevelMenus
      */
     private void loadLevelPacksAndCreateLevelMenu(final Map<String, ArrayList<LvlMenuItem>> difficultyLevelMenus) {
-        final java.awt.event.ActionListener lvlListener = new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(final java.awt.event.ActionEvent e) {
-                final LvlMenuItem item = (LvlMenuItem) e.getSource();
-                GameController.requestChangeLevel(item.levelPack, item.diffLevel, item.level, false);
-            }
-        };
+        final java.awt.event.ActionListener lvlListener = new LevelMenuActionListener();
 
         jMenuSelect = new JMenu("Select Level");
 

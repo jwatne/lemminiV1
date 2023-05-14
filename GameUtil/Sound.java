@@ -72,13 +72,14 @@ public class Sound {
 	/** gain/volume: 1.0 = 100% */
 	private double gain;
 	/** number of sounds currently played */
-	static int simulSounds;
+	private static int simulSounds;
 	/** selected mixer index */
 	static int mixerIdx;
 	/** array of available mixers */
 	static Mixer mixers[];
 	/** number of samples to be used */
 	static int sampleNum;
+	private static final Object MONITOR_OBJECT = new Object();
 
 	/**
 	 * Constructor.
@@ -94,7 +95,7 @@ public class Sound {
 		format = new AudioFormat[sampleNum];
 		info = new DataLine.Info[sampleNum];
 		gain = 1.0;
-		simulSounds = 0;
+		setSimulSounds(0);
 		defaultListener = new DefaultListener();
 		// upsampling to default frequency (more compatible for weird sample
 		// frequencies)
@@ -175,6 +176,19 @@ public class Sound {
 		mixers = mix.toArray(mixers);
 	}
 
+	public static int getSimulSounds() {
+		synchronized (MONITOR_OBJECT) {
+			return simulSounds;
+		}
+	}
+
+	public static int setSimulSounds(final int simulSounds) {
+		synchronized (MONITOR_OBJECT) {
+			Sound.simulSounds = simulSounds;
+			return simulSounds;
+		}
+	}
+
 	/**
 	 * Get an array of available mixer names.
 	 * 
@@ -221,7 +235,7 @@ public class Sound {
 	 * @param idx index of the sound to be played
 	 */
 	public synchronized void play(final int idx) {
-		if (!GameController.isSoundOn() || simulSounds >= MAX_SIMUL_SOUNDS /* || clips==null */)
+		if (!GameController.isSoundOn() || getSimulSounds() >= MAX_SIMUL_SOUNDS /* || clips==null */)
 			return;
 
 		try {
@@ -231,7 +245,7 @@ public class Sound {
 			c.open(format[idx], soundBuffer[idx], 0, soundBuffer[idx].length);
 			setLineGain(c, gain);
 			c.start();
-			simulSounds++;
+			setSimulSounds(getSimulSounds() + 1);
 		} catch (final Exception ex) {
 			System.out.println("Error playing sound " + idx + ": " + ex.getMessage());
 		}
@@ -349,7 +363,7 @@ public class Sound {
 	 * @param pitch pitch value 0..99
 	 */
 	public synchronized void playPitched(final int pitch) {
-		if (!GameController.isSoundOn() || simulSounds >= MAX_SIMUL_SOUNDS)
+		if (!GameController.isSoundOn() || getSimulSounds() >= MAX_SIMUL_SOUNDS)
 			return;
 
 		try {
@@ -359,7 +373,7 @@ public class Sound {
 			c.open(pitchFormat, pitchBuffers[pitch], 0, pitchBuffers[pitch].length);
 			setLineGain(c, gain);
 			c.start();
-			simulSounds++;
+			setSimulSounds(getSimulSounds() + 1);
 		} catch (final Exception ex) {
 			System.out.println("Error playing pitched sample: " + ex.getMessage());
 		}
@@ -420,19 +434,17 @@ public class Sound {
  * @author Volker Oth
  */
 class DefaultListener implements LineListener {
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.sound.sampled.LineListener#update(javax.sound.sampled.LineEvent)
-	 */
 	@Override
 	public synchronized void update(final LineEvent event) {
 		if (event.getType().equals(LineEvent.Type.STOP)) {
 			final Clip c = (Clip) event.getLine();
+
 			if (c.isOpen()) {
 				c.close();
-				if (--Sound.simulSounds < 0)
-					Sound.simulSounds = 0;
+
+				if (Sound.setSimulSounds(Sound.getSimulSounds() - 1) < 0) {
+					Sound.setSimulSounds(0);
+				}
 			}
 		}
 	}

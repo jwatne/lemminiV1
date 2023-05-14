@@ -1,4 +1,5 @@
 package Game;
+
 import java.io.File;
 import java.io.FileFilter;
 
@@ -48,7 +49,6 @@ public class Music {
 	/** array of file names */
 	private static String musicFiles[];
 
-
 	/**
 	 * Initialization.
 	 */
@@ -57,15 +57,21 @@ public class Music {
 		modMusic = new ModMusic();
 
 		// read available musicfiles for random mode
-		File dir = new File(Core.resourcePath+"music");
-		File files[] = dir.listFiles(new MusicFileFilter());
-		musicFiles = new String[files.length];
-		for (int i=0; i<files.length; i++)
-			musicFiles[i] = files[i].getName();
+		final File dir = new File(Core.resourcePath + "music");
+		final File files[] = dir.listFiles(new MusicFileFilter());
+
+		if (files != null) {
+			musicFiles = new String[files.length];
+			
+			for (int i = 0; i < files.length; i++) {
+				musicFiles[i] = files[i].getName();
+			}
+		}
 	}
 
 	/**
 	 * Load music file.
+	 * 
 	 * @param fName file name
 	 * @throws ResourceException
 	 * @throws LemmException
@@ -89,11 +95,12 @@ public class Music {
 
 	/**
 	 * Get file name of a random track.
+	 * 
 	 * @return file name of a random track
 	 */
 	public static String getRandomTrack() {
-		double r = Math.random()*musicFiles.length;
-		return musicFiles[(int)r];
+		final double r = Math.random() * musicFiles.length;
+		return musicFiles[(int) r];
 	}
 
 	/**
@@ -152,6 +159,7 @@ public class Music {
 
 	/**
 	 * Check if music is currently playing
+	 * 
 	 * @return true if music is currently playing, else false
 	 */
 	public static boolean isPlaying() {
@@ -160,6 +168,7 @@ public class Music {
 
 	/**
 	 * Get current music gain (1.0=100%)
+	 * 
 	 * @return current music gain (1.0=100%)
 	 */
 	public static double getGain() {
@@ -168,6 +177,7 @@ public class Music {
 
 	/**
 	 * Set music gain
+	 * 
 	 * @param gn gain (1.0=100%)
 	 */
 	public static void setGain(final double gn) {
@@ -188,12 +198,13 @@ public class Music {
 			default:
 				break;
 		}
-		
+
 		Core.programProps.set("musicGain", gain);
 	}
 
 	/**
 	 * Get current music type.
+	 * 
 	 * @return music type
 	 */
 	public static Type getType() {
@@ -203,10 +214,13 @@ public class Music {
 
 /**
  * File filter for music files.
+ * 
  * @author Volker Oth
  */
 class MusicFileFilter implements FileFilter {
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.io.FileFilter#accept(java.io.File)
 	 */
 	@Override
@@ -220,4 +234,3 @@ class MusicFileFilter implements FileFilter {
 		return false;
 	}
 }
-

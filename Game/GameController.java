@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -328,7 +329,7 @@ public class GameController {
 		final File dir = new File(Core.resourcePath + "levels");
 		final File files[] = dir.listFiles();
 		// now get the names of the directories
-		final ArrayList<String> dirs = getNamesOfDirectories(files);
+		final List<String> dirs = getNamesOfDirectories(files);
 		Collections.sort(dirs);
 		levelPack = new LevelPack[dirs.size() + 1];
 		levelPack[0] = new LevelPack(); // dummy
@@ -355,12 +356,14 @@ public class GameController {
 	 * @param files the level files.
 	 * @return the names of the directories.
 	 */
-	private static ArrayList<String> getNamesOfDirectories(final File[] files) {
-		final ArrayList<String> dirs = new ArrayList<String>();
+	private static List<String> getNamesOfDirectories(final File[] files) {
+		final List<String> dirs = new ArrayList<String>();
 
-		for (int i = 0; i < files.length; i++) {
-			if (files[i].isDirectory()) {
-				dirs.add(files[i].getName());
+		if (files != null) {
+			for (int i = 0; i < files.length; i++) {
+				if (files[i].isDirectory()) {
+					dirs.add(files[i].getName());
+				}
 			}
 		}
 

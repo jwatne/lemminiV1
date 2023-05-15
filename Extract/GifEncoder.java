@@ -321,9 +321,9 @@ public class GifEncoder {
 	// Joe Orost (decvax!vax135!petsd!joe)
 
 	private int n_bits; // number of bits/code
-	private final int maxbits = BITS; // user settable max # bits/code
+	private static final int MAXBITS = BITS; // user settable max # bits/code
 	private int maxcode; // maximum code, given n_bits
-	private final int maxmaxcode = 1 << BITS; // should NEVER generate this code
+	private static final int MAX_MAX_CODE = 1 << BITS; // should NEVER generate this code
 
 	final int MAXCODE(final int n_bits) {
 		return (1 << n_bits) - 1;
@@ -332,7 +332,7 @@ public class GifEncoder {
 	private final int[] htab = new int[HSIZE];
 	private final int[] codetab = new int[HSIZE];
 
-	private final int hsize = HSIZE; // for dynamic table sizing
+	// private final int hsize = HSIZE; // for dynamic table sizing
 
 	private int free_ent = 0; // first unused entry
 
@@ -383,17 +383,20 @@ public class GifEncoder {
 		ent = GIFNextPixel();
 
 		hshift = 0;
-		for (fcode = hsize; fcode < 65536; fcode *= 2)
+
+		for (fcode = HSIZE; fcode < 65536; fcode *= 2) {
 			++hshift;
+		}
+
 		hshift = 8 - hshift; // set hash code range bound
 
-		hsize_reg = hsize;
+		hsize_reg = HSIZE;
 		cl_hash(hsize_reg); // clear hash table
 
 		output(clearCode, outs);
 
 		outer_loop: while ((c = GIFNextPixel()) != EOF) {
-			fcode = (c << maxbits) + ent;
+			fcode = (c << MAXBITS) + ent;
 			i = (c << hshift) ^ ent; // xor hashing
 
 			if (htab[i] == fcode) {
@@ -415,7 +418,7 @@ public class GifEncoder {
 			}
 			output(ent, outs);
 			ent = c;
-			if (free_ent < maxmaxcode) {
+			if (free_ent < MAX_MAX_CODE) {
 				codetab[i] = free_ent++; // code -> hashtable
 				htab[i] = fcode;
 			} else
@@ -475,8 +478,8 @@ public class GifEncoder {
 				clear_flg = false;
 			} else {
 				++n_bits;
-				if (n_bits == maxbits)
-					maxcode = maxmaxcode;
+				if (n_bits == MAXBITS)
+					maxcode = MAX_MAX_CODE;
 				else
 					maxcode = MAXCODE(n_bits);
 			}
@@ -498,7 +501,7 @@ public class GifEncoder {
 
 	// table clear for block compress
 	void cl_block(final OutputStream outs) throws IOException {
-		cl_hash(hsize);
+		cl_hash(HSIZE);
 		free_ent = clearCode + 2;
 		clear_flg = true;
 

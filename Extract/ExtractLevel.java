@@ -72,10 +72,10 @@ public class ExtractLevel {
 	 * 0x0008 is bubble
 	 */
 	private static int style;
-	/** extended style: no used in windows version ? */
-	static int extStyle;
-	/** placeholder ? */
-	static int dummy;
+	// /** extended style: no used in windows version ? */
+	// static int extStyle;
+	// /** placeholder ? */
+	// static int dummy;
 	/** objects like doors - 32 objects each consists of 8 bytes */
 	static ArrayList<LvlObject> objects;
 	/** terrain the Lemmings walk on etc. - 400 tiles, 4 bytes each */
@@ -173,8 +173,8 @@ public class ExtractLevel {
 			fo.write("xPos = " + xPos + "\n");
 			style = b.getWord();
 			fo.write("style = " + styles[style] + "\n");
-			extStyle = b.getWord();
-			dummy = b.getWord();
+			/* extStyle = */b.getWord();
+			/* dummy = */ b.getWord();
 			// read objects
 			fo.write("\n# Objects" + "\n");
 			fo.write("# id, xpos, ypos, paint mode (), upside down (0,1)" + "\n");

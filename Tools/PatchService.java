@@ -152,7 +152,6 @@ public class PatchService {
      * @param ignoreExt Array of extensions to be ignored - read from ini.
      * @throws ExtractException if an extraction error occurs.
      */
-    @SuppressWarnings("unused")
     private void createCRCs(final String rPath, final String sDir, final FileWriter fCRCList,
             final String[] ignoreExt)
             throws ExtractException {

@@ -205,10 +205,13 @@ public class Props {
 	 */
 	public double get(final String key, final double def) {
 		String s = hash.getProperty(key);
-		if (s == null)
+
+		if (s == null) {
 			return def;
+		}
+
 		s = removeComment(s);
-		return Double.valueOf(s).doubleValue();
+		return Double.parseDouble(s);
 	}
 
 	/**

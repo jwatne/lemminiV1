@@ -343,8 +343,8 @@ public class PatchService {
                 }
 
                 if (!fileExists) {
-                    out = copyMissingFilesToPatchDirectory(fPatchList, files, subDirDecorated, i, src);
-                    continue;
+                    copyMissingFilesToPatchDirectory(fPatchList, files, subDirDecorated, i, src);
+                    continue; // Go to next iteration of outerloop for loop.
                 }
 
                 // create diff
@@ -359,7 +359,7 @@ public class PatchService {
                     msg = ex.toString();
                 }
 
-                throw new ExtractException(ex.getMessage());
+                throw new ExtractException(msg);
             }
         }
     }

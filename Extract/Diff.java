@@ -137,7 +137,7 @@ public class Diff {
 				final int rt = trg.length() - trg.getIndex();
 
 				if (rs == rt) {
-					len = rs;
+					// len = rs;
 					state = REPLACE;
 				} else {
 					// len = rt;

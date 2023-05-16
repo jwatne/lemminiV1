@@ -548,18 +548,22 @@ public class Level {
 		ArrayList<Image> images = new ArrayList<Image>(64);
 		final MediaTracker tracker = new MediaTracker(cmp);
 		final int tiles = props.get("tiles", 64);
+		
 		for (int n = 0; n < tiles; n++) {
 			final String fName = "styles/" + set + "/" + set + "_" + Integer.toString(n) + ".gif";
 			final Image img = Core.loadImage(tracker, fName);
 			images.add(img);
 		}
+
 		try {
 			tracker.waitForAll();
 		} catch (final InterruptedException ex) {
+			System.err.println("Waiting thread interrupted");
 		}
+
 		Image ret[] = new Image[images.size()];
 		ret = images.toArray(ret);
-		images = null;
+		// images = null;
 		return ret;
 	}
 

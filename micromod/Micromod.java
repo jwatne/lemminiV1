@@ -4,7 +4,7 @@ package micromod;
  * micromod/e fast module player (rev b)
  */
 public class Micromod {
-	private final int FP_SHIFT = 13,
+	private static final int FP_SHIFT = 13,
 			FP_ONE = 1 << FP_SHIFT,
 			IN_STRUCT_LEN = 0x05,
 			IN_SAMPLE_INDEX = 0x00,
@@ -54,23 +54,23 @@ public class Micromod {
 			EX_FINE_PORT_UP = 0x10,
 			EX_FINE_PORT_DN = 0x20;
 	@SuppressWarnings("unused")
-	private final int EX_SET_GLISS = 0x30;
+	private static final int EX_SET_GLISS = 0x30;
 	@SuppressWarnings("unused")
-	private final int EX_SET_VIBR_WAV = 0x40;
-	private final int EX_SET_FINETUNE = 0x50;
-	private final int EX_PAT_LOOP = 0x60;
+	private static final int EX_SET_VIBR_WAV = 0x40;
+	private static  final int EX_SET_FINETUNE = 0x50;
+	private static  final int EX_PAT_LOOP = 0x60;
 	@SuppressWarnings("unused")
-	private final int EX_SET_TREM_WAV = 0x70;
+	private static  final int EX_SET_TREM_WAV = 0x70;
 	@SuppressWarnings("unused")
-	private final int EX_SET_PANNING = 0x80;
-	private final int EX_RETRIG = 0x90;
-	private final int EX_FINE_VOL_UP = 0xA0;
-	private final int EX_FINE_VOL_DN = 0xB0;
-	private final int EX_NOTE_CUT = 0xC0;
-	private final int EX_NOTE_DELAY = 0xD0;
-	private final int EX_PAT_DELAY = 0xE0;
+	private static  final int EX_SET_PANNING = 0x80;
+	private static  final int EX_RETRIG = 0x90;
+	private static  final int EX_FINE_VOL_UP = 0xA0;
+	private static  final int EX_FINE_VOL_DN = 0xB0;
+	private static  final int EX_NOTE_CUT = 0xC0;
+	private static  final int EX_NOTE_DELAY = 0xD0;
+	private static  final int EX_PAT_DELAY = 0xE0;
 	@SuppressWarnings("unused")
-	private final int EX_INVERT_LOOP = 0xF0;
+	private static  final int EX_INVERT_LOOP = 0xF0;
 
 	private final int[] arptable = new int[] {
 			8192, 8679, 9195, 9742, 10321, 10935, 11585, 12274,

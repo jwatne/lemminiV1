@@ -123,7 +123,7 @@ public class ExtractSPR {
 		}
 
 		if (paletteSize != compressedIndex) {
-			paletteSize = compressedIndex;
+			// paletteSize = compressedIndex;
 			r = compressedR;
 			g = compressedG;
 			b = compressedB;

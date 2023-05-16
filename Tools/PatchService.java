@@ -205,7 +205,7 @@ public class PatchService {
                     msg = ex.toString();
                 }
 
-                throw new ExtractException(ex.getMessage());
+                throw new ExtractException(msg);
             }
         }
     }

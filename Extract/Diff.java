@@ -74,18 +74,20 @@ public class Diff {
 	 * @return buffer of differences
 	 */
 	public static byte[] diffBuffers(final byte bsrc[], final byte btrg[]) {
-		ArrayList<Byte> patch = new ArrayList<Byte>();
-		Buffer src = new Buffer(bsrc);
-		Buffer trg = new Buffer(btrg);
+		final ArrayList<Byte> patch = new ArrayList<Byte>();
+		final Buffer src = new Buffer(bsrc);
+		final Buffer trg = new Buffer(btrg);
 
 		// compare crcs
-		Adler32 crcSrc = new Adler32();
+		final Adler32 crcSrc = new Adler32();
 		crcSrc.update(src.getData());
-		Adler32 crcTrg = new Adler32();
+		final Adler32 crcTrg = new Adler32();
 		crcTrg.update(trg.getData());
 		targetCRC = (int) crcTrg.getValue();
-		if (crcTrg.getValue() == crcSrc.getValue())
+
+		if (crcTrg.getValue() == crcSrc.getValue()) {
 			return null;
+		}
 
 		// write header
 		setDWord(patch, HEADER_ID);
@@ -99,14 +101,17 @@ public class Diff {
 
 		// examine source buffer
 		int ofs = 0;
+
 		while (src.getIndex() < src.length()) {
 			// search for difference
-			int s = src.getByte();
-			int t = trg.getByte();
+			final int s = src.getByte();
+			final int t = trg.getByte();
+
 			if (s == t) {
 				ofs++;
-				continue;
+				continue; // Go to next iteration of src.getIndex().
 			}
+
 			// reset indeces
 			src.setIndex(src.getIndex() - 1);
 			trg.setIndex(trg.getIndex() - 1);
@@ -125,27 +130,32 @@ public class Diff {
 			len = Math.min(leni, lend);
 			len = Math.min(len, lenr);
 			len = Math.min(len, lens[1]);
+
 			if (len > windowLength) {
 				// completely lost synchronisation
-				int rs = src.length() - src.getIndex();
-				int rt = trg.length() - trg.getIndex();
+				final int rs = src.length() - src.getIndex();
+				final int rt = trg.length() - trg.getIndex();
+
 				if (rs == rt) {
 					len = rs;
 					state = REPLACE;
 				} else {
-					len = rt;
+					// len = rt;
 					state = INSERT;
 				}
-				break;
+
+				break; // Exit while loop.
 			}
-			if (len == leni)
+
+			if (len == leni) {
 				state = INSERT;
-			else if (len == lend)
+			} else if (len == lend) {
 				state = DELETE;
-			else if (len == lenr)
+			} else if (len == lenr) {
 				state = REPLACE;
-			else if (len == lens[1])
+			} else if (len == lens[1]) {
 				state = SUBSTITUTE;
+			}
 
 			switch (state) {
 				case INSERT:
@@ -153,8 +163,11 @@ public class Diff {
 					out("Insert: " + len);
 					patch.add(INSERT);
 					setLen(patch, len);
-					for (int i = 0; i < len; i++)
+
+					for (int i = 0; i < len; i++) {
 						patch.add((byte) trg.getByte());
+					}
+
 					break;
 				case DELETE:
 					// delete
@@ -168,8 +181,11 @@ public class Diff {
 					out("Replace: " + len);
 					patch.add(REPLACE);
 					setLen(patch, len);
-					for (int i = 0; i < len; i++)
+
+					for (int i = 0; i < len; i++) {
 						patch.add((byte) trg.getByte());
+					}
+
 					src.setIndex(src.getIndex() + len);
 					break;
 				case SUBSTITUTE:
@@ -178,8 +194,11 @@ public class Diff {
 					patch.add(SUBSTITUTE);
 					setLen(patch, lens[0]);
 					setLen(patch, lens[1]);
-					for (int i = 0; i < lens[1]; i++)
+
+					for (int i = 0; i < lens[1]; i++) {
 						patch.add((byte) trg.getByte());
+					}
+
 					src.setIndex(src.getIndex() + lens[0]);
 					break;
 			}
@@ -194,22 +213,28 @@ public class Diff {
 		// check for stuff to insert in target
 		if (trg.getIndex() < trg.length()) {
 			patch.add(INSERT);
-			int len = trg.length() - trg.getIndex();
+			final int len = trg.length() - trg.getIndex();
 			out("Insert (End): " + len);
 			setLen(patch, len);
-			for (int i = 0; i < len; i++)
+
+			for (int i = 0; i < len; i++) {
 				patch.add((byte) trg.getByte());
+			}
 		}
 
-		if (patch.size() == 0)
+		if (patch.size() == 0) {
 			return null;
+		}
 
 		out("Patch length: " + patch.size());
 
 		// convert patch list to output byte array
-		byte retVal[] = new byte[patch.size()];
-		for (int i = 0; i < retVal.length; i++)
+		final byte retVal[] = new byte[patch.size()];
+
+		for (int i = 0; i < retVal.length; i++) {
 			retVal[i] = patch.get(i).byteValue();
+		}
+
 		return retVal;
 	}
 
@@ -223,32 +248,32 @@ public class Diff {
 	 * @throws DiffException
 	 */
 	public static byte[] patchbuffers(final byte bsrc[], final byte bpatch[]) throws DiffException {
-		Buffer src = new Buffer(bsrc);
-		Buffer patch = new Buffer(bpatch);
+		final Buffer src = new Buffer(bsrc);
+		final Buffer patch = new Buffer(bpatch);
 		// calculate src crc
-		Adler32 crc = new Adler32();
+		final Adler32 crc = new Adler32();
 		crc.update(src.getData());
 		// analyze header
 		if (patch.getDWord() != Diff.HEADER_ID)
 			throw new DiffException("No header id found in patch");
-		int lenSrc = getLen(patch);
+		final int lenSrc = getLen(patch);
 		if (lenSrc != src.length())
 			throw new DiffException("Size of source differs from that in patch header");
-		int lenTrg = getLen(patch);
-		int crcPatchSrc = patch.getDWord();
+		final int lenTrg = getLen(patch);
+		final int crcPatchSrc = patch.getDWord();
 		if (crcPatchSrc != (int) crc.getValue())
 			throw new DiffException("CRC of source (0x" + Integer.toHexString((int) crc.getValue()) +
 					") differs from that in patch header (0x" + Integer.toHexString(crcPatchSrc) + ")");
-		int crcTrg = patch.getDWord();
+		final int crcTrg = patch.getDWord();
 		if (patch.getDWord() != Diff.DATA_ID)
 			throw new DiffException("No data id found in patch header");
 
-		Buffer trg = new Buffer(lenTrg);
+		final Buffer trg = new Buffer(lenTrg);
 
 		// step through patch buffer
 		try {
 			while (patch.getIndex() < patch.length()) {
-				int ofs = getLen(patch);
+				final int ofs = getLen(patch);
 				out("Offset: " + ofs);
 				// copy bytes from source buffer
 				for (int i = 0; i < ofs; i++)
@@ -257,9 +282,9 @@ public class Diff {
 				if (patch.getIndex() == patch.length())
 					break;
 				// now there must follow a command followed by a
-				int cmdIdx = patch.getIndex(); // just for exception
-				int cmd = patch.getByte();
-				int len = getLen(patch);
+				final int cmdIdx = patch.getIndex(); // just for exception
+				final int cmd = patch.getByte();
+				final int len = getLen(patch);
 				switch (cmd) {
 					case Diff.DELETE:
 						out("Delete: " + len);
@@ -275,7 +300,7 @@ public class Diff {
 							trg.setByte((byte) patch.getByte());
 						break;
 					case Diff.SUBSTITUTE: {
-						int lenT = getLen(patch);
+						final int lenT = getLen(patch);
 						out("Substitute: " + len + "/" + lenT);
 						src.setIndex(src.getIndex() + len);
 						for (int r = 0; r < lenT; r++)
@@ -286,7 +311,7 @@ public class Diff {
 						throw new DiffException("Unknown command " + cmd + " at patch offset " + cmdIdx);
 				}
 			}
-		} catch (ArrayIndexOutOfBoundsException ex) {
+		} catch (final ArrayIndexOutOfBoundsException ex) {
 			throw new DiffException("Array index exceeds bounds. Patch file corrupt...");
 		}
 
@@ -358,10 +383,10 @@ public class Diff {
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
 	private static int checkInsert(final Buffer src, final Buffer trg) throws ArrayIndexOutOfBoundsException {
-		byte[] bs = src.getData();
-		int is = src.getIndex();
-		byte[] bt = trg.getData();
-		int it = trg.getIndex();
+		final byte[] bs = src.getData();
+		final int is = src.getIndex();
+		final byte[] bt = trg.getData();
+		final int it = trg.getIndex();
 		int len = windowLength;
 		if (is + len + resyncLength >= bs.length)
 			len = bs.length - is - resyncLength;
@@ -387,10 +412,10 @@ public class Diff {
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
 	private static int checkDelete(final Buffer src, final Buffer trg) throws ArrayIndexOutOfBoundsException {
-		byte[] bs = src.getData();
-		int is = src.getIndex();
-		byte[] bt = trg.getData();
-		int it = trg.getIndex();
+		final byte[] bs = src.getData();
+		final int is = src.getIndex();
+		final byte[] bt = trg.getData();
+		final int it = trg.getIndex();
 		int len = windowLength;
 		if (is + len + resyncLength >= bs.length)
 			len = bs.length - is - resyncLength;
@@ -416,10 +441,10 @@ public class Diff {
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
 	private static int checkReplace(final Buffer src, final Buffer trg) throws ArrayIndexOutOfBoundsException {
-		byte[] bs = src.getData();
-		int is = src.getIndex();
-		byte[] bt = trg.getData();
-		int it = trg.getIndex();
+		final byte[] bs = src.getData();
+		final int is = src.getIndex();
+		final byte[] bt = trg.getData();
+		final int it = trg.getIndex();
 		int len = windowLength;
 		if (is + len + resyncLength >= bs.length)
 			len = bs.length - is - resyncLength;
@@ -447,17 +472,17 @@ public class Diff {
 	 * 
 	 */
 	private static int[] checkSubstitute(final Buffer src, final Buffer trg) throws ArrayIndexOutOfBoundsException {
-		byte[] bs = src.getData();
-		int is = src.getIndex();
-		byte[] bt = trg.getData();
-		int it = trg.getIndex();
+		final byte[] bs = src.getData();
+		final int is = src.getIndex();
+		final byte[] bt = trg.getData();
+		final int it = trg.getIndex();
 		int len = windowLength;
 		if (is + len + resyncLength >= bs.length)
 			len = bs.length - is - resyncLength;
 		if (it + len + resyncLength >= bt.length)
 			len = bt.length - it - resyncLength;
 
-		ArrayList<int[]> solutions = new ArrayList<int[]>();
+		final ArrayList<int[]> solutions = new ArrayList<int[]>();
 
 		for (int ws = 1; ws < len; ws++) {
 			for (int wt = 1; wt < len; wt++) {
@@ -466,7 +491,7 @@ public class Diff {
 					if (bs[is + ws + r] != bt[it + wt + r])
 						break;
 				if (r == resyncLength) {
-					int retVal[] = new int[2];
+					final int retVal[] = new int[2];
 					retVal[0] = ws;
 					retVal[1] = wt;
 					solutions.add(retVal);
@@ -476,7 +501,7 @@ public class Diff {
 
 		if (solutions.size() == 0) {
 			// nothing found
-			int retVal[] = new int[2];
+			final int retVal[] = new int[2];
 			retVal[0] = Integer.MAX_VALUE;
 			retVal[1] = Integer.MAX_VALUE;
 			return retVal;
@@ -485,8 +510,8 @@ public class Diff {
 		// search best solution
 		int sMinIdx = 0;
 		for (int i = 1; i < solutions.size(); i++) {
-			int s[] = solutions.get(i);
-			int sMin[] = solutions.get(sMinIdx);
+			final int s[] = solutions.get(i);
+			final int sMin[] = solutions.get(sMinIdx);
 			if (s[0] + s[1] < sMin[0] + sMin[1])
 				sMinIdx = i;
 		}
@@ -519,7 +544,7 @@ public class Diff {
  */
 class Buffer {
 	/** array of byte which defines the data buffer */
-	private byte buffer[];
+	private final byte buffer[];
 	/** byte index in buffer */
 	private int index;
 

@@ -272,24 +272,30 @@ public class Props {
 	 * @return Integer value of string
 	 */
 	private static int parseString(final String s) {
-		if (s == null || s.length() == 0)
+		if (s == null || s.length() == 0) {
 			return -1;
-		if (s.charAt(0) == '0') {
-			if (s.length() == 1)
-				return 0;
-			else if (s.length() > 2 && s.charAt(1) == 'x')
-				return Integer.parseInt(s.substring(2), 16); // hex
-			else if (s.charAt(1) == 'b') // binary
-				return Integer.parseInt(s.substring(2), 2);
-			else
-				return Integer.parseInt(s.substring(0), 8); // octal
 		}
+
+		if (s.charAt(0) == '0') {
+			if (s.length() == 1) {
+				return 0;
+			} else if (s.length() > 2 && s.charAt(1) == 'x') {
+				return Integer.parseInt(s.substring(2), 16); // hex
+			} else if (s.charAt(1) == 'b') { // binary
+				return Integer.parseInt(s.substring(2), 2);
+			} else {
+				return Integer.parseInt(s, 8); // octal
+			}
+		}
+
 		int retval;
+
 		try {
 			retval = Integer.parseInt(s);
 		} catch (final NumberFormatException ex) {
 			retval = 0;
 		}
+
 		return retval;
 	}
 

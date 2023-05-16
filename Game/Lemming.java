@@ -418,12 +418,6 @@ public class Lemming {
 		int free;
 
 		switch (type) {
-			case CLIMBER_TO_WALKER:
-				if (explode) {
-					explode();
-				}
-
-				break;
 			case FALLER:
 				if (explode) {
 					explode();
@@ -456,20 +450,15 @@ public class Lemming {
 			case SPLAT:
 				animateSplat(explode);
 				break;
-			case DIGGER:
-				if (explode) {
-					newType = Type.BOMBER;
-					playOhNoIfNotToBeNuked();
-				}
-
-				break;
 			case BASHER:
 				newType = animateBasher(newType, explode);
 				break;
 			case MINER:
 				newType = animateMiner(newType, explode);
 				break;
+			case DIGGER:
 			case BUILDER_END:
+			// Shared DIGGER / BUILDER_END code:
 				if (explode) {
 					newType = Type.BOMBER;
 					playOhNoIfNotToBeNuked();
@@ -498,8 +487,10 @@ public class Lemming {
 			case BOMBER:
 				animateBomber();
 				break;
+			case CLIMBER_TO_WALKER:
 			default:
-				// all cases not explicitly checked above should at least explode
+				// Both CLIMBER_TO_WALKER and all cases not explicitly checked above should at
+				// least explode
 				if (explode) {
 					explode();
 				}
@@ -555,11 +546,11 @@ public class Lemming {
 
 		if (free > 0) {
 			// convert to faller or walker
-			if (free >= FALL_DISTANCE_FALL) {
-				newType = Type.FALLER;
-			} else {
-				newType = Type.FALLER;
-			}
+			// if (free >= FALL_DISTANCE_FALL) {
+			newType = Type.FALLER;
+			// } else {
+			// newType = Type.FALLER;
+			// }
 
 			if (free >= FALLER_STEP) {
 				y += FALLER_STEP;

@@ -269,9 +269,11 @@ public class Core {
 	public static Image loadImage(final MediaTracker tracker, final String fName) throws ResourceException {
 		final String fileLoc = findResource(fName);
 
-		if (fileLoc == null) {
-			return null;
-		}
+		// fileLoc cannot be null, since it equals resourcePath + fName, and
+		// resourcePath must contain text in order for the program to run.
+		// if (fileLoc == null) {
+		// return null;
+		// }
 
 		return loadImage(tracker, fileLoc, false);
 	}

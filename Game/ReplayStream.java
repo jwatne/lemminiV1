@@ -114,7 +114,7 @@ public class ReplayStream {
 		try (final BufferedReader f = new BufferedReader(new FileReader(fname))) {
 			String line = f.readLine();
 
-			if (!line.equals("#REPLAY")) {
+			if (!"#REPLAY".equals(line)) {
 				return null;
 			}
 

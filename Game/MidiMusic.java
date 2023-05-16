@@ -59,11 +59,7 @@ public class MidiMusic {
 			} else {
 				// Acquire resources and make operational.
 				sequencer.open();
-			}
-
-			final Sequence mySeq = MidiSystem.getSequence(f);
-
-			if (sequencer != null) {
+				final Sequence mySeq = MidiSystem.getSequence(f);
 				setGain(Music.getGain());
 				sequencer.setSequence(mySeq);
 				canPlay = true;

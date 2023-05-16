@@ -1,7 +1,6 @@
 package lemmini;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Transparency;
@@ -87,14 +86,14 @@ public class GraphicsPane extends JPanel implements Runnable, MouseListener, Mou
 	private int activeBuffer;
 	/** monitoring object used for synchronized painting */
 	private final Object paintSemaphore;
-	private Component frame;
+	private JFrame frame;
 
 	/**
 	 * Constructor.
 	 * 
 	 * @param frame the parent component (main frame of the application).
 	 */
-	public GraphicsPane(final Component frame) {
+	public GraphicsPane(final JFrame frame) {
 		super();
 		this.frame = frame;
 		paintSemaphore = new Object();

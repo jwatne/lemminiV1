@@ -945,7 +945,7 @@ public class GameController {
 		while ((r = replay.getNext(replayFrame)) != null) {
 			switch (r.type) {
 				case ReplayStream.ASSIGN_SKILL:
-					assignSkillAndDecrementAvailable(r);
+					assignSkillAndDecrementAvailable((ReplayAssignSkillEvent) r);
 					sound.play(SND_CHANGE_OP);
 					break;
 				case ReplayStream.SET_RELEASE_RATE:
@@ -962,7 +962,7 @@ public class GameController {
 					setxPos(rx.xPos);
 					break;
 				case ReplayStream.SELECT_SKILL:
-					selectSkill(r);
+					selectSkill((ReplaySelectSkillEvent) r);
 					break;
 			}
 		}
@@ -971,10 +971,9 @@ public class GameController {
 	/**
 	 * Selects the specified skill.
 	 * 
-	 * @param r the ReplayEvent for selecting the skill.
+	 * @param rsse the ReplayEvent for selecting the skill.
 	 */
-	private static void selectSkill(final ReplayEvent r) {
-		final ReplaySelectSkillEvent rsse = (ReplaySelectSkillEvent) r;
+	private static void selectSkill(final ReplaySelectSkillEvent rsse) {
 		lemmSkill = rsse.skill;
 
 		switch (lemmSkill) {
@@ -1011,10 +1010,9 @@ public class GameController {
 	 * Assigns the selected skill to a lemming and decrements the count of available
 	 * number of that skill by 1.
 	 * 
-	 * @param r the ReplayEvent for assigning the skill.
+	 * @param rs the ReplayAssignSkillEvent for assigning the skill.
 	 */
-	private static void assignSkillAndDecrementAvailable(final ReplayEvent r) {
-		final ReplayAssignSkillEvent rs = (ReplayAssignSkillEvent) r;
+	private static void assignSkillAndDecrementAvailable(final ReplayAssignSkillEvent rs) {
 		synchronized (lemmings) {
 			final Lemming l = lemmings.get(rs.lemming);
 			l.setSkill(rs.skill);
@@ -1433,9 +1431,9 @@ public class GameController {
 	 * Fade in/out.
 	 * 
 	 * @param g     graphics object
-	 * @param frame the parent component (main frame of the application).
+	 * @param frame the parent JFrame (main frame of the application).
 	 */
-	public static void fade(final Graphics g, final Component frame) {
+	public static void fade(final Graphics g, final JFrame frame) {
 		if (Fader.getState() == Fader.State.OFF && transitionState != TransitionState.NONE) {
 			switch (transitionState) {
 				case END_LEVEL:
@@ -1462,7 +1460,7 @@ public class GameController {
 					try {
 						changeLevel(nextLevelPack, nextDiffLevel, nextLevelNumber,
 								transitionState == TransitionState.LOAD_REPLAY, frame);
-						((JFrame) frame).setTitle("Lemmini - " + getLevel().getLevelName());
+						frame.setTitle("Lemmini - " + getLevel().getLevelName());
 					} catch (final ResourceException ex) {
 						Core.resourceError(ex.getMessage());
 					} catch (final LemmException ex) {

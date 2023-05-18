@@ -120,6 +120,11 @@ public class ReplayStream {
 
 			// read level info
 			line = f.readLine();
+
+			if (line == null) {
+				return null;
+			}
+			
 			String e[] = line.split(",");
 
 			for (int j = 0; j < e.length; j++) {

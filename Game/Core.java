@@ -4,9 +4,13 @@ import java.awt.Component;
 import java.awt.Image;
 import java.awt.MediaTracker;
 import java.awt.Toolkit;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -82,20 +86,25 @@ public class Core {
 	 * 
 	 * @param frame parent frame
 	 * @throws LemmException
+	 * @throws IOException
 	 */
-	public static void init(final JFrame frame) throws LemmException {
+	public static void init(final JFrame frame) throws LemmException, IOException {
 		// get ini path
 		String s = frame.getClass().getName().replace('.', '/') + ".class";
+		System.out.println("*** s: " + s);
 		final URL url = frame.getClass().getClassLoader().getResource(s);
 		int pos;
 
 		try {
 			programPropsFileStr = URLDecoder.decode(url.getPath(), "UTF-8");
+			System.out.println("*** Initial programPropsFileStr: " + programPropsFileStr);
 		} catch (final UnsupportedEncodingException ex) {
 		}
 
 		// special handling for JAR
-		if (((pos = programPropsFileStr.toLowerCase().indexOf("file:")) != -1)) {
+		final boolean runFromJarFile = (pos = programPropsFileStr.toLowerCase().indexOf("file:")) != -1;
+
+		if (runFromJarFile) {
 			programPropsFileStr = programPropsFileStr.substring(pos + 5);
 		}
 
@@ -103,18 +112,33 @@ public class Core {
 			programPropsFileStr = programPropsFileStr.substring(0, pos);
 		}
 
-		/*
-		 * @todo doesn't work if JAR is renamed...
-		 * Maybe it would be a better idea to search only for ".JAR" and then
-		 * for the first path separator...
-		 */
-		s = (frame.getClass().getName().replace('.', '/') + ".jar").toLowerCase();
+		if (runFromJarFile) {
+			System.out.println("*** updated programPropsFileStr:" + programPropsFileStr);
+			final String currentDirectory = Paths.get("").toAbsolutePath().toString();
+			System.out.println("*** current directory: " + currentDirectory);
+			Path currentFolderPath = Paths.get(currentDirectory, "config");
+			final String currentIniFolder = currentFolderPath.toAbsolutePath().toString();
+			System.out.println("*** Current ini folder: " + currentIniFolder);
+			programPropsFileStr = Paths.get(currentIniFolder, INI_NAME).toAbsolutePath().toString();
+			System.out.println("*** New method ini file path: " + programPropsFileStr);
+			Files.createDirectories(currentFolderPath);
+		} else {
+			/*
+			 * @todo doesn't work if JAR is renamed...
+			 * Maybe it would be a better idea to search only for ".JAR" and then
+			 * for the first path separator...
+			 */
+			s = (frame.getClass().getName().replace('.', '/') + ".jar").toLowerCase();
+			System.out.println("*** updated s: " + s);
 
-		if ((pos = programPropsFileStr.toLowerCase().indexOf(s)) != -1) {
-			programPropsFileStr = programPropsFileStr.substring(0, pos);
+			if ((pos = programPropsFileStr.toLowerCase().indexOf(s)) != -1) {
+				programPropsFileStr = programPropsFileStr.substring(0, pos);
+			}
+
+			programPropsFileStr += INI_NAME;
 		}
 
-		programPropsFileStr += INI_NAME;
+		System.out.println("*** ini file path: " + programPropsFileStr);
 		readMainIniFile();
 		scale = Core.programProps.get("scale", 1.0);
 		initializeResources();

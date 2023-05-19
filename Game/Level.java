@@ -423,7 +423,7 @@ public class Level {
 									// position
 									// however: exits must always be painted
 									// also: passive objects will always be painted
-									if (inFront && spr.getType() != SpriteObject.Type.PASSIVE
+									if (spr.getType() != SpriteObject.Type.PASSIVE
 											&& spr.getType() != SpriteObject.Type.EXIT && id != 0 && id != n)
 										paint = false;
 									// sprite screenBuffer pixel

@@ -134,7 +134,7 @@ public class TextScreen {
 						textScreen.init();
 						textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_BROWN));
 						textScreen.printCentered("A game engine for Lemmings(tm) in Java", 0, RED);
-						textScreen.printCentered("Release 1.00 04/2023", 1, BLUE);
+						textScreen.printCentered("Release 1.00 05/2023", 1, BLUE);
 						textScreen.printCentered("Coded by Volker Oth 2005-2017", 2, VIOLET);
 						textScreen.printCentered("Updated by John Watne 2023", 3, BLUE);
 						textScreen.printCentered("www.lemmini.de", 4, GREEN);

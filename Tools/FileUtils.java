@@ -4,14 +4,21 @@ import java.io.File;
 
 /**
  * Utility class for File operations.
- * 
+ *
  * @author John Watne
  */
-public class FileUtils {
+public final class FileUtils {
     /**
-     * Creates a directory at the specified pathname, if it does not already exist.
-     * If unable to create the folder, write a message to the console.
-     * 
+     * Private constructor for utility class.
+     */
+    private FileUtils() {
+
+    }
+
+    /**
+     * Creates a directory at the specified pathname, if it does not already
+     * exist. If unable to create the folder, write a message to the console.
+     *
      * @param pathname the pathname fo the directory to be created.
      * @return a File object for the directory.
      */

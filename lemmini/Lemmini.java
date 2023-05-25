@@ -56,503 +56,566 @@ import Tools.ToolBox;
 /**
  * Lemmini - a game engine for Lemmings.<br>
  * This is the main window including input handling. The game logic is located
- * in
- * {@link GameController}, some core components are in {@link Core}.<br>
+ * in {@link GameController}, some core components are in {@link Core}.<br>
  * <br>
  * Note: this was developed for JRE1.4 and only ported to JRE1.5 after it was
- * finished.
- * Also the design evolved during two years of development and thus isn't nearly
- * as clean
- * as it should be. During the porting to 1.5, I cleaned up some things here and
- * there,
- * but didn't want to redesign the whole thing from scratch.
+ * finished. Also the design evolved during two years of development and thus
+ * isn't nearly as clean as it should be. During the porting to 1.5, I cleaned
+ * up some things here and there, but didn't want to redesign the whole thing
+ * from scratch.
  *
  * @author Volker Oth
  */
 public class Lemmini extends JFrame implements KeyListener {
-	/**
-	 * minimum sleep duration in milliseconds - values too small may cause system
-	 * clock shift under WinXP etc.
-	 */
-	final static int MIN_SLEEP = 10;
-	/**
-	 * threshold for sleep - don't sleep if time to wait is shorter than this as
-	 * sleep might return too late
-	 */
-	final static int THR_SLEEP = 16;
+    /**
+     * 1K = 1024.
+     */
+    private static final int ONE_K = 1024;
+    /**
+     * Minimum free memory, in MB.
+     */
+    private static final int MIN_FREE_MEMORY_MB = 60;
+    /**
+     * minimum sleep duration in milliseconds - values too small may cause
+     * system clock shift under WinXP etc.
+     */
+    static final int MIN_SLEEP = 10;
+    /**
+     * Threshold for sleep - don't sleep if time to wait is shorter than this as
+     * sleep might return too late.
+     */
+    static final int THR_SLEEP = 16;
 
-	private final static long serialVersionUID = 0x01;
+    private static final long serialVersionUID = 0x01;
 
-	/** self reference */
-	static JFrame thisFrame;
+    /** Self reference. */
+    private static JFrame thisFrame;
 
-	/** path for loading single level files */
-	@SuppressWarnings("unused")
-	private final String lvlPath;
-	/** Map to store menu items for difficulty levels */
-	private final Map<String, ArrayList<LvlMenuItem>> diffLevelMenus = new HashMap<>();
-	/** panel for the game graphics */
-	private final GraphicsPane gp;
+    /**
+     * Returns the main Lemmini object.
+     *
+     * @return the main Lemmini object.
+     */
+    public static JFrame getThisFrame() {
+        return thisFrame;
+    }
 
-	/**
-	 * Constructor of the main frame.
-	 */
-	Lemmini() {
-		try {
-			Core.init(this); // initialize Core object
-			GameController.init(this);
-			GameController.setLevelMenuUpdateListener(new LevelMenuUpdateListener(this));
-		} catch (final ResourceException ex) {
-			Core.resourceError(ex.getMessage());
-		} catch (final LemmException ex) {
-			JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-			System.exit(1);
-		} catch (final Exception ex) {
-			ToolBox.showException(ex);
-			System.exit(1);
-		} catch (final Error ex) {
-			ToolBox.showException(ex);
-			System.exit(1);
-		}
+    /**
+     * Sets the main Lemmini object.
+     *
+     * @param lemminiFrame the main Lemmini object.
+     */
+    public static void setThisFrame(final JFrame lemminiFrame) {
+        Lemmini.thisFrame = lemminiFrame;
+    }
 
-		setFrameSizeAndPosition();
-		this.validate(); // force redraw
-		this.setTitle("Lemmini");
-		final ClassLoader loader = Lemmini.class.getClassLoader();
-		final Image img = Toolkit.getDefaultToolkit().getImage(loader.getResource("icon_32.png"));
-		setIconImage(img);
-		// set component pane
-		gp = new GraphicsPane(this);
-		gp.setDoubleBuffered(false);
-		this.setContentPane(gp);
-		this.pack();
-		this.validate(); // force redraw
-		this.setTitle("Lemmini");
-		final MenuCreator menuCreator = new MenuCreator(this);
-		this.setJMenuBar(menuCreator.getLemminiMenuBar(this, this.gp, this.diffLevelMenus));
-		this.addWindowListener(new WindowClosingListener(this));
-		this.setVisible(true);
-		gp.init();
-		GameController.setGameState(GameController.State.INTRO);
-		GameController.setTransition(GameController.TransitionState.NONE);
-		Fader.setBounds(Core.getDrawWidth(), Core.getDrawHeight());
-		Fader.setState(Fader.State.IN);
-		final Thread t = new Thread(gp);
-		lvlPath = ".";
-		addKeyListener(this);
-		t.start();
-	}
+    /** Path for loading single level files. */
+    @SuppressWarnings("unused")
+    private final String lvlPath;
+    /** Map to store menu items for difficulty levels. */
+    private final Map<String, List<LvlMenuItem>> diffLevelMenus = new HashMap<>();
+    /** Panel for the game graphics. */
+    private final GraphicsPane gp;
 
-	/**
-	 * Sets the size and position for this frame.
-	 */
-	private void setFrameSizeAndPosition() {
-		// read frame props
-		int posX, posY;
-		this.setSize((int) Math.round(Core.getDrawWidth() * Core.getScale()),
-				(int) Math.round(Core.getDrawHeight() * Core.getScale()));
-		this.setMinimumSize(new Dimension((int) Math.round(Core.getDrawWidth() * Core.getScale()),
-				(int) Math.round(Core.getDrawHeight() * Core.getScale())));
-		this.setMaximumSize(new Dimension((int) Math.round(Core.getDrawWidth() * Core.getScale()),
-				(int) Math.round(Core.getDrawHeight() * Core.getScale())));
-		this.setResizable(false); // at least for the moment: forbid resize
-		final Point p = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
-		p.x -= this.getWidth() / 2;
-		p.y -= this.getHeight() / 2;
-		posX = Core.programProps.get("framePosX", p.x > 0 ? p.x : 0);
-		posY = Core.programProps.get("framePosY", p.y > 0 ? p.y : 0);
-		this.setLocation(posX, posY);
-	}
+    /**
+     * Constructor of the main frame.
+     */
+    Lemmini() {
+        try {
+            Core.init(this); // initialize Core object
+            GameController.init(this);
+            GameController.setLevelMenuUpdateListener(
+                    new LevelMenuUpdateListener(this));
+        } catch (final ResourceException ex) {
+            Core.resourceError(ex.getMessage());
+        } catch (final LemmException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        } catch (final Exception ex) {
+            ToolBox.showException(ex);
+            System.exit(1);
+        } catch (final Error ex) {
+            ToolBox.showException(ex);
+            System.exit(1);
+        }
 
-	/**
-	 * The main function. Entry point of the program.
-	 * 
-	 * @param args
-	 */
-	public static void main(final String[] args) {
-		/*
-		 * Set "Look and Feel" to system default
-		 */
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (final Exception e) {
-			System.out.println("Unable to set look and feel to system: " + e.getMessage());
-			/* don't care */}
-		/*
-		 * Apple menu bar for MacOS
-		 */
-		System.setProperty("apple.laf.useScreenMenuBar", "true");
+        setFrameSizeAndPosition();
+        this.validate(); // force redraw
+        this.setTitle("Lemmini");
+        final ClassLoader loader = Lemmini.class.getClassLoader();
+        final Image img = Toolkit.getDefaultToolkit()
+                .getImage(loader.getResource("icon_32.png"));
+        setIconImage(img);
+        // set component pane
+        gp = new GraphicsPane(this);
+        gp.setDoubleBuffered(false);
+        this.setContentPane(gp);
+        this.pack();
+        this.validate(); // force redraw
+        this.setTitle("Lemmini");
+        final MenuCreator menuCreator = new MenuCreator(this);
+        this.setJMenuBar(menuCreator.getLemminiMenuBar(this, this.gp,
+                this.diffLevelMenus));
+        this.addWindowListener(new WindowClosingListener(this));
+        this.setVisible(true);
+        gp.init();
+        GameController.setGameState(GameController.State.INTRO);
+        GameController.setTransition(GameController.TransitionState.NONE);
+        Fader.setBounds(Core.getDrawWidth(), Core.getDrawHeight());
+        Fader.setState(Fader.State.IN);
+        final Thread t = new Thread(gp);
+        lvlPath = ".";
+        addKeyListener(this);
+        t.start();
+    }
 
-		// check free memory
-		final long free = Runtime.getRuntime().maxMemory();
+    /**
+     * Sets the size and position for this frame.
+     */
+    private void setFrameSizeAndPosition() {
+        // read frame props
+        int posX;
+        int posY;
+        this.setSize((int) Math.round(Core.getDrawWidth() * Core.getScale()),
+                (int) Math.round(Core.getDrawHeight() * Core.getScale()));
+        this.setMinimumSize(new Dimension(
+                (int) Math.round(Core.getDrawWidth() * Core.getScale()),
+                (int) Math.round(Core.getDrawHeight() * Core.getScale())));
+        this.setMaximumSize(new Dimension(
+                (int) Math.round(Core.getDrawWidth() * Core.getScale()),
+                (int) Math.round(Core.getDrawHeight() * Core.getScale())));
+        this.setResizable(false); // at least for the moment: forbid resize
+        final Point p = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .getCenterPoint();
+        p.x -= this.getWidth() / 2;
+        p.y -= this.getHeight() / 2;
+        posX = Core.programProps.get("framePosX", p.x > 0 ? p.x : 0);
+        posY = Core.programProps.get("framePosY", p.y > 0 ? p.y : 0);
+        this.setLocation(posX, posY);
+    }
 
-		if (free < 60 * 1024 * 1024) { // 64MB doesn't seem to work even if set with -Xmx64M
-			JOptionPane.showMessageDialog(null, "You need at least 64MB of heap", "Error", JOptionPane.ERROR_MESSAGE);
-			System.exit(1);
-		}
+    /**
+     * The main function. Entry point of the program.
+     *
+     * @param args
+     */
+    public static void main(final String[] args) {
+        /*
+         * Set "Look and Feel" to system default
+         */
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (final Exception e) {
+            System.out.println(
+                    "Unable to set look and feel to system: " + e.getMessage());
+            /* don't care */
+        }
 
-		Toolkit.getDefaultToolkit().setDynamicLayout(true);
+        /*
+         * Apple menu bar for MacOS
+         */
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
 
-		thisFrame = new Lemmini();
+        // check free memory
+        final long free = Runtime.getRuntime().maxMemory();
 
-	}
+        if (free < MIN_FREE_MEMORY_MB * ONE_K * ONE_K) { // 64MB doesn't seem to
+                                                         // work even if set
+            // with -Xmx64M
+            JOptionPane.showMessageDialog(null,
+                    "You need at least 64MB of heap", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
 
-	public void setScale(final double scale) {
-		gp.shutdown();
-		Core.setScale(scale);
-		setSize((int) Math.round(Core.getDrawWidth() * Core.getScale()),
-				(int) Math.round(Core.getDrawHeight() * Core.getScale()));
-		this.setMinimumSize(new Dimension((int) Math.round(Core.getDrawWidth() * Core.getScale()),
-				(int) Math.round(Core.getDrawHeight() * Core.getScale())));
-		this.setMaximumSize(new Dimension((int) Math.round(Core.getDrawWidth() * Core.getScale()),
-				(int) Math.round(Core.getDrawHeight() * Core.getScale())));
-		pack();
-		validate(); // force redraw
-		gp.init();
-	}
+        Toolkit.getDefaultToolkit().setDynamicLayout(true);
 
-	/**
-	 * Update the level menus according to the given progress information.
-	 * 
-	 * @param pack name of level pack
-	 * @param diff name of difficulty level
-	 * @param bf   bitmap containing availability flags for each level
-	 */
-	public void updateLevelMenu(final String pack, final String diff, final GroupBitfield bf) {
-		final List<LvlMenuItem> menuItems = diffLevelMenus.get(LevelPack.getID(pack, diff));
+        thisFrame = new Lemmini();
 
-		for (int k = 0; k < menuItems.size(); k++) {
-			// select level, e.g. "All fall down"
-			final JMenuItem level = menuItems.get(k);
+    }
 
-			if (k == 0 || Core.player.isAvailable(bf, k)) {
-				level.setEnabled(true);
-			} else {
-				level.setEnabled(false);
-			}
-		}
-	}
+    /**
+     * Sets the size of the Lemmini window.
+     *
+     * @param scale the scaling factor.
+     */
+    public final void setScale(final double scale) {
+        gp.shutdown();
+        Core.setScale(scale);
+        setSize((int) Math.round(Core.getDrawWidth() * Core.getScale()),
+                (int) Math.round(Core.getDrawHeight() * Core.getScale()));
+        this.setMinimumSize(new Dimension(
+                (int) Math.round(Core.getDrawWidth() * Core.getScale()),
+                (int) Math.round(Core.getDrawHeight() * Core.getScale())));
+        this.setMaximumSize(new Dimension(
+                (int) Math.round(Core.getDrawWidth() * Core.getScale()),
+                (int) Math.round(Core.getDrawHeight() * Core.getScale())));
+        pack();
+        validate(); // force redraw
+        gp.init();
+    }
 
-	/**
-	 * Development function: patch current level x offset in the level configuration
-	 * file.
-	 * Works only in cheat mode.
-	 * 
-	 * @param lvlPath path of level configuration files
-	 */
-	private void patchLevel(final String lvlPath) {
-		final ArrayList<String> lines = new ArrayList<String>();
+    /**
+     * Update the level menus according to the given progress information.
+     *
+     * @param pack name of level pack
+     * @param diff name of difficulty level
+     * @param bf   bitmap containing availability flags for each level
+     */
+    public void updateLevelMenu(final String pack, final String diff,
+            final GroupBitfield bf) {
+        final List<LvlMenuItem> menuItems = diffLevelMenus
+                .get(LevelPack.getID(pack, diff));
 
-		try (final BufferedReader r = new BufferedReader(new FileReader(lvlPath));) {
-			String l;
+        for (int k = 0; k < menuItems.size(); k++) {
+            // select level, e.g. "All fall down"
+            final JMenuItem level = menuItems.get(k);
 
-			while ((l = r.readLine()) != null) {
-				lines.add(l);
-			}
-		} catch (final IOException e) {
-			System.out.println("Error reading patchLevel: " + e.getMessage());
-		}
+            if (k == 0 || Core.player.isAvailable(bf, k)) {
+                level.setEnabled(true);
+            } else {
+                level.setEnabled(false);
+            }
+        }
+    }
 
-		try (final FileWriter sw = new FileWriter(lvlPath)) {
-			for (int i = 0; i < lines.size(); i++) {
-				final String s = lines.get(i);
+    /**
+     * Development function: patch current level x offset in the level
+     * configuration file. Works only in cheat mode.
+     *
+     * @param configPath path of level configuration files
+     */
+    private void patchLevel(final String configPath) {
+        final List<String> lines = new ArrayList<String>();
 
-				if (s.startsWith("xPos =")) {
-					sw.write("xPos = " + Integer.toString(GameController.getxPos()) + "\n");
-				} else {
-					sw.write(s + "\n");
-				}
-			}
-		} catch (final IOException ex) {
-			System.out.println("Error writing position: " + ex.getMessage());
-		}
-	}
+        try (BufferedReader r = new BufferedReader(
+                new FileReader(configPath));) {
+            String l;
 
-	@Override
-	public void keyPressed(final KeyEvent keyevent) {
-		final int code = keyevent.getKeyCode();
+            while ((l = r.readLine()) != null) {
+                lines.add(l);
+            }
+        } catch (final IOException e) {
+            System.out.println("Error reading patchLevel: " + e.getMessage());
+        }
 
-		if (GameController.getGameState() == GameController.State.LEVEL) {
-			switch (code) {
-				case KeyEvent.VK_1:
-				case KeyEvent.VK_F3:
-					GameController.handleIconButton(Icons.Type.CLIMB);
-					break;
-				case KeyEvent.VK_2:
-				case KeyEvent.VK_F4:
-					GameController.handleIconButton(Icons.Type.FLOAT);
-					break;
-				case KeyEvent.VK_3:
-				case KeyEvent.VK_F5:
-					GameController.handleIconButton(Icons.Type.BOMB);
-					break;
-				case KeyEvent.VK_4:
-				case KeyEvent.VK_F6:
-					GameController.handleIconButton(Icons.Type.BLOCK);
-					break;
-				case KeyEvent.VK_5:
-				case KeyEvent.VK_F7:
-					GameController.handleIconButton(Icons.Type.BUILD);
-					break;
-				case KeyEvent.VK_6:
-				case KeyEvent.VK_F8:
-					GameController.handleIconButton(Icons.Type.BASH);
-					break;
-				case KeyEvent.VK_7:
-				case KeyEvent.VK_F9:
-					GameController.handleIconButton(Icons.Type.MINE);
-					break;
-				case KeyEvent.VK_8:
-				case KeyEvent.VK_F10:
-					GameController.handleIconButton(Icons.Type.DIG);
-					break;
-				case KeyEvent.VK_D:
-					toggleDebugDraw();
-					break;
-				case KeyEvent.VK_W:
-					handleWKey();
-					break;
-				case KeyEvent.VK_L:
-					printCurrentLevelOnConsole();
-					break;
-				case KeyEvent.VK_S: // superlemming on/off
-					toggleSuperLemming();
-					break;
-				case KeyEvent.VK_C:
-					toggleCheatMode();
-					break;
-				case KeyEvent.VK_F11:
-				case KeyEvent.VK_P:
-					GameController.setPaused(!GameController.isPaused());
-					GameController.pressIcon(Icons.Type.PAUSE);
-					break;
-				case KeyEvent.VK_F:
-				case KeyEvent.VK_ENTER:
-					GameController.setFastForward(!GameController.isFastForward());
-					GameController.pressIcon(Icons.Type.FFWD);
-					break;
-				case KeyEvent.VK_X:
-					doPatchLevelIfCheatEnabled();
-					break;
-				case KeyEvent.VK_RIGHT /* 39 */:
-					processRightArrow();
-					break;
-				case KeyEvent.VK_LEFT /* 37 */:
-					processLeftArrow();
-					break;
-				case KeyEvent.VK_UP:
-					gp.setCursor(LemmCursor.Type.WALKER);
-					break;
-				case KeyEvent.VK_SHIFT:
-					gp.setShiftPressed(true);
-					break;
-				case KeyEvent.VK_SPACE:
-					putNewLemmingAtCursorPosition();
-					break;
-				case KeyEvent.VK_PLUS:
-				case KeyEvent.VK_ADD:
-				case KeyEvent.VK_F2:
-					GameController.pressPlus(GameController.KEYREPEAT_KEY);
-					break;
-				case KeyEvent.VK_MINUS:
-				case KeyEvent.VK_SUBTRACT:
-				case KeyEvent.VK_F1:
-					GameController.pressMinus(GameController.KEYREPEAT_KEY);
-					break;
-				case KeyEvent.VK_F12:
-					GameController.handleIconButton(Icons.Type.NUKE);
-					break;
-			}
+        try (FileWriter sw = new FileWriter(configPath)) {
+            for (int i = 0; i < lines.size(); i++) {
+                final String s = lines.get(i);
 
-			keyevent.consume();
-		}
-	}
+                if (s.startsWith("xPos =")) {
+                    sw.write("xPos = "
+                            + Integer.toString(GameController.getxPos())
+                            + "\n");
+                } else {
+                    sw.write(s + "\n");
+                }
+            }
+        } catch (final IOException ex) {
+            System.out.println("Error writing position: " + ex.getMessage());
+        }
+    }
 
-	/**
-	 * Puts a new Lemming at the current cursor position, if cheat mode is enabled.
-	 */
-	private void putNewLemmingAtCursorPosition() {
-		if (GameController.isCheat()) {
-			final Lemming l = new Lemming(gp.getCursorX(), gp.getCursorY());
+    @Override
+    public final void keyPressed(final KeyEvent keyevent) {
+        final int code = keyevent.getKeyCode();
 
-			synchronized (GameController.getLemmings()) {
-				GameController.getLemmings().add(l);
-			}
-		}
-	}
+        if (GameController.getGameState() == GameController.State.LEVEL) {
+            switch (code) {
+            case KeyEvent.VK_1:
+            case KeyEvent.VK_F3:
+                GameController.handleIconButton(Icons.Type.CLIMB);
+                break;
+            case KeyEvent.VK_2:
+            case KeyEvent.VK_F4:
+                GameController.handleIconButton(Icons.Type.FLOAT);
+                break;
+            case KeyEvent.VK_3:
+            case KeyEvent.VK_F5:
+                GameController.handleIconButton(Icons.Type.BOMB);
+                break;
+            case KeyEvent.VK_4:
+            case KeyEvent.VK_F6:
+                GameController.handleIconButton(Icons.Type.BLOCK);
+                break;
+            case KeyEvent.VK_5:
+            case KeyEvent.VK_F7:
+                GameController.handleIconButton(Icons.Type.BUILD);
+                break;
+            case KeyEvent.VK_6:
+            case KeyEvent.VK_F8:
+                GameController.handleIconButton(Icons.Type.BASH);
+                break;
+            case KeyEvent.VK_7:
+            case KeyEvent.VK_F9:
+                GameController.handleIconButton(Icons.Type.MINE);
+                break;
+            case KeyEvent.VK_8:
+            case KeyEvent.VK_F10:
+                GameController.handleIconButton(Icons.Type.DIG);
+                break;
+            case KeyEvent.VK_D:
+                toggleDebugDraw();
+                break;
+            case KeyEvent.VK_W:
+                handleWKey();
+                break;
+            case KeyEvent.VK_L:
+                printCurrentLevelOnConsole();
+                break;
+            case KeyEvent.VK_S: // superlemming on/off
+                toggleSuperLemming();
+                break;
+            case KeyEvent.VK_C:
+                toggleCheatMode();
+                break;
+            case KeyEvent.VK_F11:
+            case KeyEvent.VK_P:
+                GameController.setPaused(!GameController.isPaused());
+                GameController.pressIcon(Icons.Type.PAUSE);
+                break;
+            case KeyEvent.VK_F:
+            case KeyEvent.VK_ENTER:
+                GameController.setFastForward(!GameController.isFastForward());
+                GameController.pressIcon(Icons.Type.FFWD);
+                break;
+            case KeyEvent.VK_X:
+                doPatchLevelIfCheatEnabled();
+                break;
+            case KeyEvent.VK_RIGHT /* 39 */:
+                processRightArrow();
+                break;
+            case KeyEvent.VK_LEFT /* 37 */:
+                processLeftArrow();
+                break;
+            case KeyEvent.VK_UP:
+                gp.setCursor(LemmCursor.Type.WALKER);
+                break;
+            case KeyEvent.VK_SHIFT:
+                gp.setShiftPressed(true);
+                break;
+            case KeyEvent.VK_SPACE:
+                putNewLemmingAtCursorPosition();
+                break;
+            case KeyEvent.VK_PLUS:
+            case KeyEvent.VK_ADD:
+            case KeyEvent.VK_F2:
+                GameController.pressPlus(GameController.KEYREPEAT_KEY);
+                break;
+            case KeyEvent.VK_MINUS:
+            case KeyEvent.VK_SUBTRACT:
+            case KeyEvent.VK_F1:
+                GameController.pressMinus(GameController.KEYREPEAT_KEY);
+                break;
+            case KeyEvent.VK_F12:
+                GameController.handleIconButton(Icons.Type.NUKE);
+                break;
+            default:
+                break;
+            }
 
-	/**
-	 * Processes left arrow keypress.
-	 */
-	private void processLeftArrow() {
-		if (GameController.isAdvancedSelect()) {
-			gp.setCursor(LemmCursor.Type.LEFT);
-		} else {
-			final int xOfsTemp = GameController.getxPos()
-					- ((gp.isShiftPressed()) ? GraphicsPane.X_STEP_FAST : GraphicsPane.X_STEP);
+            keyevent.consume();
+        }
+    }
 
-			if (xOfsTemp > 0) {
-				GameController.setxPos(xOfsTemp);
-			} else {
-				GameController.setxPos(0);
-			}
-		}
-	}
+    /**
+     * Puts a new Lemming at the current cursor position, if cheat mode is
+     * enabled.
+     */
+    private void putNewLemmingAtCursorPosition() {
+        if (GameController.isCheat()) {
+            final Lemming l = new Lemming(gp.getCursorX(), gp.getCursorY());
 
-	/**
-	 * Processes right arrow keypress.
-	 */
-	private void processRightArrow() {
-		if (GameController.isAdvancedSelect()) {
-			gp.setCursor(LemmCursor.Type.RIGHT);
-		} else {
-			final int xOfsTemp = GameController.getxPos()
-					+ ((gp.isShiftPressed()) ? GraphicsPane.X_STEP_FAST : GraphicsPane.X_STEP);
+            synchronized (GameController.getLemmings()) {
+                GameController.getLemmings().add(l);
+            }
+        }
+    }
 
-			if (xOfsTemp < Level.WIDTH - this.getWidth()) {
-				GameController.setxPos(xOfsTemp);
-			} else {
-				GameController.setxPos(Level.WIDTH - this.getWidth());
-			}
-		}
-	}
+    /**
+     * Processes left arrow keypress.
+     */
+    private void processLeftArrow() {
+        if (GameController.isAdvancedSelect()) {
+            gp.setCursor(LemmCursor.Type.LEFT);
+        } else {
+            final int xOfsTemp = GameController.getxPos()
+                    - ((gp.isShiftPressed()) ? GraphicsPane.X_STEP_FAST
+                            : GraphicsPane.X_STEP);
 
-	/**
-	 * Calls {@link #patchLevel(String)} if cheat mode is enabled.
-	 */
-	private void doPatchLevelIfCheatEnabled() {
-		if (GameController.isCheat()) {
-			patchLevel(GameController.getLevelPack(GameController.getCurLevelPackIdx())
-					.getInfo(GameController.getCurDiffLevel(), GameController.getCurLevelNumber())
-					.getFileName());
-		}
-	}
+            if (xOfsTemp > 0) {
+                GameController.setxPos(xOfsTemp);
+            } else {
+                GameController.setxPos(0);
+            }
+        }
+    }
 
-	/**
-	 * Toggles cheat mode.
-	 */
-	private void toggleCheatMode() {
-		if (Core.player.isCheat()) {
-			GameController.setCheat(!GameController.isCheat());
+    /**
+     * Processes right arrow keypress.
+     */
+    private void processRightArrow() {
+        if (GameController.isAdvancedSelect()) {
+            gp.setCursor(LemmCursor.Type.RIGHT);
+        } else {
+            final int xOfsTemp = GameController.getxPos()
+                    + ((gp.isShiftPressed()) ? GraphicsPane.X_STEP_FAST
+                            : GraphicsPane.X_STEP);
 
-			if (GameController.isCheat()) {
-				GameController.setWasCheated(true);
-			}
-		} else {
-			GameController.setCheat(false);
-		}
-	}
+            if (xOfsTemp < Level.WIDTH - this.getWidth()) {
+                GameController.setxPos(xOfsTemp);
+            } else {
+                GameController.setxPos(Level.WIDTH - this.getWidth());
+            }
+        }
+    }
 
-	/**
-	 * Toggles super lemming on/off, if cheat mode is enabled.
-	 */
-	private void toggleSuperLemming() {
-		if (GameController.isCheat()) {
-			GameController.setSuperLemming(!GameController.isSuperLemming());
-		} else {
-			try {
-				final File file = new File(Core.resourcePath + "/level.png");
-				final BufferedImage tmp = GameController.getLevel().createMiniMap(null,
-						GameController.getBgImage(), 1, 1, false);
-				ImageIO.write(tmp, "png", file);
-			} catch (final Exception ex) {
-				System.out.println("I/O error: " + ex.getMessage());
-			}
-		}
-	}
+    /**
+     * Calls {@link #patchLevel(String)} if cheat mode is enabled.
+     */
+    private void doPatchLevelIfCheatEnabled() {
+        if (GameController.isCheat()) {
+            patchLevel(
+                    GameController
+                            .getLevelPack(GameController.getCurLevelPackIdx())
+                            .getInfo(GameController.getCurDiffLevel(),
+                                    GameController.getCurLevelNumber())
+                            .getFileName());
+        }
+    }
 
-	/**
-	 * Prints the current level on the console if cheat mode is enabled.
-	 */
-	private void printCurrentLevelOnConsole() {
-		if (GameController.isCheat()) {
-			System.out.println(GameController.getLevelPack(GameController.getCurLevelPackIdx())
-					.getInfo(GameController.getCurDiffLevel(), GameController.getCurLevelNumber())
-					.getFileName());
-		}
-	}
+    /**
+     * Toggles cheat mode.
+     */
+    private void toggleCheatMode() {
+        if (Core.player.isCheat()) {
+            GameController.setCheat(!GameController.isCheat());
 
-	/**
-	 * Process a W keypress.
-	 */
-	private void handleWKey() {
-		if (GameController.isCheat()) {
-			GameController.setNumLeft(GameController.getNumLemmingsMax());
-			GameController.endLevel();
-		}
-	}
+            if (GameController.isCheat()) {
+                GameController.setWasCheated(true);
+            }
+        } else {
+            GameController.setCheat(false);
+        }
+    }
 
-	/**
-	 * Toggles state of debugDraw option, if cheat mode is enabled.
-	 */
-	private void toggleDebugDraw() {
-		if (GameController.isCheat()) {
-			gp.setDebugDraw(!gp.getDebugDraw());
-		}
-	}
+    /**
+     * Toggles super lemming on/off, if cheat mode is enabled.
+     */
+    private void toggleSuperLemming() {
+        if (GameController.isCheat()) {
+            GameController.setSuperLemming(!GameController.isSuperLemming());
+        } else {
+            try {
+                final File file = new File(Core.resourcePath + "/level.png");
+                final BufferedImage tmp = GameController.getLevel()
+                        .createMiniMap(null, GameController.getBgImage(), 1, 1,
+                                false);
+                ImageIO.write(tmp, "png", file);
+            } catch (final Exception ex) {
+                System.out.println("I/O error: " + ex.getMessage());
+            }
+        }
+    }
 
-	@Override
-	public void keyReleased(final KeyEvent keyevent) {
-		final int code = keyevent.getKeyCode();
+    /**
+     * Prints the current level on the console if cheat mode is enabled.
+     */
+    private void printCurrentLevelOnConsole() {
+        if (GameController.isCheat()) {
+            System.out
+                    .println(GameController
+                            .getLevelPack(GameController.getCurLevelPackIdx())
+                            .getInfo(GameController.getCurDiffLevel(),
+                                    GameController.getCurLevelNumber())
+                            .getFileName());
+        }
+    }
 
-		if (GameController.getGameState() == GameController.State.LEVEL) {
-			switch (code) {
-				case KeyEvent.VK_SHIFT:
-					gp.setShiftPressed(false);
-					break;
-				case KeyEvent.VK_PLUS:
-				case KeyEvent.VK_ADD:
-				case KeyEvent.VK_F2:
-					GameController.releasePlus(GameController.KEYREPEAT_KEY);
-					break;
-				case KeyEvent.VK_MINUS:
-				case KeyEvent.VK_SUBTRACT:
-				case KeyEvent.VK_F1:
-					GameController.releaseMinus(GameController.KEYREPEAT_KEY);
-					break;
-				case KeyEvent.VK_F12:
-					GameController.releaseIcon(Icons.Type.NUKE);
-					break;
-				case KeyEvent.VK_LEFT:
-					if (LemmCursor.getType() == LemmCursor.Type.LEFT) {
-						gp.setCursor(LemmCursor.Type.NORMAL);
-					}
+    /**
+     * Process a W keypress.
+     */
+    private void handleWKey() {
+        if (GameController.isCheat()) {
+            GameController.setNumLeft(GameController.getNumLemmingsMax());
+            GameController.endLevel();
+        }
+    }
 
-					break;
-				case KeyEvent.VK_RIGHT:
-					if (LemmCursor.getType() == LemmCursor.Type.RIGHT) {
-						gp.setCursor(LemmCursor.Type.NORMAL);
-					}
+    /**
+     * Toggles state of debugDraw option, if cheat mode is enabled.
+     */
+    private void toggleDebugDraw() {
+        if (GameController.isCheat()) {
+            gp.setDebugDraw(!gp.getDebugDraw());
+        }
+    }
 
-					break;
-				case KeyEvent.VK_UP:
-					if (LemmCursor.getType() == LemmCursor.Type.WALKER) {
-						gp.setCursor(LemmCursor.Type.NORMAL);
-					}
+    @Override
+    public final void keyReleased(final KeyEvent keyevent) {
+        final int code = keyevent.getKeyCode();
 
-					break;
-			}
-		}
-	}
+        if (GameController.getGameState() == GameController.State.LEVEL) {
+            switch (code) {
+            case KeyEvent.VK_SHIFT:
+                gp.setShiftPressed(false);
+                break;
+            case KeyEvent.VK_PLUS:
+            case KeyEvent.VK_ADD:
+            case KeyEvent.VK_F2:
+                GameController.releasePlus(GameController.KEYREPEAT_KEY);
+                break;
+            case KeyEvent.VK_MINUS:
+            case KeyEvent.VK_SUBTRACT:
+            case KeyEvent.VK_F1:
+                GameController.releaseMinus(GameController.KEYREPEAT_KEY);
+                break;
+            case KeyEvent.VK_F12:
+                GameController.releaseIcon(Icons.Type.NUKE);
+                break;
+            case KeyEvent.VK_LEFT:
+                if (LemmCursor.getType() == LemmCursor.Type.LEFT) {
+                    gp.setCursor(LemmCursor.Type.NORMAL);
+                }
 
-	@Override
-	public void keyTyped(final KeyEvent keyevent) {
-	}
+                break;
+            case KeyEvent.VK_RIGHT:
+                if (LemmCursor.getType() == LemmCursor.Type.RIGHT) {
+                    gp.setCursor(LemmCursor.Type.NORMAL);
+                }
 
-	/**
-	 * Common exit method to use in exit events.
-	 */
-	void exit() {
-		// store width and height
-		final Dimension d = this.getSize();
-		Core.programProps.set("frameWidth", d.width);
-		Core.programProps.set("frameHeight", d.height);
-		// store frame pos
-		final Point p = this.getLocation();
-		Core.programProps.set("framePosX", p.x);
-		Core.programProps.set("framePosY", p.y);
-		//
-		Core.saveProgramProps();
-		System.exit(0);
-	}
+                break;
+            case KeyEvent.VK_UP:
+                if (LemmCursor.getType() == LemmCursor.Type.WALKER) {
+                    gp.setCursor(LemmCursor.Type.NORMAL);
+                }
+
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void keyTyped(final KeyEvent keyevent) {
+    }
+
+    /**
+     * Common exit method to use in exit events.
+     */
+    void exit() {
+        // store width and height
+        final Dimension d = this.getSize();
+        Core.programProps.set("frameWidth", d.width);
+        Core.programProps.set("frameHeight", d.height);
+        // store frame pos
+        final Point p = this.getLocation();
+        Core.programProps.set("framePosX", p.x);
+        Core.programProps.set("framePosY", p.y);
+        //
+        Core.saveProgramProps();
+        System.exit(0);
+    }
 }

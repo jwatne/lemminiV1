@@ -40,272 +40,286 @@ import javax.swing.JOptionPane;
  */
 public class ToolBox {
 
-	private static GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-			.getDefaultConfiguration();
+    private static GraphicsConfiguration gc = GraphicsEnvironment
+            .getLocalGraphicsEnvironment().getDefaultScreenDevice()
+            .getDefaultConfiguration();
 
-	/**
-	 * Create a compatible buffered image.
-	 * 
-	 * @param width        width of image in pixels
-	 * @param height       height of image in pixels
-	 * @param transparency {@link java.awt.Transparency}
-	 * @return compatible buffered image
-	 */
-	public static BufferedImage createImage(final int width, final int height, final int transparency) {
-		final BufferedImage b = gc.createCompatibleImage(width, height, transparency);
-		return b;
-	}
+    /**
+     * Create a compatible buffered image.
+     *
+     * @param width        width of image in pixels
+     * @param height       height of image in pixels
+     * @param transparency {@link java.awt.Transparency}
+     * @return compatible buffered image
+     */
+    public static BufferedImage createImage(final int width, final int height,
+            final int transparency) {
+        final BufferedImage b = gc.createCompatibleImage(width, height,
+                transparency);
+        return b;
+    }
 
-	/**
-	 * Create a compatible buffered image from an image.
-	 * 
-	 * @param img          existing {@link java.awt.Image}
-	 * @param transparency {@link java.awt.Transparency}
-	 * @return compatible buffered image
-	 */
-	public static BufferedImage imageToBuffered(final Image img, final int transparency) {
-		final BufferedImage bImg = createImage(img.getWidth(null), img.getHeight(null), transparency);
-		final Graphics2D g = bImg.createGraphics();
-		g.drawImage(img, 0, 0, null);
-		g.dispose();
-		return bImg;
-	}
+    /**
+     * Create a compatible buffered image from an image.
+     *
+     * @param img          existing {@link java.awt.Image}
+     * @param transparency {@link java.awt.Transparency}
+     * @return compatible buffered image
+     */
+    public static BufferedImage imageToBuffered(final Image img,
+            final int transparency) {
+        final BufferedImage bImg = createImage(img.getWidth(null),
+                img.getHeight(null), transparency);
+        final Graphics2D g = bImg.createGraphics();
+        g.drawImage(img, 0, 0, null);
+        g.dispose();
+        return bImg;
+    }
 
-	/**
-	 * Return an array of buffered images which contain an animation.
-	 * 
-	 * @param img          image containing all the frames one above each other
-	 * @param frames       number of frames
-	 * @param transparency {@link java.awt.Transparency}
-	 * @return an array of buffered images which contain an animation
-	 */
-	public static BufferedImage[] getAnimation(final Image img, final int frames, final int transparency) {
-		final int width = img.getWidth(null);
-		return getAnimation(img, frames, transparency, width);
-	}
+    /**
+     * Return an array of buffered images which contain an animation.
+     *
+     * @param img          image containing all the frames one above each other
+     * @param frames       number of frames
+     * @param transparency {@link java.awt.Transparency}
+     * @return an array of buffered images which contain an animation
+     */
+    public static BufferedImage[] getAnimation(final Image img,
+            final int frames, final int transparency) {
+        final int width = img.getWidth(null);
+        return getAnimation(img, frames, transparency, width);
+    }
 
-	/**
-	 * Return an array of buffered images which contain an animation.
-	 * 
-	 * @param img          image containing all the frames one above each other
-	 * @param frames       number of frames
-	 * @param transparency {@link java.awt.Transparency}
-	 * @param width        image width
-	 * @return an array of buffered images which contain an animation
-	 */
-	public static BufferedImage[] getAnimation(final Image img, final int frames, final int transparency,
-			final int width) {
-		final int height = img.getHeight(null) / frames;
-		// characters stored one above the other - now separate them into single images
-		final ArrayList<BufferedImage> arrImg = new ArrayList<BufferedImage>(frames);
-		int y0 = 0;
-		for (int i = 0; i < frames; i++, y0 += height) {
-			final BufferedImage frame = createImage(width, height, transparency);
-			final Graphics2D g = frame.createGraphics();
-			g.drawImage(img, 0, 0, width, height, 0, y0, width, y0 + height, null);
-			arrImg.add(frame);
-			g.dispose();
-		}
-		final BufferedImage images[] = new BufferedImage[arrImg.size()];
-		return arrImg.toArray(images);
-	}
+    /**
+     * Return an array of buffered images which contain an animation.
+     *
+     * @param img          image containing all the frames one above each other
+     * @param frames       number of frames
+     * @param transparency {@link java.awt.Transparency}
+     * @param width        image width
+     * @return an array of buffered images which contain an animation
+     */
+    public static BufferedImage[] getAnimation(final Image img,
+            final int frames, final int transparency, final int width) {
+        final int height = img.getHeight(null) / frames;
+        // characters stored one above the other - now separate them into single
+        // images
+        final List<BufferedImage> arrImg = new ArrayList<BufferedImage>(frames);
+        int y0 = 0;
+        for (int i = 0; i < frames; i++, y0 += height) {
+            final BufferedImage frame = createImage(width, height,
+                    transparency);
+            final Graphics2D g = frame.createGraphics();
+            g.drawImage(img, 0, 0, width, height, 0, y0, width, y0 + height,
+                    null);
+            arrImg.add(frame);
+            g.dispose();
+        }
+        final BufferedImage images[] = new BufferedImage[arrImg.size()];
+        return arrImg.toArray(images);
+    }
 
-	/**
-	 * Flip image in X direction.
-	 * 
-	 * @param img image to flip
-	 * @return flipped image
-	 */
-	public static BufferedImage flipImageX(final BufferedImage img) {
-		final BufferedImage trg = createImage(img.getWidth(), img.getHeight(), img.getColorModel().getTransparency());
-		// affine transform for flipping
-		final AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-		tx.translate(-img.getWidth(), 0);
-		final AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-		return op.filter(img, trg);
-	}
+    /**
+     * Flip image in X direction.
+     *
+     * @param img image to flip
+     * @return flipped image
+     */
+    public static BufferedImage flipImageX(final BufferedImage img) {
+        final BufferedImage trg = createImage(img.getWidth(), img.getHeight(),
+                img.getColorModel().getTransparency());
+        // affine transform for flipping
+        final AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+        tx.translate(-img.getWidth(), 0);
+        final AffineTransformOp op = new AffineTransformOp(tx,
+                AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+        return op.filter(img, trg);
+    }
 
-	/**
-	 * Use the Loader to find a file.
-	 * 
-	 * @param fname file name
-	 * @return URL of the file
-	 */
-	public static URL findFile(final String fname) {
-		final ClassLoader loader = ToolBox.class.getClassLoader();
-		return loader.getResource(fname);
-	}
+    /**
+     * Use the Loader to find a file.
+     *
+     * @param fname file name
+     * @return URL of the file
+     */
+    public static URL findFile(final String fname) {
+        final ClassLoader loader = ToolBox.class.getClassLoader();
+        return loader.getResource(fname);
+    }
 
-	/**
-	 * Add (system default) path separator to string (if there isn't one already).
-	 * 
-	 * @param fName String containing path name
-	 * @return String that ends with the (system default) path separator for sure
-	 */
-	public static String addSeparator(final String fName) {
-		int pos = fName.lastIndexOf(File.separator);
-		if (pos != fName.length() - 1)
-			pos = fName.lastIndexOf("/");
-		if (pos != fName.length() - 1)
-			return fName + "/";
-		else
-			return fName;
-	}
+    /**
+     * Add (system default) path separator to string (if there isn't one
+     * already).
+     *
+     * @param fName String containing path name
+     * @return String that ends with the (system default) path separator for
+     *         sure
+     */
+    public static String addSeparator(final String fName) {
+        int pos = fName.lastIndexOf(File.separator);
+        if (pos != fName.length() - 1)
+            pos = fName.lastIndexOf("/");
+        if (pos != fName.length() - 1)
+            return fName + "/";
+        else
+            return fName;
+    }
 
-	/**
-	 * Exchange any DOS style path separator ("\") with a Unix style separator
-	 * ("/").
-	 * 
-	 * @param fName String containing file/path name
-	 * @return String with only Unix style path separators
-	 */
-	public static String exchangeSeparators(final String fName) {
-		int pos;
-		final StringBuffer sb = new StringBuffer(fName);
-		while ((pos = sb.indexOf("\\")) != -1)
-			sb.setCharAt(pos, '/');
-		return sb.toString();
-	}
+    /**
+     * Exchange any DOS style path separator ("\") with a Unix style separator
+     * ("/").
+     *
+     * @param fName String containing file/path name
+     * @return String with only Unix style path separators
+     */
+    public static String exchangeSeparators(final String fName) {
+        int pos;
+        final StringBuffer sb = new StringBuffer(fName);
+        while ((pos = sb.indexOf("\\")) != -1)
+            sb.setCharAt(pos, '/');
+        return sb.toString();
+    }
 
-	/**
-	 * Return file name from path.
-	 * 
-	 * @param path String of a path with a file name
-	 * @return String containing only the file name
-	 */
-	public static String getFileName(final String path) {
-		int p1 = path.lastIndexOf("/");
-		final int p2 = path.lastIndexOf("\\");
-		if (p2 > p1)
-			p1 = p2;
-		if (p1 < 0)
-			p1 = 0;
-		else
-			p1++;
-		return path.substring(p1);
-	}
+    /**
+     * Return file name from path.
+     *
+     * @param path String of a path with a file name
+     * @return String containing only the file name
+     */
+    public static String getFileName(final String path) {
+        int p1 = path.lastIndexOf("/");
+        final int p2 = path.lastIndexOf("\\");
+        if (p2 > p1)
+            p1 = p2;
+        if (p1 < 0)
+            p1 = 0;
+        else
+            p1++;
+        return path.substring(p1);
+    }
 
-	/**
-	 * Returns the extension of a filename without the dot.
-	 * 
-	 * @param path String containing file name
-	 * @return String containing only the extension (without the dot) or null (if no
-	 *         extension found)
-	 */
-	public static String getExtension(final String path) {
-		final int p1 = path.lastIndexOf("/");
-		final int p2 = path.lastIndexOf("\\");
-		final int p = path.lastIndexOf(".");
-		if (p == -1 || p < p1 || p < p2)
-			return null;
-		return path.substring(p + 1);
-	}
+    /**
+     * Returns the extension of a filename without the dot.
+     *
+     * @param path String containing file name
+     * @return String containing only the extension (without the dot) or null
+     *         (if no extension found)
+     */
+    public static String getExtension(final String path) {
+        final int p1 = path.lastIndexOf("/");
+        final int p2 = path.lastIndexOf("\\");
+        final int p = path.lastIndexOf(".");
+        if (p == -1 || p < p1 || p < p2)
+            return null;
+        return path.substring(p + 1);
+    }
 
-	/**
-	 * Returns the first few bytes of a file to check its type.
-	 * 
-	 * @param fname Filename of the file
-	 * @param num   Number of bytes to return
-	 * @return Array of bytes (size num) from the beginning of the file
-	 */
-	public static byte[] getFileID(final String fname, final int num) {
-		final byte buf[] = new byte[num];
-		final File f = new File(fname);
+    /**
+     * Returns the first few bytes of a file to check its type.
+     *
+     * @param fname Filename of the file
+     * @param num   Number of bytes to return
+     * @return Array of bytes (size num) from the beginning of the file
+     */
+    public static byte[] getFileID(final String fname, final int num) {
+        final byte buf[] = new byte[num];
+        final File f = new File(fname);
 
-		if (f.length() < num) {
-			return null;
-		}
+        if (f.length() < num) {
+            return null;
+        }
 
-		try (final FileInputStream fi = new FileInputStream(fname)) {
-			if (fi.read(buf) < 1) {
-				System.out.println("0 bytes read from file " + fname);
-			}
-		} catch (final Exception ex) {
-			return null;
-		}
+        try (final FileInputStream fi = new FileInputStream(fname)) {
+            if (fi.read(buf) < 1) {
+                System.out.println("0 bytes read from file " + fname);
+            }
+        } catch (final Exception ex) {
+            return null;
+        }
 
-		return buf;
-	}
+        return buf;
+    }
 
-	/**
-	 * Get path name from absolute file name.
-	 * 
-	 * @param path absolute file name
-	 * @return path name without the separator
-	 */
-	public static String getPathName(final String path) {
-		int p1 = path.lastIndexOf("/");
-		final int p2 = path.lastIndexOf("\\");
-		if (p2 > p1)
-			p1 = p2;
-		if (p1 < 0)
-			p1 = 0;
-		return path.substring(0, p1);
-	}
+    /**
+     * Get path name from absolute file name.
+     *
+     * @param path absolute file name
+     * @return path name without the separator
+     */
+    public static String getPathName(final String path) {
+        int p1 = path.lastIndexOf("/");
+        final int p2 = path.lastIndexOf("\\");
+        if (p2 > p1)
+            p1 = p2;
+        if (p1 < 0)
+            p1 = 0;
+        return path.substring(0, p1);
+    }
 
-	/**
-	 * Show exception message box.
-	 * 
-	 * @param ex exception
-	 */
-	public static void showException(final Throwable ex) {
-		String m;
-		m = "<html>";
-		m += ex.getClass().getName() + "<p>";
-		if (ex.getMessage() != null)
-			m += ex.getMessage() + "<p>";
-		final StackTraceElement ste[] = ex.getStackTrace();
-		for (int i = 0; i < ste.length; i++)
-			m += ste[i].toString() + "<p>";
-		m += "</html>";
-		ex.printStackTrace();
-		JOptionPane.showMessageDialog(null, m, "Error", JOptionPane.ERROR_MESSAGE);
-		ex.printStackTrace();
-	}
+    /**
+     * Show exception message box.
+     *
+     * @param ex exception
+     */
+    public static void showException(final Throwable ex) {
+        String m;
+        m = "<html>";
+        m += ex.getClass().getName() + "<p>";
+        if (ex.getMessage() != null)
+            m += ex.getMessage() + "<p>";
+        final StackTraceElement ste[] = ex.getStackTrace();
+        for (int i = 0; i < ste.length; i++)
+            m += ste[i].toString() + "<p>";
+        m += "</html>";
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(null, m, "Error",
+                JOptionPane.ERROR_MESSAGE);
+        ex.printStackTrace();
+    }
 
-	/**
-	 * Open file dialog.
-	 * 
-	 * @param parent parent frame
-	 * @param path   default file name
-	 * @param ext    array of allowed extensions
-	 * @param load   true: load, false: save
-	 * @return absolute file name of selected file or null
-	 */
-	public static String getFileName(final Component parent, final String path, final List<String> ext,
-			final boolean load) {
-		String p = path;
-		if (p.length() == 0) {
-			p = ".";
-		}
+    /**
+     * Open file dialog.
+     *
+     * @param parent parent frame
+     * @param path   default file name
+     * @param ext    array of allowed extensions
+     * @param load   true: load, false: save
+     * @return absolute file name of selected file or null
+     */
+    public static String getFileName(final Component parent, final String path,
+            final List<String> ext, final boolean load) {
+        String p = path;
+        if (p.length() == 0) {
+            p = ".";
+        }
 
-		final JFileChooser jf = new JFileChooser(p);
-		final JFileFilter filter = new JFileFilter();
+        final JFileChooser jf = new JFileChooser(p);
+        final JFileFilter filter = new JFileFilter();
 
-		if (ext != null) {
-			for (final String s : ext) {
-				filter.addExtension(s);
-			}
+        if (ext != null) {
+            for (final String s : ext) {
+                filter.addExtension(s);
+            }
 
-			jf.setFileFilter(filter);
-		}
+            jf.setFileFilter(filter);
+        }
 
-		jf.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        jf.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-		if (!load) {
-			jf.setDialogType(JFileChooser.SAVE_DIALOG);
-		}
+        if (!load) {
+            jf.setDialogType(JFileChooser.SAVE_DIALOG);
+        }
 
-		final int returnVal = jf.showDialog(parent, null);
+        final int returnVal = jf.showDialog(parent, null);
 
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			final File f = jf.getSelectedFile();
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            final File f = jf.getSelectedFile();
 
-			if (f != null) {
-				return f.getAbsolutePath();
-			}
-		}
+            if (f != null) {
+                return f.getAbsolutePath();
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 }

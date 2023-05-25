@@ -74,7 +74,7 @@ public class Diff {
 	 * @return buffer of differences
 	 */
 	public static byte[] diffBuffers(final byte bsrc[], final byte btrg[]) {
-		final ArrayList<Byte> patch = new ArrayList<Byte>();
+		final List<Byte> patch = new ArrayList<Byte>();
 		final Buffer src = new Buffer(bsrc);
 		final Buffer trg = new Buffer(btrg);
 
@@ -482,7 +482,7 @@ public class Diff {
 		if (it + len + resyncLength >= bt.length)
 			len = bt.length - it - resyncLength;
 
-		final ArrayList<int[]> solutions = new ArrayList<int[]>();
+		final List<int[]> solutions = new ArrayList<int[]>();
 
 		for (int ws = 1; ws < len; ws++) {
 			for (int wt = 1; wt < len; wt++) {

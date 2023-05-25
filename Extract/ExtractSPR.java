@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /*
  * Copyright 2009 Volker Oth
@@ -30,320 +31,365 @@ import java.util.Arrays;
  * @author Volker Oth
  */
 public class ExtractSPR {
-	/** palette index of transparent color */
-	private final static int transparentIndex = 0;
+    /** palette index of transparent color */
+    private final static int transparentIndex = 0;
 
-	/** array of GIF images to store to disk */
-	private GIFImage images[];
-	/** color palette */
-	private Palette palette = null;
-	/**
-	 * buffer used to compress the palette (remove double entries) to work around
-	 * issues on MacOS
-	 */
-	private int lookupBuffer[];
+    /** array of GIF images to store to disk */
+    private GIFImage images[];
+    /** color palette */
+    private Palette palette = null;
+    /**
+     * buffer used to compress the palette (remove double entries) to work
+     * around issues on MacOS
+     */
+    private int lookupBuffer[];
 
-	/**
-	 * Load palette.
-	 *
-	 * @param fname Name of palette file
-	 * @return ColorModel representation of Palette
-	 * @throws ExtractException
-	 */
-	Palette loadPalette(final String fname) throws ExtractException {
-		byte buffer[];
-		// read file into buffer
-		int paletteSize = 0;
-		final File f = new File(fname);
+    /**
+     * Load palette.
+     *
+     * @param fname Name of palette file
+     * @return ColorModel representation of Palette
+     * @throws ExtractException
+     */
+    Palette loadPalette(final String fname) throws ExtractException {
+        byte buffer[];
+        // read file into buffer
+        int paletteSize = 0;
+        final File f = new File(fname);
 
-		try (FileInputStream fi = new FileInputStream(fname)) {
-			buffer = new byte[(int) f.length()];
+        try (FileInputStream fi = new FileInputStream(fname)) {
+            buffer = new byte[(int) f.length()];
 
-			if (fi.read(buffer) < 1) {
-				System.out.println("0 bytes read from file " + fname);
-			}
-		} catch (final FileNotFoundException e) {
-			throw new ExtractException("File " + fname + " not found");
-		} catch (final IOException e) {
-			throw new ExtractException("I/O error while reading " + fname);
-		}
+            if (fi.read(buffer) < 1) {
+                System.out.println("0 bytes read from file " + fname);
+            }
+        } catch (final FileNotFoundException e) {
+            throw new ExtractException("File " + fname + " not found");
+        } catch (final IOException e) {
+            throw new ExtractException("I/O error while reading " + fname);
+        }
 
-		// check header
-		if (buffer[0] != 0x20 || buffer[1] != 0x4c || buffer[2] != 0x41 || buffer[3] != 0x50) {
-			throw new ExtractException("File " + fname + " ist not a lemmings palette file");
-		}
+        // check header
+        if (buffer[0] != 0x20 || buffer[1] != 0x4c || buffer[2] != 0x41
+                || buffer[3] != 0x50) {
+            throw new ExtractException(
+                    "File " + fname + " ist not a lemmings palette file");
+        }
 
-		paletteSize = unsigned(buffer[4]) + unsigned(buffer[5]) * 256; // number of palette entries
-		byte[] r = new byte[paletteSize];
-		byte[] g = new byte[paletteSize];
-		byte[] b = new byte[paletteSize];
-		int ofs = 6; // skip two bytes which contain number of palettes (?)
+        paletteSize = unsigned(buffer[4]) + unsigned(buffer[5]) * 256; // number
+                                                                       // of
+                                                                       // palette
+                                                                       // entries
+        byte[] r = new byte[paletteSize];
+        byte[] g = new byte[paletteSize];
+        byte[] b = new byte[paletteSize];
+        int ofs = 6; // skip two bytes which contain number of palettes (?)
 
-		for (int idx = 0; idx < paletteSize; idx++) {
-			r[idx] = buffer[ofs++];
-			g[idx] = buffer[ofs++];
-			b[idx] = buffer[ofs++];
-			ofs++;
-		}
+        for (int idx = 0; idx < paletteSize; idx++) {
+            r[idx] = buffer[ofs++];
+            g[idx] = buffer[ofs++];
+            b[idx] = buffer[ofs++];
+            ofs++;
+        }
 
-		// search for double entries, create
-		// new palette without double entries
-		// and lookup table to fix the pixel values
-		final byte compressedR[] = new byte[paletteSize];
-		final byte compressedG[] = new byte[paletteSize];
-		final byte compressedB[] = new byte[paletteSize];
-		lookupBuffer = new int[paletteSize];
-		Arrays.fill(lookupBuffer, -1); // mark all entries invalid
-		Arrays.fill(compressedR, (byte) 0);
-		Arrays.fill(compressedG, (byte) 0);
-		Arrays.fill(compressedB, (byte) 0);
-		int compressedIndex = 0;
+        // search for double entries, create
+        // new palette without double entries
+        // and lookup table to fix the pixel values
+        final byte compressedR[] = new byte[paletteSize];
+        final byte compressedG[] = new byte[paletteSize];
+        final byte compressedB[] = new byte[paletteSize];
+        lookupBuffer = new int[paletteSize];
+        Arrays.fill(lookupBuffer, -1); // mark all entries invalid
+        Arrays.fill(compressedR, (byte) 0);
+        Arrays.fill(compressedG, (byte) 0);
+        Arrays.fill(compressedB, (byte) 0);
+        int compressedIndex = 0;
 
-		for (int i = 0; i < paletteSize; i++) {
-			if (lookupBuffer[i] == -1) { // if -1, this value is no doublette of a lower index
-				compressedR[compressedIndex] = r[i]; // copy value to compressed buffer
-				compressedG[compressedIndex] = g[i];
-				compressedB[compressedIndex] = b[i];
+        for (int i = 0; i < paletteSize; i++) {
+            if (lookupBuffer[i] == -1) { // if -1, this value is no doublette of
+                                         // a lower index
+                compressedR[compressedIndex] = r[i]; // copy value to compressed
+                                                     // buffer
+                compressedG[compressedIndex] = g[i];
+                compressedB[compressedIndex] = b[i];
 
-				if (i != transparentIndex) { // don't search doublettes of transparent color
-					// search for doublettes at higher indeces
-					for (int j = i + 1; j < paletteSize; j++) {
-						if (j == transparentIndex) { // transparent color can't be a doublette of another color
-							continue;
-						}
+                if (i != transparentIndex) { // don't search doublettes of
+                                             // transparent color
+                    // search for doublettes at higher indeces
+                    for (int j = i + 1; j < paletteSize; j++) {
+                        if (j == transparentIndex) { // transparent color can't
+                                                     // be a doublette of
+                                                     // another color
+                            continue;
+                        }
 
-						if ((r[i] == r[j]) && (g[i] == g[j]) && (b[i] == b[j])) {
-							lookupBuffer[j] = compressedIndex; // mark double entry in lookupBuffer
-						}
-					}
-				}
+                        if ((r[i] == r[j]) && (g[i] == g[j])
+                                && (b[i] == b[j])) {
+                            lookupBuffer[j] = compressedIndex; // mark double
+                                                               // entry in
+                                                               // lookupBuffer
+                        }
+                    }
+                }
 
-				lookupBuffer[i] = compressedIndex++;
-			}
-		}
+                lookupBuffer[i] = compressedIndex++;
+            }
+        }
 
-		if (paletteSize != compressedIndex) {
-			// paletteSize = compressedIndex;
-			r = compressedR;
-			g = compressedG;
-			b = compressedB;
-		}
+        if (paletteSize != compressedIndex) {
+            // paletteSize = compressedIndex;
+            r = compressedR;
+            g = compressedG;
+            b = compressedB;
+        }
 
-		palette = new Palette(r, g, b);
-		return palette;
-	}
+        palette = new Palette(r, g, b);
+        return palette;
+    }
 
-	/**
-	 * Convert byte in unsigned int
-	 *
-	 * @param b Byte to convert
-	 * @return Unsigned value of byte
-	 */
-	private static int unsigned(final byte b) {
-		return b & 0xFF;
-	}
+    /**
+     * Convert byte in unsigned int
+     *
+     * @param b Byte to convert
+     * @return Unsigned value of byte
+     */
+    private static int unsigned(final byte b) {
+        return b & 0xFF;
+    }
 
-	/**
-	 * Load SPR file. Load palette first!
-	 *
-	 * @param fname Name of SPR file
-	 * @return Array of Images representing all images stored in the SPR file
-	 * @throws ExtractException
-	 */
-	GIFImage[] loadSPR(final String fname) throws ExtractException {
-		byte buffer[];
+    /**
+     * Load SPR file. Load palette first!
+     *
+     * @param fname Name of SPR file
+     * @return Array of Images representing all images stored in the SPR file
+     * @throws ExtractException
+     */
+    GIFImage[] loadSPR(final String fname) throws ExtractException {
+        byte buffer[];
 
-		if (palette == null)
-			throw new ExtractException("Load Palette first!");
+        if (palette == null)
+            throw new ExtractException("Load Palette first!");
 
-		// read file into buffer
-		final File f = new File(fname);
-		try (final FileInputStream fi = new FileInputStream(fname)) {
-			buffer = new byte[(int) f.length()];
+        // read file into buffer
+        final File f = new File(fname);
+        try (final FileInputStream fi = new FileInputStream(fname)) {
+            buffer = new byte[(int) f.length()];
 
-			if (fi.read(buffer) < 1) {
-				System.out.println("0 bytes read from file " + fname);
-			}
-		} catch (final FileNotFoundException e) {
-			throw new ExtractException("File " + fname + " not found");
-		} catch (final IOException e) {
-			throw new ExtractException("I/O error while reading " + fname);
-		}
-		// check header
-		if (buffer[0] != 0x53 || buffer[1] != 0x52 || buffer[2] != 0x4c || buffer[3] != 0x45)
-			throw new ExtractException("File " + fname + " ist not a lemmings sprite file");
-		// get number of frames
-		final int frames = unsigned(buffer[4]) + unsigned(buffer[5]) * 256;
-		int ofs = unsigned(buffer[6]) + unsigned(buffer[7]) * 256;
+            if (fi.read(buffer) < 1) {
+                System.out.println("0 bytes read from file " + fname);
+            }
+        } catch (final FileNotFoundException e) {
+            throw new ExtractException("File " + fname + " not found");
+        } catch (final IOException e) {
+            throw new ExtractException("I/O error while reading " + fname);
+        }
+        // check header
+        if (buffer[0] != 0x53 || buffer[1] != 0x52 || buffer[2] != 0x4c
+                || buffer[3] != 0x45)
+            throw new ExtractException(
+                    "File " + fname + " ist not a lemmings sprite file");
+        // get number of frames
+        final int frames = unsigned(buffer[4]) + unsigned(buffer[5]) * 256;
+        int ofs = unsigned(buffer[6]) + unsigned(buffer[7]) * 256;
 
-		images = new GIFImage[frames];
-		byte b;
-		int lineOfs;
+        images = new GIFImage[frames];
+        byte b;
+        int lineOfs;
 
-		for (int frame = 0; frame < frames; frame++) {
-			// get header info
-			final int xOfs = unsigned(buffer[ofs++]) + unsigned(buffer[ofs++]) * 256; // x offset of data in output
-																						// image
-			final int yOfs = unsigned(buffer[ofs++]) + unsigned(buffer[ofs++]) * 256; // y offset of data in output
-																						// image
-			final int maxLen = unsigned(buffer[ofs++]) + unsigned(buffer[ofs++]) * 256; // maximum length of a data line
-			final int lines = unsigned(buffer[ofs++]) + unsigned(buffer[ofs++]) * 256; // number of data lines
-			final int width = unsigned(buffer[ofs++]) + unsigned(buffer[ofs++]) * 256; // width of output image
-			final int height = unsigned(buffer[ofs++]) + unsigned(buffer[ofs++]) * 256; // height of output image
+        for (int frame = 0; frame < frames; frame++) {
+            // get header info
+            final int xOfs = unsigned(buffer[ofs++])
+                    + unsigned(buffer[ofs++]) * 256; // x offset of data in
+                                                     // output
+                                                     // image
+            final int yOfs = unsigned(buffer[ofs++])
+                    + unsigned(buffer[ofs++]) * 256; // y offset of data in
+                                                     // output
+                                                     // image
+            final int maxLen = unsigned(buffer[ofs++])
+                    + unsigned(buffer[ofs++]) * 256; // maximum length of a data
+                                                     // line
+            final int lines = unsigned(buffer[ofs++])
+                    + unsigned(buffer[ofs++]) * 256; // number of data lines
+            final int width = unsigned(buffer[ofs++])
+                    + unsigned(buffer[ofs++]) * 256; // width of output image
+            final int height = unsigned(buffer[ofs++])
+                    + unsigned(buffer[ofs++]) * 256; // height of output image
 
-			final byte pixels[] = new byte[width * height];
+            final byte pixels[] = new byte[width * height];
 
-			for (int i = 0; i < pixels.length; i++)
-				pixels[i] = transparentIndex;
+            for (int i = 0; i < pixels.length; i++)
+                pixels[i] = transparentIndex;
 
-			int y = yOfs * width;
+            int y = yOfs * width;
 
-			int pxOffset = 0; // additional offset for lines broken in several packets
+            int pxOffset = 0; // additional offset for lines broken in several
+                              // packets
 
-			for (int line = 0; line < lines;) {
-				// read line
-				b = buffer[ofs++]; // start character including length (>= 0x80) or line offset (<0x80)
-				lineOfs = 0;
-				while (b == 0x7f) { // special line offset for large sprites
-					lineOfs += 0x7f;
-					b = buffer[ofs++];
-				}
-				if (!((b & 0x80) == 0x80)) {
-					// additional line offset
-					lineOfs += (b & 0x7f);
-					b = buffer[ofs++]; // start character
-				}
-				// get line length
-				final int len = (b & 0xff) - 0x80;
-				if (len < 0 || len > 0x7f || len > maxLen)
-					throw new ExtractException(
-							"Maximum data line length exceeded in line " + line + " of frame " + frame + " of " + fname
-									+ " (ofs:" + ofs + ")");
-				if (len > 0) {
-					try {
-						for (int pixel = 0; pixel < len; pixel++) {
-							// none of the extracted images uses more than 128 colors (indeed much less)
-							// but some use higher indeces. Instead of mirroring the palette, just and every
-							// entry with 0x7f.
-							// The lookup table is needed to get new index in compresse palette
-							final byte pixelVal = (byte) (lookupBuffer[buffer[ofs++] & 0x7f] & 0xff);
-							pixels[y + xOfs + lineOfs + pixel + pxOffset] = pixelVal;
-						}
-					} catch (final ArrayIndexOutOfBoundsException ex) {
-						throw new ExtractException(
-								"Index out of bounds in line " + line + " of frame " + frame + " of " + fname + " (ofs:"
-										+ ofs + ")");
-					}
-					b = buffer[ofs++]; // end character must be 0x80
-					if ((b & 0xff) != 0x80) {
-						// if this is not the end character, the line is continued after an offset
-						pxOffset += (lineOfs + len);
-						ofs--;
-						continue;
-					}
-				}
-				pxOffset = 0;
-				line++;
-				y += width;
-			}
-			// convert byte array into BufferedImage
-			images[frame] = new GIFImage(width, height, pixels, palette);
-		}
+            for (int line = 0; line < lines;) {
+                // read line
+                b = buffer[ofs++]; // start character including length (>= 0x80)
+                                   // or line offset (<0x80)
+                lineOfs = 0;
+                while (b == 0x7f) { // special line offset for large sprites
+                    lineOfs += 0x7f;
+                    b = buffer[ofs++];
+                }
+                if (!((b & 0x80) == 0x80)) {
+                    // additional line offset
+                    lineOfs += (b & 0x7f);
+                    b = buffer[ofs++]; // start character
+                }
+                // get line length
+                final int len = (b & 0xff) - 0x80;
+                if (len < 0 || len > 0x7f || len > maxLen)
+                    throw new ExtractException(
+                            "Maximum data line length exceeded in line " + line
+                                    + " of frame " + frame + " of " + fname
+                                    + " (ofs:" + ofs + ")");
+                if (len > 0) {
+                    try {
+                        for (int pixel = 0; pixel < len; pixel++) {
+                            // none of the extracted images uses more than 128
+                            // colors (indeed much less)
+                            // but some use higher indeces. Instead of mirroring
+                            // the palette, just and every
+                            // entry with 0x7f.
+                            // The lookup table is needed to get new index in
+                            // compresse palette
+                            final byte pixelVal = (byte) (lookupBuffer[buffer[ofs++]
+                                    & 0x7f] & 0xff);
+                            pixels[y + xOfs + lineOfs + pixel
+                                    + pxOffset] = pixelVal;
+                        }
+                    } catch (final ArrayIndexOutOfBoundsException ex) {
+                        throw new ExtractException(
+                                "Index out of bounds in line " + line
+                                        + " of frame " + frame + " of " + fname
+                                        + " (ofs:" + ofs + ")");
+                    }
+                    b = buffer[ofs++]; // end character must be 0x80
+                    if ((b & 0xff) != 0x80) {
+                        // if this is not the end character, the line is
+                        // continued after an offset
+                        pxOffset += (lineOfs + len);
+                        ofs--;
+                        continue;
+                    }
+                }
+                pxOffset = 0;
+                line++;
+                y += width;
+            }
+            // convert byte array into BufferedImage
+            images[frame] = new GIFImage(width, height, pixels, palette);
+        }
 
-		return images;
-	}
+        return images;
+    }
 
-	/**
-	 * Save all images of currently loaded SPR file
-	 *
-	 * @param fname     Filename of GIF files to export. "_N.gif" will be appended
-	 *                  with N being the image number.
-	 * @param keepAnims If true, consequently stored imaged with same size will be
-	 *                  stored inside one GIF (one beneath the other)
-	 * @return Array of all the filenames stored
-	 * @throws ExtractException
-	 */
-	String[] saveAll(final String fname, final boolean keepAnims) throws ExtractException {
-		int width = images[0].getWidth();
-		int height = images[0].getHeight();
-		int startIdx = 0;
-		int animNum = 0;
-		final ArrayList<String> files = new ArrayList<String>();
+    /**
+     * Save all images of currently loaded SPR file
+     *
+     * @param fname     Filename of GIF files to export. "_N.gif" will be
+     *                  appended with N being the image number.
+     * @param keepAnims If true, consequently stored imaged with same size will
+     *                  be stored inside one GIF (one beneath the other)
+     * @return Array of all the filenames stored
+     * @throws ExtractException
+     */
+    String[] saveAll(final String fname, final boolean keepAnims)
+            throws ExtractException {
+        int width = images[0].getWidth();
+        int height = images[0].getHeight();
+        int startIdx = 0;
+        int animNum = 0;
+        final List<String> files = new ArrayList<String>();
 
-		for (int idx = 1; idx <= images.length; idx++) {
-			// search for first image with different size
-			if (keepAnims)
-				if (idx < images.length)
-					if (images[idx].getWidth() == width && images[idx].getHeight() == height)
-						continue;
-			// now save all the images in one: one above the other
-			int num;
-			if (keepAnims)
-				num = idx - startIdx;
-			else
-				num = 1;
-			final byte pixels[] = new byte[width * num * height];
-			final GIFImage anim = new GIFImage(width, num * height, pixels, palette);
-			for (int n = 0; n < num; n++)
-				System.arraycopy(images[startIdx + n].getPixels(), 0, pixels, n * height * width,
-						images[startIdx + n].getPixels().length);
+        for (int idx = 1; idx <= images.length; idx++) {
+            // search for first image with different size
+            if (keepAnims)
+                if (idx < images.length)
+                    if (images[idx].getWidth() == width
+                            && images[idx].getHeight() == height)
+                        continue;
+            // now save all the images in one: one above the other
+            int num;
+            if (keepAnims)
+                num = idx - startIdx;
+            else
+                num = 1;
+            final byte pixels[] = new byte[width * num * height];
+            final GIFImage anim = new GIFImage(width, num * height, pixels,
+                    palette);
+            for (int n = 0; n < num; n++)
+                System.arraycopy(images[startIdx + n].getPixels(), 0, pixels,
+                        n * height * width,
+                        images[startIdx + n].getPixels().length);
 
-			startIdx = idx;
-			// construct filename
-			final String fn = fname + "_" + Integer.toString(animNum++) + ".gif";
-			// save gif
-			saveGif(anim, fn);
-			files.add(fn.toLowerCase());
-			// remember new size
-			if (idx < images.length) {
-				width = images[idx].getWidth();
-				height = images[idx].getHeight();
-			}
-		}
-		final String[] fileArray = new String[files.size()];
-		return files.toArray(fileArray);
-	}
+            startIdx = idx;
+            // construct filename
+            final String fn = fname + "_" + Integer.toString(animNum++)
+                    + ".gif";
+            // save gif
+            saveGif(anim, fn);
+            files.add(fn.toLowerCase());
+            // remember new size
+            if (idx < images.length) {
+                width = images[idx].getWidth();
+                height = images[idx].getHeight();
+            }
+        }
+        final String[] fileArray = new String[files.size()];
+        return files.toArray(fileArray);
+    }
 
-	/**
-	 * Save a number of images of currently loaded SPR file into one GIF (one image
-	 * beneath the other)
-	 *
-	 * @param fname    Name of GIF file to create (".gif" will NOT be appended)
-	 * @param startIdx Index of first image to store
-	 * @param frames   Number of frames to store
-	 * @throws ExtractException
-	 */
-	void saveAnim(final String fname, final int startIdx, final int frames) throws ExtractException {
-		final int width = images[startIdx].getWidth();
-		final int height = images[startIdx].getHeight();
+    /**
+     * Save a number of images of currently loaded SPR file into one GIF (one
+     * image beneath the other)
+     *
+     * @param fname    Name of GIF file to create (".gif" will NOT be appended)
+     * @param startIdx Index of first image to store
+     * @param frames   Number of frames to store
+     * @throws ExtractException
+     */
+    void saveAnim(final String fname, final int startIdx, final int frames)
+            throws ExtractException {
+        final int width = images[startIdx].getWidth();
+        final int height = images[startIdx].getHeight();
 
-		final byte pixels[] = new byte[width * frames * height];
-		final GIFImage anim = new GIFImage(width, frames * height, pixels, palette);
-		for (int n = 0; n < frames; n++)
-			System.arraycopy(images[startIdx + n].getPixels(), 0, pixels, n * height * width,
-					images[startIdx + n].getPixels().length);
-		// save gif
-		saveGif(anim, fname);
-	}
+        final byte pixels[] = new byte[width * frames * height];
+        final GIFImage anim = new GIFImage(width, frames * height, pixels,
+                palette);
+        for (int n = 0; n < frames; n++)
+            System.arraycopy(images[startIdx + n].getPixels(), 0, pixels,
+                    n * height * width,
+                    images[startIdx + n].getPixels().length);
+        // save gif
+        saveGif(anim, fname);
+    }
 
-	/**
-	 * Save one image as GIF
-	 *
-	 * @param img   Image object to save
-	 * @param fname Name of GIF file to create (".gif" will NOT be appended)
-	 * @throws ExtractException
-	 */
-	public static void saveGif(final GIFImage img, final String fname) throws ExtractException {
-		final GifEncoder gifEnc = new GifEncoder(img.getWidth(), img.getHeight(), img.getPixels(),
-				img.palette.getRed(), img.palette.getGreen(), img.getPalette().getBlue());
+    /**
+     * Save one image as GIF
+     *
+     * @param img   Image object to save
+     * @param fname Name of GIF file to create (".gif" will NOT be appended)
+     * @throws ExtractException
+     */
+    public static void saveGif(final GIFImage img, final String fname)
+            throws ExtractException {
+        final GifEncoder gifEnc = new GifEncoder(img.getWidth(),
+                img.getHeight(), img.getPixels(), img.palette.getRed(),
+                img.palette.getGreen(), img.getPalette().getBlue());
 
-		try (final FileOutputStream f = new FileOutputStream(fname)) {
-			gifEnc.setTransparentPixel(transparentIndex);
-			gifEnc.write(f);
-		} catch (final FileNotFoundException ex) {
-			throw new ExtractException("Can't open file " + fname + " for writing.");
-		} catch (final IOException ex) {
-			throw new ExtractException("I/O error while writing file " + fname);
-		}
-	}
+        try (final FileOutputStream f = new FileOutputStream(fname)) {
+            gifEnc.setTransparentPixel(transparentIndex);
+            gifEnc.write(f);
+        } catch (final FileNotFoundException ex) {
+            throw new ExtractException(
+                    "Can't open file " + fname + " for writing.");
+        } catch (final IOException ex) {
+            throw new ExtractException("I/O error while writing file " + fname);
+        }
+    }
 }

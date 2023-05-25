@@ -3,6 +3,7 @@ package lemmini;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
@@ -31,10 +32,11 @@ import Tools.ToolBox;
  * This service class creates the menu system for the lemmini application.
  */
 public class MenuCreator {
-    private static final class SFXMixerActionListener implements java.awt.event.ActionListener {
+    private static final class SFXMixerActionListener
+            implements java.awt.event.ActionListener {
         @Override
         public void actionPerformed(final java.awt.event.ActionEvent e) {
-            final String mixerNames[] = GameController.sound.getMixers();
+            final String[] mixerNames = GameController.sound.getMixers();
             final String mixerName = e.getActionCommand();
 
             for (int i = 0; i < mixerNames.length; i++) {
@@ -47,22 +49,28 @@ public class MenuCreator {
         }
     }
 
-    private static final class RestartLevelActionListener implements java.awt.event.ActionListener {
+    private static final class RestartLevelActionListener
+            implements java.awt.event.ActionListener {
         @Override
         public void actionPerformed(final java.awt.event.ActionEvent e) {
-            if (!GameController.getLevel().isReady())
-                GameController.requestChangeLevel(GameController.getCurLevelPackIdx(),
-                        GameController.getCurDiffLevel(), GameController.getCurLevelNumber(), false);
-            else
+            if (!GameController.getLevel().isReady()) {
+                GameController.requestChangeLevel(
+                        GameController.getCurLevelPackIdx(),
+                        GameController.getCurDiffLevel(),
+                        GameController.getCurLevelNumber(), false);
+            } else {
                 GameController.requestRestartLevel(false);
+            }
         }
     }
 
-    private static final class LevelMenuActionListener implements java.awt.event.ActionListener {
+    private static final class LevelMenuActionListener
+            implements java.awt.event.ActionListener {
         @Override
         public void actionPerformed(final java.awt.event.ActionEvent e) {
             final LvlMenuItem item = (LvlMenuItem) e.getSource();
-            GameController.requestChangeLevel(item.levelPack, item.diffLevel, item.level, false);
+            GameController.requestChangeLevel(item.levelPack, item.diffLevel,
+                    item.level, false);
         }
     }
 
@@ -113,14 +121,14 @@ public class MenuCreator {
      *
      * @param lemmini              the calling {@link Lemmini} window.
      * @param graphicsPane         the {@link GraphicsPane} associated with the
-     *                             Lemmini
-     *                             window.
+     *                             Lemmini window.
      * @param difficultyLevelMenus
      *
      * @return the initialized menu bar for the Lemmini window.
      */
-    public final JMenuBar getLemminiMenuBar(final Lemmini lemmini, final GraphicsPane graphicsPane,
-            final Map<String, ArrayList<LvlMenuItem>> difficultyLevelMenus) {
+    public final JMenuBar getLemminiMenuBar(final Lemmini lemmini,
+            final GraphicsPane graphicsPane,
+            final Map<String, List<LvlMenuItem>> difficultyLevelMenus) {
         this.lemmini = lemmini;
         // create Menu
         jMenuFile = new JMenu("File");
@@ -201,7 +209,8 @@ public class MenuCreator {
     private void getManagePlayerMenuItem() {
         jMenuItemManagePlayer = new JMenuItem("Manage Players");
 
-        jMenuItemManagePlayer.addActionListener(new ManagePlayerMenuItemActionListener(this, frame));
+        jMenuItemManagePlayer.addActionListener(
+                new ManagePlayerMenuItemActionListener(this, frame));
     }
 
     /**
@@ -254,17 +263,17 @@ public class MenuCreator {
         zoomGroup.add(jMenuRadioItemX3);
 
         switch ((int) Math.round(Core.getScale() * 2)) {
-            case 3:
-                jMenuRadioItemX1P5.setSelected(true);
-                break;
-            case 4:
-                jMenuRadioItemX2.setSelected(true);
-                break;
-            case 6:
-                jMenuRadioItemX3.setSelected(true);
-                break;
-            default:
-                jMenuRadioItemX1.setSelected(true);
+        case 3:
+            jMenuRadioItemX1P5.setSelected(true);
+            break;
+        case 4:
+            jMenuRadioItemX2.setSelected(true);
+            break;
+        case 6:
+            jMenuRadioItemX3.setSelected(true);
+            break;
+        default:
+            jMenuRadioItemX1.setSelected(true);
         }
     }
 
@@ -274,7 +283,8 @@ public class MenuCreator {
      * @return the initialized x3 radio button menu item.
      */
     private JRadioButtonMenuItem getX3RadioButtonMenuItem() {
-        final JRadioButtonMenuItem jMenuRadioItemX3 = new JRadioButtonMenuItem("x3");
+        final JRadioButtonMenuItem jMenuRadioItemX3 = new JRadioButtonMenuItem(
+                "x3");
 
         jMenuRadioItemX3.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -292,14 +302,17 @@ public class MenuCreator {
      * @return the initialized X2.5 radio button menu item.
      */
     private JRadioButtonMenuItem getX2P5RadioButtonMenuItem() {
-        final JRadioButtonMenuItem jMenuRadioItemX2P5 = new JRadioButtonMenuItem("X2.5");
+        final JRadioButtonMenuItem jMenuRadioItemX2P5 = new JRadioButtonMenuItem(
+                "X2.5");
 
-        jMenuRadioItemX2P5.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(final java.awt.event.ActionEvent e) {
-                lemmini.setScale(2.5);
-            }
-        });
+        jMenuRadioItemX2P5
+                .addActionListener(new java.awt.event.ActionListener() {
+                    @Override
+                    public void actionPerformed(
+                            final java.awt.event.ActionEvent e) {
+                        lemmini.setScale(2.5);
+                    }
+                });
 
         return jMenuRadioItemX2P5;
     }
@@ -310,7 +323,8 @@ public class MenuCreator {
      * @return the initialized x2 radio button menu item.
      */
     private JRadioButtonMenuItem getX2RadioButtonMenuItem() {
-        final JRadioButtonMenuItem jMenuRadioItemX2 = new JRadioButtonMenuItem("x2");
+        final JRadioButtonMenuItem jMenuRadioItemX2 = new JRadioButtonMenuItem(
+                "x2");
 
         jMenuRadioItemX2.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -328,14 +342,17 @@ public class MenuCreator {
      * @return the initialized X1.5 radio button menu item.
      */
     private JRadioButtonMenuItem getX1P5RadioButtonMenuItem() {
-        final JRadioButtonMenuItem jMenuRadioItemX1P5 = new JRadioButtonMenuItem("X1.5");
+        final JRadioButtonMenuItem jMenuRadioItemX1P5 = new JRadioButtonMenuItem(
+                "X1.5");
 
-        jMenuRadioItemX1P5.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(final java.awt.event.ActionEvent e) {
-                lemmini.setScale(1.5);
-            }
-        });
+        jMenuRadioItemX1P5
+                .addActionListener(new java.awt.event.ActionListener() {
+                    @Override
+                    public void actionPerformed(
+                            final java.awt.event.ActionEvent e) {
+                        lemmini.setScale(1.5);
+                    }
+                });
 
         return jMenuRadioItemX1P5;
     }
@@ -346,7 +363,8 @@ public class MenuCreator {
      * @return the initialized x1 radio button menu item.
      */
     private JRadioButtonMenuItem getX1RadioButtonMenuItem() {
-        final JRadioButtonMenuItem jMenuRadioItemX1 = new JRadioButtonMenuItem("x1");
+        final JRadioButtonMenuItem jMenuRadioItemX1 = new JRadioButtonMenuItem(
+                "x1");
 
         jMenuRadioItemX1.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -366,23 +384,29 @@ public class MenuCreator {
      */
     private void initializeOptionsMenu(final GraphicsPane graphicsPane) {
         initializeAdvancedSelectCheckboxMenuItem(graphicsPane);
-        jMenuItemClassicalCursor = new JCheckBoxMenuItem("Classical Cursor", false);
-        jMenuItemClassicalCursor.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItemClassicalCursor = new JCheckBoxMenuItem("Classical Cursor",
+                false);
+        jMenuItemClassicalCursor
+                .addActionListener(new java.awt.event.ActionListener() {
 
-            @Override
-            public void actionPerformed(final java.awt.event.ActionEvent e) {
-                final boolean selected = jMenuItemClassicalCursor.isSelected();
-                if (selected) {
-                    GameController.setClassicalCursor(true);
-                } else {
-                    GameController.setClassicalCursor(false);
-                }
+                    @Override
+                    public void actionPerformed(
+                            final java.awt.event.ActionEvent e) {
+                        final boolean selected = jMenuItemClassicalCursor
+                                .isSelected();
+                        if (selected) {
+                            GameController.setClassicalCursor(true);
+                        } else {
+                            GameController.setClassicalCursor(false);
+                        }
 
-                Core.programProps.set("classicalCursor", GameController.isClassicalCursor());
-            }
-        });
+                        Core.programProps.set("classicalCursor",
+                                GameController.isClassicalCursor());
+                    }
+                });
 
-        jMenuItemClassicalCursor.setSelected(GameController.isClassicalCursor());
+        jMenuItemClassicalCursor
+                .setSelected(GameController.isClassicalCursor());
 
         jMenuOptions = new JMenu();
         jMenuOptions.setText("Options");
@@ -396,7 +420,8 @@ public class MenuCreator {
      * @param the {@link GraphicsPane} whose cursor is set to normal if this
      *            checkbox is not selected.
      */
-    private void initializeAdvancedSelectCheckboxMenuItem(final GraphicsPane graphicsPane) {
+    private void initializeAdvancedSelectCheckboxMenuItem(
+            final GraphicsPane graphicsPane) {
         this.graphicsPane = graphicsPane;
         jMenuItemCursor = new JCheckBoxMenuItem("Advanced select", false);
         jMenuItemCursor.addActionListener(new java.awt.event.ActionListener() {
@@ -412,7 +437,8 @@ public class MenuCreator {
                     graphicsPane.setCursor(LemmCursor.Type.NORMAL);
                 }
 
-                Core.programProps.set("advancedSelect", GameController.isAdvancedSelect());
+                Core.programProps.set("advancedSelect",
+                        GameController.isAdvancedSelect());
             }
         });
 
@@ -448,9 +474,10 @@ public class MenuCreator {
      */
     private void initializeSFXMixerMenu() {
         jMenuSFX = new JMenu("SFX Mixer");
-        final String mixerNames[] = GameController.sound.getMixers();
+        final String[] mixerNames = GameController.sound.getMixers();
         final ButtonGroup mixerGroup = new ButtonGroup();
-        String lastMixerName = Core.programProps.get("mixerName", "Java Sound Audio Engine");
+        String lastMixerName = Core.programProps.get("mixerName",
+                "Java Sound Audio Engine");
 
         // special handling of mixer from INI that doesn't exist (any more)
         boolean found = false;
@@ -523,7 +550,9 @@ public class MenuCreator {
 
                 Core.programProps.set("music", GameController.isMusicOn());
 
-                if (GameController.getLevel() != null) { // to be improved: level is running (game state)
+                if (GameController.getLevel() != null) { // to be improved:
+                                                         // level is running
+                                                         // (game state)
                     if (GameController.isMusicOn()) {
                         Music.play();
                     } else {
@@ -541,48 +570,62 @@ public class MenuCreator {
      */
     private void initializeEnterLevelCodeMenuItem() {
         jMenuItemLevelCode = new JMenuItem("Enter Level Code");
-        jMenuItemLevelCode.addActionListener(new java.awt.event.ActionListener() {
-            @Override
-            public void actionPerformed(final java.awt.event.ActionEvent e) {
-                final LevelCodeDialog lcd = new LevelCodeDialog((JFrame) frame, true);
-                lcd.setVisible(true);
-                String levelCode = lcd.getCode();
-                final int lvlPack = lcd.getLevelPack();
+        jMenuItemLevelCode
+                .addActionListener(new java.awt.event.ActionListener() {
+                    @Override
+                    public void actionPerformed(
+                            final java.awt.event.ActionEvent e) {
+                        final LevelCodeDialog lcd = new LevelCodeDialog(
+                                (JFrame) frame, true);
+                        lcd.setVisible(true);
+                        String levelCode = lcd.getCode();
+                        final int lvlPack = lcd.getLevelPack();
 
-                if (levelCode != null && levelCode.length() != 0 && lvlPack > 0) {
-                    levelCode = levelCode.trim();
+                        if (levelCode != null && levelCode.length() != 0
+                                && lvlPack > 0) {
+                            levelCode = levelCode.trim();
 
-                    // cheat mode
-                    if (levelCode.equals("0xdeadbeef")) {
-                        JOptionPane.showMessageDialog(frame, "All levels and debug mode enabled", "Cheater!",
-                                JOptionPane.INFORMATION_MESSAGE);
-                        Core.player.enableCheatMode();
-                        updateLevelMenus();
-                        return;
+                            // cheat mode
+                            if (levelCode.equals("0xdeadbeef")) {
+                                JOptionPane.showMessageDialog(frame,
+                                        "All levels and debug mode enabled",
+                                        "Cheater!",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                                Core.player.enableCheatMode();
+                                updateLevelMenus();
+                                return;
+                            }
+
+                            // real level code -> get absolute level
+                            levelCode = levelCode.toUpperCase();
+                            final LevelPack lpack = GameController
+                                    .getLevelPack(lvlPack);
+                            final int lvlAbs = LevelCode.getLevel(
+                                    lpack.getCodeSeed(), levelCode,
+                                    lpack.getCodeOffset());
+
+                            if (lvlAbs != -1) {
+                                // calculate level pack and relative levelnumber
+                                // from absolute number
+                                final int[] l = GameController
+                                        .relLevelNum(lvlPack, lvlAbs);
+                                final int diffLvl = l[0];
+                                final int lvlRel = l[1];
+                                Core.player.setAvailable(lpack.getName(),
+                                        lpack.getDiffLevels()[diffLvl], lvlRel);
+                                GameController.requestChangeLevel(lvlPack,
+                                        diffLvl, lvlRel, false);
+                                updateLevelMenus();
+                                return;
+                            }
+                        }
+
+                        // not found
+                        JOptionPane.showMessageDialog(frame,
+                                "Invalid Level Code", "Error",
+                                JOptionPane.WARNING_MESSAGE);
                     }
-
-                    // real level code -> get absolute level
-                    levelCode = levelCode.toUpperCase();
-                    final LevelPack lpack = GameController.getLevelPack(lvlPack);
-                    final int lvlAbs = LevelCode.getLevel(lpack.getCodeSeed(), levelCode, lpack.getCodeOffset());
-
-                    if (lvlAbs != -1) {
-                        // calculate level pack and relative levelnumber from absolute number
-                        final int l[] = GameController.relLevelNum(lvlPack, lvlAbs);
-                        final int diffLvl = l[0];
-                        final int lvlRel = l[1];
-                        Core.player.setAvailable(lpack.getName(), lpack.getDiffLevels()[diffLvl], lvlRel);
-                        GameController.requestChangeLevel(lvlPack, diffLvl, lvlRel, false);
-                        updateLevelMenus();
-                        return;
-                    }
-                }
-
-                // not found
-                JOptionPane.showMessageDialog(frame, "Invalid Level Code", "Error",
-                        JOptionPane.WARNING_MESSAGE);
-            }
-        });
+                });
     }
 
     /**
@@ -594,33 +637,39 @@ public class MenuCreator {
         jMenuItemReplay.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(final java.awt.event.ActionEvent e) {
-                final String replayPath = ToolBox.getFileName(lemmini, Core.resourcePath, Core.REPLAY_EXTENSIONS,
-                        true);
+                final String replayPath = ToolBox.getFileName(lemmini,
+                        Core.resourcePath, Core.REPLAY_EXTENSIONS, true);
 
                 if (replayPath != null) {
                     try {
-                        if (ToolBox.getExtension(replayPath).equalsIgnoreCase("rpl")) {
-                            final ReplayLevelInfo rli = GameController.loadReplay(replayPath);
+                        if (ToolBox.getExtension(replayPath)
+                                .equalsIgnoreCase("rpl")) {
+                            final ReplayLevelInfo rli = GameController
+                                    .loadReplay(replayPath);
 
                             if (rli != null) {
                                 int lpn = -1;
 
-                                for (int i = 0; i < GameController.getLevelPackNum(); i++) {
-                                    if (GameController.getLevelPack(i).getName().equals(rli.getLevelPack())) {
+                                for (int i = 0; i < GameController
+                                        .getLevelPackNum(); i++) {
+                                    if (GameController.getLevelPack(i).getName()
+                                            .equals(rli.getLevelPack())) {
                                         lpn = i;
                                     }
                                 }
 
                                 if (lpn > -1) {
-                                    GameController.requestChangeLevel(lpn, rli.getDiffLevel(), rli.getLvlNumber(),
-                                            true);
+                                    GameController.requestChangeLevel(lpn,
+                                            rli.getDiffLevel(),
+                                            rli.getLvlNumber(), true);
                                     return; // success
                                 }
                             }
                         }
 
                         // else: no success
-                        JOptionPane.showMessageDialog(frame, "Wrong format!", "Loading replay failed",
+                        JOptionPane.showMessageDialog(frame, "Wrong format!",
+                                "Loading replay failed",
                                 JOptionPane.INFORMATION_MESSAGE);
                     } catch (final Exception ex) {
                         ToolBox.showException(ex);
@@ -639,29 +688,36 @@ public class MenuCreator {
         jMenuItemLoad.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(final java.awt.event.ActionEvent e) {
-                String p = ToolBox.getFileName(lemmini, lvlPath, Core.LEVEL_EXTENSIONS, true);
+                String p = ToolBox.getFileName(lemmini, lvlPath,
+                        Core.LEVEL_EXTENSIONS, true);
 
                 if (p != null) {
                     try {
                         if (ToolBox.getExtension(p).equalsIgnoreCase("lvl")) {
-                            extract.ExtractLevel.convertLevel(p, Core.resourcePath + "/temp.ini");
+                            extract.ExtractLevel.convertLevel(p,
+                                    Core.resourcePath + "/temp.ini");
                             p = Core.resourcePath + "/temp.ini";
                         }
 
                         if (ToolBox.getExtension(p).equalsIgnoreCase("ini")) {
-                            final String id = new String(ToolBox.getFileID(p, 5));
+                            final String id = new String(
+                                    ToolBox.getFileID(p, 5));
 
                             if (id.equalsIgnoreCase("# LVL")) {
                                 // this is a hack - maybe find a better way
-                                GameController.getLevelPack(0).getInfo(0, 0).setFileName(p);
-                                GameController.getLevelPack(0).getInfo(0, 0).setMusic(Music.getRandomTrack());
-                                GameController.requestChangeLevel(0, 0, 0, false);
+                                GameController.getLevelPack(0).getInfo(0, 0)
+                                        .setFileName(p);
+                                GameController.getLevelPack(0).getInfo(0, 0)
+                                        .setMusic(Music.getRandomTrack());
+                                GameController.requestChangeLevel(0, 0, 0,
+                                        false);
                                 lvlPath = p;
                                 return;
                             }
                         }
 
-                        JOptionPane.showMessageDialog(frame, "Wrong format!", "Loading level failed",
+                        JOptionPane.showMessageDialog(frame, "Wrong format!",
+                                "Loading level failed",
                                 JOptionPane.INFORMATION_MESSAGE);
                     } catch (final Exception ex) {
                         ToolBox.showException(ex);
@@ -685,26 +741,32 @@ public class MenuCreator {
      *
      * @param difficultyLevelMenus
      */
-    private void loadLevelPacksAndCreateLevelMenu(final Map<String, ArrayList<LvlMenuItem>> difficultyLevelMenus) {
+    private void loadLevelPacksAndCreateLevelMenu(
+            final Map<String, List<LvlMenuItem>> difficultyLevelMenus) {
         final java.awt.event.ActionListener lvlListener = new LevelMenuActionListener();
 
         jMenuSelect = new JMenu("Select Level");
 
-        for (int lp = 1; lp < GameController.getLevelPackNum(); lp++) { // skip dummy level pack
+        for (int lp = 1; lp < GameController.getLevelPackNum(); lp++) { // skip
+                                                                        // dummy
+                                                                        // level
+                                                                        // pack
             final LevelPack lPack = GameController.getLevelPack(lp);
             final JMenu jMenuPack = new JMenu(lPack.getName());
-            final String difficulties[] = lPack.getDiffLevels();
+            final String[] difficulties = lPack.getDiffLevels();
 
             for (int i = 0; i < difficulties.length; i++) {
                 // get activated levels for this group
-                final GroupBitfield bf = Core.player.getBitField(lPack.getName(), difficulties[i]);
-                final String names[] = lPack.getLevels(i);
+                final GroupBitfield bf = Core.player
+                        .getBitField(lPack.getName(), difficulties[i]);
+                final String[] names = lPack.getLevels(i);
                 final JMenu jMenuDiff = new JMenu(difficulties[i]);
                 // store menus to access them later
-                final ArrayList<LvlMenuItem> menuItems = new ArrayList<LvlMenuItem>();
+                final List<LvlMenuItem> menuItems = new ArrayList<LvlMenuItem>();
 
                 for (int n = 0; n < names.length; n++) {
-                    final LvlMenuItem jMenuLvl = new LvlMenuItem(names[n], lp, i, n);
+                    final LvlMenuItem jMenuLvl = new LvlMenuItem(names[n], lp,
+                            i, n);
                     jMenuLvl.addActionListener(lvlListener);
 
                     if (Core.player.isAvailable(bf, n)) {
@@ -719,7 +781,9 @@ public class MenuCreator {
 
                 jMenuPack.add(jMenuDiff);
                 // store menus to access them later
-                difficultyLevelMenus.put(LevelPack.getID(lPack.getName(), difficulties[i]), menuItems);
+                difficultyLevelMenus.put(
+                        LevelPack.getID(lPack.getName(), difficulties[i]),
+                        menuItems);
             }
 
             jMenuSelect.add(jMenuPack);
@@ -731,13 +795,17 @@ public class MenuCreator {
      */
     void updateLevelMenus() {
         // update level menus
-        for (int lp = 1; lp < GameController.getLevelPackNum(); lp++) { // skip dummy level pack
+        for (int lp = 1; lp < GameController.getLevelPackNum(); lp++) { // skip
+                                                                        // dummy
+                                                                        // level
+                                                                        // pack
             final LevelPack lPack = GameController.getLevelPack(lp);
-            final String difficulties[] = lPack.getDiffLevels();
+            final String[] difficulties = lPack.getDiffLevels();
 
             for (int i = 0; i < difficulties.length; i++) {
                 // get activated levels for this group
-                final GroupBitfield bf = Core.player.getBitField(lPack.getName(), difficulties[i]);
+                final GroupBitfield bf = Core.player
+                        .getBitField(lPack.getName(), difficulties[i]);
                 lemmini.updateLevelMenu(lPack.getName(), difficulties[i], bf);
             }
         }

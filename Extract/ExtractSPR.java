@@ -1,4 +1,4 @@
-package Extract;
+package extract;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,7 +26,7 @@ import java.util.Arrays;
 
 /**
  * Extract graphics from "Lemming for Win95" SPR data files.
- * 
+ *
  * @author Volker Oth
  */
 public class ExtractSPR {
@@ -45,7 +45,7 @@ public class ExtractSPR {
 
 	/**
 	 * Load palette.
-	 * 
+	 *
 	 * @param fname Name of palette file
 	 * @return ColorModel representation of Palette
 	 * @throws ExtractException
@@ -135,7 +135,7 @@ public class ExtractSPR {
 
 	/**
 	 * Convert byte in unsigned int
-	 * 
+	 *
 	 * @param b Byte to convert
 	 * @return Unsigned value of byte
 	 */
@@ -145,7 +145,7 @@ public class ExtractSPR {
 
 	/**
 	 * Load SPR file. Load palette first!
-	 * 
+	 *
 	 * @param fname Name of SPR file
 	 * @return Array of Images representing all images stored in the SPR file
 	 * @throws ExtractException
@@ -255,7 +255,7 @@ public class ExtractSPR {
 
 	/**
 	 * Save all images of currently loaded SPR file
-	 * 
+	 *
 	 * @param fname     Filename of GIF files to export. "_N.gif" will be appended
 	 *                  with N being the image number.
 	 * @param keepAnims If true, consequently stored imaged with same size will be
@@ -307,7 +307,7 @@ public class ExtractSPR {
 	/**
 	 * Save a number of images of currently loaded SPR file into one GIF (one image
 	 * beneath the other)
-	 * 
+	 *
 	 * @param fname    Name of GIF file to create (".gif" will NOT be appended)
 	 * @param startIdx Index of first image to store
 	 * @param frames   Number of frames to store
@@ -328,7 +328,7 @@ public class ExtractSPR {
 
 	/**
 	 * Save one image as GIF
-	 * 
+	 *
 	 * @param img   Image object to save
 	 * @param fname Name of GIF file to create (".gif" will NOT be appended)
 	 * @throws ExtractException

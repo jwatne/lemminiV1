@@ -1,4 +1,4 @@
-package Extract;
+package extract;
 
 /**
  * Stores GIF Image in RAM.
@@ -15,7 +15,7 @@ class GIFImage {
 
     /**
      * Constructor.
-     * 
+     *
      * @param w   width in pixels.
      * @param h   height in pixels.
      * @param buf pixel data
@@ -30,7 +30,7 @@ class GIFImage {
 
     /**
      * Get pixel data.
-     * 
+     *
      * @return pixel data as array of bytes
      */
     public byte[] getPixels() {
@@ -39,7 +39,7 @@ class GIFImage {
 
     /**
      * Get width in pixels.
-     * 
+     *
      * @return width in pixels
      */
     public int getWidth() {
@@ -48,7 +48,7 @@ class GIFImage {
 
     /**
      * Get height in pixels.
-     * 
+     *
      * @return height in pixels
      */
     public int getHeight() {
@@ -57,7 +57,7 @@ class GIFImage {
 
     /**
      * Get color palette.
-     * 
+     *
      * @return color palette
      */
     public Palette getPalette() {

@@ -19,11 +19,11 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import Extract.Extract;
-import Extract.ExtractException;
 import GUI.LegalDialog;
 import Tools.Props;
 import Tools.ToolBox;
+import extract.Extract;
+import extract.ExtractException;
 
 /*
  * Copyright 2009 Volker Oth
@@ -45,7 +45,7 @@ import Tools.ToolBox;
  * Well, this started as some kind of core class to collect all global stuff
  * Now lots of the functionality moved to GameController.
  * Would need some cleaning up, maybe remove the whole thing?
- * 
+ *
  * @author Volker Oth
  */
 public class Core {
@@ -83,7 +83,7 @@ public class Core {
 
 	/**
 	 * Initialize some core elements.
-	 * 
+	 *
 	 * @param frame parent frame
 	 * @throws LemmException
 	 * @throws IOException
@@ -149,7 +149,7 @@ public class Core {
 
 	/**
 	 * Reads main INI file.
-	 * 
+	 *
 	 * @throws LemmException if user aborts the initialization; that is, if they do
 	 *                       not specify source and destination paths for resources
 	 *                       from original Lemmings game disk.
@@ -170,7 +170,7 @@ public class Core {
 
 	/**
 	 * Initializes resources.
-	 * 
+	 *
 	 * @throws LemmException in unable to load resources from files.
 	 */
 	private static void initializeResources() throws LemmException {
@@ -207,7 +207,7 @@ public class Core {
 
 	/**
 	 * Sets the player for the game to use.
-	 * 
+	 *
 	 * @param defaultPlayer the default player.
 	 */
 	private static void setPlayer(final String defaultPlayer) {
@@ -222,7 +222,7 @@ public class Core {
 
 	/**
 	 * Reads player name from INI file and returns name of default player.
-	 * 
+	 *
 	 * @return the name of the default player.
 	 */
 	private static String getDefaultPlayer() {
@@ -248,7 +248,7 @@ public class Core {
 
 	/**
 	 * Get String to resource in resource path.
-	 * 
+	 *
 	 * @param fname file name (without path)
 	 * @return absolute path to resource
 	 */
@@ -269,7 +269,7 @@ public class Core {
 
 	/**
 	 * Output error message box in case of a missing resource.
-	 * 
+	 *
 	 * @param rsrc name missing of resource.
 	 */
 	public static void resourceError(final String rsrc) {
@@ -284,7 +284,7 @@ public class Core {
 
 	/**
 	 * Load an image from the resource path.
-	 * 
+	 *
 	 * @param tracker media tracker
 	 * @param fName   file name
 	 * @return Image
@@ -305,7 +305,7 @@ public class Core {
 	/**
 	 * Load an image from either the resource path or from inside the JAR (or the
 	 * directory of the main class).
-	 * 
+	 *
 	 * @param tracker media tracker
 	 * @param fName   file name
 	 * @param jar     true: load from the jar/class path, false: load from resource
@@ -345,7 +345,7 @@ public class Core {
 
 	/**
 	 * Load an image from the resource path.
-	 * 
+	 *
 	 * @param fname file name
 	 * @param frame the parent component (main frame of the application).
 	 * @return Image
@@ -364,7 +364,7 @@ public class Core {
 
 	/**
 	 * Load an image from inside the JAR or the directory of the main class.
-	 * 
+	 *
 	 * @param fname
 	 * @param frame the parent component (main frame of the application).
 	 * @return Image
@@ -383,7 +383,7 @@ public class Core {
 
 	/**
 	 * Get player name via index.
-	 * 
+	 *
 	 * @param idx player index
 	 * @return player name
 	 */
@@ -393,7 +393,7 @@ public class Core {
 
 	/**
 	 * Get number of players.
-	 * 
+	 *
 	 * @return number of player.
 	 */
 	public static int getPlayerNum() {
@@ -414,7 +414,7 @@ public class Core {
 
 	/**
 	 * Add player.
-	 * 
+	 *
 	 * @param name player name
 	 */
 	public static void addPlayer(final String name) {
@@ -424,7 +424,7 @@ public class Core {
 
 	/**
 	 * Get internal Draw Width
-	 * 
+	 *
 	 * @return internal draw width
 	 */
 	public static int getDrawWidth() {
@@ -433,7 +433,7 @@ public class Core {
 
 	/**
 	 * Get internal Draw Height
-	 * 
+	 *
 	 * @return internal draw width
 	 */
 	public static int getDrawHeight() {
@@ -442,7 +442,7 @@ public class Core {
 
 	/**
 	 * Get Zoom scale
-	 * 
+	 *
 	 * @return zoom scale
 	 */
 	public static double getScale() {
@@ -451,7 +451,7 @@ public class Core {
 
 	/**
 	 * Set zoom scale
-	 * 
+	 *
 	 * @param s zoom scale
 	 */
 	public static void setScale(final double s) {

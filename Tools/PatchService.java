@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.zip.Adler32;
 
-import Extract.Diff;
-import Extract.DiffException;
-import Extract.Extract;
-import Extract.ExtractException;
+import extract.Diff;
+import extract.DiffException;
+import extract.Extract;
+import extract.ExtractException;
 
 /**
  * Service for patching files.
@@ -52,7 +52,7 @@ public class PatchService {
 
     /**
      * Create DIF and CRC files, if enabled.
-     * 
+     *
      * @param props           the Properties for the game.
      * @param referencePath   reference path for creation of DIF files
      * @param destinationPath Destination path (Lemmini resource) for extraction.
@@ -97,9 +97,9 @@ public class PatchService {
 
     /**
      * Step 8 of Extract thread run: use patch.ini to extract/patch all files.
-     * 
+     *
      * @param destinationPath Destination path (Lemmini resource) for extraction.
-     * 
+     *
      * @throws ExtractException if unable to use patch.ini to extract/patch all
      *                          files.
      */
@@ -145,7 +145,7 @@ public class PatchService {
 
     /**
      * Create CRCs for resources (development).
-     * 
+     *
      * @param rPath     The root path with the files to create CRCs for
      * @param sDir      SubDir to create patches for
      * @param fCRCList  FileWriter to create crc.ini
@@ -212,7 +212,7 @@ public class PatchService {
 
     /**
      * Step 7 of Extract thread run: create patches and patch.ini.
-     * 
+     *
      * @param props           the Properties for the game.
      * @param patchPath       Path of the DIF files.
      * @param referencePath   Reference path for creation of DIF files.
@@ -249,7 +249,7 @@ public class PatchService {
     /**
      * Create the DIF files from reference files and the extracted files
      * (development).
-     * 
+     *
      * @param sPath        The path with the original (wanted) files
      * @param dPath        The patch with the differing (to be patched) files
      * @param subDir       SubDir to create patches for
@@ -272,7 +272,7 @@ public class PatchService {
 
     /**
      * Loop through the List of Files to patch and patch them.
-     * 
+     *
      * @param sDir         The path with the original (wanted) files
      * @param fPatchList   FileWriter to create patch.ini
      * @param fSource      a File representation of the folder containing the source
@@ -366,7 +366,7 @@ public class PatchService {
 
     /**
      * Indicates whether the target files exists.
-     * 
+     *
      * @param fnOut        the name of the target file.
      * @param createdFiles Map of the files created.
      * @return <code>true</code> if the target file exists.
@@ -385,7 +385,7 @@ public class PatchService {
     /**
      * Given that the specified file does not exist, mark it as missing and needing
      * to be extracted from the JAR file. Then, copy missing files to the patch dir.
-     * 
+     *
      * @param fPatchList FileWriter to create patch.ini.
      * @param files      A List of Files in the source path.
      * @param subDir     SubDir to create patches for.
@@ -412,7 +412,7 @@ public class PatchService {
     /**
      * Writes the patch file if the patch is not null, or writes the appropriate
      * check Property if it is null.
-     * 
+     *
      * @param fPatchList FileWriter to create patch.ini.
      * @param out        String with full path and filename + CRC for patch file.
      * @param fnPatch    Path and filename for .DIF file.
@@ -439,7 +439,7 @@ public class PatchService {
 
     /**
      * Patch files, if enabled.
-     * 
+     *
      * @param pprops          Properties from the patch.ini file.
      * @param destinationPath Destination path (Lemmini resource) for extraction.
      * @throws ExtractException if unable to patch files.
@@ -490,7 +490,7 @@ public class PatchService {
 
     /**
      * Get only the name of the file from an absolute path.
-     * 
+     *
      * @param path absolute path of a file
      * @return file name without the path
      */
@@ -513,7 +513,7 @@ public class PatchService {
 
     /**
      * Copy a file.
-     * 
+     *
      * @param source      URL of source file
      * @param destination full destination file name including path
      * @throws FileNotFoundException
@@ -528,7 +528,7 @@ public class PatchService {
 
     /**
      * Read file into an array of byte.
-     * 
+     *
      * @param fname file name as URL
      * @return array of byte
      * @throws ExtractException
@@ -565,7 +565,7 @@ public class PatchService {
 
     /**
      * Write array of byte to file.
-     * 
+     *
      * @param fname file name
      * @param buf   array of byte
      * @throws ExtractException

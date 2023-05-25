@@ -1,4 +1,4 @@
-package Extract;
+package extract;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,7 +87,7 @@ public class ExtractLevel {
 
 	/**
 	 * Convert one binary LVL file into text file
-	 * 
+	 *
 	 * @param fnIn  Name of binary LVL file
 	 * @param fnOut Name of target text file
 	 * @throws Exception
@@ -270,7 +270,7 @@ public class ExtractLevel {
 
 /**
  * Storage class for level objects.
- * 
+ *
  * @author Volker Oth
  */
 class LvlObject {
@@ -296,7 +296,7 @@ class LvlObject {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param b     buffer
 	 * @param scale Scale (to convert lowres levels into hires levels)
 	 */
@@ -335,7 +335,7 @@ class LvlObject {
 
 /**
  * Storage class for terrain tiles.
- * 
+ *
  * @author Volker Oth
  */
 class Terrain {
@@ -350,7 +350,7 @@ class Terrain {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param b     buffer
 	 * @param scale Scale (to convert lowres levels into hires levels)
 	 */
@@ -380,7 +380,7 @@ class Terrain {
 /**
  *
  * Storage class for steel areas.
- * 
+ *
  * @author Volker Oth
  */
 class Steel {
@@ -395,7 +395,7 @@ class Steel {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param b     buffer
 	 * @param scale Scale (to convert lowres levels into hires levels)
 	 */
@@ -418,7 +418,7 @@ class Steel {
 
 /**
  * Abstraction layer for binary level in byte buffer.
- * 
+ *
  * @author Volker Oth
  */
 class LevelBuffer {
@@ -429,7 +429,7 @@ class LevelBuffer {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param b array of byte to use as buffer
 	 */
 	LevelBuffer(final byte b[]) {
@@ -439,7 +439,7 @@ class LevelBuffer {
 
 	/**
 	 * Get word (2 bytes, little endian) at current position.
-	 * 
+	 *
 	 * @return word at current position
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
@@ -449,7 +449,7 @@ class LevelBuffer {
 
 	/**
 	 * Get byte at current position.
-	 * 
+	 *
 	 * @return byte at current position
 	 * @throws ArrayIndexOutOfBoundsException
 	 */

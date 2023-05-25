@@ -1,8 +1,8 @@
-package Extract;
+package extract;
 
 /**
  * Generic Exception for Diff.
- * 
+ *
  * @author Volker Oth
  */
 public class DiffException extends Exception {
@@ -17,7 +17,7 @@ public class DiffException extends Exception {
 
     /**
      * Constructor.
-     * 
+     *
      * @param s Exception string
      */
     public DiffException(final String s) {

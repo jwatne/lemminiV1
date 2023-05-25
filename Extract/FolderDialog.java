@@ -1,4 +1,4 @@
-package Extract;
+package extract;
 
 /*
  * Copyright 2009 Volker Oth

@@ -1,4 +1,4 @@
-package Extract;
+package extract;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class Diff {
 
 	/**
 	 * Set diff parameters
-	 * 
+	 *
 	 * @param winLen    Length of windows to search for re-synchronization
 	 * @param resyncLen Number of equal bytes needed for re-synchronization
 	 */
@@ -68,7 +68,7 @@ public class Diff {
 
 	/**
 	 * Create diff buffer from the differences between source and target buffer
-	 * 
+	 *
 	 * @param bsrc source buffer (the file to be patched)
 	 * @param btrg target buffer (the file as it should be)
 	 * @return buffer of differences
@@ -240,7 +240,7 @@ public class Diff {
 
 	/**
 	 * Create a target buffer from a source buffer and a buffer of differences
-	 * 
+	 *
 	 * @param bsrc   source buffer
 	 * @param bpatch buffer containing differences
 	 * @return target buffer created from a source buffer and a buffer of
@@ -332,7 +332,7 @@ public class Diff {
 	 * Lengths/Offset are stored as 7bit values. The 8th bit is used as marker if
 	 * the number
 	 * is continued in the next byte.
-	 * 
+	 *
 	 * @param b Buffer from which to read the length/offset
 	 * @return integer value of length/offset
 	 * @throws ArrayIndexOutOfBoundsException
@@ -361,7 +361,7 @@ public class Diff {
 	 * continued in next byte
 	 * So 127 is stored as 0x7f, but 128 is stored as 0x80 0x01 (where 0x80 means 0,
 	 * highest bit is marker)
-	 * 
+	 *
 	 * @param l     Patch list to add length/offset in 7bit encoding
 	 * @param value Value to add in 7bit encoding
 	 */
@@ -376,7 +376,7 @@ public class Diff {
 
 	/**
 	 * Check for "insert" difference
-	 * 
+	 *
 	 * @param src source buffer
 	 * @param trg target buffer
 	 * @return number of bytes inserted
@@ -405,7 +405,7 @@ public class Diff {
 
 	/**
 	 * Check for "delete" difference
-	 * 
+	 *
 	 * @param src source buffer
 	 * @param trg target buffer
 	 * @return number of bytes deleted
@@ -434,7 +434,7 @@ public class Diff {
 
 	/**
 	 * Check for "replace" difference
-	 * 
+	 *
 	 * @param src source buffer
 	 * @param trg target buffer
 	 * @return number of bytes replaced
@@ -463,13 +463,13 @@ public class Diff {
 
 	/**
 	 * Check for "substitute" difference
-	 * 
+	 *
 	 * @param src source buffer
 	 * @param trg target buffer
 	 * @return integer array: [0]: number of bytes to delete in source, [1]: number
 	 *         of bytes to insert in target
 	 * @throws ArrayIndexOutOfBoundsException
-	 * 
+	 *
 	 */
 	private static int[] checkSubstitute(final Buffer src, final Buffer trg) throws ArrayIndexOutOfBoundsException {
 		final byte[] bs = src.getData();
@@ -520,7 +520,7 @@ public class Diff {
 
 	/**
 	 * Write DWord to difference list
-	 * 
+	 *
 	 * @param l   difference list
 	 * @param val DWord value
 	 */
@@ -550,7 +550,7 @@ class Buffer {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param size buffer size in bytes
 	 */
 	Buffer(final int size) {
@@ -560,7 +560,7 @@ class Buffer {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param b array of byte to use as buffer
 	 */
 	Buffer(final byte b[]) {
@@ -570,7 +570,7 @@ class Buffer {
 
 	/**
 	 * Get size of buffer.
-	 * 
+	 *
 	 * @return size of buffer in bytes
 	 */
 	int length() {
@@ -579,7 +579,7 @@ class Buffer {
 
 	/**
 	 * Get current byte index.
-	 * 
+	 *
 	 * @return current byte index
 	 */
 	int getIndex() {
@@ -588,7 +588,7 @@ class Buffer {
 
 	/**
 	 * Get data buffer.
-	 * 
+	 *
 	 * @return data buffer
 	 */
 	byte[] getData() {
@@ -597,7 +597,7 @@ class Buffer {
 
 	/**
 	 * Set index to new byte position.
-	 * 
+	 *
 	 * @param idx index to new byte position
 	 */
 	void setIndex(final int idx) {
@@ -606,7 +606,7 @@ class Buffer {
 
 	/**
 	 * Get byte at current position.
-	 * 
+	 *
 	 * @return byte at current position
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
@@ -616,7 +616,7 @@ class Buffer {
 
 	/**
 	 * Set byte at current position, increase index by 1.
-	 * 
+	 *
 	 * @param val byte value to write
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
@@ -626,7 +626,7 @@ class Buffer {
 
 	/**
 	 * Get word (2 bytes, little endian) at current position.
-	 * 
+	 *
 	 * @return word at current position
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
@@ -636,7 +636,7 @@ class Buffer {
 
 	/**
 	 * Set word (2 bytes, little endian) at current position, increase index by 2.
-	 * 
+	 *
 	 * @param val word to write at current position
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
@@ -647,7 +647,7 @@ class Buffer {
 
 	/**
 	 * Get double word (4 bytes, little endian) at current position.
-	 * 
+	 *
 	 * @return dword at current position
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
@@ -658,7 +658,7 @@ class Buffer {
 	/**
 	 * Set double word (4 bytes, little endian) at current position, increase index
 	 * by 4.
-	 * 
+	 *
 	 * @param val dword to write at current position
 	 * @throws ArrayIndexOutOfBoundsException
 	 */

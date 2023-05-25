@@ -1,4 +1,4 @@
-package Extract;
+package extract;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -54,7 +54,7 @@ public class GifEncoder {
 
 	/**
 	 * Constructs a new GifEncoder.
-	 * 
+	 *
 	 * @param width  The image width.
 	 * @param height The image height.
 	 * @param pixels The pixel data.
@@ -78,7 +78,7 @@ public class GifEncoder {
 	/**
 	 * Constructs a new GifEncoder using an 8-bit AWT Image.
 	 * The image is assumed to be fully loaded.
-	 * 
+	 *
 	 * @param img Image
 	 */
 	public GifEncoder(final BufferedImage img) {
@@ -122,7 +122,7 @@ public class GifEncoder {
 
 	/**
 	 * Saves the image as a GIF file.
-	 * 
+	 *
 	 * @param out Output stream to write to
 	 * @throws IOException
 	 */
@@ -156,7 +156,7 @@ public class GifEncoder {
 	// hpm
 	/**
 	 * Set transparent pixel color (palette index)
-	 * 
+	 *
 	 * @param pixel transparent pixel color (palette index)
 	 */
 	public void setTransparentPixel(final int pixel) {
@@ -166,7 +166,7 @@ public class GifEncoder {
 	// hpm
 	/**
 	 * Get transparent pixel color (palette index)
-	 * 
+	 *
 	 * @return transparent pixel color (palette index)
 	 */
 	public int getTransparentPixel() {

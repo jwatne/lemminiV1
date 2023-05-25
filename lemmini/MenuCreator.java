@@ -96,7 +96,7 @@ public class MenuCreator {
 
     /**
      * Initializes the MenuCreator.
-     * 
+     *
      * @param frame the parent component (main frame of the application).
      */
     public MenuCreator(final JFrame frame) {
@@ -110,13 +110,13 @@ public class MenuCreator {
 
     /**
      * Returns the initialized menu bar for the Lemmini window.
-     * 
+     *
      * @param lemmini              the calling {@link Lemmini} window.
      * @param graphicsPane         the {@link GraphicsPane} associated with the
      *                             Lemmini
      *                             window.
      * @param difficultyLevelMenus
-     * 
+     *
      * @return the initialized menu bar for the Lemmini window.
      */
     public final JMenuBar getLemminiMenuBar(final Lemmini lemmini, final GraphicsPane graphicsPane,
@@ -206,7 +206,7 @@ public class MenuCreator {
 
     /**
      * Add a menu item for a player.
-     * 
+     *
      * @param name player name
      * @return JCheckBoxMenuItem
      */
@@ -270,7 +270,7 @@ public class MenuCreator {
 
     /**
      * Returns the initialized x3 radio button menu item.
-     * 
+     *
      * @return the initialized x3 radio button menu item.
      */
     private JRadioButtonMenuItem getX3RadioButtonMenuItem() {
@@ -288,7 +288,7 @@ public class MenuCreator {
 
     /**
      * Returns the initialized X2.5 radio button menu item.
-     * 
+     *
      * @return the initialized X2.5 radio button menu item.
      */
     private JRadioButtonMenuItem getX2P5RadioButtonMenuItem() {
@@ -306,7 +306,7 @@ public class MenuCreator {
 
     /**
      * Returns the initialized x2 radio button menu item.
-     * 
+     *
      * @return the initialized x2 radio button menu item.
      */
     private JRadioButtonMenuItem getX2RadioButtonMenuItem() {
@@ -324,7 +324,7 @@ public class MenuCreator {
 
     /**
      * Returns the initialized X1.5 radio button menu item.
-     * 
+     *
      * @return the initialized X1.5 radio button menu item.
      */
     private JRadioButtonMenuItem getX1P5RadioButtonMenuItem() {
@@ -342,7 +342,7 @@ public class MenuCreator {
 
     /**
      * Returns the initialized x1 radio button menu item.
-     * 
+     *
      * @return the initialized x1 radio button menu item.
      */
     private JRadioButtonMenuItem getX1RadioButtonMenuItem() {
@@ -360,7 +360,7 @@ public class MenuCreator {
 
     /**
      * Initializes the Options menu.
-     * 
+     *
      * @param graphicsPane the {@link GraphicsPane} to which the Options menu is
      *                     assigned.
      */
@@ -392,7 +392,7 @@ public class MenuCreator {
 
     /**
      * Initializes Advanced select checkbox menu item.
-     * 
+     *
      * @param the {@link GraphicsPane} whose cursor is set to normal if this
      *            checkbox is not selected.
      */
@@ -644,7 +644,7 @@ public class MenuCreator {
                 if (p != null) {
                     try {
                         if (ToolBox.getExtension(p).equalsIgnoreCase("lvl")) {
-                            Extract.ExtractLevel.convertLevel(p, Core.resourcePath + "/temp.ini");
+                            extract.ExtractLevel.convertLevel(p, Core.resourcePath + "/temp.ini");
                             p = Core.resourcePath + "/temp.ini";
                         }
 
@@ -682,7 +682,7 @@ public class MenuCreator {
 
     /**
      * Loads level packs and creates the level menu.
-     * 
+     *
      * @param difficultyLevelMenus
      */
     private void loadLevelPacksAndCreateLevelMenu(final Map<String, ArrayList<LvlMenuItem>> difficultyLevelMenus) {

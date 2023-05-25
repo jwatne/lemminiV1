@@ -1,11 +1,11 @@
-package Extract;
+package extract;
 
 import java.io.File;
 import java.io.FilenameFilter;
 
 /**
  * File name filter for level files.
- * 
+ *
  * @author Volker Oth
  */
 public class LvlFilter implements FilenameFilter {

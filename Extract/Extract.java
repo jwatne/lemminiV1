@@ -1,4 +1,4 @@
-package Extract;
+package extract;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -66,7 +66,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Display an exception message box.
-	 * 
+	 *
 	 * @param ex Exception
 	 */
 	private static void showException(final Throwable ex) {
@@ -139,7 +139,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Validate that the program has access to a valid WINLEMM installation's files.
-	 * 
+	 *
 	 * @throws ExtractException if an extraction error occurs.
 	 */
 	private void validateWINLEMM() throws ExtractException {
@@ -181,7 +181,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Step 6 of Extract thread run: clone files inside destination dir.
-	 * 
+	 *
 	 * @param props the Properties for the game.
 	 * @throws ExtractException if an extraction error occurs.
 	 */
@@ -212,7 +212,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Step 5 of Extract thread run: copy stuff.
-	 * 
+	 *
 	 * @param props the Properties for the game.
 	 * @throws ExtractException if unable to copy stuff.
 	 */
@@ -243,7 +243,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Step 4 of Extract thread run: create directories.
-	 * 
+	 *
 	 * @param props the Properties for the game.
 	 * @throws ExtractException if unable to create directories.
 	 */
@@ -268,7 +268,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Step 3 of Extract thread run: extract the objects.
-	 * 
+	 *
 	 * @param props  the Properties for the game.
 	 * @param sprite Extract graphics from "Lemming for Win95" SPR data files.
 	 * @throws ExtractException if unable to extract the objects.
@@ -315,7 +315,7 @@ public class Extract extends Thread {
 	/**
 	 * Step 2 of Extract thread run: extract the styles and return Extract graphics
 	 * from "Lemming for Win95" SPR data files.
-	 * 
+	 *
 	 * @param props the Properties for the game.
 	 * @return Extract graphics from "Lemming for Win95" SPR data files.
 	 * @throws ExtractException if unable to extract the styles.
@@ -355,7 +355,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Step 1 of Extract thread run: extract the levels.
-	 * 
+	 *
 	 * @param props the properties for the game.
 	 * @throws ExtractException if unable to retrieve the levels.
 	 */
@@ -379,7 +379,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Get source path (WINLEMM) for extraction.
-	 * 
+	 *
 	 * @return source path (WINLEMM) for extraction
 	 */
 	public static String getSOURCE_PATH() {
@@ -388,7 +388,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Get destination path (Lemmini resource) for extraction.
-	 * 
+	 *
 	 * @return destination path (Lemmini resource) for extraction
 	 */
 	public static String getResourcePath() {
@@ -397,7 +397,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Extract all resources and create patch.ini if referencePath is not null
-	 * 
+	 *
 	 * @param frame   parent frame
 	 * @param srcPath WINLEMM directory
 	 * @param dstPath target (installation) directory. May also be a relative path
@@ -463,7 +463,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Extract the level INI files from LVL files
-	 * 
+	 *
 	 * @param r    name of root folder (source of LVL files)
 	 * @param dest destination folder for extraction (resource folder)
 	 * @throws ExtractException
@@ -509,7 +509,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Add separator "/" to path name (if there isn't one yet)
-	 * 
+	 *
 	 * @param fName path name with or without separator
 	 * @return path name with separator
 	 */
@@ -530,7 +530,7 @@ public class Extract extends Thread {
 	/**
 	 * Exchange all Windows style file separators ("\") with Unix style seaparators
 	 * ("/")
-	 * 
+	 *
 	 * @param fName file name
 	 * @return file name with only Unix style separators
 	 */
@@ -547,7 +547,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Copy a file.
-	 * 
+	 *
 	 * @param source      full source file name including path
 	 * @param destination full destination file name including path
 	 * @throws FileNotFoundException
@@ -565,7 +565,7 @@ public class Extract extends Thread {
 	 * Read data from the already opened input stream and write to the already
 	 * opened output stream. Calling code is responsible for closing both, most
 	 * likely by initializing them both in a try-with-resources block.
-	 * 
+	 *
 	 * @param source      the source input stream.
 	 * @param destination the destination output stream.
 	 * @throws IOException if an I/O error occurs.
@@ -582,7 +582,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Read file into an array of byte.
-	 * 
+	 *
 	 * @param fname file name
 	 * @return array of byte
 	 * @throws ExtractException
@@ -611,7 +611,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Find a file.
-	 * 
+	 *
 	 * @param fname File name (without absolute path)
 	 * @return URL to file
 	 */
@@ -632,7 +632,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Print string to output dialog.
-	 * 
+	 *
 	 * @param s string to print
 	 */
 	public static void out(final String s) {
@@ -644,7 +644,7 @@ public class Extract extends Thread {
 
 	/**
 	 * Return cancel state of output dialog
-	 * 
+	 *
 	 * @throws ExtractException
 	 */
 	public static void checkCancel() throws ExtractException {

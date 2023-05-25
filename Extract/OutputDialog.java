@@ -1,4 +1,4 @@
-package Extract;
+package extract;
 
 import javax.swing.JPanel;
 import java.awt.GraphicsEnvironment;

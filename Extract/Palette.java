@@ -1,8 +1,8 @@
-package Extract;
+package extract;
 
 /**
  * Storage class for palettes.
- * 
+ *
  * @author Volker Oth
  */
 class Palette {
@@ -15,7 +15,7 @@ class Palette {
 
     /**
      * Create palette from array of color components
-     * 
+     *
      * @param r byte array of red components
      * @param g byte array of green components
      * @param b byte array of blue components
@@ -28,7 +28,7 @@ class Palette {
 
     /**
      * Get blue components.
-     * 
+     *
      * @return byte array of blue components
      */
     public byte[] getBlue() {
@@ -37,7 +37,7 @@ class Palette {
 
     /**
      * Get green components.
-     * 
+     *
      * @return byte array of green components
      */
     public byte[] getGreen() {
@@ -46,7 +46,7 @@ class Palette {
 
     /**
      * Get red components.
-     * 
+     *
      * @return byte array of red components
      */
     public byte[] getRed() {

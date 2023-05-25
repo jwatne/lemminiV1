@@ -6,7 +6,7 @@ package extract;
  * @author Volker Oth
  */
 public class DiffException extends Exception {
-    private final static long serialVersionUID = 0x000000001;
+    private static final long serialVersionUID = 0x000000001;
 
     /**
      * Constructor.

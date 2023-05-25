@@ -2,5 +2,12 @@ Thumbs.db
 .VSCodeCounter/*
 lemminiV1.jar
 config/
-Extract/
 .vscode/
+extract/*.ini
+extract/levels/
+extract/misc/*.gif
+extract/misc/
+extract/music/
+extract/players/
+extract/sound/
+extract/styles/

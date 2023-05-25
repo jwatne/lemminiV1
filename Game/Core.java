@@ -48,7 +48,7 @@ import extract.ExtractException;
  *
  * @author Volker Oth
  */
-public class Core {
+public final class Core {
     /**
      * The revision string for resource compatibility - not necessarily the
      * version number

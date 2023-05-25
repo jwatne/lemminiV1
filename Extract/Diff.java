@@ -29,7 +29,7 @@ import java.util.zip.Adler32;
  *
  * @author Volker Oth
  */
-public class Diff {
+public final class Diff {
     /** insert n bytes */
     private static final byte INSERT = 0;
     /** delete n bytes */
@@ -327,8 +327,9 @@ public class Diff {
                     final int lenT = getLen(patch);
                     out("Substitute: " + len + "/" + lenT);
                     src.setIndex(src.getIndex() + len);
-                    for (int r = 0; r < lenT; r++)
+                    for (int r = 0; r < lenT; r++) {
                         trg.setByte((byte) patch.getByte());
+                    }
                     break;
                 default:
                     throw new DiffException("Unknown command " + cmd
@@ -425,8 +426,9 @@ public class Diff {
         for (int w = 1; w < len; w++) {
             int r;
             for (r = 0; r < resyncLength; r++) {
-                if (bs[is + r] != bt[it + w + r])
+                if (bs[is + r] != bt[it + w + r]) {
                     break;
+                }
             }
             if (r == resyncLength) {
                 return w;
@@ -459,8 +461,9 @@ public class Diff {
         for (int w = 1; w < len; w++) {
             int r;
             for (r = 0; r < resyncLength; r++) {
-                if (bs[is + w + r] != bt[it + r])
+                if (bs[is + w + r] != bt[it + r]) {
                     break;
+                }
             }
             if (r == resyncLength) {
                 return w;
@@ -493,8 +496,9 @@ public class Diff {
         for (int w = 1; w < len; w++) {
             int r;
             for (r = 0; r < resyncLength; r++) {
-                if (bs[is + w + r] != bt[it + w + r])
+                if (bs[is + w + r] != bt[it + w + r]) {
                     break;
+                }
             }
             if (r == resyncLength) {
                 return w;
@@ -533,8 +537,9 @@ public class Diff {
             for (int wt = 1; wt < len; wt++) {
                 int r;
                 for (r = 0; r < resyncLength; r++) {
-                    if (bs[is + ws + r] != bt[it + wt + r])
+                    if (bs[is + ws + r] != bt[it + wt + r]) {
                         break;
+                    }
                 }
                 if (r == resyncLength) {
                     final int[] retVal = new int[2];

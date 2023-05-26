@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +67,7 @@ public class LevelPack {
 
 	/**
 	 * Constructor for loading a level pack.
-	 * 
+	 *
 	 * @param fname file name of level pack ini
 	 * @throws ResourceException
 	 */
@@ -138,7 +138,7 @@ public class LevelPack {
 
 	/**
 	 * Assemble level pack and difficulty level to string.
-	 * 
+	 *
 	 * @param pack level pack
 	 * @param diff name of difficulty level
 	 * @return String formed from level pack and difficulty level
@@ -149,7 +149,7 @@ public class LevelPack {
 
 	/**
 	 * Return levels of difficulty as string array.
-	 * 
+	 *
 	 * @return levels of difficulty as string array
 	 */
 	public String[] getDiffLevels() {
@@ -160,7 +160,7 @@ public class LevelPack {
 
 	/**
 	 * Get name of level pack.
-	 * 
+	 *
 	 * @return name of level pack
 	 */
 	public String getName() {
@@ -169,7 +169,7 @@ public class LevelPack {
 
 	/**
 	 * Get code seed.
-	 * 
+	 *
 	 * @return code seed.
 	 */
 	public String getCodeSeed() {
@@ -178,7 +178,7 @@ public class LevelPack {
 
 	/**
 	 * Get maximum fall distance.
-	 * 
+	 *
 	 * @return maximum fall distance
 	 */
 	public int getMaxFallDistance() {
@@ -187,7 +187,7 @@ public class LevelPack {
 
 	/**
 	 * Get offset to apply in level code algorithm.
-	 * 
+	 *
 	 * @return offset to apply in level code algorithm
 	 */
 	public int getCodeOffset() {
@@ -196,7 +196,7 @@ public class LevelPack {
 
 	/**
 	 * Get level info for a certain level.
-	 * 
+	 *
 	 * @param diffLvl difficulty level
 	 * @param level   level number
 	 * @return LevelInfo for the given level
@@ -207,7 +207,7 @@ public class LevelPack {
 
 	/**
 	 * Return all levels for a given difficulty
-	 * 
+	 *
 	 * @param diffLevel number of difficulty level
 	 * @return level names as string array
 	 */

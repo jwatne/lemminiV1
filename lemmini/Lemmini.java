@@ -24,18 +24,18 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import Game.Core;
-import Game.GameController;
-import Game.GroupBitfield;
-import Game.Icons;
-import Game.LemmCursor;
-import Game.LemmException;
-import Game.Lemming;
-import Game.Level;
-import Game.LevelPack;
-import Game.ResourceException;
 import GameUtil.Fader;
 import Tools.ToolBox;
+import game.Core;
+import game.GameController;
+import game.GroupBitfield;
+import game.Icons;
+import game.LemmCursor;
+import game.LemmException;
+import game.Lemming;
+import game.Level;
+import game.LevelPack;
+import game.ResourceException;
 
 /*
  * Copyright 2009 Volker Oth
@@ -599,8 +599,7 @@ public class Lemmini extends JFrame implements KeyListener {
     }
 
     @Override
-    public void keyTyped(final KeyEvent keyevent) {
-    }
+    public void keyTyped(final KeyEvent keyevent) {}
 
     /**
      * Common exit method to use in exit events.

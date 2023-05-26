@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.awt.Component;
 import java.awt.Image;
@@ -94,7 +94,7 @@ public class Lemming {
 
 		/**
 		 * Reverse lookup implemented via hashtable.
-		 * 
+		 *
 		 * @param val Ordinal value
 		 * @return Parameter with ordinal value val
 		 */
@@ -118,7 +118,7 @@ public class Lemming {
 
 		/**
 		 * Reverse lookup implemented via hashtable.
-		 * 
+		 *
 		 * @param val Ordinal value
 		 * @return Parameter with ordinal value val
 		 */
@@ -224,7 +224,7 @@ public class Lemming {
 
 	/**
 	 * Constructor: Create Lemming
-	 * 
+	 *
 	 * @param sx x coordinate of foot
 	 * @param sy y coordinate of foot
 	 */
@@ -249,7 +249,7 @@ public class Lemming {
 
 	/**
 	 * Get number of Lemming type in internal resource array.
-	 * 
+	 *
 	 * @param t Type
 	 * @return resource number for type
 	 */
@@ -296,7 +296,7 @@ public class Lemming {
 
 	/**
 	 * Animates the Lemming's current type if the trigger condition is reached.
-	 * 
+	 *
 	 * @param initialNewType the original new Type to be assigned to the Lemming
 	 *                       before the call to this method.
 	 * @param trigger        <code>true</code> if trigger condition reached.
@@ -353,7 +353,7 @@ public class Lemming {
 
 	/**
 	 * Performs the proper animation for a LOOP or ONCE animation mode.
-	 * 
+	 *
 	 * @return <code>true</code> if the trigger condition is reached by executing
 	 *         the animation.
 	 */
@@ -377,7 +377,7 @@ public class Lemming {
 	/**
 	 * Perform special animations if the {@link Stencil} for the pixel in the middle
 	 * of the Lemming indicates a trap or level exit.
-	 * 
+	 *
 	 * @param initialNewType the original new Type to be assigned to the Lemming
 	 *                       before the call to this method.
 	 * @return the updated new Type to be assigned to the Lemming.
@@ -406,7 +406,7 @@ public class Lemming {
 
 	/**
 	 * Executes the Lemming state machine.
-	 * 
+	 *
 	 * @param initialNewType the original new Type to be assigned to the Lemming
 	 *                       before the call to this method.
 	 * @param oldX           the old X value of the foot in pixels.
@@ -501,7 +501,7 @@ public class Lemming {
 
 	/**
 	 * Applies dig mask to bottom of Lemming.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @return the updated new Type to be assigned to the Lemming.
@@ -564,7 +564,7 @@ public class Lemming {
 
 	/**
 	 * Animates once.
-	 * 
+	 *
 	 * @param startingTrigger the initial value of the trigger before calling this
 	 *                        method.
 	 * @return the updated value of the trigger.
@@ -583,7 +583,7 @@ public class Lemming {
 
 	/**
 	 * Animates loop.
-	 * 
+	 *
 	 * @param startingTrigger the initial value of the trigger before calling this
 	 *                        method.
 	 * @return the updated value of the trigger.
@@ -604,7 +604,7 @@ public class Lemming {
 
 	/**
 	 * Animates exiting the level.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @param s               {@link Stencil} value from the middle of the Lemming.
@@ -633,7 +633,7 @@ public class Lemming {
 
 	/**
 	 * Replaces the Lemming with the special death animation.
-	 * 
+	 *
 	 * @param s {@link Stencil} value from the middle of the Lemming.
 	 */
 	private void replaceLemmingWithSpecialDeathAnimation(final int s) {
@@ -658,7 +658,7 @@ public class Lemming {
 
 	/**
 	 * Animates normal death.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @param s               {@link Stencil} value from the middle of the Lemming.
@@ -692,7 +692,7 @@ public class Lemming {
 
 	/**
 	 * Animates drowning.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @param s               {@link Stencil} value from the middle of the Lemming.
@@ -737,7 +737,7 @@ public class Lemming {
 
 	/**
 	 * Animates stopper.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @param explode         <code>true</code> if the Lemming is to explode.
@@ -783,7 +783,7 @@ public class Lemming {
 
 	/**
 	 * Animates builder.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @param oldX            the old X value of the foot in pixels.
@@ -850,7 +850,7 @@ public class Lemming {
 
 	/**
 	 * Animates miner.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @param explode         <code>true</code> if the Lemming is to explode.
@@ -922,7 +922,7 @@ public class Lemming {
 
 	/**
 	 * Animates basher.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @param explode         <code>true</code> if the Lemming is to explode.
@@ -1046,7 +1046,7 @@ public class Lemming {
 
 	/**
 	 * Animates splat.
-	 * 
+	 *
 	 * @param explode <code>true</code> if the Lemming is to explode.
 	 */
 	private void animateSplat(final boolean explode) {
@@ -1059,7 +1059,7 @@ public class Lemming {
 
 	/**
 	 * Animates climber.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @param explode         <code>true</code> if the Lemming is to explode.
@@ -1090,7 +1090,7 @@ public class Lemming {
 
 	/**
 	 * Animates floater.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @param explode         <code>true</code> if the Lemming is to explode.
@@ -1127,7 +1127,7 @@ public class Lemming {
 
 	/**
 	 * Starts animating floater.
-	 * 
+	 *
 	 * @param explode <code>true</code> if the Lemming is to explode.
 	 */
 	private void animateFloaterStart(final boolean explode) {
@@ -1157,7 +1157,7 @@ public class Lemming {
 
 	/**
 	 * Animates walker.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @param oldX            the old X value of the foot in pixels.
@@ -1227,7 +1227,7 @@ public class Lemming {
 
 	/**
 	 * Animates jumper.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @return the updated new Type to be assigned to the Lemming.
@@ -1249,7 +1249,7 @@ public class Lemming {
 
 	/**
 	 * Animates faller.
-	 * 
+	 *
 	 * @param startingNewType the original new Type to be assigned to the Lemming
 	 *                        before the call to this method.
 	 * @return the updated new Type to be assigned to the Lemming.
@@ -1297,7 +1297,7 @@ public class Lemming {
 
 	/**
 	 * Indicates whether the Lemming has finished exploding.
-	 * 
+	 *
 	 * @return <code>true</code> if the Lemming has finished exploding.
 	 */
 	private boolean checkExplodeState() {
@@ -1320,7 +1320,7 @@ public class Lemming {
 
 	/**
 	 * Check if a Lemming is to be turned by a stopper/blocker.
-	 * 
+	 *
 	 * @return true if Lemming is to be turned, false otherwise
 	 */
 	private boolean turnedByStopper() {
@@ -1339,7 +1339,7 @@ public class Lemming {
 
 	/**
 	 * Change skill/type.
-	 * 
+	 *
 	 * @param oldType old skill/type of Lemming
 	 * @param newType new skill/type of Lemming
 	 */
@@ -1390,7 +1390,7 @@ public class Lemming {
 
 	/**
 	 * Get stencil value from the middle of the lemming
-	 * 
+	 *
 	 * @return stencil value from the middle of the lemming
 	 */
 	private int stencilMid() {
@@ -1406,7 +1406,7 @@ public class Lemming {
 
 	/**
 	 * Check if bashing is possible.
-	 * 
+	 *
 	 * @return true if bashing is possible, false otherwise.
 	 */
 	private boolean canBash() {
@@ -1437,7 +1437,7 @@ public class Lemming {
 
 	/**
 	 * Check if digging is possible.
-	 * 
+	 *
 	 * @return true if digging is possible, false otherwise.
 	 */
 	private boolean canDig() {
@@ -1451,7 +1451,7 @@ public class Lemming {
 
 	/**
 	 * Check if mining is possible.
-	 * 
+	 *
 	 * @return true if mining is possible, false otherwise.
 	 */
 	private boolean canMine() {
@@ -1485,7 +1485,7 @@ public class Lemming {
 
 	/**
 	 * Get number of free pixels below the lemming (max of step is checked).
-	 * 
+	 *
 	 * @return number of free pixels below the lemming
 	 */
 	private int freeBelow(final int step) {
@@ -1512,7 +1512,7 @@ public class Lemming {
 	/**
 	 * Check if Lemming reached the left or right border of the level and was
 	 * turned.
-	 * 
+	 *
 	 * @return true if lemming was turned, false otherwise.
 	 */
 	private boolean flipDirBorder() {
@@ -1533,7 +1533,7 @@ public class Lemming {
 
 	/**
 	 * Get number of free pixels above the lemming (max of step is checked).
-	 * 
+	 *
 	 * @return number of free pixels above the lemming
 	 */
 	private int freeAbove(final int step) {
@@ -1560,7 +1560,7 @@ public class Lemming {
 
 	/**
 	 * Check if Lemming has fallen to/through the bottom of the level.
-	 * 
+	 *
 	 * @return true if Lemming has fallen to/through the bottom of the level, false
 	 *         otherwise
 	 */
@@ -1575,7 +1575,7 @@ public class Lemming {
 
 	/**
 	 * Get the number of pixels of walkable ground above the Lemmings foot.
-	 * 
+	 *
 	 * @return number of pixels of walkable ground above the Lemmings foot.
 	 */
 	private int aboveGround() {
@@ -1600,7 +1600,7 @@ public class Lemming {
 
 	/**
 	 * Check if climber reached a plateau he can walk on.
-	 * 
+	 *
 	 * @return true if climber reached a plateau he can walk on, false otherwise
 	 */
 	private boolean reachedPlateau() {
@@ -1624,7 +1624,7 @@ public class Lemming {
 	/**
 	 * Replace a color in the animation frame with another color.
 	 * Used to patch the color of debris from pink color to a level specific color.
-	 * 
+	 *
 	 * @param findCol    color to find
 	 * @param replaceCol color to replace with
 	 */
@@ -1644,7 +1644,7 @@ public class Lemming {
 
 	/**
 	 * Load images used for Lemming animations.
-	 * 
+	 *
 	 * @param cmp parent component
 	 * @throws ResourceException
 	 */
@@ -1721,7 +1721,7 @@ public class Lemming {
 
 	/**
 	 * Get display name of this Lemming.
-	 * 
+	 *
 	 * @return display name of this Lemming
 	 */
 	public String getName() {
@@ -1753,7 +1753,7 @@ public class Lemming {
 
 	/**
 	 * Get current skill/type of this Lemming.
-	 * 
+	 *
 	 * @return current skill/type of this Lemming
 	 */
 	public Type getSkill() {
@@ -1762,7 +1762,7 @@ public class Lemming {
 
 	/**
 	 * Set new skill/type of this Lemming.
-	 * 
+	 *
 	 * @param skill new skill/type
 	 * @return true if a change was possible, false otherwise
 	 */
@@ -1875,7 +1875,7 @@ public class Lemming {
 
 	/**
 	 * Get width of animation frame in pixels.
-	 * 
+	 *
 	 * @return width of animation frame in pixels
 	 */
 	public int width() {
@@ -1884,7 +1884,7 @@ public class Lemming {
 
 	/**
 	 * Get height of animation frame in pixels.
-	 * 
+	 *
 	 * @return height of animation frame in pixels
 	 */
 	public int height() {
@@ -1893,7 +1893,7 @@ public class Lemming {
 
 	/**
 	 * Get static resource for a skill/type
-	 * 
+	 *
 	 * @param type skill/type
 	 * @return static resource for this skill/type
 	 */
@@ -1903,7 +1903,7 @@ public class Lemming {
 
 	/**
 	 * Get X coordinate of upper left corner of animation frame.
-	 * 
+	 *
 	 * @return X coordinate of upper left corner of animation frame
 	 */
 	public int screenX() {
@@ -1916,7 +1916,7 @@ public class Lemming {
 
 	/**
 	 * Get Y coordinate of upper left corner of animation frame
-	 * 
+	 *
 	 * @return Y coordinate of upper left corner of animation frame
 	 */
 	public int screenY() {
@@ -1925,7 +1925,7 @@ public class Lemming {
 
 	/**
 	 * Get X coordinate of collision position in pixels.
-	 * 
+	 *
 	 * @return X coordinate of collision position in pixels.
 	 */
 	public int midX() {
@@ -1934,7 +1934,7 @@ public class Lemming {
 
 	/**
 	 * Collision position
-	 * 
+	 *
 	 * @return Position inside lemming which is used for collisions
 	 */
 	public int midY() {
@@ -1943,7 +1943,7 @@ public class Lemming {
 
 	/**
 	 * Get heading of Lemming.
-	 * 
+	 *
 	 * @return heading of Lemming
 	 */
 	public Direction getDirection() {
@@ -1952,7 +1952,7 @@ public class Lemming {
 
 	/**
 	 * Get current animation frame for this Lemming.
-	 * 
+	 *
 	 * @return current animation frame for this Lemming
 	 */
 	public BufferedImage getImage() {
@@ -1961,7 +1961,7 @@ public class Lemming {
 
 	/**
 	 * Get image for explosion countdown.
-	 * 
+	 *
 	 * @return image for explosion countdown (or null if no explosion countdown)
 	 */
 	public BufferedImage getCountdown() {
@@ -1980,7 +1980,7 @@ public class Lemming {
 
 	/**
 	 * Get the selection image for replay.
-	 * 
+	 *
 	 * @return the selection image (or null if no selection displayed)
 	 */
 	public BufferedImage getSelectImg() {
@@ -1992,7 +1992,7 @@ public class Lemming {
 
 	/**
 	 * Get: Lemming has died.
-	 * 
+	 *
 	 * @return true if Lemming has died, false otherwise
 	 */
 	public boolean hasDied() {
@@ -2001,7 +2001,7 @@ public class Lemming {
 
 	/**
 	 * Get: Lemming has left the level.
-	 * 
+	 *
 	 * @return true if Lemming has left the level, false otherwise
 	 */
 	public boolean hasLeft() {
@@ -2010,7 +2010,7 @@ public class Lemming {
 
 	/**
 	 * Get: Lemming is to be nuked.
-	 * 
+	 *
 	 * @return true if Lemming is to be nuked, false otherwise
 	 */
 	public boolean nuke() {
@@ -2019,7 +2019,7 @@ public class Lemming {
 
 	/**
 	 * Get: Lemming can float.
-	 * 
+	 *
 	 * @return true if Lemming can float, false otherwise
 	 */
 	public boolean canFloat() {
@@ -2028,7 +2028,7 @@ public class Lemming {
 
 	/**
 	 * Get: Lemming can climb.
-	 * 
+	 *
 	 * @return true if Lemming can climb, false otherwise
 	 */
 	public boolean canClimb() {
@@ -2037,7 +2037,7 @@ public class Lemming {
 
 	/**
 	 * Get: Lemming can get a new skill.
-	 * 
+	 *
 	 * @return true if Lemming can get a new skill, false otherwise
 	 */
 	public boolean canChangeSkill() {

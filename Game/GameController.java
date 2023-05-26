@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -25,7 +25,7 @@ import Tools.ToolBox;
 
 /**
  * Game controller. Contains all the game logic.
- * 
+ *
  * @author Volker Oth
  */
 public class GameController {
@@ -297,9 +297,9 @@ public class GameController {
 
 	/**
 	 * Initialization.
-	 * 
+	 *
 	 * @param frame the parent component (main frame of the application).
-	 * 
+	 *
 	 * @throws ResourceException
 	 */
 	public static void init(final Component frame) throws ResourceException {
@@ -352,7 +352,7 @@ public class GameController {
 
 	/**
 	 * Returns the names of the directories.
-	 * 
+	 *
 	 * @param files the level files.
 	 * @return the names of the directories.
 	 */
@@ -372,7 +372,7 @@ public class GameController {
 
 	/**
 	 * Calculate absolute level number from diff level and relative level number
-	 * 
+	 *
 	 * @param lvlPack   level pack
 	 * @param diffLevel difficulty level
 	 * @param level     relative level number
@@ -392,7 +392,7 @@ public class GameController {
 
 	/**
 	 * Calculate diffLevel and relative level number from absolute level number
-	 * 
+	 *
 	 * @param lvlPack level pack
 	 * @param lvlAbs  absolute level number
 	 * @return { difficulty level, relative level number }
@@ -425,7 +425,7 @@ public class GameController {
 
 	/**
 	 * Proceed to next level.
-	 * 
+	 *
 	 * @return true: ok, false: no more level in this difficulty level
 	 */
 	public static synchronized boolean nextLevel() {
@@ -467,7 +467,7 @@ public class GameController {
 
 	/**
 	 * Hook for GUI to get informed when a level was successfully finished.
-	 * 
+	 *
 	 * @param l UpdateListener
 	 */
 	public static void setLevelMenuUpdateListener(final UpdateListener l) {
@@ -476,7 +476,7 @@ public class GameController {
 
 	/**
 	 * Restart level.
-	 * 
+	 *
 	 * @param doReplay true: replay, false: play
 	 * @param frame    the parent component (main frame of the application).
 	 */
@@ -495,7 +495,7 @@ public class GameController {
 
 	/**
 	 * Initialize a level after it was loaded.
-	 * 
+	 *
 	 * @param frame the parent component (main frame of the application).
 	 */
 	private static void initLevel(final Component frame) {
@@ -548,7 +548,7 @@ public class GameController {
 
 	/**
 	 * Request the restart of this level.
-	 * 
+	 *
 	 * @param doReplay
 	 */
 	public static synchronized void requestRestartLevel(final boolean doReplay) {
@@ -563,7 +563,7 @@ public class GameController {
 
 	/**
 	 * Request a new level.
-	 * 
+	 *
 	 * @param lPack    index of level pack
 	 * @param dLevel   index of difficulty level
 	 * @param lNum     level number
@@ -586,7 +586,7 @@ public class GameController {
 
 	/**
 	 * Start a new level.
-	 * 
+	 *
 	 * @param lPack    index of level pack
 	 * @param dLevel   index of difficulty level
 	 * @param lNum     level number
@@ -627,7 +627,7 @@ public class GameController {
 
 	/**
 	 * Get level lost state.
-	 * 
+	 *
 	 * @return true if level was lost, false otherwise
 	 */
 	static synchronized boolean wasLost() {
@@ -640,7 +640,7 @@ public class GameController {
 
 	/**
 	 * Get current replay image.
-	 * 
+	 *
 	 * @return current replay image
 	 */
 	public synchronized static BufferedImage getReplayImage() {
@@ -657,7 +657,7 @@ public class GameController {
 
 	/**
 	 * Get a Lemming under the selection cursor.
-	 * 
+	 *
 	 * @param type cursor type
 	 * @return fitting Lemming or null if none found
 	 */
@@ -729,7 +729,7 @@ public class GameController {
 
 	/**
 	 * Return time as String "minutes-seconds"
-	 * 
+	 *
 	 * @return time as String "minutes-seconds"
 	 */
 	public synchronized static String getTimeString() {
@@ -873,7 +873,7 @@ public class GameController {
 
 	/**
 	 * Handle nuking if appropriate.
-	 * 
+	 *
 	 * @param nukeTemp Stored initial value of {@link #nuke}.
 	 */
 	private static void nuke(final boolean nukeTemp) {
@@ -892,7 +892,7 @@ public class GameController {
 
 	/**
 	 * Releases lemmings if appropriate to current game conditions.
-	 * 
+	 *
 	 * @param nukeTemp Stored initial value of {@link #nuke}.
 	 */
 	private static void releaseLemmings(final boolean nukeTemp) {
@@ -970,7 +970,7 @@ public class GameController {
 
 	/**
 	 * Selects the specified skill.
-	 * 
+	 *
 	 * @param rsse the ReplayEvent for selecting the skill.
 	 */
 	private static void selectSkill(final ReplaySelectSkillEvent rsse) {
@@ -1009,7 +1009,7 @@ public class GameController {
 	/**
 	 * Assigns the selected skill to a lemming and decrements the count of available
 	 * number of that skill by 1.
-	 * 
+	 *
 	 * @param rs the ReplayAssignSkillEvent for assigning the skill.
 	 */
 	private static void assignSkillAndDecrementAvailable(final ReplayAssignSkillEvent rs) {
@@ -1135,7 +1135,7 @@ public class GameController {
 
 	/**
 	 * Request a skill change for a Lemming (currently selected skill).
-	 * 
+	 *
 	 * @param lemm Lemming
 	 */
 	public synchronized static void requestSkill(final Lemming lemm) {
@@ -1146,7 +1146,7 @@ public class GameController {
 
 	/**
 	 * Assign the selected skill to the selected Lemming.
-	 * 
+	 *
 	 * @param delete flag: reset the current skill request
 	 */
 	private synchronized static void assignSkill(final boolean delete) {
@@ -1189,7 +1189,7 @@ public class GameController {
 
 	/**
 	 * Indicates whether the lemming's skill can be set to the selected one.
-	 * 
+	 *
 	 * @param lemm the lemming whose skill is to be set, if possible.
 	 * @return <code>true</code> if the lemming's skill can be set to the selected
 	 *         one.
@@ -1209,7 +1209,7 @@ public class GameController {
 	/**
 	 * Indicates whether the lemming's skill can be set to the selected one, given
 	 * that cheat mode is NOT enabled.
-	 * 
+	 *
 	 * @param lemm the lemming whose skill is to be set, if possible.
 	 * @return <code>true</code> if the lemming's skill can be set to the selected
 	 *         one, given that cheat mode is NOT enabled.
@@ -1294,7 +1294,7 @@ public class GameController {
 
 	/**
 	 * Handle pressing of an icon button.
-	 * 
+	 *
 	 * @param type icon type
 	 */
 	public static synchronized void handleIconButton(final Icons.Type type) {
@@ -1389,7 +1389,7 @@ public class GameController {
 
 	/**
 	 * Plays the sound appropriate for the icon button pressed, if any.
-	 * 
+	 *
 	 * @param type         the icon type.
 	 * @param lemmSkillOld the lemming skill before pressing the button.
 	 * @param ok           <code>true</code> if suppressing default icon button
@@ -1429,7 +1429,7 @@ public class GameController {
 
 	/**
 	 * Fade in/out.
-	 * 
+	 *
 	 * @param g     graphics object
 	 * @param frame the parent JFrame (main frame of the application).
 	 */
@@ -1503,7 +1503,7 @@ public class GameController {
 
 	/**
 	 * Draw the explosions
-	 * 
+	 *
 	 * @param g      graphics object
 	 * @param width  width of screen in pixels
 	 * @param height height of screen in pixels
@@ -1519,7 +1519,7 @@ public class GameController {
 
 	/**
 	 * Add a new explosion.
-	 * 
+	 *
 	 * @param x x coordinate in pixels.
 	 * @param y y coordinate in pixels.
 	 */
@@ -1532,7 +1532,7 @@ public class GameController {
 
 	/**
 	 * Draw icon bar.
-	 * 
+	 *
 	 * @param g graphics object
 	 * @param x x coordinate in pixels
 	 * @param y y coordinate in pixels
@@ -1543,7 +1543,7 @@ public class GameController {
 
 	/**
 	 * Draw the skill/release rate values
-	 * 
+	 *
 	 * @param g graphics object
 	 * @param y y offset in pixels
 	 */
@@ -1592,7 +1592,7 @@ public class GameController {
 
 	/**
 	 * Get index of current level pack.
-	 * 
+	 *
 	 * @return index of current level pack
 	 */
 	public static int getCurLevelPackIdx() {
@@ -1601,7 +1601,7 @@ public class GameController {
 
 	/**
 	 * Get current level pack.
-	 * 
+	 *
 	 * @return current level pack
 	 */
 	public static LevelPack getCurLevelPack() {
@@ -1610,7 +1610,7 @@ public class GameController {
 
 	/**
 	 * get number of level packs
-	 * 
+	 *
 	 * @return number of level packs
 	 */
 	public static int getLevelPackNum() {
@@ -1619,7 +1619,7 @@ public class GameController {
 
 	/**
 	 * Get level pack via index.
-	 * 
+	 *
 	 * @param i index of level pack
 	 * @return LevelPack
 	 */
@@ -1629,7 +1629,7 @@ public class GameController {
 
 	/**
 	 * Get index of current difficulty level.
-	 * 
+	 *
 	 * @return index of current difficulty level
 	 */
 	public static int getCurDiffLevel() {
@@ -1638,7 +1638,7 @@ public class GameController {
 
 	/**
 	 * Get number of current level.
-	 * 
+	 *
 	 * @return number of current leve
 	 */
 	public static int getCurLevelNumber() {
@@ -1647,7 +1647,7 @@ public class GameController {
 
 	/**
 	 * Set horizontal scrolling offset.
-	 * 
+	 *
 	 * @param x horizontal scrolling offset in pixels
 	 */
 	public static void setxPos(final int x) {
@@ -1656,7 +1656,7 @@ public class GameController {
 
 	/**
 	 * Get horizontal scrolling offset.
-	 * 
+	 *
 	 * @return horizontal scrolling offset in pixels
 	 */
 	public static int getxPos() {
@@ -1665,7 +1665,7 @@ public class GameController {
 
 	/**
 	 * Set game state.
-	 * 
+	 *
 	 * @param s new game state
 	 */
 	public static void setGameState(final State s) {
@@ -1674,7 +1674,7 @@ public class GameController {
 
 	/**
 	 * Get game state.
-	 * 
+	 *
 	 * @return game state
 	 */
 	public static State getGameState() {
@@ -1683,7 +1683,7 @@ public class GameController {
 
 	/**
 	 * Enable/disable cheat mode.
-	 * 
+	 *
 	 * @param c true: enable, false: disable
 	 */
 	public static void setCheat(final boolean c) {
@@ -1692,7 +1692,7 @@ public class GameController {
 
 	/**
 	 * Get state of cheat mode.
-	 * 
+	 *
 	 * @return true if cheat mode enabled, false otherwise
 	 */
 	public static boolean isCheat() {
@@ -1701,7 +1701,7 @@ public class GameController {
 
 	/**
 	 * Set transition state.
-	 * 
+	 *
 	 * @param ts TransitionState
 	 */
 	public static void setTransition(final TransitionState ts) {
@@ -1710,7 +1710,7 @@ public class GameController {
 
 	/**
 	 * Load a replay.
-	 * 
+	 *
 	 * @param fn file name
 	 * @return replay level info object
 	 */
@@ -1720,7 +1720,7 @@ public class GameController {
 
 	/**
 	 * Save a replay.
-	 * 
+	 *
 	 * @param fn file name
 	 * @return true if saved successfully, false otherwise
 	 */
@@ -1730,7 +1730,7 @@ public class GameController {
 
 	/**
 	 * Activate/deactivate Superlemming mode.
-	 * 
+	 *
 	 * @param sl true: activate, false: deactivate
 	 */
 	public static void setSuperLemming(final boolean sl) {
@@ -1739,7 +1739,7 @@ public class GameController {
 
 	/**
 	 * Get Superlemming state.
-	 * 
+	 *
 	 * @return true is Superlemming mode is active, false otherwise
 	 */
 	public static boolean isSuperLemming() {
@@ -1748,7 +1748,7 @@ public class GameController {
 
 	/**
 	 * Set cheated detection.
-	 * 
+	 *
 	 * @param c true: cheat mode was activated, false otherwise
 	 */
 	public static void setWasCheated(final boolean c) {
@@ -1757,7 +1757,7 @@ public class GameController {
 
 	/**
 	 * Enable pause mode.
-	 * 
+	 *
 	 * @param p true: pause is active, false otherwise
 	 */
 	public static void setPaused(final boolean p) {
@@ -1766,7 +1766,7 @@ public class GameController {
 
 	/**
 	 * Get pause state.
-	 * 
+	 *
 	 * @return true if pause is active, false otherwise
 	 */
 	public static boolean isPaused() {
@@ -1775,7 +1775,7 @@ public class GameController {
 
 	/**
 	 * Enable fast forward mode.
-	 * 
+	 *
 	 * @param ff true: fast forward is active, false otherwise
 	 */
 	public static void setFastForward(final boolean ff) {
@@ -1784,7 +1784,7 @@ public class GameController {
 
 	/**
 	 * Get fast forward state.
-	 * 
+	 *
 	 * @return true if fast forward is active, false otherwise
 	 */
 	public static boolean isFastForward() {
@@ -1793,7 +1793,7 @@ public class GameController {
 
 	/**
 	 * get number of lemmings left in the game
-	 * 
+	 *
 	 * @return number of lemmings left in the game
 	 */
 	public static int getNumLeft() {
@@ -1802,7 +1802,7 @@ public class GameController {
 
 	/**
 	 * Set number of Lemmings left in the game.
-	 * 
+	 *
 	 * @param n number of Lemmings left in the game
 	 */
 	public static void setNumLeft(final int n) {
@@ -1811,7 +1811,7 @@ public class GameController {
 
 	/**
 	 * Get level object.
-	 * 
+	 *
 	 * @return level object
 	 */
 	public static Level getLevel() {
@@ -1820,7 +1820,7 @@ public class GameController {
 
 	/**
 	 * Get maximum number of Lemmings for this level.
-	 * 
+	 *
 	 * @return maximum number of Lemmings for this level
 	 */
 	public static int getNumLemmingsMax() {
@@ -1829,7 +1829,7 @@ public class GameController {
 
 	/**
 	 * Get icon type from x position.
-	 * 
+	 *
 	 * @param x x position in pixels
 	 * @return icon type
 	 */
@@ -1839,7 +1839,7 @@ public class GameController {
 
 	/**
 	 * Icon was pressed.
-	 * 
+	 *
 	 * @param t icon type
 	 */
 	public static void pressIcon(final Icons.Type t) {
@@ -1848,7 +1848,7 @@ public class GameController {
 
 	/**
 	 * Icon was released.
-	 * 
+	 *
 	 * @param t icon type
 	 */
 	public static void releaseIcon(final Icons.Type t) {
@@ -1857,7 +1857,7 @@ public class GameController {
 
 	/**
 	 * Plus was pressed.
-	 * 
+	 *
 	 * @param d bitmask: key or icon
 	 */
 	public static void pressPlus(final int d) {
@@ -1866,7 +1866,7 @@ public class GameController {
 
 	/**
 	 * Plus was released.
-	 * 
+	 *
 	 * @param d bitmask: key or icon
 	 */
 	public static void releasePlus(final int d) {
@@ -1875,7 +1875,7 @@ public class GameController {
 
 	/**
 	 * Minus was pressed.
-	 * 
+	 *
 	 * @param d bitmask: key or icon
 	 */
 	public static void pressMinus(final int d) {
@@ -1884,7 +1884,7 @@ public class GameController {
 
 	/**
 	 * Minus was released.
-	 * 
+	 *
 	 * @param d bitmask: key or icon
 	 */
 	public static void releaseMinus(final int d) {
@@ -1893,7 +1893,7 @@ public class GameController {
 
 	/**
 	 * Get list of all Lemmings under the mouse cursor.
-	 * 
+	 *
 	 * @return list of all Lemmings under the mouse cursor
 	 */
 	public static List<Lemming> getLemmsUnderCursor() {
@@ -1902,7 +1902,7 @@ public class GameController {
 
 	/**
 	 * Get list of all Lemmings in this level.
-	 * 
+	 *
 	 * @return list of all Lemmings in this level
 	 */
 	public static LinkedList<Lemming> getLemmings() {
@@ -1911,7 +1911,7 @@ public class GameController {
 
 	/**
 	 * Set sound gain.
-	 * 
+	 *
 	 * @param g gain (0..1.0)
 	 */
 	public static void setSoundGain(final double g) {
@@ -1924,7 +1924,7 @@ public class GameController {
 
 	/**
 	 * Set music gain.
-	 * 
+	 *
 	 * @param g gain (0..1.0)
 	 */
 	public static void setMusicGain(final double g) {
@@ -1937,7 +1937,7 @@ public class GameController {
 
 	/**
 	 * Set advanced mouse selection mode.
-	 * 
+	 *
 	 * @param sel true: advanced selection mode active, false otherwise
 	 */
 	public static void setAdvancedSelect(final boolean sel) {
@@ -1946,7 +1946,7 @@ public class GameController {
 
 	/**
 	 * Get state of advanced mouse selection mode.
-	 * 
+	 *
 	 * @return true if advanced selection mode activated, false otherwise
 	 */
 	public static boolean isAdvancedSelect() {
@@ -1955,7 +1955,7 @@ public class GameController {
 
 	/**
 	 * Set classical cursor mode.
-	 * 
+	 *
 	 * @param sel true: classical cursor mode active, false otherwise
 	 */
 	public static void setClassicalCursor(final boolean sel) {
@@ -1964,7 +1964,7 @@ public class GameController {
 
 	/**
 	 * Get state of classical cursor mode.
-	 * 
+	 *
 	 * @return true if classical cursor mode activated, false otherwise
 	 */
 	public static boolean isClassicalCursor() {
@@ -1973,7 +1973,7 @@ public class GameController {
 
 	/**
 	 * Get background image of level.
-	 * 
+	 *
 	 * @return background image of level
 	 */
 	public static BufferedImage getBgImage() {
@@ -1982,7 +1982,7 @@ public class GameController {
 
 	/**
 	 * Get background stencil of level.
-	 * 
+	 *
 	 * @return background stencil of level
 	 */
 	public static Stencil getStencil() {
@@ -1991,7 +1991,7 @@ public class GameController {
 
 	/**
 	 * Enable music.
-	 * 
+	 *
 	 * @param on true: music on, false otherwise
 	 */
 	public static void setMusicOn(final boolean on) {
@@ -2000,7 +2000,7 @@ public class GameController {
 
 	/**
 	 * Get music enable state.
-	 * 
+	 *
 	 * @return true: music is on, false otherwise
 	 */
 	public static boolean isMusicOn() {
@@ -2009,7 +2009,7 @@ public class GameController {
 
 	/**
 	 * Enable sound.
-	 * 
+	 *
 	 * @param on true: sound on, false otherwise
 	 */
 	public static void setSoundOn(final boolean on) {
@@ -2018,7 +2018,7 @@ public class GameController {
 
 	/**
 	 * Get sound enable state.
-	 * 
+	 *
 	 * @return true: sound is on, false otherwise
 	 */
 	public static boolean isSoundOn() {
@@ -2027,7 +2027,7 @@ public class GameController {
 
 	/**
 	 * Get small preview image of level.
-	 * 
+	 *
 	 * @return small preview image of level
 	 */
 	public static BufferedImage getMapPreview() {
@@ -2036,7 +2036,7 @@ public class GameController {
 
 	/**
 	 * Get number of Lemmings to rescue.
-	 * 
+	 *
 	 * @return number of Lemmings to rescue
 	 */
 	public static int getNumToRecue() {
@@ -2045,7 +2045,7 @@ public class GameController {
 
 	/**
 	 * Get time left in seconds.
-	 * 
+	 *
 	 * @return time left in seconds
 	 */
 	public static int getTime() {

@@ -9,8 +9,8 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 
 import GUI.PlayerDialog;
-import Game.Core;
-import Game.Player;
+import game.Core;
+import game.Player;
 
 public final class ManagePlayerMenuItemActionListener implements java.awt.event.ActionListener {
     /**
@@ -88,7 +88,7 @@ public final class ManagePlayerMenuItemActionListener implements java.awt.event.
     /**
      * Checks for players to delete and deletes them. Returns the currentPlayer or
      * &quot;default&quot; if currentPlayer is not in the List of players.
-     * 
+     *
      * @param players       the List of players currently in the application.
      * @param currentPlayer the name of the current player.
      * @return currentPlayer, or &quot;default&quot; if currentPlayer is not in the

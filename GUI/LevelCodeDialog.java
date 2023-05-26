@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import Game.GameController;
+import game.GameController;
 
 /*
  * Copyright 2009 Volker Oth

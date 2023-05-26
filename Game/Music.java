@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -62,7 +62,7 @@ public class Music {
 
 		if (files != null) {
 			musicFiles = new String[files.length];
-			
+
 			for (int i = 0; i < files.length; i++) {
 				musicFiles[i] = files[i].getName();
 			}
@@ -71,7 +71,7 @@ public class Music {
 
 	/**
 	 * Load music file.
-	 * 
+	 *
 	 * @param fName file name
 	 * @throws ResourceException
 	 * @throws LemmException
@@ -95,7 +95,7 @@ public class Music {
 
 	/**
 	 * Get file name of a random track.
-	 * 
+	 *
 	 * @return file name of a random track
 	 */
 	public static String getRandomTrack() {
@@ -159,7 +159,7 @@ public class Music {
 
 	/**
 	 * Check if music is currently playing
-	 * 
+	 *
 	 * @return true if music is currently playing, else false
 	 */
 	public static boolean isPlaying() {
@@ -168,7 +168,7 @@ public class Music {
 
 	/**
 	 * Get current music gain (1.0=100%)
-	 * 
+	 *
 	 * @return current music gain (1.0=100%)
 	 */
 	public static double getGain() {
@@ -177,7 +177,7 @@ public class Music {
 
 	/**
 	 * Set music gain
-	 * 
+	 *
 	 * @param gn gain (1.0=100%)
 	 */
 	public static void setGain(final double gn) {
@@ -204,7 +204,7 @@ public class Music {
 
 	/**
 	 * Get current music type.
-	 * 
+	 *
 	 * @return music type
 	 */
 	public static Type getType() {
@@ -214,13 +214,13 @@ public class Music {
 
 /**
  * File filter for music files.
- * 
+ *
  * @author Volker Oth
  */
 class MusicFileFilter implements FileFilter {
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.io.FileFilter#accept(java.io.File)
 	 */
 	@Override

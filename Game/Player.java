@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ import Tools.Props;
 
 /**
  * Stores player progress.
- * 
+ *
  * @author Volker Oth
  */
 public class Player {
@@ -42,7 +42,7 @@ public class Player {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param n player's name
 	 */
 	public Player(final String n) {
@@ -98,7 +98,7 @@ public class Player {
 
 	/**
 	 * Allow a level to be played.
-	 * 
+	 *
 	 * @param pack level pack
 	 * @param diff difficulty level
 	 * @param num  level number
@@ -118,7 +118,7 @@ public class Player {
 
 	/**
 	 * Check if player is allowed to play a level.
-	 * 
+	 *
 	 * @param pack level pack
 	 * @param diff difficulty level
 	 * @param num  level number
@@ -137,7 +137,7 @@ public class Player {
 
 	/**
 	 * Check if player is allowed to play a level.
-	 * 
+	 *
 	 * @param bf  bitfield containing the approval information for all levels of
 	 *            this pack/difficulty
 	 * @param num number of level
@@ -152,7 +152,7 @@ public class Player {
 	/**
 	 * Get bitfield containing the approval information for all levels of this
 	 * pack/difficulty.
-	 * 
+	 *
 	 * @param pack level pack
 	 * @param diff difficulty level
 	 * @return bitfield containing the approval information for all levels of this
@@ -171,7 +171,7 @@ public class Player {
 
 	/**
 	 * Get player's name.
-	 * 
+	 *
 	 * @return player's name
 	 */
 	public String getName() {
@@ -180,7 +180,7 @@ public class Player {
 
 	/**
 	 * Get cheat state.
-	 * 
+	 *
 	 * @return true if cheat is enabled
 	 */
 	public boolean isCheat() {

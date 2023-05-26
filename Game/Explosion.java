@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -26,7 +26,7 @@ import Tools.ToolBox;
 
 /**
  * Handle the nuke/bomber particle explosion.
- * 
+ *
  * @author Volker Oth
  */
 public class Explosion {
@@ -68,9 +68,9 @@ public class Explosion {
 	/**
 	 * Load explosion image as static resource.
 	 * Mainly outside constructor for easier handling of ResourceException.
-	 * 
+	 *
 	 * @param frame the parent component (main frame of the application).
-	 * 
+	 *
 	 * @throws ResourceException
 	 */
 	static void init(final Component frame) throws ResourceException {
@@ -79,7 +79,7 @@ public class Explosion {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param x x position in pixels.
 	 * @param y y position in pixels.
 	 */
@@ -125,7 +125,7 @@ public class Explosion {
 
 	/**
 	 * Draw explosion on graphics object.
-	 * 
+	 *
 	 * @param g
 	 * @param width
 	 * @param height
@@ -159,7 +159,7 @@ public class Explosion {
 
 	/**
 	 * Get finished state.
-	 * 
+	 *
 	 * @return true if the explosion is over, false otherwise
 	 */
 	public boolean isFinished() {
@@ -168,7 +168,7 @@ public class Explosion {
 
 	/**
 	 * Storage class for a particle.
-	 * 
+	 *
 	 * @author Volker Oth
 	 */
 	private static class Particle {
@@ -187,7 +187,7 @@ public class Explosion {
 
 		/**
 		 * Constructor
-		 * 
+		 *
 		 * @param x0   initial x position in pixels
 		 * @param y0   initial y position in pixels
 		 * @param dx0  x step width (velocity) in pixels per step

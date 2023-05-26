@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.awt.Component;
 import java.awt.Cursor;
@@ -74,7 +74,7 @@ public class LemmCursor {
 
 	/**
 	 * Initialization.
-	 * 
+	 *
 	 * @param frame the parent component (main frame of the application).
 	 * @throws ResourceException
 	 */
@@ -101,7 +101,7 @@ public class LemmCursor {
 
 	/**
 	 * Set enable state for Mouse cursor.
-	 * 
+	 *
 	 * @param en true to show, false to hide
 	 */
 	public static void setEnabled(final boolean en) {
@@ -110,7 +110,7 @@ public class LemmCursor {
 
 	/**
 	 * Get enable state.
-	 * 
+	 *
 	 * @return true if shows, false if hidden
 	 */
 	public static boolean getEnabled() {
@@ -119,7 +119,7 @@ public class LemmCursor {
 
 	/**
 	 * Get image for a certain cursor type.
-	 * 
+	 *
 	 * @param t cursor type
 	 * @return image for the given cursor type
 	 */
@@ -129,7 +129,7 @@ public class LemmCursor {
 
 	/**
 	 * Get image for current cursor type.
-	 * 
+	 *
 	 * @return image for current cursor type
 	 */
 	public static BufferedImage getImage() {
@@ -138,7 +138,7 @@ public class LemmCursor {
 
 	/**
 	 * Get boxed version of image for the current cursor type.
-	 * 
+	 *
 	 * @return boxed version of image for the current cursor type
 	 */
 	public static BufferedImage getBoxImage() {
@@ -164,7 +164,7 @@ public class LemmCursor {
 
 	/**
 	 * Get current cursor as AWT cursor object.
-	 * 
+	 *
 	 * @return current cursor as AWT cursor object
 	 */
 	public static Cursor getCursor() {
@@ -176,7 +176,7 @@ public class LemmCursor {
 
 	/**
 	 * Get current cursor type.
-	 * 
+	 *
 	 * @return current cursor type
 	 */
 	public static Type getType() {
@@ -185,7 +185,7 @@ public class LemmCursor {
 
 	/**
 	 * Set current cursor type.
-	 * 
+	 *
 	 * @param t cursor type
 	 */
 	public static void setType(final Type t) {
@@ -194,7 +194,7 @@ public class LemmCursor {
 
 	/**
 	 * Check if a Lemming is under the cursor.
-	 * 
+	 *
 	 * @param l    Lemming to check
 	 * @param xOfs screen x offset
 	 * @return true if the Lemming is under the Cursor, else false.
@@ -220,7 +220,7 @@ public class LemmCursor {
 
 	/**
 	 * Set x position in pixels.
-	 * 
+	 *
 	 * @param x x position in pixels.
 	 */
 	public static void setX(final int x) {
@@ -229,7 +229,7 @@ public class LemmCursor {
 
 	/**
 	 * Get x position in pixels.
-	 * 
+	 *
 	 * @return x position in pixels
 	 */
 	public static int getX() {
@@ -238,7 +238,7 @@ public class LemmCursor {
 
 	/**
 	 * Set y position in pixels.
-	 * 
+	 *
 	 * @param y y position in pixels
 	 */
 	public static void setY(final int y) {
@@ -247,7 +247,7 @@ public class LemmCursor {
 
 	/**
 	 * Get y position in pixels.
-	 * 
+	 *
 	 * @return y position in pixels
 	 */
 	public static int getY() {

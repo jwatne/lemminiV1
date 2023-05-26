@@ -14,20 +14,20 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import Game.Core;
-import Game.GameController;
-import Game.Icons;
-import Game.LemmCursor;
-import Game.LemmFont;
-import Game.Lemming;
-import Game.Level;
-import Game.MiniMap;
-import Game.MiscGfx;
-import Game.Stencil;
-import Game.TextScreen;
 import GameUtil.Fader;
 import Tools.MicrosecondTimer;
 import Tools.ToolBox;
+import game.Core;
+import game.GameController;
+import game.Icons;
+import game.LemmCursor;
+import game.LemmFont;
+import game.Lemming;
+import game.Level;
+import game.MiniMap;
+import game.MiscGfx;
+import game.Stencil;
+import game.TextScreen;
 
 /**
  * A graphics panel in which the actual game contents is displayed.
@@ -610,8 +610,7 @@ public class GraphicsPane extends JPanel
     }
 
     @Override
-    public void mouseClicked(final MouseEvent mouseevent) {
-    }
+    public void mouseClicked(final MouseEvent mouseevent) {}
 
     @Override
     public void mousePressed(final MouseEvent mouseevent) {

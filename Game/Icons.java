@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.awt.Component;
 import java.awt.Graphics2D;
@@ -164,7 +164,7 @@ public class Icons {
 	 */
 	static void press(final Type type) {
 		int idx = type.ordinal();
-		
+
 		switch (type) {
 			case PAUSE:
 			case FFWD:
@@ -193,8 +193,8 @@ public class Icons {
 				if (idx <= LAST_DRAWN)
 					iconGfx.drawImage(icons[idx].getImage(),WIDTH*idx,0,null);
 				break;
-			
-			
+
+
 			default:
 				break;
 		}

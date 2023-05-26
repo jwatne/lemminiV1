@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 /*
  * Copyright 2009 Volker Oth

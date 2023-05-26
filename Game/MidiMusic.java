@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -44,7 +44,7 @@ public class MidiMusic {
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param fName file name
 	 * @throws ResourceException
 	 * @throws LemmException
@@ -116,7 +116,7 @@ public class MidiMusic {
 
 	/**
 	 * Set gain (volume) of midi output
-	 * 
+	 *
 	 * @param gn gain factor: 0.0 (off) .. 1.0 (full volume)
 	 */
 	public void setGain(final double gn) {

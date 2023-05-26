@@ -1,4 +1,6 @@
-package Game;
+package game;
+
+import static game.LemmFont.Color.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -8,7 +10,6 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import Tools.ToolBox;
-import static Game.LemmFont.Color.*;
 
 /*
  * Copyright 2009 Volker Oth
@@ -122,7 +123,7 @@ public class TextScreen {
 
 	/**
 	 * Set mode.
-	 * 
+	 *
 	 * @param m mode.
 	 */
 	public static void setMode(final Mode m) {
@@ -260,7 +261,7 @@ public class TextScreen {
 
 	/**
 	 * Get text dialog.
-	 * 
+	 *
 	 * @return text dialog.
 	 */
 	public static TextDialog getDialog() {
@@ -271,7 +272,7 @@ public class TextScreen {
 
 	/**
 	 * Initialize text screen.
-	 * 
+	 *
 	 * @param width  width in pixels
 	 * @param height height in pixels
 	 */
@@ -401,7 +402,7 @@ public class TextScreen {
 
 	/**
 	 * Get image of text screen
-	 * 
+	 *
 	 * @return image of text screen
 	 */
 	public static BufferedImage getScreen() {

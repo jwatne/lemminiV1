@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.awt.Component;
 import java.awt.Image;
@@ -9,13 +9,13 @@ import Tools.ToolBox;
 
 /**
  * Used to manage the font for the explosion counter.
- * 
+ *
  * @author Volker Oth
  */
 public class ExplodeFont {
     /**
      * Constructor.
-     * 
+     *
      * @param cmp the parent component (main frame of the application).
      * @throws ResourceException
      */
@@ -26,7 +26,7 @@ public class ExplodeFont {
 
     /**
      * Get image for a counter value (0..9)
-     * 
+     *
      * @param num counter value (0..9)
      * @return
      */

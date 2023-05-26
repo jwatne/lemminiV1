@@ -17,16 +17,16 @@ import javax.swing.JRadioButtonMenuItem;
 
 import GUI.GainDialog;
 import GUI.LevelCodeDialog;
-import Game.Core;
-import Game.GameController;
-import Game.GroupBitfield;
-import Game.LemmCursor;
-import Game.LevelCode;
-import Game.LevelPack;
-import Game.Music;
-import Game.Player;
-import Game.ReplayLevelInfo;
 import Tools.ToolBox;
+import game.Core;
+import game.GameController;
+import game.GroupBitfield;
+import game.LemmCursor;
+import game.LevelCode;
+import game.LevelPack;
+import game.Music;
+import game.Player;
+import game.ReplayLevelInfo;
 
 /**
  * This service class creates the menu system for the lemmini application.

@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 /**
  * Trapdoor/Entry class
@@ -20,7 +20,7 @@ public class TrapDoor {
 
     /**
      * Reset to new number of entries.
-     * 
+     *
      * @param e number of entries
      */
     static void reset(final int e) {
@@ -30,7 +30,7 @@ public class TrapDoor {
 
     /**
      * Get index of next entry.
-     * 
+     *
      * @return index of next entry
      */
     static int getNext() {

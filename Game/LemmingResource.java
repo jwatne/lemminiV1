@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
@@ -7,7 +7,7 @@ import Tools.ToolBox;
 
 /**
  * Storage class for a Lemming.
- * 
+ *
  * @author Volker Oth
  */
 public class LemmingResource {
@@ -40,7 +40,7 @@ public class LemmingResource {
 
     /**
      * Constructor.
-     * 
+     *
      * @param sourceImg  image containing animation frames (one above the other)
      * @param animFrames number of animation frames.
      * @param directions number of directions (1 or 2)
@@ -62,7 +62,7 @@ public class LemmingResource {
 
     /**
      * Get the mask for stencil manipulation.
-     * 
+     *
      * @param dir Direction
      * @return mask for stencil manipulation
      */
@@ -75,7 +75,7 @@ public class LemmingResource {
 
     /**
      * Set the mask for stencil manipulation.
-     * 
+     *
      * @param dir Direction
      * @param m   mask for stencil manipulation
      */
@@ -88,7 +88,7 @@ public class LemmingResource {
 
     /**
      * Get the mask for checking of indestructible pixels.
-     * 
+     *
      * @param dir Direction
      * @return mask for checking of indestructible pixels
      */
@@ -101,7 +101,7 @@ public class LemmingResource {
 
     /**
      * Set the mask for checking of indestructible pixels
-     * 
+     *
      * @param dir Direction
      * @param m   mask for checking of indestructible pixels
      */
@@ -114,7 +114,7 @@ public class LemmingResource {
 
     /**
      * Get specific animation frame.
-     * 
+     *
      * @param dir   Direction.
      * @param frame Index of animation frame.
      * @return specific animation frame

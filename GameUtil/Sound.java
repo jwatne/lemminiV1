@@ -15,9 +15,9 @@ import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 import javax.sound.sampled.Mixer;
 
-import Game.Core;
-import Game.GameController;
-import Game.ResourceException;
+import game.Core;
+import game.GameController;
+import game.ResourceException;
 
 /*
  * Copyright 2009 Volker Oth

@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import Game.Core;
+import game.Core;
 
 /*
  * Copyright 2009 Volker Oth
@@ -37,7 +37,7 @@ import Game.Core;
 
 /**
  * Dialog for managing players.
- * 
+ *
  * @author Volker Oth
  */
 public class PlayerDialog extends JDialog {
@@ -66,7 +66,7 @@ public class PlayerDialog extends JDialog {
 
 	/**
 	 * Get list of players.
-	 * 
+	 *
 	 * @return list of players.
 	 */
 	public List<String> getPlayers() {
@@ -76,7 +76,7 @@ public class PlayerDialog extends JDialog {
 
 	/**
 	 * Get selected list index.
-	 * 
+	 *
 	 * @return selected list index
 	 */
 	public int getSelection() {
@@ -97,7 +97,7 @@ public class PlayerDialog extends JDialog {
 
 	/**
 	 * Constructor for modal dialog in parent frame.
-	 * 
+	 *
 	 * @param frame parent frame
 	 * @param modal create modal dialog?
 	 */

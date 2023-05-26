@@ -10,8 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
-import Game.GameController;
-import Game.Music;
+import game.GameController;
+import game.Music;
 
 /*
  * Copyright 2009 Volker Oth

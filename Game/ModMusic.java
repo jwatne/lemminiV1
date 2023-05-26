@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,7 +50,7 @@ public class ModMusic implements Runnable {
 
 	/**
 	 * Load MOD file, initialize player.
-	 * 
+	 *
 	 * @param fn file name
 	 * @throws ResourceException
 	 */
@@ -87,7 +87,7 @@ public class ModMusic implements Runnable {
 
 	/**
 	 * Set whether the song is to loop continuously or not. The default is to loop.
-	 * 
+	 *
 	 * @param loop true: loop, false: playe only once
 	 */
 	public void setloop(final boolean loop) {
@@ -96,7 +96,7 @@ public class ModMusic implements Runnable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Runnable#run()
 	 *
 	 * Begin playback.
@@ -186,7 +186,7 @@ public class ModMusic implements Runnable {
 
 	/**
 	 * Set gain (volume) of MOD output
-	 * 
+	 *
 	 * @param gn gain factor: 0.0 (off) .. 1.0 (full volume)
 	 */
 	public void setGain(final double gn) {

@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.awt.Component;
 import java.awt.Graphics2D;
@@ -60,7 +60,7 @@ public class LemmFont {
 
 	/**
 	 * Initialization.
-	 * 
+	 *
 	 * @param frame the parent component (main frame of the application).
 	 * @throws ResourceException
 	 */
@@ -117,7 +117,7 @@ public class LemmFont {
 
 	/**
 	 * Draw string into graphics object in given color.
-	 * 
+	 *
 	 * @param g     graphics object to draw to.
 	 * @param s     string to draw.
 	 * @param sx    x coordinate in pixels
@@ -139,7 +139,7 @@ public class LemmFont {
 
 	/**
 	 * Draw string into graphics object in given color.
-	 * 
+	 *
 	 * @param g     graphics object to draw to.
 	 * @param s     string to draw.
 	 * @param color Color
@@ -151,7 +151,7 @@ public class LemmFont {
 
 	/**
 	 * Create image of string in given color.
-	 * 
+	 *
 	 * @param s     string to draw
 	 * @param color Color
 	 * @return a buffered image of the needed size that contains an image of the
@@ -165,7 +165,7 @@ public class LemmFont {
 
 	/**
 	 * Create image of string in default color (green).
-	 * 
+	 *
 	 * @param s string to draw
 	 * @return a buffered image of the needed size that contains an image of the
 	 *         given string
@@ -176,7 +176,7 @@ public class LemmFont {
 
 	/**
 	 * Draw string into graphics object in default color (green).
-	 * 
+	 *
 	 * @param g graphics object to draw to.
 	 * @param s string to draw.
 	 */
@@ -186,7 +186,7 @@ public class LemmFont {
 
 	/**
 	 * Get width of one character in pixels.
-	 * 
+	 *
 	 * @return width of one character in pixels
 	 */
 	public static int getWidth() {
@@ -195,7 +195,7 @@ public class LemmFont {
 
 	/**
 	 * Get height of one character in pixels.
-	 * 
+	 *
 	 * @return height of one character in pixels
 	 */
 	public static int getHeight() {

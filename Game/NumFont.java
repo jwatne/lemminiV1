@@ -1,4 +1,4 @@
-package Game;
+package game;
 
 import java.awt.Component;
 import java.awt.Graphics2D;
@@ -41,7 +41,7 @@ public class NumFont {
 
 	/**
 	 * Load and initialize the font.
-	 * 
+	 *
 	 * @param frame the parent component (main frame of the application).
 	 * @throws ResourceException
 	 */
@@ -62,7 +62,7 @@ public class NumFont {
 
 	/**
 	 * Get an image for a number between 0 and 99
-	 * 
+	 *
 	 * @param n number (0..99)
 	 * @return image of the number
 	 */

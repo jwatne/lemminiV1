@@ -1,14 +1,14 @@
 package lemmini;
 
-import Game.Core;
-import Game.GameController;
-import Game.GroupBitfield;
-import Game.LevelPack;
-import Game.UpdateListener;
+import game.Core;
+import game.GameController;
+import game.GroupBitfield;
+import game.LevelPack;
+import game.UpdateListener;
 
 /**
  * Listener to inform the GUI of the player's progress.
- * 
+ *
  * @author Volker Oth
  */
 public class LevelMenuUpdateListener implements UpdateListener {

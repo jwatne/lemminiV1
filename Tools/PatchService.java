@@ -378,7 +378,7 @@ public class PatchService {
 
                 // create diff
                 final byte patch[] = Diff.diffBuffers(trg, src);
-                final int crc = Diff.targetCRC; // crc of target buffer
+                final int crc = Diff.getTargetCRC(); // crc of target buffer
                 out = subDir + files[i].getName() + ", 0x"
                         + Integer.toHexString(crc);
                 writePatchFileIfPatchExists(fPatchList, out, fnPatch, trg,

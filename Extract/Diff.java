@@ -30,30 +30,80 @@ import java.util.zip.Adler32;
  * @author Volker Oth
  */
 public final class Diff {
-    /** insert n bytes */
+    /**
+     * Bits to shift by three bytes.
+     */
+    private static final int THREE_BYTE_SHIFT = 24;
+    /**
+     * Bits to shift by two bytes.
+     */
+    private static final int TWO_BYTE_SHIFT = 16;
+    /**
+     * Bits to shift by one byte.
+     */
+    private static final int ONE_BYTE_SHIFT = 8;
+    /**
+     * Standard 7 value.
+     */
+    private static final int DECIMAL7 = 7;
+    /**
+     * Hexadecimal 0x7f.
+     */
+    private static final int HEX7F = 0x7f;
+    /**
+     * Hexadecimal 0x80.
+     */
+    private static final int HEX80 = 0x80;
+    /**
+     * Re-synchronization window length.
+     */
+    private static final int WINDOW_LENGTH = 512;
+    /**
+     * Re-synchronization length.
+     */
+    private static final int RESYNC_LENGTH = 4;
+    /** insert n bytes.. */
     private static final byte INSERT = 0;
-    /** delete n bytes */
+    /** delete n bytes. */
     private static final byte DELETE = 1;
-    /** replace n bytes with n bytes */
+    /** replace n bytes with n bytes. */
     private static final byte REPLACE = 2;
-    /** substitute n bytes with m bytes */
+    /** substitute n bytes with m bytes. */
     private static final byte SUBSTITUTE = 3;
 
-    /** magic number for header ID */
+    /** magic number for header ID. */
     private static final int HEADER_ID = 0xdeadbeef;
-    /** magic number for data ID */
+    /** magic number for data ID. */
     private static final int DATA_ID = 0xfade0ff;
 
-    /** print info to System.out */
+    /** print info to System.out. */
     private static boolean verbatim = false;
 
-    /** re-synchronization length */
-    private static int resyncLength = 4;
-    /** re-synchronization window length */
-    private static int windowLength = 512;
+    /** re-synchronization length. */
+    private static int resyncLength = RESYNC_LENGTH;
+    /** re-synchronization window length. */
+    private static int windowLength = WINDOW_LENGTH;
 
-    /** target CRC */
-    public static int targetCRC = 0;
+    /** target CRC. */
+    private static int targetCRC = 0;
+
+    /**
+     * Returns target CRC.
+     *
+     * @return target CRC.
+     */
+    public static int getTargetCRC() {
+        return targetCRC;
+    }
+
+    /**
+     * Sets target CRC.
+     *
+     * @param target target CRC.
+     */
+    public static void setTargetCRC(final int target) {
+        Diff.targetCRC = target;
+    }
 
     /**
      * Private constructor for utility class.
@@ -63,7 +113,7 @@ public final class Diff {
     }
 
     /**
-     * Set diff parameters
+     * Set diff parameters.
      *
      * @param winLen    Length of windows to search for re-synchronization
      * @param resyncLen Number of equal bytes needed for re-synchronization
@@ -74,7 +124,7 @@ public final class Diff {
     }
 
     /**
-     * Create diff buffer from the differences between source and target buffer
+     * Create diff buffer from the differences between source and target buffer.
      *
      * @param bsrc source buffer (the file to be patched)
      * @param btrg target buffer (the file as it should be)
@@ -252,7 +302,7 @@ public final class Diff {
     }
 
     /**
-     * Create a target buffer from a source buffer and a buffer of differences
+     * Create a target buffer from a source buffer and a buffer of differences.
      *
      * @param bsrc   source buffer
      * @param bpatch buffer containing differences
@@ -370,18 +420,22 @@ public final class Diff {
         int val = 0;
         int v;
         int shift = 0;
+
         do {
             v = b.getByte();
-            if ((v & 0x80) == 0) {
+
+            if ((v & HEX80) == 0) {
                 // no continue bit set
                 val += (v << shift);
                 break;
             }
+
             // erase contine marker bit
-            v &= 0x7f;
+            v &= HEX7F;
             val += (v << shift);
-            shift += 7;
+            shift += DECIMAL7;
         } while (true);
+
         return val;
     }
 
@@ -395,15 +449,17 @@ public final class Diff {
      */
     private static void setLen(final List<Byte> l, final int value) {
         int val = value;
-        while (val > 0x7f) {
-            l.add((byte) (val & 0x7f | 0x80));
-            val >>>= 7;
+
+        while (val > HEX7F) {
+            l.add((byte) (val & HEX7F | HEX80));
+            val >>>= DECIMAL7;
         }
+
         l.add((byte) val);
     }
 
     /**
-     * Check for "insert" difference
+     * Check for "insert" difference.
      *
      * @param src source buffer
      * @param trg target buffer
@@ -438,7 +494,7 @@ public final class Diff {
     }
 
     /**
-     * Check for "delete" difference
+     * Check for "delete" difference.
      *
      * @param src source buffer
      * @param trg target buffer
@@ -473,7 +529,7 @@ public final class Diff {
     }
 
     /**
-     * Check for "replace" difference
+     * Check for "replace" difference.
      *
      * @param src source buffer
      * @param trg target buffer
@@ -508,7 +564,7 @@ public final class Diff {
     }
 
     /**
-     * Check for "substitute" difference
+     * Check for "substitute" difference.
      *
      * @param src source buffer
      * @param trg target buffer
@@ -571,156 +627,21 @@ public final class Diff {
     }
 
     /**
-     * Write DWord to difference list
+     * Write DWord to difference list.
      *
      * @param l   difference list
      * @param val DWord value
      */
     private static void setDWord(final List<Byte> l, final int val) {
         l.add((byte) val);
-        l.add((byte) (val >> 8));
-        l.add((byte) (val >> 16));
-        l.add((byte) (val >> 24));
+        l.add((byte) (val >> ONE_BYTE_SHIFT));
+        l.add((byte) (val >> TWO_BYTE_SHIFT));
+        l.add((byte) (val >> THREE_BYTE_SHIFT));
     }
 
     private static void out(final String s) {
         if (verbatim) {
             System.out.println(s);
         }
-    }
-}
-
-/**
- * Buffer class that manages reading/writing from/to a byte buffer
- *
- * @author Volker Oth
- */
-class Buffer {
-    /** array of byte which defines the data buffer */
-    private final byte[] buffer;
-    /** byte index in buffer */
-    private int index;
-
-    /**
-     * Constructor.
-     *
-     * @param size buffer size in bytes
-     */
-    Buffer(final int size) {
-        index = 0;
-        buffer = new byte[size];
-    }
-
-    /**
-     * Constructor.
-     *
-     * @param b array of byte to use as buffer
-     */
-    Buffer(final byte[] b) {
-        index = 0;
-        buffer = b;
-    }
-
-    /**
-     * Get size of buffer.
-     *
-     * @return size of buffer in bytes
-     */
-    int length() {
-        return buffer.length;
-    }
-
-    /**
-     * Get current byte index.
-     *
-     * @return current byte index
-     */
-    int getIndex() {
-        return index;
-    }
-
-    /**
-     * Get data buffer.
-     *
-     * @return data buffer
-     */
-    byte[] getData() {
-        return buffer;
-    }
-
-    /**
-     * Set index to new byte position.
-     *
-     * @param idx index to new byte position
-     */
-    void setIndex(final int idx) {
-        index = idx;
-    }
-
-    /**
-     * Get byte at current position.
-     *
-     * @return byte at current position
-     * @throws ArrayIndexOutOfBoundsException
-     */
-    int getByte() throws ArrayIndexOutOfBoundsException {
-        return buffer[index++] & 0xff;
-    }
-
-    /**
-     * Set byte at current position, increase index by 1.
-     *
-     * @param val byte value to write
-     * @throws ArrayIndexOutOfBoundsException
-     */
-    void setByte(final byte val) throws ArrayIndexOutOfBoundsException {
-        buffer[index++] = val;
-    }
-
-    /**
-     * Get word (2 bytes, little endian) at current position.
-     *
-     * @return word at current position
-     * @throws ArrayIndexOutOfBoundsException
-     */
-    int getWord() throws ArrayIndexOutOfBoundsException {
-        return getByte() | (getByte() << 8);
-    }
-
-    /**
-     * Set word (2 bytes, little endian) at current position, increase index by
-     * 2.
-     *
-     * @param val word to write at current position
-     * @throws ArrayIndexOutOfBoundsException
-     */
-    void setWord(final int val) throws ArrayIndexOutOfBoundsException {
-        setByte((byte) val);
-        setByte((byte) (val >> 8));
-    }
-
-    /**
-     * Get double word (4 bytes, little endian) at current position.
-     *
-     * @return dword at current position
-     * @throws ArrayIndexOutOfBoundsException
-     */
-    int getDWord() throws ArrayIndexOutOfBoundsException {
-        return getByte() | (getByte() << 8) | (getByte() << 16)
-                | (getByte() << 24);
-    }
-
-    /**
-     * Set double word (4 bytes, little endian) at current position, increase
-     * index by 4.
-     *
-     * @param val dword to write at current position
-     * @throws ArrayIndexOutOfBoundsException
-     */
-    void setDWord(final int val) throws ArrayIndexOutOfBoundsException {
-        setByte((byte) val);
-        setByte((byte) (val >> 8));
-        setByte((byte) (val >> 16));
-        setByte((byte) (val >> 24));
     }
 }

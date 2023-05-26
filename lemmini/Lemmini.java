@@ -36,9 +36,10 @@ import game.Lemming;
 import game.Level;
 import game.LevelPack;
 import game.ResourceException;
-import game.State;
+import game.GameState;
 import game.TransitionState;
 import gameutil.Fader;
+import gameutil.FaderState;
 
 /*
  * Copyright 2009 Volker Oth
@@ -163,10 +164,10 @@ public class Lemmini extends JFrame implements KeyListener {
         this.addWindowListener(new WindowClosingListener(this));
         this.setVisible(true);
         gp.init();
-        GameController.setGameState(State.INTRO);
+        GameController.setGameState(GameState.INTRO);
         GameController.setTransition(TransitionState.NONE);
         Fader.setBounds(Core.getDrawWidth(), Core.getDrawHeight());
-        Fader.setState(Fader.State.IN);
+        Fader.setState(FaderState.IN);
         final Thread t = new Thread(gp);
         lvlPath = ".";
         addKeyListener(this);
@@ -324,7 +325,7 @@ public class Lemmini extends JFrame implements KeyListener {
     public final void keyPressed(final KeyEvent keyevent) {
         final int code = keyevent.getKeyCode();
 
-        if (GameController.getGameState() == State.LEVEL) {
+        if (GameController.getGameState() == GameState.LEVEL) {
             switch (code) {
             case KeyEvent.VK_1:
             case KeyEvent.VK_F3:
@@ -560,7 +561,7 @@ public class Lemmini extends JFrame implements KeyListener {
     public final void keyReleased(final KeyEvent keyevent) {
         final int code = keyevent.getKeyCode();
 
-        if (GameController.getGameState() == State.LEVEL) {
+        if (GameController.getGameState() == GameState.LEVEL) {
             switch (code) {
             case KeyEvent.VK_SHIFT:
                 gp.setShiftPressed(false);

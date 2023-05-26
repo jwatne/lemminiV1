@@ -31,7 +31,27 @@ import Tools.ToolBox;
  *
  * @author Volker Oth
  */
-public class Fader {
+public final class Fader {
+    /**
+     * Number of bits in 2 bytes.
+     */
+    private static final int TWO_BYTES = 16;
+    /**
+     * Maximum hex value for RGBA channel.
+     */
+    private static final int MAX_CHANNEL_VALUE = 0xff;
+    /**
+     * White RGB hex value.
+     */
+    private static final int WHITE = 0xffffff;
+    /**
+     * Half transparent RGBA alpha value.
+     */
+    private static final int HALF_TRANSPARENT_ALPHA = 0x80;
+    /**
+     * Fade step size.
+     */
+    private static final int FADE_STEP_SIZE = 14;
     /** width of square to use for fading. */
     private static final int WIDTH = 64;
     /** height of square to use for fading. */
@@ -39,26 +59,16 @@ public class Fader {
     /** maximum alpha (opaque). */
     private static final int MAX_ALPHA = 0xff;
 
-    /** Fader state. */
-    public static enum State {
-        /** don't fade. */
-        OFF,
-        /** fade in. */
-        IN,
-        /** fade out. */
-        OUT
-    }
-
     /** current alpha value. */
     private static int fadeValue;
     /** current fade state. */
-    private static State fadeState = State.OFF;
+    private static FaderState fadeState = FaderState.OFF;
     /** step size for fading. */
-    private static int fadeStep = 14;
+    private static int fadeStep = FADE_STEP_SIZE;
     /** color of the fading rectangle. */
     private static int color = 0; // black
     /** alpha value of the fading rectangle. */
-    private static int alpha = 0x80; // half transparent
+    private static int alpha = HALF_TRANSPARENT_ALPHA; // half transparent
     /** width of faded area. */
     private static int width;
     /** height of faded area. */
@@ -66,8 +76,8 @@ public class Fader {
     /** the image used as fading rectangle. */
     private static BufferedImage alphaImg = null;
     /**
-     * the graphics used as fading rectangle (static to avoid multiple
-     * allocation)
+     * The graphics used as fading rectangle (static to avoid multiple
+     * allocation).
      */
     private static Graphics2D alphaGfx;
 
@@ -84,7 +94,7 @@ public class Fader {
      * @param c RGB color
      */
     public static synchronized void setColor(final int c) {
-        color = c & 0xffffff;
+        color = c & WHITE;
         init();
     }
 
@@ -94,7 +104,7 @@ public class Fader {
      * @param a 8bit alpha value
      */
     public static synchronized void setAlpha(final int a) {
-        alpha = a & 0xff;
+        alpha = a & MAX_CHANNEL_VALUE;
         init();
     }
 
@@ -124,8 +134,9 @@ public class Fader {
             alphaGfx = alphaImg.createGraphics();
         }
         // fill with alpha blended color
-        fillColor = new Color((color >> 16) & 0xff, (color >> 8) & 0xff,
-                color & 0xff, alpha);
+        fillColor = new Color((color >> TWO_BYTES) & MAX_CHANNEL_VALUE,
+                (color >> TWO_BYTES) & MAX_CHANNEL_VALUE,
+                color & MAX_CHANNEL_VALUE, alpha);
         alphaGfx.setBackground(fillColor);
         alphaGfx.clearRect(0, 0, WIDTH, HEIGHT);
     }
@@ -137,8 +148,9 @@ public class Fader {
      */
     public static synchronized void apply(final Graphics g) {
         for (int y = 0; y < height; y += HEIGHT) {
-            for (int x = 0; x < width; x += WIDTH)
+            for (int x = 0; x < width; x += WIDTH) {
                 g.drawImage(alphaImg, x, y, null);
+            }
         }
     }
 
@@ -147,7 +159,7 @@ public class Fader {
      *
      * @param s state
      */
-    public static synchronized void setState(final State s) {
+    public static synchronized void setState(final FaderState s) {
         fadeState = s;
 
         switch (fadeState) {
@@ -169,7 +181,7 @@ public class Fader {
      *
      * @return fader state.
      */
-    public static synchronized State getState() {
+    public static synchronized FaderState getState() {
         return fadeState;
     }
 
@@ -179,7 +191,7 @@ public class Fader {
      * @param step
      */
     public static void setStep(final int step) {
-        fadeStep = step & 0xff;
+        fadeStep = step & MAX_CHANNEL_VALUE;
     }
 
     /**
@@ -194,7 +206,7 @@ public class Fader {
                 fadeValue -= fadeStep;
             } else {
                 fadeValue = 0;
-                fadeState = State.OFF;
+                fadeState = FaderState.OFF;
             }
             Fader.setAlpha(fadeValue);
             Fader.apply(g);
@@ -205,7 +217,7 @@ public class Fader {
                 fadeValue += fadeStep;
             } else {
                 fadeValue = MAX_ALPHA;
-                fadeState = State.OFF;
+                fadeState = FaderState.OFF;
             }
             Fader.setAlpha(fadeValue);
             Fader.apply(g);

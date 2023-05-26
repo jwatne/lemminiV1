@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import Tools.MicrosecondTimer;
 import Tools.ToolBox;
 import gameutil.Fader;
+import gameutil.FaderState;
 import gameutil.KeyRepeat;
 import gameutil.Sound;
 import gameutil.Sprite;
@@ -237,7 +238,7 @@ public final class GameController {
     /** flag: Superlemming mode is active. */
     private static boolean superLemming;
     /** game state. */
-    private static State gameState;
+    private static GameState gameState;
     /** transition (fading) state. */
     private static TransitionState transitionState;
     /** skill to assign to lemming (skill icon). */
@@ -367,7 +368,7 @@ public final class GameController {
         bgImage = ToolBox.createImage(Level.WIDTH, Level.HEIGHT,
                 Transparency.BITMASK);
         bgGfx = bgImage.createGraphics();
-        gameState = State.INIT;
+        gameState = GameState.INIT;
         sound = new Sound(NUM_SAMPLES, SND_MOUSEPRE);
         sound.setGain(soundGain);
         Icons.init(frame);
@@ -510,8 +511,8 @@ public final class GameController {
      */
     public static synchronized void endLevel() {
         transitionState = TransitionState.END_LEVEL;
-        gameState = State.LEVEL_END;
-        Fader.setState(Fader.State.OUT);
+        gameState = GameState.LEVEL_END;
+        Fader.setState(FaderState.OUT);
     }
 
     /**
@@ -528,7 +529,7 @@ public final class GameController {
             levelMenuUpdateListener.update();
         }
 
-        gameState = State.DEBRIEFING;
+        gameState = GameState.DEBRIEFING;
     }
 
     /**
@@ -611,7 +612,7 @@ public final class GameController {
         lemmSkillOld = lemmSkill;
         nukeOld = false;
         xPosOld = getLevel().getXpos();
-        gameState = State.BRIEFING;
+        gameState = GameState.BRIEFING;
     }
 
     /**
@@ -627,7 +628,7 @@ public final class GameController {
             transitionState = TransitionState.RESTART_LEVEL;
         }
 
-        Fader.setState(Fader.State.OUT);
+        Fader.setState(FaderState.OUT);
     }
 
     /**
@@ -650,7 +651,7 @@ public final class GameController {
             transitionState = TransitionState.LOAD_LEVEL;
         }
 
-        Fader.setState(Fader.State.OUT);
+        Fader.setState(FaderState.OUT);
     }
 
     /**
@@ -704,7 +705,7 @@ public final class GameController {
      * @return true if level was lost, false otherwise
      */
     static synchronized boolean wasLost() {
-        if (gameState != State.LEVEL && numLeft >= numToRecue) {
+        if (gameState != GameState.LEVEL && numLeft >= numToRecue) {
             return false;
         }
 
@@ -828,7 +829,7 @@ public final class GameController {
      * Update the whole game state by one frame.
      */
     public static synchronized void update() {
-        if (gameState != State.LEVEL) {
+        if (gameState != GameState.LEVEL) {
             return;
         }
 
@@ -1529,20 +1530,20 @@ public final class GameController {
      * @param frame the parent JFrame (main frame of the application).
      */
     public static void fade(final Graphics g, final JFrame frame) {
-        if (Fader.getState() == Fader.State.OFF
+        if (Fader.getState() == FaderState.OFF
                 && transitionState != TransitionState.NONE) {
             switch (transitionState) {
             case END_LEVEL:
                 finishLevel();
                 break;
             case TO_BRIEFING:
-                gameState = State.BRIEFING;
+                gameState = GameState.BRIEFING;
                 break;
             case TO_DEBRIEFING:
-                gameState = State.DEBRIEFING;
+                gameState = GameState.DEBRIEFING;
                 break;
             case TO_INTRO:
-                gameState = State.INTRO;
+                gameState = GameState.INTRO;
                 break;
             case TO_LEVEL:
                 fadeToLevel();
@@ -1572,7 +1573,7 @@ public final class GameController {
                 break;
             }
 
-            Fader.setState(Fader.State.IN);
+            Fader.setState(FaderState.IN);
             transitionState = TransitionState.NONE;
         }
 
@@ -1599,7 +1600,7 @@ public final class GameController {
             System.exit(1);
         }
 
-        gameState = State.LEVEL;
+        gameState = GameState.LEVEL;
     }
 
     /**
@@ -1773,7 +1774,7 @@ public final class GameController {
      *
      * @param s new game state
      */
-    public static void setGameState(final State s) {
+    public static void setGameState(final GameState s) {
         gameState = s;
     }
 
@@ -1782,7 +1783,7 @@ public final class GameController {
      *
      * @return game state
      */
-    public static State getGameState() {
+    public static GameState getGameState() {
         return gameState;
     }
 

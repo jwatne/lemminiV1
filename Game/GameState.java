@@ -1,7 +1,7 @@
 package game;
 
 /** game state. */
-public enum State {
+public enum GameState {
     /** init state. */
     INIT,
     /** display intro screen. */

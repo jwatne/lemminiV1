@@ -25,11 +25,12 @@ import game.Lemming;
 import game.Level;
 import game.MiniMap;
 import game.MiscGfx;
-import game.State;
+import game.GameState;
 import game.Stencil;
 import game.TextScreen;
 import game.TransitionState;
 import gameutil.Fader;
+import gameutil.FaderState;
 
 /**
  * A graphics panel in which the actual game contents is displayed.
@@ -519,7 +520,7 @@ public class GraphicsPane extends JPanel
 
         try {
             while (true) {
-                final State gameState = GameController
+                final GameState gameState = GameController
                         .getGameState();
 
                 // Try to keep the Amiga timing. Note that no frames are skipped
@@ -535,7 +536,7 @@ public class GraphicsPane extends JPanel
                     // special handling for fast forward or super lemming mode
                     // only during real
                     // gameplay
-                    if (gameState == State.LEVEL) {
+                    if (gameState == GameState.LEVEL) {
                         // in fast forward or super lemming modes, update the
                         // game mechanics
                         // multiple times per (drawn) frame
@@ -626,7 +627,7 @@ public class GraphicsPane extends JPanel
             leftMousePressed = true;
         }
 
-        if (Fader.getState() != Fader.State.OFF) {
+        if (Fader.getState() != FaderState.OFF) {
             return;
         }
 
@@ -635,7 +636,7 @@ public class GraphicsPane extends JPanel
             MiniMap.init(smallX, smallY, 16, 8, true);
             GameController
                     .setTransition(TransitionState.TO_LEVEL);
-            Fader.setState(Fader.State.OUT);
+            Fader.setState(FaderState.OUT);
             mouseevent.consume();
             break;
         case DEBRIEFING:
@@ -655,7 +656,7 @@ public class GraphicsPane extends JPanel
             case TextScreen.BUTTON_MENU:
                 GameController
                         .setTransition(TransitionState.TO_INTRO);
-                Fader.setState(Fader.State.OUT);
+                Fader.setState(FaderState.OUT);
                 ((JFrame) frame).setTitle("Lemmini");
                 break;
             case TextScreen.BUTTON_REPLAY:

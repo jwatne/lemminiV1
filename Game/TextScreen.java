@@ -35,38 +35,38 @@ import Tools.ToolBox;
  */
 public class TextScreen {
 
-	/** Mode (type of screen to present) */
+	/** Mode (type of screen to present). */
 	public static enum Mode {
-		/** initial state */
+		/** initial state. */
 		INIT,
-		/** main introduction screen */
+		/** main introduction screen. */
 		INTRO,
-		/** level briefing screen */
+		/** level briefing screen. */
 		BRIEFING,
-		/** level debriefing screen */
+		/** level debriefing screen. */
 		DEBRIEFING
 	}
 
-	/** Button: continue */
+	/** Button: continue. */
 	public final static int BUTTON_CONTINUE = 0;
-	/** Button: restart level */
+	/** Button: restart level. */
 	public final static int BUTTON_RESTART = 1;
-	/** Button: back to menu */
+	/** Button: back to menu. */
 	public final static int BUTTON_MENU = 2;
-	/** Button: replay level */
+	/** Button: replay level. */
 	public final static int BUTTON_REPLAY = 3;
-	/** Button: save replay */
+	/** Button: save replay. */
 	public final static int BUTTON_SAVEREPLAY = 4;
 
-	/** y position of scroll text - pixels relative to center */
+	/** y position of scroll text - pixels relative to center. */
 	private final static int SCROLL_Y = 150;
-	/** width of scroll text in characters */
+	/** width of scroll text in characters. */
 	private final static int SCROLL_WIDTH = 39;
-	/** height of scroll text in pixels */
+	/** height of scroll text in pixels. */
 	private final static int SCROLL_HEIGHT = LemmFont.getHeight() * 2;
-	/** step width of scroll text in pixels */
+	/** step width of scroll text in pixels. */
 	private final static int SCROLL_STEP = 2;
-	/** scroll text */
+	/** scroll text. */
 	private final static String SCROLL_TEXT = "                                           " +
 			"Lemmini - a game engine for Lemmings (tm) in Java. " +
 			"Thanks to Martin Cameron for his MicroMod Library, " +
@@ -76,21 +76,21 @@ public class TextScreen {
 			"ccexplore and the other nice folks at the Lemmingswelt Forum for discussion and advice " +
 			"and to Sun for maintaining Java and providing the community with a free development environment.";
 
-	/** TextDialog used as base component */
+	/** TextDialog used as base component. */
 	private static TextDialog textScreen;
-	/** factor used for the rotation animation */
+	/** factor used for the rotation animation. */
 	private static double rotFact = 1.0;
-	/** delta used for the rotation animation */
+	/** delta used for the rotation animation. */
 	private static double rotDelta;
-	/** source image for rotation animation */
+	/** source image for rotation animation. */
 	private static BufferedImage imgSrc;
-	/** target image for rotation animation */
+	/** target image for rotation animation. */
 	private static BufferedImage imgTrg;
-	/** graphics for rotation animation */
+	/** graphics for rotation animation. */
 	private static Graphics2D imgGfx;
-	/** flip state for rotation: true - image is flipped in Y direction */
+	/** flip state for rotation: true - image is flipped in Y direction. */
 	private static boolean flip;
-	/** affine transformation used for rotation animation */
+	/** affine transformation used for rotation animation. */
 	private static AffineTransform at;
 	/**
 	 * counter used to trigger the rotation animation (in animation update frames)
@@ -106,17 +106,17 @@ public class TextScreen {
 	 * direction
 	 */
 	private static int flipCtr;
-	/** counter for scrolled characters */
+	/** counter for scrolled characters. */
 	private static int scrollCharCtr;
-	/** counter for scrolled pixels */
+	/** counter for scrolled pixels. */
 	private static int scrollPixCtr;
-	/** image used for scroller */
+	/** image used for scroller. */
 	private static BufferedImage scrollerImg;
-	/** graphics used for scroller */
+	/** graphics used for scroller. */
 	private static Graphics2D scrollerGfx;
-	/** screen type to display */
+	/** screen type to display. */
 	private static Mode mode;
-	/** synchronization monitor */
+	/** synchronization monitor. */
 	private static Object monitor = new Object();
 
 	private static double oldScale = Core.getScale();

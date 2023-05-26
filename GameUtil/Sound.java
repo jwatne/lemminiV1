@@ -42,42 +42,42 @@ import game.ResourceException;
  */
 public class Sound {
 
-    /** default sampling frequency */
+    /** default sampling frequency. */
     final private static float DEFAULT_FREQUENCY = 22050;
-    /** number of pitch levels */
+    /** number of pitch levels. */
     final private static int NUMBER_PITCHED = 100;
-    /** fade in the first n samples when calculating the pitched buffers */
+    /** fade in the first n samples when calculating the pitched buffers. */
     final private static int PITCH_FADE_IN = 20;
-    /** maximum number of sounds played in parallel */
+    /** maximum number of sounds played in parallel. */
     final private static int MAX_SIMUL_SOUNDS = 6;
 
-    /** line listener to be called after sample was played */
+    /** line listener to be called after sample was played. */
     private final LineListener defaultListener;
-    /** sound buffers to store the samples */
+    /** sound buffers to store the samples. */
     private final byte soundBuffer[][];
-    /** pitch buffers to store all pitched samples */
+    /** pitch buffers to store all pitched samples. */
     private byte pitchBuffers[][];
-    /** audio formats for normal samples (one for each sample) */
+    /** audio formats for normal samples (one for each sample). */
     private final AudioFormat format[];
-    /** audio format for pitched samples */
+    /** audio format for pitched samples. */
     private AudioFormat pitchFormat;
-    /** audio format for upsampling */
+    /** audio format for upsampling. */
     private final AudioFormat defaultFormat;
-    /** line info for each sample */
+    /** line info for each sample. */
     private final DataLine.Info info[];
-    /** line info for the pitched sample */
+    /** line info for the pitched sample. */
     private DataLine.Info pitchInfo;
-    /** line info for upsampling */
+    /** line info for upsampling. */
     private final DataLine.Info defaultInfo;
-    /** gain/volume: 1.0 = 100% */
+    /** gain/volume: 1.0 = 100%. */
     private double gain;
-    /** number of sounds currently played */
+    /** number of sounds currently played. */
     private static int simulSounds;
-    /** selected mixer index */
+    /** selected mixer index. */
     static int mixerIdx;
-    /** array of available mixers */
+    /** array of available mixers. */
     static Mixer mixers[];
-    /** number of samples to be used */
+    /** number of samples to be used. */
     static int sampleNum;
     private static final Object MONITOR_OBJECT = new Object();
 

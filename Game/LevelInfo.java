@@ -22,11 +22,11 @@ package game;
  * @author Volker Oth
  */
 public class LevelInfo {
-	/** level name */
+	/** level name. */
 	private String name;
-	/** name of music for this level */
+	/** name of music for this level. */
 	private String music;
-	/** file name of the INI file containing the level information */
+	/** file name of the INI file containing the level information. */
 	private String fileName;
 
 	/**

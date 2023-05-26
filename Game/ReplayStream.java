@@ -285,9 +285,9 @@ public class ReplayStream {
  * @author Volker Oth
  */
 class ReplayEvent {
-    /** frame counter */
+    /** frame counter. */
     int frameCtr;
-    /** event type */
+    /** event type. */
     int type;
 
     /**
@@ -318,9 +318,9 @@ class ReplayEvent {
  * @author Volker Oth
  */
 class ReplayAssignSkillEvent extends ReplayEvent {
-    /** skill */
+    /** skill. */
     Lemming.Type skill;
-    /** Lemming */
+    /** Lemming. */
     int lemming;
 
     /**
@@ -384,7 +384,7 @@ class ReplaySelectSkillEvent extends ReplayEvent {
  * @author Volker Oth
  */
 class ReplayMoveXPosEvent extends ReplayEvent {
-    /** screen x position */
+    /** screen x position. */
     int xPos;
 
     /**

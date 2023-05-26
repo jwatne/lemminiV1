@@ -26,24 +26,24 @@ import java.awt.image.BufferedImage;
  */
 public class MiniMap {
 
-	/** color of Lemmings in mini map */
+	/** color of Lemmings in mini map. */
 	final private static Color LEMM_COLOR = Color.RED;
-	/** color of screen frame in mini map */
+	/** color of screen frame in mini map. */
 	final private static Color BORDER_COLOR = Color.YELLOW;
 
-	/** image used for mini map */
+	/** image used for mini map. */
 	private static BufferedImage img;
-	/** X position in main gfx */
+	/** X position in main gfx. */
 	private static int xPos;
-	/** Y position in main gfx */
+	/** Y position in main gfx. */
 	private static int yPos;
-	/** X scale */
+	/** X scale. */
 	private static int scaleX;
-	/** Y scale */
+	/** Y scale. */
 	private static int scaleY;
-	/** height of mini map */
+	/** height of mini map. */
 	private static int height;
-	/** width of mini map */
+	/** width of mini map. */
 	private static int width;
 
 	/**

@@ -11,31 +11,31 @@ import Tools.ToolBox;
  * @author Volker Oth
  */
 public class LemmingResource {
-    /** relative foot X position in pixels inside bitmap */
+    /** relative foot X position in pixels inside bitmap. */
     int footX;
-    /** relative foot Y position in pixels inside bitmap */
+    /** relative foot Y position in pixels inside bitmap. */
     int footY;
-    /** mask collision ("mid") position above foot in pixels */
+    /** mask collision ("mid") position above foot in pixels. */
     int size;
-    /** width of image in pixels */
+    /** width of image in pixels. */
     int width;
-    /** height of image in pixels */
+    /** height of image in pixels. */
     int height;
-    /** number of animation frames */
+    /** number of animation frames. */
     int frames;
-    /** animation mode */
+    /** animation mode. */
     Lemming.Animation animMode;
-    /** number of directions (1 or 2) */
+    /** number of directions (1 or 2). */
     int dirs;
     int maskStep;
-    /** array of images to store the animation [Direction][AnimationFrame] */
+    /** array of images to store the animation [Direction][AnimationFrame]. */
     private final BufferedImage img[][];
     /**
      * array of removal masks used for digging/bashing/mining/explosions etc.
      * [Direction]
      */
     private final Mask mask[];
-    /** array of check masks for indestructible pixels [Direction] */
+    /** array of check masks for indestructible pixels [Direction]. */
     private final Mask iMask[];
 
     /**

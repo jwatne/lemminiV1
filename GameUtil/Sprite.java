@@ -33,31 +33,31 @@ public class Sprite {
 	 * Animation style.
 	 */
 	public static enum Animation {
-		/** not animated */
+		/** not animated. */
 		NONE,
-		/** endless animation loop */
+		/** endless animation loop. */
 		LOOP,
-		/** triggered animation */
+		/** triggered animation. */
 		TRIGGERED,
-		/** one animation cycle */
+		/** one animation cycle. */
 		ONCE
 	};
 
-	/** sprite width in pixels */
+	/** sprite width in pixels. */
 	protected int width;
-	/** sprite height in pixels */
+	/** sprite height in pixels. */
 	protected int height;
-	/** number of animation frames */
+	/** number of animation frames. */
 	private int numframes;
-	/** index of current animation frame */
+	/** index of current animation frame. */
 	private int frameIdx;
-	/** animation mode */
+	/** animation mode. */
 	private Animation animMode;
-	/** index for a sound */
+	/** index for a sound. */
 	private int sound;
-	/** boolean flag: animation was triggered */
+	/** boolean flag: animation was triggered. */
 	private boolean triggered;
-	/** array of animation frames */
+	/** array of animation frames. */
 	private BufferedImage frames[];
 
 	/**
@@ -141,7 +141,7 @@ public class Sprite {
 	 */
 	public BufferedImage getImageAnim() {
 		BufferedImage i = frames[frameIdx];
-		
+
 		switch (animMode) {
 			case LOOP:
 				if(++frameIdx >= numframes)

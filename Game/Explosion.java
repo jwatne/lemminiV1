@@ -31,38 +31,38 @@ import Tools.ToolBox;
  */
 public class Explosion {
 
-	/** number of particles per explosion */
+	/** number of particles per explosion. */
 	private final static int PARTICLE_NUM = 24;
-	/** maximum step width (velocity) in X direction (pixels per step) */
+	/** maximum step width (velocity) in X direction (pixels per step). */
 	private final static double MAX_DX = 1.5;
-	/** minimum step width (velocity) in X direction (pixels per step) */
+	/** minimum step width (velocity) in X direction (pixels per step). */
 	private final static double MIN_DX = -1.5;
-	/** maximum step width (velocity) in Y direction (pixels per step) */
+	/** maximum step width (velocity) in Y direction (pixels per step). */
 	private final static double MAX_DY = 1;
-	/** minimum step width (velocity) in Y direction (pixels per step) */
+	/** minimum step width (velocity) in Y direction (pixels per step). */
 	private final static double MIN_DY = -4;
-	/** mean life time of a particle (in animation frames) */
+	/** mean life time of a particle (in animation frames). */
 	private final static int LIFE_COUNTER = 64;
-	/** life time variance of a particle (in animation frames) */
+	/** life time variance of a particle (in animation frames). */
 	private final static int LIFE_VARIANCE = 16;
-	/** factor used to simulate gravity (drags particles down) */
+	/** factor used to simulate gravity (drags particles down). */
 	private final static double GRAVITY = 0.1;
-	/** Remove the explosion bitmaps after REMOVE_IMAGE_CTR animation steps */
+	/** Remove the explosion bitmaps after REMOVE_IMAGE_CTR animation steps. */
 	private final static int REMOVE_IMAGE_CTR = 2;
 
-	/** array of particles */
+	/** array of particles. */
 	private final Particle particles[];
-	/** time/frame counter for explosion */
+	/** time/frame counter for explosion. */
 	private int counter;
-	/** x position in pixels */
+	/** x position in pixels. */
 	private final int xExp;
-	/** y position in pixels */
+	/** y position in pixels. */
 	private final int yExp;
-	/** time/frame position when all particles are vanished */
+	/** time/frame position when all particles are vanished. */
 	private int maxCounter;
-	/** flag: explosion is finished */
+	/** flag: explosion is finished. */
 	private boolean finished;
-	/** explosion image used for the first few frames */
+	/** explosion image used for the first few frames. */
 	private static BufferedImage expImg;
 
 	/**
@@ -172,17 +172,17 @@ public class Explosion {
 	 * @author Volker Oth
 	 */
 	private static class Particle {
-		/** x position in pixels */
+		/** x position in pixels. */
 		double x;
-		/** y position in pixels */
+		/** y position in pixels. */
 		double y;
-		/** x step width (velocity) in pixels per step */
+		/** x step width (velocity) in pixels per step. */
 		double dx;
-		/** y step width (velocity) in pixels per step */
+		/** y step width (velocity) in pixels per step. */
 		double dy;
-		/** particle color */
+		/** particle color. */
 		Color color;
-		/** life counter in steps (counting down) */
+		/** life counter in steps (counting down). */
 		int lifeCtr;
 
 		/**

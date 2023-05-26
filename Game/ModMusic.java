@@ -34,18 +34,18 @@ import micromod.Micromod;
  * @author Volker Oth
  */
 public class ModMusic implements Runnable {
-	/** sample frequency */
+	/** sample frequency. */
 	private final static int SAMPLE_RATE = 44100;
 
-	/** object to play MODs */
+	/** object to play MODs. */
 	private Micromod micromod;
-	/** flag: loop the song */
+	/** flag: loop the song. */
 	private boolean songloop;
-	/** flag: currently playing */
+	/** flag: currently playing. */
 	private boolean play;
-	/** thread for playing */
+	/** thread for playing. */
 	private Thread mmThread;
-	/** data line used to play samples */
+	/** data line used to play samples. */
 	private SourceDataLine line;
 
 	/**

@@ -40,18 +40,18 @@ import Tools.ToolBox;
  * @author Volker Oth
  */
 public class Level {
-    /** maximum width of level */
+    /** maximum width of level. */
     public final static int WIDTH = 1664 * 2;
-    /** maximum height of level */
+    /** maximum height of level. */
     public final static int HEIGHT = 160 * 2;
-    /** array of default ARGB colors for particle effects */
+    /** array of default ARGB colors for particle effects. */
     public final static int DEFAULT_PARTICLE_COLORS[] = { 0xff00ff00,
             0xff0000ff, 0xffffffff, 0xffffffff, 0xffff0000 };
 
-    /** array of default styles */
+    /** array of default styles. */
     private final static String STYLES[] = { "dirt", "fire", "marble", "pillar",
             "crystal", "brick", "rock", "snow", "Bubble", "special" };
-    /** template color to be replaced with debris color */
+    /** template color to be replaced with debris color. */
     private final static int TEMPLATE_COLOR = 0xffff00ff;
 
     /**
@@ -64,11 +64,11 @@ public class Level {
      * background image
      */
     private SpriteObject sprObjFront[];
-    /** array of all sprite objects (in front and behind) */
+    /** array of all sprite objects (in front and behind). */
     private SpriteObject sprObjects[];
-    /** array of level entries */
+    /** array of level entries. */
     private Entry entries[];
-    /** release rate : 0 is slowest, 0x0FA (250) is fastest */
+    /** release rate : 0 is slowest, 0x0FA (250) is fastest. */
     private int releaseRate;
     /**
      * number of Lemmings in this level (maximum 0x0072 in original LVL format)
@@ -79,39 +79,39 @@ public class Level {
      * Lemmings
      */
     private int numToRescue;
-    /** time limit in seconds */
+    /** time limit in seconds. */
     private int timeLimitSeconds;
-    /** number of climbers in this level : max 0xfa (250) */
+    /** number of climbers in this level : max 0xfa (250). */
     private int numClimbers;
-    /** number of floaters in this level : max 0xfa (250) */
+    /** number of floaters in this level : max 0xfa (250). */
     private int numFloaters;
-    /** number of bombers in this level : max 0xfa (250) */
+    /** number of bombers in this level : max 0xfa (250). */
     private int numBombers;
-    /** number of blockers in this level : max 0xfa (250) */
+    /** number of blockers in this level : max 0xfa (250). */
     private int numBlockers;
-    /** number of builders in this level : max 0xfa (250) */
+    /** number of builders in this level : max 0xfa (250). */
     private int numBuilders;
-    /** number of bashers in this level : max 0xfa (250) */
+    /** number of bashers in this level : max 0xfa (250). */
     private int numBashers;
-    /** number of miners in this level : max 0xfa (250) */
+    /** number of miners in this level : max 0xfa (250). */
     private int numMiners;
-    /** number of diggers in this level : max 0xfa (250) */
+    /** number of diggers in this level : max 0xfa (250). */
     private int numDiggers;
-    /** start screen x pos : 0 - 0x04f0 (1264) rounded to modulo 8 */
+    /** start screen x pos : 0 - 0x04f0 (1264) rounded to modulo 8. */
     private int xPos;
-    /** background color as ARGB */
+    /** background color as ARGB. */
     private int bgCol;
-    /** background color */
+    /** background color. */
     private Color bgColor;
-    /** color used for steps and debris */
+    /** color used for steps and debris. */
     private int debrisCol;
-    /** array of ARGB colors used for particle effects */
+    /** array of ARGB colors used for particle effects. */
     private int particleCol[];
-    /** maximum safe fall distance */
+    /** maximum safe fall distance. */
     private int maxFallDistance;
-    /** this level is a SuperLemming level (runs faster) */
+    /** this level is a SuperLemming level (runs faster). */
     private boolean superlemming;
-    /** level is completely loaded */
+    /** level is completely loaded. */
     private boolean ready = false;
     /**
      * objects like doors - originally 32 objects where each consists of 8 bytes
@@ -122,7 +122,7 @@ public class Level {
      * stencil
      */
     private Image tiles[];
-    /** sprite objects of all sprite objects available in this style */
+    /** sprite objects of all sprite objects available in this style. */
     private SpriteObject sprObjAvailable[];
     /**
      * terrain the Lemmings walk on etc. - originally 400 tiles, 4 bytes each
@@ -133,9 +133,9 @@ public class Level {
      * each
      */
     private ArrayList<Steel> steel; //
-    /** level name - originally 32 bytes ASCII - filled with whitespaces */
+    /** level name - originally 32 bytes ASCII - filled with whitespaces. */
     private String lvlName;
-    /** used to read in the configuration file */
+    /** used to read in the configuration file. */
     private Props props;
 
     /**
@@ -1041,7 +1041,7 @@ public class Level {
  * @author Volker Oth
  */
 class LvlObject {
-    /** paint mode: only visible on a terrain pixel */
+    /** paint mode: only visible on a terrain pixel. */
     static final int MODE_VIS_ON_TERRAIN = 8;
     /**
      * paint mode: don't overwrite terrain pixel in the original background
@@ -1053,18 +1053,18 @@ class LvlObject {
      * image. special NO_OVERWRITE case for objects hidden behind terrain.
      */
     static final int MODE_HIDDEN = 5;
-    /** paint mode: paint without any further checks */
+    /** paint mode: paint without any further checks. */
     static final int MODE_FULL = 0;
 
-    /** identifier */
+    /** identifier. */
     int id;
-    /** x position in pixels */
+    /** x position in pixels. */
     int xPos;
-    /** y position in pixels */
+    /** y position in pixels. */
     int yPos;
-    /** paint mode - must be one of the MODEs above */
+    /** paint mode - must be one of the MODEs above. */
     int paintMode;
-    /** flag: paint the object upside down */
+    /** flag: paint the object upside down. */
     boolean upsideDown;
 
     /**
@@ -1087,22 +1087,22 @@ class LvlObject {
  * @author Volker Oth
  */
 class Terrain {
-    /** paint mode: don't overwrite existing terrain pixel */
+    /** paint mode: don't overwrite existing terrain pixel. */
     static final int MODE_NO_OVERWRITE = 8;
-    /** paint mode: upside down */
+    /** paint mode: upside down. */
     static final int MODE_UPSIDE_DOWN = 4;
     /**
      * paint mode: remove existing terrain pixels instead of overdrawing them
      */
     static final int MODE_REMOVE = 2;
 
-    /** identifier */
+    /** identifier. */
     int id;
-    /** x position in pixels */
+    /** x position in pixels. */
     int xPos;
-    /** y position in pixels */
+    /** y position in pixels. */
     int yPos;
-    /** modifier - must be one of the above MODEs */
+    /** modifier - must be one of the above MODEs. */
     int modifier;
 
     /**
@@ -1124,13 +1124,13 @@ class Terrain {
  * @author Volker Oth
  */
 class Steel {
-    /** x position in pixels */
+    /** x position in pixels. */
     int xPos;
-    /** y position in pixels */
+    /** y position in pixels. */
     int yPos;
-    /** width in pixels */
+    /** width in pixels. */
     int width;
-    /** height in pixels */
+    /** height in pixels. */
     int height;
 
     /**
@@ -1152,11 +1152,11 @@ class Steel {
  * @author Volker Oth
  */
 class Entry {
-    /** identifier */
+    /** identifier. */
     int id;
-    /** x position in pixels */
+    /** x position in pixels. */
     int xPos;
-    /** y position in pixels */
+    /** y position in pixels. */
     int yPos;
 
     /**

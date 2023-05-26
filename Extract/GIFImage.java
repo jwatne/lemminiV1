@@ -4,13 +4,13 @@ package extract;
  * Stores GIF Image in RAM.
  */
 class GIFImage {
-    /** width in pixels */
+    /** width in pixels. */
     private final int width;
-    /** height in pixels */
+    /** height in pixels. */
     private final int height;
-    /** pixel data */
+    /** pixel data. */
     private final byte[] pixels;
-    /** color palette */
+    /** color palette. */
     final Palette palette;
 
     /**

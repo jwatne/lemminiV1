@@ -31,49 +31,49 @@ import Tools.MicrosecondTimer;
  */
 public class KeyRepeat {
 
-	/** key repeat event */
+	/** key repeat event. */
 	public static enum Event {
-		/** no state reached yet */
+		/** no state reached yet. */
 		NONE,
-		/** single click detected */
+		/** single click detected. */
 		SINGLE_CLICK,
-		/** double click detected */
+		/** double click detected. */
 		DOUBLE_CLICK
 	}
 
-	/** repeat state */
+	/** repeat state. */
 	private enum State {
-		/** off state */
+		/** off state. */
 		OFF,
-		/** wait for timeFirstPress to pass */
+		/** wait for timeFirstPress to pass. */
 		DETECT_FIRST,
-		/** wait for timeRepeat to pass */
+		/** wait for timeRepeat to pass. */
 		REPEAT
 	}
 
-	/** double click state */
+	/** double click state. */
 	private enum DcState {
-		/** not pressed */
+		/** not pressed. */
 		OFF,
-		/** pressed and released once */
+		/** pressed and released once. */
 		PRESSED_ONCE
 	}
 
-	/** timer used as time base */
+	/** timer used as time base. */
 	private MicrosecondTimer timer;
-	/** internal debounce state */
+	/** internal debounce state. */
 	private State state;
-	/** double click state */
+	/** double click state. */
 	private DcState ddstate;
-	/** 32bit debounce mask - up to 32 triggers can used for the same event */
+	/** 32bit debounce mask - up to 32 triggers can used for the same event. */
 	private int mask;
-	/** time after which a pressed (and not released) key is recognized as key press (microseconds) */
+	/** time after which a pressed (and not released) key is recognized as key press (microseconds). */
 	private long timeFirstPress;
-	/** time after which a pressed key fires repeatedly (microseconds) */
+	/** time after which a pressed key fires repeatedly (microseconds). */
 	private long timeRepeat;
-	/** the maximum time between two clicks to be recognized as double click (microseconds) */
+	/** the maximum time between two clicks to be recognized as double click (microseconds). */
 	private long timeDoubleClick;
-	/** repeat event */
+	/** repeat event. */
 	private Event event;
 
 	/**

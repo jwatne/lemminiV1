@@ -31,25 +31,25 @@ import Tools.ToolBox;
  */
 public class MiscGfx {
 
-    /** Index of images */
+    /** Index of images. */
     public static enum Index {
-        /** border for the mini map */
+        /** border for the mini map. */
         BORDER,
-        /** Lemmin i logo */
+        /** Lemmin i logo. */
         LEMMINI,
-        /** green background tile */
+        /** green background tile. */
         TILE_GREEN,
-        /** brows background tile */
+        /** brows background tile. */
         TILE_BROWN,
-        /** replay sign 1 */
+        /** replay sign 1. */
         REPLAY_1,
-        /** replay sign 2 */
+        /** replay sign 2. */
         REPLAY_2,
-        /** selection marker for replay */
+        /** selection marker for replay. */
         SELECT
     }
 
-    /** array of images */
+    /** array of images. */
     private static BufferedImage image[];
 
     /**

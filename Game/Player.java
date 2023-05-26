@@ -29,15 +29,15 @@ import Tools.Props;
  */
 public class Player {
 
-	/** property class to store player settings persistently */
+	/** property class to store player settings persistently. */
 	private final Props props;
-	/** name of the INI file used for persistence */
+	/** name of the INI file used for persistence. */
 	private final String iniFileStr;
-	/** used to store level progress */
+	/** used to store level progress. */
 	private final Map<String, GroupBitfield> lvlGroup;
-	/** cheat mode enabled? */
+	/** cheat mode enabled?. */
 	private boolean cheat;
-	/** player's name */
+	/** player's name. */
 	private final String name;
 
 	/**

@@ -29,51 +29,51 @@ public class Stencil {
 	 * since some combinations of properties are possible.
 	 * Yet of course not all combinations are possible or make sense.
 	 */
-	/** empty space - background is visible */
+	/** empty space - background is visible. */
 	public final static int MSK_EMPTY = 0;
-	/** brick - can be destroyed, Lemmings can walk on it */
+	/** brick - can be destroyed, Lemmings can walk on it. */
 	public final static int MSK_BRICK = 1;
-	/** steel - can't be destroyed, Lemmings can walk on it */
+	/** steel - can't be destroyed, Lemmings can walk on it. */
 	public final static int MSK_STEEL = 2;
-	/** Lemmings can either walk on steel or on brick */
+	/** Lemmings can either walk on steel or on brick. */
 	public final static int MSK_WALK_ON = MSK_BRICK|MSK_STEEL;
-	/** stair build by a builder - note that this is just an additional attribute - brick is also needed to walk on it */
+	/** stair build by a builder - note that this is just an additional attribute - brick is also needed to walk on it. */
 	public final static int MSK_STAIR = 4;
-	/** right side of stopper mask - reflects to the right */
+	/** right side of stopper mask - reflects to the right. */
 	public final static int MSK_STOPPER_RIGHT = 8;
-	/** left side of stopper mask - reflects to the left */
+	/** left side of stopper mask - reflects to the left. */
 	public final static int MSK_STOPPER_LEFT = 16;
-	/** stopper mask (either left or right) */
+	/** stopper mask (either left or right). */
 	public final static int MSK_STOPPER = MSK_STOPPER_RIGHT|MSK_STOPPER_LEFT;
-	/** arrow to the right - no digging to the left */
+	/** arrow to the right - no digging to the left. */
 	public final static int MSK_NO_DIG_LEFT = 32;
-	/** arrow to the left - no digging to the right */
+	/** arrow to the left - no digging to the right. */
 	public final static int MSK_NO_DIG_RIGHT = 64;
-	/** no digging - either left or right */
+	/** no digging - either left or right. */
 	public final static int MSK_NO_DIG = MSK_NO_DIG_LEFT|MSK_NO_DIG_RIGHT;
 
-	/** mask used to erase stencil properties when a pixel is erased */
+	/** mask used to erase stencil properties when a pixel is erased. */
 	public final static int MSK_ERASE = ~(Stencil.MSK_WALK_ON|Stencil.MSK_STAIR|Stencil.MSK_NO_DIG);
 
-	/** a trap triggering the drowning animation - i.e. water */
+	/** a trap triggering the drowning animation - i.e. water. */
 	public final static int MSK_TRAP_DROWN = 128;
-	/** a trap that replaces the Lemming with a special death animation */
+	/** a trap that replaces the Lemming with a special death animation. */
 	public final static int MSK_TRAP_REPLACE = 256;
-	/** a trap that triggers the normal death animation */
+	/** a trap that triggers the normal death animation. */
 	public final static int MSK_TRAP_DIE = 512;
-	/** a trap (either DROWN, REPLACE or DIE) */
+	/** a trap (either DROWN, REPLACE or DIE). */
 	public final static int MSK_TRAP = MSK_TRAP_DROWN|MSK_TRAP_REPLACE|MSK_TRAP_DIE;
-	/** the level exit */
+	/** the level exit. */
 	public final static int MSK_EXIT = 1024;
 
-	/** number of bits the identifier is shifter up (below is the bitmask part) */
+	/** number of bits the identifier is shifter up (below is the bitmask part). */
 	private final static int ID_SHIFT_VAL = 16;
 
-	/** array which represents the stencil buffer */
+	/** array which represents the stencil buffer. */
 	private int stencil[];
-	/** width of stencil (=width of level) */
+	/** width of stencil (=width of level). */
 	private int width;
-	/** height of stencil (=height of level) */
+	/** height of stencil (=height of level). */
 	private int height;
 
 

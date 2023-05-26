@@ -11,11 +11,11 @@ package game;
  * @author Volker Oth
  */
 public class TrapDoor {
-    /** pattern for three entries */
+    /** pattern for three entries. */
     private final static int[] PATTERN3 = { 0, 1, 2, 1 };
-    /** number of entries */
+    /** number of entries. */
     private static int entries;
-    /** entry counter */
+    /** entry counter. */
     private static int counter;
 
     /**

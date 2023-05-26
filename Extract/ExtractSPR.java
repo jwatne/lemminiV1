@@ -31,12 +31,12 @@ import java.util.List;
  * @author Volker Oth
  */
 public class ExtractSPR {
-    /** palette index of transparent color */
+    /** palette index of transparent color. */
     private final static int transparentIndex = 0;
 
-    /** array of GIF images to store to disk */
+    /** array of GIF images to store to disk. */
     private GIFImage images[];
-    /** color palette */
+    /** color palette. */
     private Palette palette = null;
     /**
      * buffer used to compress the palette (remove double entries) to work

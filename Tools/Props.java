@@ -31,9 +31,9 @@ import java.util.Properties;
  */
 public class Props {
 
-	/** extended hash to store properties */
+	/** extended hash to store properties. */
 	private final Properties hash;
-	/** header string */
+	/** header string. */
 	private String header;
 
 	/**
@@ -46,7 +46,7 @@ public class Props {
 
 	/**
 	 * Set the property file header
-	 * 
+	 *
 	 * @param h String containing Header information
 	 */
 	public void setHeader(final String h) {
@@ -62,7 +62,7 @@ public class Props {
 
 	/**
 	 * Remove key
-	 * 
+	 *
 	 * @param key Name of key
 	 */
 	public void remove(final String key) {
@@ -71,7 +71,7 @@ public class Props {
 
 	/**
 	 * Set string property
-	 * 
+	 *
 	 * @param key   Name of the key to set value for
 	 * @param value Value to set
 	 */
@@ -81,7 +81,7 @@ public class Props {
 
 	/**
 	 * Set integer property
-	 * 
+	 *
 	 * @param key   Name of the key to set value for
 	 * @param value Value to set
 	 */
@@ -91,7 +91,7 @@ public class Props {
 
 	/**
 	 * Set boolean property
-	 * 
+	 *
 	 * @param key   Name of the key to set value for
 	 * @param value Value to set
 	 */
@@ -101,7 +101,7 @@ public class Props {
 
 	/**
 	 * Set double property
-	 * 
+	 *
 	 * @param key   Name of the key to set value for
 	 * @param value Value to set
 	 */
@@ -111,7 +111,7 @@ public class Props {
 
 	/**
 	 * Get string property
-	 * 
+	 *
 	 * @param key Name of the key to get value for
 	 * @param def Default value in case key is not found
 	 * @return Value of key as String
@@ -123,7 +123,7 @@ public class Props {
 
 	/**
 	 * Get integer property
-	 * 
+	 *
 	 * @param key Name of the key to get value for
 	 * @param def Default value in case key is not found
 	 * @return Value of key as int
@@ -138,7 +138,7 @@ public class Props {
 
 	/**
 	 * Get integer array property
-	 * 
+	 *
 	 * @param key Name of the key to get value for
 	 * @param def Default value in case key is not found
 	 * @return Value of key as array of int
@@ -163,7 +163,7 @@ public class Props {
 
 	/**
 	 * Get string array property
-	 * 
+	 *
 	 * @param key Name of the key to get value for
 	 * @param def Default value in case key is not found
 	 * @return Value of key as array of string
@@ -183,7 +183,7 @@ public class Props {
 
 	/**
 	 * Get boolean property
-	 * 
+	 *
 	 * @param key Name of the key to get value for
 	 * @param def Default value in case key is not found
 	 * @return Value of key as boolean
@@ -198,7 +198,7 @@ public class Props {
 
 	/**
 	 * Get double property
-	 * 
+	 *
 	 * @param key Name of the key to get value for
 	 * @param def default value in case key is not found
 	 * @return value of key as double
@@ -216,7 +216,7 @@ public class Props {
 
 	/**
 	 * Save property file
-	 * 
+	 *
 	 * @param fname File name of property file
 	 * @return True if OK, false if exception occurred
 	 */
@@ -233,7 +233,7 @@ public class Props {
 
 	/**
 	 * Load property file
-	 * 
+	 *
 	 * @param file File handle of property file
 	 * @return True if OK, false if exception occurred
 	 */
@@ -250,7 +250,7 @@ public class Props {
 
 	/**
 	 * Load property file
-	 * 
+	 *
 	 * @param fname File name of property file
 	 * @return True if OK, false if exception occurred
 	 */
@@ -267,7 +267,7 @@ public class Props {
 
 	/**
 	 * Parse hex, binary or octal number
-	 * 
+	 *
 	 * @param s String that contains one number
 	 * @return Integer value of string
 	 */
@@ -302,7 +302,7 @@ public class Props {
 	/**
 	 * Remove comment from line. Comment character is "#".
 	 * Everything behind (including "#") will be removed
-	 * 
+	 *
 	 * @param s String to search for comment
 	 * @return String without comment
 	 */
@@ -316,7 +316,7 @@ public class Props {
 
 	/**
 	 * Remove trailing and leading spaces from a string
-	 * 
+	 *
 	 * @param s String to process
 	 * @return String without leading and trailing spaces
 	 */

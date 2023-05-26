@@ -32,11 +32,11 @@ import Tools.ToolBox;
  */
 public class NumFont {
 
-	/** width in pixels */
+	/** width in pixels. */
 	private static int width;
-	/** height in pixels */
+	/** height in pixels. */
 	private static int height;
-	/** array of images - one for each cipher 0..9 */
+	/** array of images - one for each cipher 0..9. */
 	private static BufferedImage numImg[];
 
 	/**

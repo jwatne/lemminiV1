@@ -24,7 +24,7 @@ import java.math.BigInteger;
  */
 public class GroupBitfield extends BigInteger {
 
-	/** define "1" to avoid multiple instances */
+	/** define "1" to avoid multiple instances. */
 	final static GroupBitfield ONE = new GroupBitfield("1");
 
 	private final static long serialVersionUID = 1;

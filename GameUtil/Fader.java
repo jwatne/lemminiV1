@@ -32,38 +32,38 @@ import Tools.ToolBox;
  * @author Volker Oth
  */
 public class Fader {
-    /** width of square to use for fading */
+    /** width of square to use for fading. */
     private static final int WIDTH = 64;
-    /** height of square to use for fading */
+    /** height of square to use for fading. */
     private static final int HEIGHT = 64;
-    /** maximum alpha (opaque) */
+    /** maximum alpha (opaque). */
     private static final int MAX_ALPHA = 0xff;
 
-    /** Fader state */
+    /** Fader state. */
     public static enum State {
-        /** don't fade */
+        /** don't fade. */
         OFF,
-        /** fade in */
+        /** fade in. */
         IN,
-        /** fade out */
+        /** fade out. */
         OUT
     }
 
-    /** current alpha value */
+    /** current alpha value. */
     private static int fadeValue;
-    /** current fade state */
+    /** current fade state. */
     private static State fadeState = State.OFF;
-    /** step size for fading */
+    /** step size for fading. */
     private static int fadeStep = 14;
-    /** color of the fading rectangle */
+    /** color of the fading rectangle. */
     private static int color = 0; // black
-    /** alpha value of the fading rectangle */
+    /** alpha value of the fading rectangle. */
     private static int alpha = 0x80; // half transparent
-    /** width of faded area */
+    /** width of faded area. */
     private static int width;
-    /** height of faded area */
+    /** height of faded area. */
     private static int height;
-    /** the image used as fading rectangle */
+    /** the image used as fading rectangle. */
     private static BufferedImage alphaImg = null;
     /**
      * the graphics used as fading rectangle (static to avoid multiple

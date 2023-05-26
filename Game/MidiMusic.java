@@ -37,9 +37,9 @@ import javax.sound.midi.Synthesizer;
  */
 public class MidiMusic {
 
-	/** Midi sequencer */
+	/** Midi sequencer. */
 	private Sequencer sequencer;
-	/** flag: initialization is finished and midi file can be played */
+	/** flag: initialization is finished and midi file can be played. */
 	private boolean canPlay;
 
 	/**

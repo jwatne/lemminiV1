@@ -26,13 +26,13 @@ import java.awt.image.BufferedImage;
  * @author Volker Oth
  */
 public class Mask {
-	/** number of pixels in mask that may be indestructible before action is stopped */
+	/** number of pixels in mask that may be indestructible before action is stopped. */
 	private int maxMaskPixels[];
-	/** width of mask in pixels */
+	/** width of mask in pixels. */
 	private int width;
-	/** height of mask in pixels */
+	/** height of mask in pixels. */
 	private int height;
-	/** array of byte arrays. Note: masks may be animated and thus contain multiple frames. */
+	/** array of byte arrays. Note: masks may be animated and thus contain multiple frames.. */
 	private byte mask[][];
 
 	/**

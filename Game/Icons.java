@@ -36,42 +36,42 @@ import Tools.ToolBox;
  */
 public class Icons {
 
-	/** icon width in pixels */
+	/** icon width in pixels. */
 	public final static int WIDTH = 32;
-	/** icon height in pixels */
+	/** icon height in pixels. */
 	public final static int HEIGHT = 40;
 
-	/** Icon types */
+	/** Icon types. */
 	public static enum Type {
-		/** minus icon */
+		/** minus icon. */
 		MINUS,
-		/** plus icon */
+		/** plus icon. */
 		PLUS,
-		/** climber icon */
+		/** climber icon. */
 		CLIMB,
-		/** floater icon */
+		/** floater icon. */
 		FLOAT,
-		/** bomber icon */
+		/** bomber icon. */
 		BOMB,
-		/** blocker icon */
+		/** blocker icon. */
 		BLOCK,
-		/** builder icon */
+		/** builder icon. */
 		BUILD,
-		/** basher icon */
+		/** basher icon. */
 		BASH,
-		/** miner icon */
+		/** miner icon. */
 		MINE,
-		/** digger icon */
+		/** digger icon. */
 		DIG,
-		/** pause icon */
+		/** pause icon. */
 		PAUSE,
-		/** nuke icon */
+		/** nuke icon. */
 		NUKE,
-		/** fast forward icon */
+		/** fast forward icon. */
 		FFWD,
-		/** an empty icon (not used) */
+		/** an empty icon (not used). */
 		EMPTY,
-		/** invalid no such icon */
+		/** invalid no such icon. */
 		INVALID;
 
 		private static final Map<Integer,Type> lookup = new HashMap<Integer,Type>();
@@ -91,18 +91,18 @@ public class Icons {
 		}
 	}
 
-	/** 1st radio button */
+	/** 1st radio button. */
 	private final static int FIRST_RADIO = Type.CLIMB.ordinal();
-	/** last radio button */
+	/** last radio button. */
 	private final static int LAST_RADIO = Type.DIG.ordinal();
-	/** last icon to be drawn */
+	/** last icon to be drawn. */
 	private final static int LAST_DRAWN = Type.FFWD.ordinal();
 
-	/** array of Sprites that contains the icons */
+	/** array of Sprites that contains the icons. */
 	private static Sprite icons[];
-	/** buffered image that contains the whole icon bar in its current state */
+	/** buffered image that contains the whole icon bar in its current state. */
 	private static BufferedImage iconImg;
-	/** graphics object used to draw on iconImg */
+	/** graphics object used to draw on iconImg. */
 	private static Graphics2D iconGfx;
 
 

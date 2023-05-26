@@ -46,10 +46,10 @@ public class PatchService {
      * index for files to be patched - static since multiple runs are possible
      */
     private static int patchNo = 0;
-    /** path of the DIF files */
+    /** path of the DIF files. */
     private String patchPath;
-    /** array of extensions to be ignored - read from ini */
-    private String[] ignoreExt = { null };
+    /** array of extensions to be ignored - read from ini. */
+    private String[] ignoreExt = {null};
 
     /**
      * Create DIF and CRC files, if enabled.
@@ -77,7 +77,7 @@ public class PatchService {
                 Extract.out("\nCreate CRC ini");
 
                 try (FileWriter fCRCList = new FileWriter(
-                        Extract.CRC_PATH + Extract.CRC_INI_NAME);) {
+                        Extract.getCrcPath() + Extract.CRC_INI_NAME);) {
                     for (int i = 0; true; i++) {
                         String ppath;
                         ppath = props.get("pcrc_" + Integer.toString(i), "");
@@ -86,12 +86,12 @@ public class PatchService {
                             break;
                         }
 
-                        createCRCs(Extract.SOURCE_PATH, ppath, fCRCList,
+                        createCRCs(Extract.getSourcePath(), ppath, fCRCList,
                                 ignoreExt);
                     }
                 } catch (final IOException ex) {
                     throw new ExportException("Error processing "
-                            + Extract.CRC_PATH + Extract.CRC_INI_NAME + ": "
+                            + Extract.getCrcPath() + Extract.CRC_INI_NAME + ": "
                             + ex.getMessage());
                 }
 
@@ -132,7 +132,7 @@ public class PatchService {
         Extract.out("\nExtract files");
 
         for (int i = 0; true; i++) {
-            String copy[] = { null, null };
+            String copy[] = {null, null};
             // 0: name 1: crc
             copy = pprops.get("extract_" + Integer.toString(i), copy);
 
@@ -285,8 +285,8 @@ public class PatchService {
             final String sDir, final String pPath, final FileWriter fPatchList,
             final Map<String, Object> createdFiles) throws ExtractException {
         // add separators and create missing directories
-        Extract.SOURCE_PATH = Extract.addSeparator(sPath + sDir);
-        final File fSource = new File(Extract.SOURCE_PATH);
+        Extract.setSourcePath(Extract.addSeparator(sPath + sDir));
+        final File fSource = new File(Extract.getSourcePath());
         final String destPath = Extract.addSeparator(dPath + sDir);
         FileUtils.makeDirIfItDoesNotExist(destPath);
         patchPath = Extract.addSeparator(pPath);
@@ -313,7 +313,7 @@ public class PatchService {
         final File[] files = fSource.listFiles();
 
         if (files == null) {
-            throw new ExtractException("Path " + Extract.SOURCE_PATH
+            throw new ExtractException("Path " + Extract.getSourcePath()
                     + " doesn't exist or IO error occured.");
         }
 
@@ -342,7 +342,7 @@ public class PatchService {
                 }
             }
 
-            final String fnIn = Extract.SOURCE_PATH + files[i].getName();
+            final String fnIn = Extract.getSourcePath() + files[i].getName();
             final String fnOut = destPath + files[i].getName();
             String fnPatch = files[i].getName();
             pos = fnPatch.toLowerCase().lastIndexOf('.');
@@ -430,7 +430,8 @@ public class PatchService {
             final File[] files, final String subDir, final int filesIndex,
             final byte[] src) throws IOException, FileNotFoundException {
         final String subDirDecorated = subDir.replace('/', '@');
-        final String fnIn = Extract.SOURCE_PATH + files[filesIndex].getName();
+        final String fnIn = Extract.getSourcePath()
+                + files[filesIndex].getName();
         String out;
         // mark missing files: needs to be extracted from JAR
         final Adler32 crc = new Adler32();
@@ -492,7 +493,7 @@ public class PatchService {
         Extract.out("\nPatch files");
 
         for (int i = 0; true; i++) {
-            String ppath[] = { null, null };
+            String ppath[] = {null, null};
             // 0: name 1: crc
             ppath = pprops.get("patch_" + Integer.toString(i), ppath);
 

@@ -29,119 +29,119 @@ import Tools.ToolBox;
  * @author Volker Oth
  */
 public class GameController {
-	/** game state */
+	/** game state. */
 	public static enum State {
-		/** init state */
+		/** init state. */
 		INIT,
-		/** display intro screen */
+		/** display intro screen. */
 		INTRO,
-		/** display level briefing screen */
+		/** display level briefing screen. */
 		BRIEFING,
-		/** display level */
+		/** display level. */
 		LEVEL,
-		/** display debriefing screen */
+		/** display debriefing screen. */
 		DEBRIEFING,
-		/** fade out after level was finished */
+		/** fade out after level was finished. */
 		LEVEL_END
 	}
 
-	/** Transition states */
+	/** Transition states. */
 	public static enum TransitionState {
-		/** no fading */
+		/** no fading. */
 		NONE,
-		/** restart level: fade out, fade in briefing */
+		/** restart level: fade out, fade in briefing. */
 		RESTART_LEVEL,
-		/** replay level: fade out, fade in briefing */
+		/** replay level: fade out, fade in briefing. */
 		REPLAY_LEVEL,
-		/** load level: fade out, fade in briefing */
+		/** load level: fade out, fade in briefing. */
 		LOAD_LEVEL,
-		/** load replay: fade out, fade in briefing */
+		/** load replay: fade out, fade in briefing. */
 		LOAD_REPLAY,
-		/** level finished: fade out */
+		/** level finished: fade out. */
 		END_LEVEL,
-		/** go to intro: fade in intro */
+		/** go to intro: fade in intro. */
 		TO_INTRO,
-		/** go to briefing: fade in briefing */
+		/** go to briefing: fade in briefing. */
 		TO_BRIEFING,
-		/** go to debriefing: fade in debriefing */
+		/** go to debriefing: fade in debriefing. */
 		TO_DEBRIEFING,
-		/** go to level: fade in level */
+		/** go to level: fade in level. */
 		TO_LEVEL
 	}
 
-	/** key repeat bitmask for icons */
+	/** key repeat bitmask for icons. */
 	public final static int KEYREPEAT_ICON = 1;
-	/** key repeat bitmask for keys */
+	/** key repeat bitmask for keys. */
 	public final static int KEYREPEAT_KEY = 2;
 
-	/** bang sound */
+	/** bang sound. */
 	public final static int SND_BANG = 0;
-	/** brick wheel trap sound */
+	/** brick wheel trap sound. */
 	public final static int SND_CHAIN = 1;
-	/** setting new skill sound */
+	/** setting new skill sound. */
 	public final static int SND_CHANGE_OP = 2;
-	/** only some builder steps left sound */
+	/** only some builder steps left sound. */
 	public final static int SND_CHINK = 3;
-	/** dieing sound */
+	/** dieing sound. */
 	public final static int SND_DIE = 4;
-	/** trap door opening sound */
+	/** trap door opening sound. */
 	public final static int SND_DOOR = 5;
-	/** electric sound */
+	/** electric sound. */
 	public final static int SND_ELECTRIC = 6;
-	/** explode sound */
+	/** explode sound. */
 	public final static int SND_EXPLODE = 7;
-	/** fire sound */
+	/** fire sound. */
 	public final static int SND_FIRE = 8;
-	/** drowning sound */
+	/** drowning sound. */
 	public final static int SND_GLUG = 9;
-	/** start of level sound */
+	/** start of level sound. */
 	public final static int SND_LETSGO = 10;
-	/** bear/twiner trap sound */
+	/** bear/twiner trap sound. */
 	public final static int SND_MANTRAP = 11;
-	/** mouse clicked sound */
+	/** mouse clicked sound. */
 	public final static int SND_MOUSEPRE = 12;
-	/** nuke command sound */
+	/** nuke command sound. */
 	public final static int SND_OHNO = 13;
-	/** leaving exit sound */
+	/** leaving exit sound. */
 	public final static int SND_OING = 14;
-	/** scrape sound */
+	/** scrape sound. */
 	public final static int SND_SCRAPE = 15;
-	/** slicer sound */
+	/** slicer sound. */
 	public final static int SND_SLICER = 16;
-	/** splash sound */
+	/** splash sound. */
 	public final static int SND_SPLASH = 17;
-	/** faller splat sound */
+	/** faller splat sound. */
 	public final static int SND_SPLAT = 18;
-	/** ten tons sound, also pipe sucking lemmings in */
+	/** ten tons sound, also pipe sucking lemmings in. */
 	public final static int SND_TEN_TONS = 19;
-	/** icycle, brick stamper sound */
+	/** icycle, brick stamper sound. */
 	public final static int SND_THUD = 20;
-	/** thunk sound */
+	/** thunk sound. */
 	public final static int SND_THUNK = 21;
-	/** ting sound */
+	/** ting sound. */
 	public final static int SND_TING = 22;
-	/** yipee sound */
+	/** yipee sound. */
 	public final static int SND_YIPEE = 23;
 
-	/** updates 5 frames instead of 1 in fast forward mode */
+	/** updates 5 frames instead of 1 in fast forward mode. */
 	public final static int FAST_FWD_MULTI = 5;
-	/** updates 3 frames instead of 1 in Superlemming mode */
+	/** updates 3 frames instead of 1 in Superlemming mode. */
 	public final static int SUPERLEMM_MULTI = 3;
 	/**
 	 * time per frame in microseconds - this is the timing everything else is based
 	 * on
 	 */
 	public final static int MICROSEC_PER_FRAME = 30 * 1000;
-	/** resync if time difference greater than that (in microseconds) */
+	/** resync if time difference greater than that (in microseconds). */
 	public final static int MICROSEC_RESYNC = 5 * 30 * 1000;
 
-	/** redraw animated level obejcts every 3rd frame (about 100ms) */
+	/** redraw animated level obejcts every 3rd frame (about 100ms). */
 	private final static int MAX_ANIM_CTR = 100 * 1000 / MICROSEC_PER_FRAME;
-	/** open Entry after about 1.5 seconds */
+	/** open Entry after about 1.5 seconds. */
 	private final static int MAX_ENTRY_OPEN_CTR = 1500 * 1000 / MICROSEC_PER_FRAME;
-	/** one second is 33.33 ticks (integer would cause error) */
+	/** one second is 33.33 ticks (integer would cause error). */
 	private final static double MAX_SECOND_CTR = 1000.0 * 1000 / MICROSEC_PER_FRAME;
-	/** maximum release rate */
+	/** maximum release rate. */
 	private final static int MAX_RELEASE_RATE = 99;
 
 	/**
@@ -154,145 +154,145 @@ public class GameController {
 	 * (in microseconds)
 	 */
 	private final static long MICROSEC_RELEASE_DOUBLE_CLICK = 200 * 1000;
-	/** +/- icons: time for key repeat to kick in */
+	/** +/- icons: time for key repeat to kick in. */
 	private final static long MICROSEC_KEYREPEAT_START = 250 * 1000;
-	/** +/- icons: time for key repeat rate */
+	/** +/- icons: time for key repeat rate. */
 	private final static long MICROSEC_KEYREPEAT_REPEAT = 67 * 1000;
 
-	/** sound object */
+	/** sound object. */
 	public static Sound sound;
 
-	/** the background stencil */
+	/** the background stencil. */
 	private static Stencil stencil;
-	/** the background image */
+	/** the background image. */
 	private static BufferedImage bgImage;
-	/** flag: play music */
+	/** flag: play music. */
 	private static boolean musicOn;
-	/** flag: play sounds */
+	/** flag: play sounds. */
 	private static boolean soundOn;
-	/** flag: use advanced mouse selection methods */
+	/** flag: use advanced mouse selection methods. */
 	private static boolean advancedSelect;
-	/** flag: use classical mouse cursor behavior */
+	/** flag: use classical mouse cursor behavior. */
 	private static boolean classicalCursor;
-	/** graphics object for the background image */
+	/** graphics object for the background image. */
 	private static Graphics2D bgGfx;
-	/** color used to erase the background (black) */
+	/** color used to erase the background (black). */
 	private static Color blankColor = new Color(0xff, 0, 0, 0);
-	/** flag: fast forward mode is active */
+	/** flag: fast forward mode is active. */
 	private static boolean fastForward;
-	/** flag: Superlemming mode is active */
+	/** flag: Superlemming mode is active. */
 	private static boolean superLemming;
-	/** game state */
+	/** game state. */
 	private static State gameState;
-	/** transition (fading) state */
+	/** transition (fading) state. */
 	private static TransitionState transitionState;
-	/** skill to assign to lemming (skill icon) */
+	/** skill to assign to lemming (skill icon). */
 	private static Lemming.Type lemmSkill;
-	/** flag: entry is openend */
+	/** flag: entry is openend. */
 	private static boolean entryOpened;
-	/** flag: nuke was acticated */
+	/** flag: nuke was acticated. */
 	private static boolean nuke;
-	/** flag: game is paused */
+	/** flag: game is paused. */
 	private static boolean paused;
-	/** flag: cheat/debug mode is activated */
+	/** flag: cheat/debug mode is activated. */
 	private static boolean cheat = false;
-	/** flag: cheat mode was activated during play */
+	/** flag: cheat mode was activated during play. */
 	private static boolean wasCheated = false;
-	/** frame counter for handling opening of entries */
+	/** frame counter for handling opening of entries. */
 	private static int entryOpenCtr;
-	/** frame counter for handling time */
+	/** frame counter for handling time. */
 	private static double secondCtr;
-	/** frame counter used to handle release of new Lemmings */
+	/** frame counter used to handle release of new Lemmings. */
 	private static int releaseCtr;
-	/** threshold to release a new Lemming */
+	/** threshold to release a new Lemming. */
 	private static int releaseBase;
-	/** frame counter used to update animated sprite objects */
+	/** frame counter used to update animated sprite objects. */
 	private static int animCtr;
-	/** level object */
+	/** level object. */
 	private static Level level;
-	/** index of current difficulty level */
+	/** index of current difficulty level. */
 	private static int curDiffLevel;
-	/** index of current level pack */
+	/** index of current level pack. */
 	private static int curLevelPack;
-	/** index of current level */
+	/** index of current level. */
 	private static int curLevelNumber;
-	/** index of next difficulty level */
+	/** index of next difficulty level. */
 	private static int nextDiffLevel;
-	/** index of next level pack */
+	/** index of next level pack. */
 	private static int nextLevelPack;
-	/** index of next level */
+	/** index of next level. */
 	private static int nextLevelNumber;
-	/** list of all active Lemmings in the Level */
+	/** list of all active Lemmings in the Level. */
 	private static LinkedList<Lemming> lemmings;
-	/** list of all active explosions */
+	/** list of all active explosions. */
 	private static LinkedList<Explosion> explosions;
-	/** list of all Lemmings under the mouse cursor */
+	/** list of all Lemmings under the mouse cursor. */
 	private static List<Lemming> lemmsUnderCursor;
-	/** array of available level packs */
+	/** array of available level packs. */
 	private static LevelPack levelPack[];
-	/** small preview version of level used in briefing screen */
+	/** small preview version of level used in briefing screen. */
 	private static BufferedImage mapPreview;
-	/** timer used for nuking */
+	/** timer used for nuking. */
 	private static MicrosecondTimer timerNuke;
-	/** key repeat object for plus key/icon */
+	/** key repeat object for plus key/icon. */
 	private static KeyRepeat plus;
-	/** key repeat object for minus key/icon */
+	/** key repeat object for minus key/icon. */
 	private static KeyRepeat minus;
-	/** Lemming for which skill change is requested */
+	/** Lemming for which skill change is requested. */
 	private static Lemming lemmSkillRequest;
-	/** horizontal scrolling offset for level */
+	/** horizontal scrolling offset for level. */
 	private static int xPos;
-	/** replay stream used for handling replays */
+	/** replay stream used for handling replays. */
 	private static ReplayStream replay;
-	/** frame counter used for handling replays */
+	/** frame counter used for handling replays. */
 	private static int replayFrame;
-	/** old value of release rate */
+	/** old value of release rate. */
 	private static int releaseRateOld;
-	/** old value of nuke flag */
+	/** old value of nuke flag. */
 	private static boolean nukeOld;
-	/** old value of horizontal scrolling position */
+	/** old value of horizontal scrolling position. */
 	private static int xPosOld;
-	/** old value of selected skill */
+	/** old value of selected skill. */
 	private static Lemming.Type lemmSkillOld;
-	/** flag: replay mode is active */
+	/** flag: replay mode is active. */
 	private static boolean replayMode;
-	/** flag: replay mode should be stopped */
+	/** flag: replay mode should be stopped. */
 	private static boolean stopReplayMode;
-	/** listener to inform GUI of player's progress */
+	/** listener to inform GUI of player's progress. */
 	private static UpdateListener levelMenuUpdateListener;
-	/** number of Lemmings which left the level */
+	/** number of Lemmings which left the level. */
 	private static int numLeft;
-	/** release rate 0..99 */
+	/** release rate 0..99. */
 	private static int releaseRate;
-	/** number of Lemmings available */
+	/** number of Lemmings available. */
 	private static int numLemmingsMax;
-	/** number of Lemmings who entered the level */
+	/** number of Lemmings who entered the level. */
 	private static int numLemmingsOut;
-	/** number of Lemmings which have to be rescued to finish the level */
+	/** number of Lemmings which have to be rescued to finish the level. */
 	private static int numToRecue;
-	/** time left in seconds */
+	/** time left in seconds. */
 	private static int time;
-	/** number of climber skills left to be assigned */
+	/** number of climber skills left to be assigned. */
 	private static int numClimbers;
-	/** number of floater skills left to be assigned */
+	/** number of floater skills left to be assigned. */
 	private static int numFloaters;
-	/** number of bomber skills left to be assigned */
+	/** number of bomber skills left to be assigned. */
 	private static int numBombers;
-	/** number of blocker skills left to be assigned */
+	/** number of blocker skills left to be assigned. */
 	private static int numBlockers;
-	/** number of builder skills left to be assigned */
+	/** number of builder skills left to be assigned. */
 	private static int numBuilders;
-	/** number of basher skills left to be assigned */
+	/** number of basher skills left to be assigned. */
 	private static int numBashers;
-	/** number of miner skills left to be assigned */
+	/** number of miner skills left to be assigned. */
 	private static int numMiners;
-	/** number of digger skills left to be assigned */
+	/** number of digger skills left to be assigned. */
 	private static int numDiggers;
-	/** free running update counter */
+	/** free running update counter. */
 	private static int updateCtr;
-	/** gain for sound 0..1.0 */
+	/** gain for sound 0..1.0. */
 	private static double soundGain = 1.0;
-	/** gain for music 0..1.0 */
+	/** gain for music 0..1.0. */
 	private static double musicGain = 1.0;
 
 	/**

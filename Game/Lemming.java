@@ -34,55 +34,55 @@ import Tools.ToolBox;
  * @author Volker Oth
  */
 public class Lemming {
-	/** name of the configuration file */
+	/** name of the configuration file. */
 	private final static String LEMM_INI_STR = "misc/lemming.ini";
-	/** number of resources (animations/names) */
+	/** number of resources (animations/names). */
 	private final static int NUM_RESOURCES = 17;
 
-	/** Lemming skill type */
+	/** Lemming skill type. */
 	public static enum Type {
-		/** the typical Lemming */
+		/** the typical Lemming. */
 		WALKER,
-		/** a falling Lemming */
+		/** a falling Lemming. */
 		FALLER,
-		/** a climbing Lemming */
+		/** a climbing Lemming. */
 		CLIMBER,
-		/** a climbing Lemming returning to the ground */
+		/** a climbing Lemming returning to the ground. */
 		CLIMBER_TO_WALKER,
-		/** a Lemming on a parachute */
+		/** a Lemming on a parachute. */
 		FLOATER,
-		/** a Lemming dieing from a fall */
+		/** a Lemming dieing from a fall. */
 		SPLAT,
-		/** a Lemming blocking the way for the other Lemmings */
+		/** a Lemming blocking the way for the other Lemmings. */
 		STOPPER,
-		/** a Lemming drowning in the water */
+		/** a Lemming drowning in the water. */
 		DROWNING,
-		/** a Lemming killed by a trap */
+		/** a Lemming killed by a trap. */
 		TRAPPED,
-		/** a Lemming existing the level */
+		/** a Lemming existing the level. */
 		EXITING,
-		/** a Lemming blowing itself up */
+		/** a Lemming blowing itself up. */
 		BOMBER,
-		/** a Lemming building stairs */
+		/** a Lemming building stairs. */
 		BUILDER,
-		/** a builder Lemmings with no more steps in his backpack */
+		/** a builder Lemmings with no more steps in his backpack. */
 		BUILDER_END,
-		/** a Lemming digging a hole in the ground */
+		/** a Lemming digging a hole in the ground. */
 		DIGGER,
-		/** a Lemming bashing the ground before it */
+		/** a Lemming bashing the ground before it. */
 		BASHER,
-		/** a Lemming digging a mine with a pick */
+		/** a Lemming digging a mine with a pick. */
 		MINER,
-		/** a Lemming jumping over a small obstacle */
+		/** a Lemming jumping over a small obstacle. */
 		JUMPER,
 		/* types without a separate animation */
-		/** a Lemming that is nuked */
+		/** a Lemming that is nuked. */
 		NUKE,
-		/** a stopper that is told to explode */
+		/** a stopper that is told to explode. */
 		BOMBER_STOPPER,
-		/** a floater before the parachute opened completely */
+		/** a floater before the parachute opened completely. */
 		FLOATER_START,
-		/** undefined */
+		/** undefined. */
 		UNDEFINED;
 
 		private static final Map<Integer, Type> lookup = new HashMap<Integer, Type>();
@@ -103,7 +103,7 @@ public class Lemming {
 		}
 	}
 
-	/** Lemming heading */
+	/** Lemming heading. */
 	static enum Direction {
 		RIGHT,
 		LEFT,
@@ -128,14 +128,14 @@ public class Lemming {
 
 	}
 
-	/** animation type */
+	/** animation type. */
 	static enum Animation {
 		NONE,
 		LOOP,
 		ONCE
 	}
 
-	/** display string for skills/types. order must be the same as in the enum! */
+	/** display string for skills/types. order must be the same as in the enum!. */
 	private final static String LEMM_NAMES[] = {
 			"WALKER", "FALLER", "CLIMBER", "CLIMBER",
 			"FLOATER", "", "BLOCKER", "DROWNING",
@@ -143,83 +143,83 @@ public class Lemming {
 			"BUILDER", "DIGGER", "BASHER", "MINER", "WALKER"
 	};
 
-	/** a walker walks one pixel per frame */
+	/** a walker walks one pixel per frame. */
 	private final static int WALKER_STEP = 1;
-	/** a climber climbs up 1 pixel every 2nd frame */
+	/** a climber climbs up 1 pixel every 2nd frame. */
 	private final static int CLIMBER_STEP = 1;
-	/** at this height a walker will turn around */
+	/** at this height a walker will turn around. */
 	private final static int WALKER_OBSTACLE_HEIGHT = 14;
-	/** check N pixels above the lemming's feet */
+	/** check N pixels above the lemming's feet. */
 	private final static int BASHER_CHECK_STEP = 12;
-	/** from this on a basher will become a faller */
+	/** from this on a basher will become a faller. */
 	private final static int BASHER_FALL_DISTANCE = 6;
-	/** from this on a miner will become a faller */
+	/** from this on a miner will become a faller. */
 	private final static int MINER_FALL_DISTANCE = 4;
-	/** a faller falls down three pixels per frame */
+	/** a faller falls down three pixels per frame. */
 	private final static int FALLER_STEP = 3;
-	/** a floater falls down two pixels per frame */
+	/** a floater falls down two pixels per frame. */
 	private final static int FLOATER_STEP = 2;
-	/** a jumper moves up two pixels per frame */
+	/** a jumper moves up two pixels per frame. */
 	private final static int JUMPER_STEP = 2;
-	/** if a walker jumps up 6 pixels, it becomes a jumper */
+	/** if a walker jumps up 6 pixels, it becomes a jumper. */
 	private final static int JUMPER_JUMP = 4;
-	/** pixels a floater falls before the parachute begins to open */
+	/** pixels a floater falls before the parachute begins to open. */
 	private final static int FALL_DISTANCE_FLOAT = 32;
-	/** number of free pixels below needed to convert a lemming to a faller */
+	/** number of free pixels below needed to convert a lemming to a faller. */
 	private final static int FALL_DISTANCE_FALL = 8;
-	/** used as "free below" value to convert most skills into a faller */
+	/** used as "free below" value to convert most skills into a faller. */
 	private final static int FALL_DISTANCE_FORCE_FALL = 2 * FALL_DISTANCE_FALL;
-	/** number of steps a builder can build */
+	/** number of steps a builder can build. */
 	private final static int STEPS_MAX = 12;
-	/** number of steps before the warning sound is played */
+	/** number of steps before the warning sound is played. */
 	private final static int STEPS_WARNING = 9;
-	/** Lemmini runs with 50fps instead of 25fps */
+	/** Lemmini runs with 50fps instead of 25fps. */
 	private final static int TIME_SCALE = 2;
-	/** explosion counter is decreased every second */
+	/** explosion counter is decreased every second. */
 	private final static int MAX_EXPLODE_CTR = 1000000 / GameController.MICROSEC_PER_FRAME;
 
-	/** resource (animation etc.) for the current Lemming */
+	/** resource (animation etc.) for the current Lemming. */
 	private LemmingResource lemRes;
-	/** animation frame */
+	/** animation frame. */
 	private int frameIdx;
-	/** x coordinate of foot in pixels */
+	/** x coordinate of foot in pixels. */
 	private int x;
-	/** y coordinate of foot in pixels */
+	/** y coordinate of foot in pixels. */
 	private int y;
-	/** x coordinate for mask in pixels */
+	/** x coordinate for mask in pixels. */
 	private int maskX;
-	/** y coordinate for mask in pixels */
+	/** y coordinate for mask in pixels. */
 	private int maskY;
-	/** Lemming's heading */
+	/** Lemming's heading. */
 	private Direction dir;
-	/** Lemming's skill/type */
+	/** Lemming's skill/type. */
 	private Type type;
-	/** counter used for internal state changes */
+	/** counter used for internal state changes. */
 	private int counter;
-	/** another counter used for internal state changes */
+	/** another counter used for internal state changes. */
 	private int counter2;
-	/** explosion counter when nuked */
+	/** explosion counter when nuked. */
 	private int explodeNumCtr;
-	/** Lemming can float */
+	/** Lemming can float. */
 	private boolean canFloat;
-	/** Lemming can climb */
+	/** Lemming can climb. */
 	private boolean canClimb;
-	/** Lemming can change its skill */
+	/** Lemming can change its skill. */
 	private boolean canChangeSkill;
-	/** Lemming is to be nuked */
+	/** Lemming is to be nuked. */
 	private boolean nuke;
-	/** Lemming has died */
+	/** Lemming has died. */
 	private boolean hasDied;
-	/** Lemming has left the level */
+	/** Lemming has left the level. */
 	private boolean hasLeft;
-	/** counter used to manage the explosion */
+	/** counter used to manage the explosion. */
 	private int explodeCtr;
-	/** counter used to display the select image in replay mode */
+	/** counter used to display the select image in replay mode. */
 	private int selectCtr;
 
-	/** static array of resources for each Lemming skill/type */
+	/** static array of resources for each Lemming skill/type. */
 	private static LemmingResource lemmings[];
-	/** font used for the explosion counter */
+	/** font used for the explosion counter. */
 	private static ExplodeFont explodeFont;
 
 	/**

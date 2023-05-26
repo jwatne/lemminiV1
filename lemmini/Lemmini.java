@@ -88,7 +88,7 @@ public class Lemmini extends JFrame implements KeyListener {
 
     private static final long serialVersionUID = 0x01;
 
-    /** Self reference. */
+    /** Self reference.. */
     private static JFrame thisFrame;
 
     /**
@@ -109,12 +109,12 @@ public class Lemmini extends JFrame implements KeyListener {
         Lemmini.thisFrame = lemminiFrame;
     }
 
-    /** Path for loading single level files. */
+    /** Path for loading single level files.. */
     @SuppressWarnings("unused")
     private final String lvlPath;
-    /** Map to store menu items for difficulty levels. */
+    /** Map to store menu items for difficulty levels.. */
     private final Map<String, List<LvlMenuItem>> diffLevelMenus = new HashMap<>();
-    /** Panel for the game graphics. */
+    /** Panel for the game graphics.. */
     private final GraphicsPane gp;
 
     /**

@@ -27,33 +27,33 @@ import GameUtil.Sprite;
  */
 public class SpriteObject extends Sprite {
 
-	/** Type of level object */
+	/** Type of level object. */
 	public static enum Type {
-		/** no influence on gameplay */
+		/** no influence on gameplay. */
 		PASSIVE,
-		/** right arrows - no digging to the left */
+		/** right arrows - no digging to the left. */
 		NO_DIG_LEFT,
-		/** left arrows - no digging to the right */
+		/** left arrows - no digging to the right. */
 		NO_DIG_RIGHT,
-		/** trap triggering drowning animation */
+		/** trap triggering drowning animation. */
 		TRAP_DROWN,
-		/** trap triggering a replacement with special death animation */
+		/** trap triggering a replacement with special death animation. */
 		TRAP_REPLACE,
-		/** trap triggering default death animation */
+		/** trap triggering default death animation. */
 		TRAP_DIE,
-		/** level exit (active part!) */
+		/** level exit (active part!). */
 		EXIT,
-		/** level entry */
+		/** level entry. */
 		ENTRY
 	}
 
-	/** x position in pixels */
+	/** x position in pixels. */
 	private int x;
-	/** y position in pixels */
+	/** y position in pixels. */
 	private int y;
-	/** Type of level object */
+	/** Type of level object. */
 	private Type type;
-	/** collision mask - only this part is copied into the stencil */
+	/** collision mask - only this part is copied into the stencil. */
 	private int mask[];
 
 	/**

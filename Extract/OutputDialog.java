@@ -49,7 +49,7 @@ public class OutputDialog extends JDialog {
 	private JTextArea jTextAreaOut = null;
 
 	// own stuff
-	/** Extraction canceled? */
+	/** Extraction canceled?. */
 	private boolean cancel = false;
 
 	/**

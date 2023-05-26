@@ -50,13 +50,13 @@ public class FolderDialog extends JDialog {
 	// own stuff
 	private final static long serialVersionUID = 0x01;
 
-	/** target (Lemmini resource) path for extraction */
+	/** target (Lemmini resource) path for extraction. */
 	private String targetPath;
-	/** source (WINLEMM) path for extraction */
+	/** source (WINLEMM) path for extraction. */
 	private String sourcePath;  //  @jve:decl-index=0:
-	/** self reference to this dialog */
+	/** self reference to this dialog. */
 	private JDialog thisDialog;
-	/** flag that tells whether to extract or not */
+	/** flag that tells whether to extract or not. */
 	private boolean doExtract;
 
 

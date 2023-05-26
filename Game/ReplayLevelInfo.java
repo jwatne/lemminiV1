@@ -21,11 +21,11 @@ package game;
  * @author Volker Oth
  */
 public class ReplayLevelInfo {
-	/** name of level pack */
+	/** name of level pack. */
 	private String levelPack;
-	/** difficulty level */
+	/** difficulty level. */
 	private int diffLevel;
-	/** level number */
+	/** level number. */
 	private int lvlNumber;
 
 	/**

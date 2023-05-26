@@ -6,11 +6,11 @@ package extract;
  * @author Volker Oth
  */
 class Palette {
-    /** byte array of red components */
+    /** byte array of red components. */
     private final byte[] red;
-    /** byte array of green components */
+    /** byte array of green components. */
     private final byte[] green;
-    /** byte array of blue components */
+    /** byte array of blue components. */
     private final byte[] blue;
 
     /**

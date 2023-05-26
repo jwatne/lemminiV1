@@ -30,32 +30,32 @@ import Tools.ToolBox;
  */
 public class LemmFont {
 
-	/** Colors */
+	/** Colors. */
 	public static enum Color {
-		/** green color */
+		/** green color. */
 		GREEN,
-		/** blue color */
+		/** blue color. */
 		BLUE,
-		/** red color */
+		/** red color. */
 		RED,
-		/** brown/yellow color */
+		/** brown/yellow color. */
 		BROWN,
-		/** turquoise/cyan color */
+		/** turquoise/cyan color. */
 		TURQUOISE,
-		/** violet color */
+		/** violet color. */
 		VIOLET
 	}
 
-	/** default width of one character in pixels */
+	/** default width of one character in pixels. */
 	private final static int SPACING = 18;
-	/** character map */
+	/** character map. */
 	private final static String CHARS = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_�abcdefghijklmnopqrstuvwxyz{|}~";
 
-	/** width of one character in pixels */
+	/** width of one character in pixels. */
 	private static int width;
-	/** height of one character pixels */
+	/** height of one character pixels. */
 	private static int height;
-	/** array of array of images [color,character] */
+	/** array of array of images [color,character]. */
 	static private BufferedImage img[][];
 
 	/**

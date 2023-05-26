@@ -54,33 +54,33 @@ public final class Core {
      * version number
      */
     private static final String REVISION = "0.80";
-    /** name of the ini file */
+    /** name of the ini file. */
     private static final String INI_NAME = "lemmings.ini";
-    /** extensions accepted for level files in file dialog */
+    /** extensions accepted for level files in file dialog. */
     public static final List<String> LEVEL_EXTENSIONS = Collections
             .unmodifiableList(Arrays.asList("ini", "lvl"));
-    /** extensions accepted for replay files in file dialog */
+    /** extensions accepted for replay files in file dialog. */
     public static final List<String> REPLAY_EXTENSIONS = Collections
             .unmodifiableList(Arrays.asList("rpl"));
-    /** height of menu and icon bar in pixels */
+    /** height of menu and icon bar in pixels. */
     private static final int WIN_OFS = 120;
 
-    /** program properties */
+    /** program properties. */
     public static Props programProps;
-    /** path of (extracted) resources */
+    /** path of (extracted) resources. */
     public static String resourcePath;
-    /** current player */
+    /** current player. */
     public static Player player;
-    /** name of program properties file */
+    /** name of program properties file. */
     private static String programPropsFileStr;
-    /** name of player properties file */
+    /** name of player properties file. */
     private static String playerPropsFileStr;
-    /** player properties */
+    /** player properties. */
     private static Props playerProps;
-    /** list of all players */
+    /** list of all players. */
     private static ArrayList<String> players;
 
-    /** Zoom scale */
+    /** Zoom scale. */
     private static double scale;
 
     /**
@@ -217,14 +217,14 @@ public final class Core {
                 programProps.set("resourcePath",
                         ToolBox.addSeparator(Extract.getResourcePath()));
                 programProps.set("sourcePath",
-                        ToolBox.addSeparator(Extract.getSOURCE_PATH()));
+                        ToolBox.addSeparator(Extract.getSourcePath()));
                 programProps.set("revision", REVISION);
                 programProps.save(programPropsFileStr);
             } catch (final ExtractException ex) {
                 programProps.set("resourcePath",
                         ToolBox.addSeparator(Extract.getResourcePath()));
                 programProps.set("sourcePath",
-                        ToolBox.addSeparator(Extract.getSOURCE_PATH()));
+                        ToolBox.addSeparator(Extract.getSourcePath()));
                 programProps.save(programPropsFileStr);
                 throw new LemmException(
                         "Ressource extraction failed\n" + ex.getMessage());

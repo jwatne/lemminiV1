@@ -37,39 +37,39 @@ public class LemmCursor {
 	 */
 	private final static int HIT_DISTANCE = 12;
 
-	/** cursor type */
+	/** cursor type. */
 	public enum Type {
-		/** empty image to hide cursor */
+		/** empty image to hide cursor. */
 		HIDDEN,
-		/** normal cursor */
+		/** normal cursor. */
 		NORMAL,
-		/** select left cursor */
+		/** select left cursor. */
 		LEFT,
-		/** select right cursor */
+		/** select right cursor. */
 		RIGHT,
-		/** select walkers cursor */
+		/** select walkers cursor. */
 		WALKER,
-		/** normal cursor with selection box */
+		/** normal cursor with selection box. */
 		BOX_NORMAL,
-		/** select left cursor with selection box */
+		/** select left cursor with selection box. */
 		BOX_LEFT,
-		/** select right cursor with selection box */
+		/** select right cursor with selection box. */
 		BOX_RIGHT,
-		/** select walkers cursor with selection box */
+		/** select walkers cursor with selection box. */
 		BOX_WALKER,
 	}
 
-	/** x position in pixels */
+	/** x position in pixels. */
 	private static int x;
-	/** y position in pixels */
+	/** y position in pixels. */
 	private static int y;
-	/** current cursor type */
+	/** current cursor type. */
 	private static Type type;
-	/** array of images - one for each cursor type */
+	/** array of images - one for each cursor type. */
 	private static BufferedImage img[];
-	/** array of AWT cursor Objects */
+	/** array of AWT cursor Objects. */
 	private static Cursor cursor[];
-	/** is Mouse cursor hidden? */
+	/** is Mouse cursor hidden?. */
 	private static boolean enabled;
 
 	/**

@@ -36,58 +36,58 @@ import game.TextScreen;
  */
 public class GraphicsPane extends JPanel
         implements Runnable, MouseListener, MouseMotionListener {
-    /** step size in pixels for horizontal scrolling */
+    /** step size in pixels for horizontal scrolling. */
     final static int X_STEP = 4;
-    /** step size in pixels for fast horizontal scrolling */
+    /** step size in pixels for fast horizontal scrolling. */
     final static int X_STEP_FAST = 8;
     /**
      * size of auto scrolling range in pixels (from the left and right border)
      */
     final static int AUTOSCROLL_RANGE = 20;
-    /** y coordinate of score display in pixels */
+    /** y coordinate of score display in pixels. */
     final static int scoreY = Level.HEIGHT;
-    /** y coordinate of counter displays in pixels */
+    /** y coordinate of counter displays in pixels. */
     final static int counterY = scoreY + 40;
-    /** y coordinate of icons in pixels */
+    /** y coordinate of icons in pixels. */
     final static int iconsY = counterY + 14;
-    /** x coordinate of minimap in pixels */
+    /** x coordinate of minimap in pixels. */
     final static int smallX = 640 - 16/*-32*/ - 200;
-    /** y coordinate of minimap in pixels */
+    /** y coordinate of minimap in pixels. */
     final static int smallY = iconsY;
 
     private final static long serialVersionUID = 0x01;
 
-    /** start position of mouse drag (for mouse scrolling) */
+    /** start position of mouse drag (for mouse scrolling). */
     private int mouseDragStartX;
-    /** x position of cursor in level */
+    /** x position of cursor in level. */
     private int xMouse;
-    /** x position of cursor on screen */
+    /** x position of cursor on screen. */
     private int xMouseScreen;
-    /** y position of cursor in level */
+    /** y position of cursor in level. */
     private int yMouse;
-    /** y position of cursor on screen */
+    /** y position of cursor on screen. */
     private int yMouseScreen;
-    /** mouse drag length in x direction (pixels) */
+    /** mouse drag length in x direction (pixels). */
     private int mouseDx;
-    /** mouse drag length in y direction (pixels) */
+    /** mouse drag length in y direction (pixels). */
     private int mouseDy;
-    /** flag: Shift key is pressed */
+    /** flag: Shift key is pressed. */
     private boolean shiftPressed;
-    /** flag: left mouse button is currently pressed */
+    /** flag: left mouse button is currently pressed. */
     private boolean leftMousePressed;
-    /** flag: debug draw is active */
+    /** flag: debug draw is active. */
     private boolean draw;
-    /** image for information string display */
+    /** image for information string display. */
     private transient BufferedImage outStrImg;
-    /** graphics object for information string display */
+    /** graphics object for information string display. */
     private transient Graphics2D outStrGfx;
-    /** array of offscreen images (one is active, one is passive) */
+    /** array of offscreen images (one is active, one is passive). */
     private transient BufferedImage offImage[];
-    /** graphics objects for the two offscreen images */
+    /** graphics objects for the two offscreen images. */
     private transient Graphics2D offGraphics[];
-    /** index of the active buffer in the image buffer */
+    /** index of the active buffer in the image buffer. */
     private int activeBuffer;
-    /** monitoring object used for synchronized painting */
+    /** monitoring object used for synchronized painting. */
     private final Object paintSemaphore;
     private JFrame frame;
 

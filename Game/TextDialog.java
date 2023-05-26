@@ -32,23 +32,23 @@ import Tools.ToolBox;
  * @author Volker Oth
  */
 public class TextDialog {
-    /** list of buttons */
+    /** list of buttons. */
     private final List<Button> buttons;
-    /** image used as screen buffer */
+    /** image used as screen buffer. */
     private final BufferedImage screenBuffer;
-    /** graphics object to draw in screen buffer */
+    /** graphics object to draw in screen buffer. */
     private final Graphics2D gScreen;
-    /** image used as 2nd screen buffer for offscreen drawing */
+    /** image used as 2nd screen buffer for offscreen drawing. */
     private final BufferedImage backBuffer;
-    /** graphics object to draw in 2nd (offscreen) screen buffer */
+    /** graphics object to draw in 2nd (offscreen) screen buffer. */
     private final Graphics2D gBack;
-    /** width of screen in pixels */
+    /** width of screen in pixels. */
     private final int width;
-    /** height of screen in pixels */
+    /** height of screen in pixels. */
     private final int height;
-    /** horizontal center of the screen in pixels */
+    /** horizontal center of the screen in pixels. */
     private final int centerX;
-    /** vertical center of the screen in pixels */
+    /** vertical center of the screen in pixels. */
     private final int centerY;
 
     /**
@@ -342,21 +342,21 @@ public class TextDialog {
  * @author Volker Oth
  */
 class Button {
-    /** x coordinate in pixels */
+    /** x coordinate in pixels. */
     private final int x;
-    /** y coordinate in pixels */
+    /** y coordinate in pixels. */
     private final int y;
-    /** width in pixels */
+    /** width in pixels. */
     protected int width;
-    /** height in pixels */
+    /** height in pixels. */
     protected int height;
-    /** button identifier */
+    /** button identifier. */
     protected int id;
-    /** true if button is selected */
+    /** true if button is selected. */
     protected boolean selected;
-    /** normal button image */
+    /** normal button image. */
     protected BufferedImage image;
-    /** selected button image */
+    /** selected button image. */
     protected BufferedImage imgSelected;
 
     /**

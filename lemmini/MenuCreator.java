@@ -96,7 +96,7 @@ public class MenuCreator {
     private JMenu jMenuSound = null;
     private JMenuItem jMenuItemVolume = null;
     private JMenuItem jMenuItemCursor = null;
-    /** path for loading single level files */
+    /** path for loading single level files. */
     private String lvlPath;
     private Lemmini lemmini;
     protected GraphicsPane graphicsPane;

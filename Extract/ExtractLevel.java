@@ -28,13 +28,13 @@ import java.util.ArrayList;
  */
 public class ExtractLevel {
 	private final static int scale = 2; // Scale (to convert lowres levels into hires levels)
-	/** names for defautl styles */
+	/** names for defautl styles. */
 	private final static String styles[] = { "dirt", "fire", "marble", "pillar",
 			"crystal", "brick", "rock", "snow", "bubble" };
 
-	/** release rate : 0 is slowest, 0x0FA (250) is fastest */
+	/** release rate : 0 is slowest, 0x0FA (250) is fastest. */
 	private static int releaseRate;
-	/** number of Lemmings in this level (maximum 0x0072 in original LVL format) */
+	/** number of Lemmings in this level (maximum 0x0072 in original LVL format). */
 	private static int numLemmings;
 	/**
 	 * number of Lemmings to rescue : should be less than or equal to number of
@@ -42,23 +42,23 @@ public class ExtractLevel {
 	 */
 	private static int numToRescue;
 	static int timeLimit; // Time Limit : max 0x00FF, 0x0001 to 0x0009 works best
-	/** number of climbers in this level : max 0xfa (250) */
+	/** number of climbers in this level : max 0xfa (250). */
 	private static int numClimbers;
-	/** number of floaters in this level : max 0xfa (250) */
+	/** number of floaters in this level : max 0xfa (250). */
 	private static int numFloaters;
-	/** number of bombers in this level : max 0xfa (250) */
+	/** number of bombers in this level : max 0xfa (250). */
 	private static int numBombers;
-	/** number of blockers in this level : max 0xfa (250) */
+	/** number of blockers in this level : max 0xfa (250). */
 	private static int numBlockers;
-	/** number of builders in this level : max 0xfa (250) */
+	/** number of builders in this level : max 0xfa (250). */
 	private static int numBuilders;
-	/** number of bashers in this level : max 0xfa (250) */
+	/** number of bashers in this level : max 0xfa (250). */
 	private static int numBashers;
-	/** number of miners in this level : max 0xfa (250) */
+	/** number of miners in this level : max 0xfa (250). */
 	private static int numMiners;
-	/** number of diggers in this level : max 0xfa (250) */
+	/** number of diggers in this level : max 0xfa (250). */
 	private static int numDiggers;
-	/** start screen x pos : 0 - 0x04f0 (1264) rounded to modulo 8 */
+	/** start screen x pos : 0 - 0x04f0 (1264) rounded to modulo 8. */
 	private static int xPos;
 	/**
 	 * 0x0000 is dirt, <br>
@@ -72,17 +72,17 @@ public class ExtractLevel {
 	 * 0x0008 is bubble
 	 */
 	private static int style;
-	// /** extended style: no used in windows version ? */
+	// /** extended style: no used in windows version ?. */
 	// static int extStyle;
-	// /** placeholder ? */
+	// /** placeholder ?. */
 	// static int dummy;
-	/** objects like doors - 32 objects each consists of 8 bytes */
+	/** objects like doors - 32 objects each consists of 8 bytes. */
 	static ArrayList<LvlObject> objects;
-	/** terrain the Lemmings walk on etc. - 400 tiles, 4 bytes each */
+	/** terrain the Lemmings walk on etc. - 400 tiles, 4 bytes each. */
 	static ArrayList<Terrain> terrain;
-	/** steel areas which are indestructible - 32 objects, 4 bytes each */
+	/** steel areas which are indestructible - 32 objects, 4 bytes each. */
 	static ArrayList<Steel> steel;
-	/** 32 byte level name - filled with whitespaces */
+	/** 32 byte level name - filled with whitespaces. */
 	static String lvlName;
 
 	/**
@@ -274,24 +274,24 @@ public class ExtractLevel {
  * @author Volker Oth
  */
 class LvlObject {
-	/** paint mode: only visible on a terrain pixel */
+	/** paint mode: only visible on a terrain pixel. */
 	private static final int MODE_VIS_ON_TERRAIN = 8;
 	/**
 	 * paint mode: don't overwrite terrain pixel in the original background image
 	 */
 	private static final int MODE_NO_OVERWRITE = 4;
-	/** paint mode: paint without any further checks */
+	/** paint mode: paint without any further checks. */
 	private static final int MODE_FULL = 0;
 
-	/** x position in pixels */
+	/** x position in pixels. */
 	int xPos;
-	/** y position in pixels */
+	/** y position in pixels. */
 	int yPos;
-	/** identifier */
+	/** identifier. */
 	int id;
-	/** paint mode */
+	/** paint mode. */
 	int paintMode;
-	/** flag: paint object upsdie down */
+	/** flag: paint object upsdie down. */
 	boolean upsideDown;
 
 	/**
@@ -339,13 +339,13 @@ class LvlObject {
  * @author Volker Oth
  */
 class Terrain {
-	/** identifier */
+	/** identifier. */
 	int id;
-	/** x position in pixels */
+	/** x position in pixels. */
 	int xPos;
-	/** y position in pixels */
+	/** y position in pixels. */
 	int yPos;
-	/** modifier - must be one of the above MODEs */
+	/** modifier - must be one of the above MODEs. */
 	int modifier;
 
 	/**
@@ -384,13 +384,13 @@ class Terrain {
  * @author Volker Oth
  */
 class Steel {
-	/** x position in pixels */
+	/** x position in pixels. */
 	int xPos;
-	/** y position in pixels */
+	/** y position in pixels. */
 	int yPos;
-	/** width in pixels */
+	/** width in pixels. */
 	int width;
-	/** height in pixels */
+	/** height in pixels. */
 	int height;
 
 	/**
@@ -422,9 +422,9 @@ class Steel {
  * @author Volker Oth
  */
 class LevelBuffer {
-	/** data buffer */
+	/** data buffer. */
 	private final byte buffer[];
-	/** byte offset */
+	/** byte offset. */
 	private int ofs;
 
 	/**

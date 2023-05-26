@@ -22,9 +22,9 @@ class Buffer {
      * Hexidecimal value 0xff.
      */
     private static final int HEXFF = 0xff;
-    /** array of byte which defines the data buffer. */
+    /** array of byte which defines the data buffer.. */
     private final byte[] buffer;
-    /** byte index in buffer. */
+    /** byte index in buffer.. */
     private int index;
 
     /**

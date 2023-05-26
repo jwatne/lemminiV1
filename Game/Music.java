@@ -26,27 +26,27 @@ import java.io.FileFilter;
  */
 public class Music {
 
-	/** music type */
+	/** music type. */
 	private static enum Type {
-		/** no type */
+		/** no type. */
 		NONE,
-		/** midi music */
+		/** midi music. */
 		MIDI,
-		/** MOD music */
+		/** MOD music. */
 		MOD
 	}
 
-	/** music type */
+	/** music type. */
 	private static Type type;
-	/** currently playing? */
+	/** currently playing?. */
 	private static boolean playing;
-	/** MOD music object */
+	/** MOD music object. */
 	private static ModMusic modMusic;
-	/** Midi music object */
+	/** Midi music object. */
 	private static MidiMusic midiMusic;
-	/** music gain */
+	/** music gain. */
 	private static double gain = 1.0;
-	/** array of file names */
+	/** array of file names. */
 	private static String musicFiles[];
 
 	/**

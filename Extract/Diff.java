@@ -62,29 +62,29 @@ public final class Diff {
      * Re-synchronization length.
      */
     private static final int RESYNC_LENGTH = 4;
-    /** insert n bytes.. */
+    /** insert n bytes... */
     private static final byte INSERT = 0;
-    /** delete n bytes. */
+    /** delete n bytes.. */
     private static final byte DELETE = 1;
-    /** replace n bytes with n bytes. */
+    /** replace n bytes with n bytes.. */
     private static final byte REPLACE = 2;
-    /** substitute n bytes with m bytes. */
+    /** substitute n bytes with m bytes.. */
     private static final byte SUBSTITUTE = 3;
 
-    /** magic number for header ID. */
+    /** magic number for header ID.. */
     private static final int HEADER_ID = 0xdeadbeef;
-    /** magic number for data ID. */
+    /** magic number for data ID.. */
     private static final int DATA_ID = 0xfade0ff;
 
-    /** print info to System.out. */
+    /** print info to System.out.. */
     private static boolean verbatim = false;
 
-    /** re-synchronization length. */
+    /** re-synchronization length.. */
     private static int resyncLength = RESYNC_LENGTH;
-    /** re-synchronization window length. */
+    /** re-synchronization window length.. */
     private static int windowLength = WINDOW_LENGTH;
 
-    /** target CRC. */
+    /** target CRC.. */
     private static int targetCRC = 0;
 
     /**

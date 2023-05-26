@@ -29,19 +29,19 @@ import Tools.ToolBox;
  */
 public class LevelPack {
 
-	/** name of the level pack */
+	/** name of the level pack. */
 	private String name;
-	/** seed used to generate the level codes */
+	/** seed used to generate the level codes. */
 	private String codeSeed;
-	/** array containing names of difficulty levels (easiest first, hardest last) */
+	/** array containing names of difficulty levels (easiest first, hardest last). */
 	private String diffLevels[];
-	/** array of array of level info - [difficulty][level number] */
+	/** array of array of level info - [difficulty][level number]. */
 	private LevelInfo lvlInfo[][];
-	/** path of level pack - where the INI files for the level are located */
+	/** path of level pack - where the INI files for the level are located. */
 	private String path;
-	/** maximum number of pixels a Lemming can fall before he dies */
+	/** maximum number of pixels a Lemming can fall before he dies. */
 	private int maxFallDistance;
-	/** offset to apply in level code algorithm */
+	/** offset to apply in level code algorithm. */
 	private int codeOffset;
 
 	/**

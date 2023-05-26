@@ -34,6 +34,6 @@ public class ExplodeFont {
         return img[num];
     }
 
-    /** array of images for each counter value */
+    /** array of images for each counter value. */
     private final BufferedImage img[];
 }

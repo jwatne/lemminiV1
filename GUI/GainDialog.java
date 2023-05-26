@@ -36,20 +36,151 @@ import game.Music;
  */
 public class GainDialog extends JDialog {
 
+    /**
+     * Height of Cancel button.
+     */
+    private static final int CANCEL_BUTTON_HEIGHT = 23;
+
+    /**
+     * Width of Cancel button.
+     */
+    private static final int CANCEL_BUTTON_WIDTH = 77;
+
+    /**
+     * Y coordinate of Cancel button.
+     */
+    private static final int CANCEL_BUTTON_Y = 136;
+
+    /**
+     * X coordinate of cancel button.
+     */
+    private static final int CANCEL_BUTTON_X = 14;
+
+    /**
+     * Divisor for converting percentages to decimal values.
+     */
+    private static final double PERCENT_DIVISOR = 100.0;
+
+    /**
+     * Width of OK button.
+     */
+    private static final int OK_BUTTON_WIDTH = 66;
+
+    /**
+     * Y coordinate of OK button.
+     */
+    private static final int OK_BUTTON_Y = 135;
+
+    /**
+     * X coordinate of OK button.
+     */
+    private static final int OK_BUTTON_X = 210;
+
+    /**
+     * Y coordinate of sound slider.
+     */
+    private static final int SOUND_SLIDER_Y = 90;
+
+    /**
+     * Major tick spacing, in pixels.
+     */
+    private static final int MAJOR_TICK_SPACING = 10;
+
+    /**
+     * Height of controls.
+     */
+    private static final int CONTROL_HEIGHT = 25;
+
+    /**
+     * Width of music slider.
+     */
+    private static final int MUSIC_SLIDER_WIDTH = 256;
+
+    /**
+     * Y coordinate of music slider.
+     */
+    private static final int MUSIC_SLIDER_Y = 30;
+
+    /**
+     * Width of music volume label.
+     */
+    private static final int MUSIC_VOLUME_WIDTH = 106;
+
+    /**
+     * Y coordinate of music volume label.
+     */
+    private static final int MUSIC_VOLUME_Y = 15;
+
+    /**
+     * Shared height of volume labels.
+     */
+    private static final int VOLUME_HEIGHT = 14;
+
+    /**
+     * Width of sound volume label.
+     */
+    private static final int SOUND_VOLUME_WIDTH = 101;
+
+    /**
+     * Y coordinate of sound volume label.
+     */
+    private static final int SOUND_VOLUME_Y = 75;
+
+    /**
+     * Shared x value for volume labels.
+     */
+    private static final int VOLUME_LABELS_X = 15;
+
+    /**
+     * Initial height of dialog.
+     */
+    private static final int INITIAL_HEIGHT = 200;
+
+    /**
+     * Initial width of dialog.
+     */
+    private static final int INITIAL_WIDTH = 300;
+
+    /**
+     * Multiplier to convert decimal values to percentages.
+     */
+    private static final int ONE_HUNDRED_PERCENT = 100;
+
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Content pane.
+     */
     private JPanel jContentPane = null;
 
+    /**
+     * Music slider.
+     */
     private JSlider jSliderMusic = null;
 
+    /**
+     * Music gain label.
+     */
     private JLabel jLabelMusicGain = null;
 
+    /**
+     * Sound gain label.
+     */
     private JLabel jLabelSoundGain = null;
 
+    /**
+     * Sound slider.
+     */
     private JSlider jSliderSound = null;
 
+    /**
+     * Ok button.
+     */
     private JButton jButtonOK = null;
 
+    /**
+     * Cancel button.
+     */
     private JButton jButtonCancel = null;
 
     /**
@@ -61,36 +192,38 @@ public class GainDialog extends JDialog {
     public GainDialog(final JFrame frame, final boolean modal) {
         super(frame, modal);
         initialize();
-        Point p = frame.getLocation();
+        final Point p = frame.getLocation();
         this.setLocation(p.x + frame.getWidth() / 2 - getWidth() / 2,
                 p.y + frame.getHeight() / 2 - getHeight() / 2);
-        jSliderSound
-                .setValue((int) (100 * GameController.getSound().getGain()));
-        jSliderMusic.setValue((int) (100 * Music.getGain()));
+        jSliderSound.setValue((int) (ONE_HUNDRED_PERCENT
+                * GameController.getSound().getGain()));
+        jSliderMusic.setValue((int) (ONE_HUNDRED_PERCENT * Music.getGain()));
     }
 
     /**
      * Automatically generated init.
      */
     private void initialize() {
-        this.setSize(300, 200);
+        this.setSize(INITIAL_WIDTH, INITIAL_HEIGHT);
         this.setTitle("Volume Controls");
         this.setContentPane(getJContentPane());
     }
 
     /**
-     * This method initializes jContentPane
+     * This method initializes jContentPane.
      *
      * @return javax.swing.JPanel
      */
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jLabelSoundGain = new JLabel();
-            jLabelSoundGain.setBounds(new Rectangle(15, 75, 101, 14));
+            jLabelSoundGain.setBounds(new Rectangle(VOLUME_LABELS_X,
+                    SOUND_VOLUME_Y, SOUND_VOLUME_WIDTH, VOLUME_HEIGHT));
             jLabelSoundGain.setText("Sound Volume");
             jLabelMusicGain = new JLabel();
             jLabelMusicGain.setText("Music Volume");
-            jLabelMusicGain.setBounds(new Rectangle(15, 15, 106, 14));
+            jLabelMusicGain.setBounds(new Rectangle(VOLUME_LABELS_X,
+                    MUSIC_VOLUME_Y, MUSIC_VOLUME_WIDTH, VOLUME_HEIGHT));
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
             jContentPane.add(getJSliderMusic(), null);
@@ -104,57 +237,62 @@ public class GainDialog extends JDialog {
     }
 
     /**
-     * This method initializes jSliderMusic
+     * This method initializes jSliderMusic.
      *
      * @return javax.swing.JSlider
      */
     private JSlider getJSliderMusic() {
         if (jSliderMusic == null) {
             jSliderMusic = new JSlider();
-            jSliderMusic.setBounds(new Rectangle(15, 30, 256, 25));
-            jSliderMusic.setMaximum(100);
+            jSliderMusic.setBounds(new Rectangle(VOLUME_LABELS_X,
+                    MUSIC_SLIDER_Y, MUSIC_SLIDER_WIDTH, CONTROL_HEIGHT));
+            jSliderMusic.setMaximum(ONE_HUNDRED_PERCENT);
             jSliderMusic.setMinimum(0);
-            jSliderMusic.setMajorTickSpacing(10);
+            jSliderMusic.setMajorTickSpacing(MAJOR_TICK_SPACING);
             jSliderMusic.setPaintTicks(true);
-            jSliderMusic.setValue(100);
+            jSliderMusic.setValue(ONE_HUNDRED_PERCENT);
         }
         return jSliderMusic;
     }
 
     /**
-     * This method initializes jSliderSound
+     * This method initializes jSliderSound.
      *
      * @return javax.swing.JSlider
      */
     private JSlider getJSliderSound() {
         if (jSliderSound == null) {
             jSliderSound = new JSlider();
-            jSliderSound.setBounds(new Rectangle(15, 90, 256, 25));
-            jSliderSound.setMaximum(100);
+            jSliderSound.setBounds(new Rectangle(VOLUME_LABELS_X,
+                    SOUND_SLIDER_Y, MUSIC_SLIDER_WIDTH, CONTROL_HEIGHT));
+            jSliderSound.setMaximum(ONE_HUNDRED_PERCENT);
             jSliderSound.setMinimum(0);
             jSliderSound.setPaintTicks(true);
-            jSliderSound.setValue(100);
-            jSliderSound.setMajorTickSpacing(10);
+            jSliderSound.setValue(ONE_HUNDRED_PERCENT);
+            jSliderSound.setMajorTickSpacing(MAJOR_TICK_SPACING);
         }
+
         return jSliderSound;
     }
 
     /**
-     * This method initializes jButtonOK
+     * This method initializes jButtonOK.
      *
      * @return javax.swing.JButton
      */
     private JButton getJButtonOK() {
         if (jButtonOK == null) {
             jButtonOK = new JButton();
-            jButtonOK.setBounds(new Rectangle(210, 135, 66, 25));
+            jButtonOK.setBounds(new Rectangle(OK_BUTTON_X, OK_BUTTON_Y,
+                    OK_BUTTON_WIDTH, CONTROL_HEIGHT));
             jButtonOK.setText(" Ok ");
             jButtonOK.addActionListener(new java.awt.event.ActionListener() {
                 @Override
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    Music.setGain(jSliderMusic.getValue() / 100.0);
+                public void actionPerformed(
+                        final java.awt.event.ActionEvent e) {
+                    Music.setGain(jSliderMusic.getValue() / PERCENT_DIVISOR);
                     GameController.getSound()
-                            .setGain(jSliderSound.getValue() / 100.0);
+                            .setGain(jSliderSound.getValue() / PERCENT_DIVISOR);
                     dispose();
                 }
             });
@@ -164,20 +302,22 @@ public class GainDialog extends JDialog {
     }
 
     /**
-     * This method initializes jButtonCancel
+     * This method initializes jButtonCancel.
      *
      * @return javax.swing.JButton
      */
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new Rectangle(14, 136, 77, 23));
+            jButtonCancel
+                    .setBounds(new Rectangle(CANCEL_BUTTON_X, CANCEL_BUTTON_Y,
+                            CANCEL_BUTTON_WIDTH, CANCEL_BUTTON_HEIGHT));
             jButtonCancel.setText("Cancel");
             jButtonCancel
                     .addActionListener(new java.awt.event.ActionListener() {
                         @Override
                         public void actionPerformed(
-                                java.awt.event.ActionEvent e) {
+                                final java.awt.event.ActionEvent e) {
                             dispose();
                         }
                     });

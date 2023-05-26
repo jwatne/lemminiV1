@@ -1,4 +1,4 @@
-package GUI;
+package gui;
 
 import java.awt.Desktop;
 import java.awt.GraphicsEnvironment;
@@ -51,12 +51,12 @@ public class LegalDialog extends JDialog {
 	private JButton jButtonOk = null;
 
 	private JScrollPane jScrollPane = null;
-	
+
 	private JEditorPane thisEditor = null;
 
 	// own stuff
 	private boolean ok = false;
-	
+
 	private URL thisURL;
 
 	/**
@@ -74,7 +74,7 @@ public class LegalDialog extends JDialog {
 				public void hyperlinkUpdate(HyperlinkEvent e) {
 					URL url = e.getURL();
 					if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-						try {							
+						try {
 							if (url.sameFile(thisURL))
 								thisEditor.setPage(url);
 							else

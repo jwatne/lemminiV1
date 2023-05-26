@@ -19,11 +19,11 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import GUI.LegalDialog;
 import Tools.Props;
 import Tools.ToolBox;
 import extract.Extract;
 import extract.ExtractException;
+import gui.LegalDialog;
 
 /*
  * Copyright 2009 Volker Oth

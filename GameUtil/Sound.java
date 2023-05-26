@@ -41,30 +41,73 @@ import game.ResourceException;
  * @author Volker Oth
  */
 public class Sound {
-
+    /**
+     * Minimum gain value.
+     */
+    private static final double MINIMUM_GAIN = 0.001;
+    /**
+     * Decimal value 10.0.
+     */
+    private static final double TEN_POINT_0 = 10.0;
+    /**
+     * Decimal value 0.5.
+     */
+    private static final double HALF = 0.5;
+    /**
+     * Multiplier used to derive pitched value.
+     */
+    private static final double PITCH_MULTIPLIER = 0.0204;
+    /**
+     * Numeric value 3.
+     */
+    private static final int THREE = 3;
+    /**
+     * Numeric value 8.
+     */
+    private static final int EIGHT = 8;
+    /**
+     * Hexidecimal value 0x80.
+     */
+    private static final int HEX_80 = 0x80;
+    /**
+     * Hexidecimal value 0xff.
+     */
+    private static final int HEX_FF = 0xff;
+    /**
+     * Value of 0.1.
+     */
+    private static final double ONE_TENTH = 0.1;
+    /**
+     * Sample rate.
+     */
+    private static final int SAMPLE_RATE = 44100;
+    /**
+     * Default sample size in bits.
+     */
+    private static final int DEFAULT_SAMPLE_SIZE = 16;
     /** default sampling frequency. */
-    final private static float DEFAULT_FREQUENCY = 22050;
+    private static final float DEFAULT_FREQUENCY = 22050;
     /** number of pitch levels. */
-    final private static int NUMBER_PITCHED = 100;
+    private static final int NUMBER_PITCHED = 100;
     /** fade in the first n samples when calculating the pitched buffers. */
-    final private static int PITCH_FADE_IN = 20;
+    private static final int PITCH_FADE_IN = 20;
     /** maximum number of sounds played in parallel. */
-    final private static int MAX_SIMUL_SOUNDS = 6;
+    private static final int MAX_SIMUL_SOUNDS = 6;
 
     /** line listener to be called after sample was played. */
     private final LineListener defaultListener;
     /** sound buffers to store the samples. */
-    private final byte soundBuffer[][];
+    private final byte[][] soundBuffer;
     /** pitch buffers to store all pitched samples. */
-    private byte pitchBuffers[][];
+    private byte[][] pitchBuffers;
     /** audio formats for normal samples (one for each sample). */
-    private final AudioFormat format[];
+    private final AudioFormat[] format;
     /** audio format for pitched samples. */
     private AudioFormat pitchFormat;
     /** audio format for upsampling. */
     private final AudioFormat defaultFormat;
     /** line info for each sample. */
-    private final DataLine.Info info[];
+    private final DataLine.Info[] info;
     /** line info for the pitched sample. */
     private DataLine.Info pitchInfo;
     /** line info for upsampling. */
@@ -74,11 +117,62 @@ public class Sound {
     /** number of sounds currently played. */
     private static int simulSounds;
     /** selected mixer index. */
-    static int mixerIdx;
+    private static int mixerIdx;
+
+    /**
+     * Returns selected mixer index.
+     *
+     * @return selected mixer index.
+     */
+    public static int getMixerIdx() {
+        return mixerIdx;
+    }
+
+    /**
+     * Sets selected mixer index.
+     *
+     * @param mixerIndex selected mixer index.
+     */
+    public static void setMixerIdx(final int mixerIndex) {
+        Sound.mixerIdx = mixerIndex;
+    }
+
     /** array of available mixers. */
-    static Mixer mixers[];
+    private static Mixer[] mixers;
+
+    /**
+     * Sets array of available mixers.
+     *
+     * @param availableMixers array of available mixers.
+     */
+    public static void setMixers(final Mixer[] availableMixers) {
+        Sound.mixers = availableMixers;
+    }
+
     /** number of samples to be used. */
-    static int sampleNum;
+    private static int sampleNum;
+
+    /**
+     * Returns number of samples to be used.
+     *
+     * @return number of samples to be used.
+     */
+    public static int getSampleNum() {
+        return sampleNum;
+    }
+
+    /**
+     * Sets number of samples to be used.
+     *
+     * @param numberOfSamples number of samples to be used.
+     */
+    public static void setSampleNum(final int numberOfSamples) {
+        Sound.sampleNum = numberOfSamples;
+    }
+
+    /**
+     * Monitor object.
+     */
     private static final Object MONITOR_OBJECT = new Object();
 
     /**
@@ -99,7 +193,8 @@ public class Sound {
         defaultListener = new DefaultListener();
         // upsampling to default frequency (more compatible for weird sample
         // frequencies)
-        defaultFormat = new AudioFormat(DEFAULT_FREQUENCY, 16, 1, true, false);
+        defaultFormat = new AudioFormat(DEFAULT_FREQUENCY, DEFAULT_SAMPLE_SIZE,
+                1, true, false);
         defaultInfo = new DataLine.Info(Clip.class, defaultFormat);
         int maxLen = 0;
 
@@ -109,7 +204,7 @@ public class Sound {
                 fName = "sound/sound_" + Integer.toString(i) + ".wav";
                 final File fs = new File(Core.findResource(fName));
 
-                try (final AudioInputStream f = AudioSystem
+                try (AudioInputStream f = AudioSystem
                         .getAudioInputStream(fs.toURI().toURL())) {
                     format[i] = f.getFormat();
                     info[i] = new DataLine.Info(Clip.class, format[i]);
@@ -158,7 +253,8 @@ public class Sound {
             // note that bit size (8) and channels (1) have to be the same for
             // all pitched
             // buffers
-            pitchFormat = new AudioFormat(44100, 16, 1, true, false);
+            pitchFormat = new AudioFormat(SAMPLE_RATE, DEFAULT_SAMPLE_SIZE, 1,
+                    true, false);
             pitchInfo = new DataLine.Info(Clip.class, pitchFormat);
             pitchBuffers = new byte[NUMBER_PITCHED][];
 
@@ -173,8 +269,8 @@ public class Sound {
 
         for (int i = 0; i < mixInfo.length; i++) {
             final Mixer mixer = AudioSystem.getMixer(mixInfo[i]);
-            final Line.Info info = new Line.Info(Clip.class);
-            final int num = mixer.getMaxLines(info);
+            final Line.Info clipInfo = new Line.Info(Clip.class);
+            final int num = mixer.getMaxLines(clipInfo);
 
             if (num != 0) {
                 mix.add(mixer);
@@ -185,16 +281,27 @@ public class Sound {
         mixers = mix.toArray(mixers);
     }
 
+    /**
+     * Returns number of sounds simultaneously played.
+     *
+     * @return number of sounds simultaneously played.
+     */
     public static int getSimulSounds() {
         synchronized (MONITOR_OBJECT) {
             return simulSounds;
         }
     }
 
-    public static int setSimulSounds(final int simulSounds) {
+    /**
+     * Sets number of sounds simultaneously played.
+     *
+     * @param numberPlayed number of sounds simultaneously played.
+     * @return number of sounds simultaneously played.
+     */
+    public static int setSimulSounds(final int numberPlayed) {
         synchronized (MONITOR_OBJECT) {
-            Sound.simulSounds = simulSounds;
-            return simulSounds;
+            Sound.simulSounds = numberPlayed;
+            return numberPlayed;
         }
     }
 
@@ -204,11 +311,13 @@ public class Sound {
      * @return array of available mixer names
      */
     public String[] getMixers() {
-        if (mixers == null)
+        if (mixers == null) {
             return null;
-        final String s[] = new String[mixers.length];
-        for (int i = 0; i < mixers.length; i++)
+        }
+        final String[] s = new String[mixers.length];
+        for (int i = 0; i < mixers.length; i++) {
             s[i] = mixers[i].getMixerInfo().getName();
+        }
         return s;
     }
 
@@ -218,21 +327,22 @@ public class Sound {
      * @param idx index of mixer
      */
     public void setMixer(final int idx) {
-        if (idx > mixers.length)
+        if (idx > mixers.length) {
             mixerIdx = 0;
-        else
+        } else {
             mixerIdx = idx;
+        }
     }
 
     /**
      * Return a data line to play a sample.
      *
-     * @param info line info with requirements
+     * @param lineInfo line info with requirements
      * @return data line to play a sample
      */
-    public Line getLine(final DataLine.Info info) {
+    public Line getLine(final DataLine.Info lineInfo) {
         try {
-            return mixers[mixerIdx].getLine(info);
+            return mixers[mixerIdx].getLine(lineInfo);
         } catch (final Exception ex) {
             return null;
         }
@@ -245,8 +355,9 @@ public class Sound {
      */
     public synchronized void play(final int idx) {
         if (!GameController.isSoundOn()
-                || getSimulSounds() >= MAX_SIMUL_SOUNDS /* || clips==null */)
+                || getSimulSounds() >= MAX_SIMUL_SOUNDS /* || clips==null */) {
             return;
+        }
 
         try {
             final Clip c = (Clip) mixers[mixerIdx].getLine(info[idx]);
@@ -265,73 +376,87 @@ public class Sound {
     /**
      * Convert sampling rate to default sampling rate.
      *
-     * @param buffer byte array containing source sample
-     * @param format AudioFormat of source sample (only unsigned 8bit PCM or
-     *               signed 16bit PCM supported)
+     * @param buffer       byte array containing source sample
+     * @param sampleFormat AudioFormat of source sample (only unsigned 8bit PCM
+     *                     or signed 16bit PCM supported)
      * @return sample converted to default format (16bit signed PCM 22050Hz)
      *         stored in byte array
      */
-    public synchronized byte[] convertToDefault(final byte buffer[],
-            final AudioFormat format) {
+    public synchronized byte[] convertToDefault(final byte[] buffer,
+            final AudioFormat sampleFormat) {
         // check unsupported formats
 
         // check if the default format is already OK
-        if ((format.getFrameRate() == DEFAULT_FREQUENCY)
-                && (format.getFrameSize() == 2) && !format.isBigEndian()
-                && (format.getEncoding() == AudioFormat.Encoding.PCM_SIGNED))
+        if ((sampleFormat.getFrameRate() == DEFAULT_FREQUENCY)
+                && (sampleFormat.getFrameSize() == 2)
+                && !sampleFormat.isBigEndian() && (sampleFormat
+                        .getEncoding() == AudioFormat.Encoding.PCM_SIGNED)) {
             return buffer;
+        }
 
-        final boolean from8bit = (format.getFrameSize() == 1);
-        final boolean convertEndian = ((format.getFrameSize() == 2)
-                && format.isBigEndian());
+        final boolean from8bit = (sampleFormat.getFrameSize() == 1);
+        final boolean convertEndian = ((sampleFormat.getFrameSize() == 2)
+                && sampleFormat.isBigEndian());
 
         // sample up low frequency files to a DEFAULT_FREQUENCY to work around
         // sound bug
         // in JDK6
-        final double scale = DEFAULT_FREQUENCY / format.getSampleRate();
+        final double scale = DEFAULT_FREQUENCY / sampleFormat.getSampleRate();
         final int sampleNumSrc = buffer.length / (from8bit ? 1 : 2);
         final int sampleNumTrg = (int) (buffer.length * scale)
                 / (from8bit ? 1 : 2); // length of target buffer in
                                       // samples
-        final byte buf[] = new byte[sampleNumTrg * (from8bit ? 2 : 1)];
+        final byte[] buf = new byte[sampleNumTrg * (from8bit ? 2 : 1)];
 
         // create scaled buffer
         for (int i = 0; i < sampleNumTrg; i++) {
             int pos = (int) (i / scale);
             final double ofs = i / scale - pos;
-            if (pos >= sampleNumSrc)
-                pos = sampleNumSrc - 1;
-            int val, val2;
 
+            if (pos >= sampleNumSrc) {
+                pos = sampleNumSrc - 1;
+            }
+
+            int val;
+
+            int val2;
             if (from8bit) {
-                if (ofs < 0.1 || pos == sampleNumSrc - 1)
-                    val = buffer[pos] & 0xff;
-                else {
+                if (ofs < ONE_TENTH || pos == sampleNumSrc - 1) {
+                    val = buffer[pos] & HEX_FF;
+                } else {
                     // interpolate between sample points
-                    val = (int) ((buffer[pos] & 0xff) * (1.0 - ofs)
-                            + (buffer[pos + 1] & 0xff) * ofs);
+                    val = (int) ((buffer[pos] & HEX_FF) * (1.0 - ofs)
+                            + (buffer[pos + 1] & HEX_FF) * ofs);
                 }
                 // byte order is little endian
-                val = (val - 0x80) << 8;
+                val = (val - HEX_80) << EIGHT;
             } else {
-                if (convertEndian)
-                    val = (buffer[2 * pos + 1] & 0xff) | (buffer[2 * pos] << 8);
-                else
-                    val = (buffer[2 * pos] & 0xff) | (buffer[2 * pos + 1] << 8);
-                if (ofs >= 0.1 && pos < sampleNumSrc - 1) {
+                if (convertEndian) {
+                    val = (buffer[2 * pos + 1] & HEX_FF)
+                            | (buffer[2 * pos] << EIGHT);
+                } else {
+                    val = (buffer[2 * pos] & HEX_FF)
+                            | (buffer[2 * pos + 1] << EIGHT);
+                }
+
+                if (ofs >= ONE_TENTH && pos < sampleNumSrc - 1) {
                     // interpolate between sample points
-                    if (convertEndian)
-                        val2 = (buffer[2 * pos + 3] & 0xff)
-                                | (buffer[2 * pos + 2] << 8);
-                    else
-                        val2 = (buffer[2 * pos + 2] & 0xff)
-                                | (buffer[2 * pos + 3] << 8);
+                    if (convertEndian) {
+                        val2 = (buffer[2 * pos + THREE] & HEX_FF)
+                                | (buffer[2 * pos + 2] << EIGHT);
+                    } else {
+                        val2 = (buffer[2 * pos + 2] & HEX_FF)
+                                | (buffer[2 * pos + THREE] << EIGHT);
+                    }
+
                     val = (int) (val * (1.0 - ofs) + val2 * ofs);
                 }
             }
+
             buf[i * 2] = (byte) val;
-            buf[i * 2 + 1] = (byte) (val >> 8);
+            buf[i * 2 + 1] = (byte) (val >> EIGHT);
         }
+
         return buf;
     }
 
@@ -348,14 +473,18 @@ public class Sound {
         // contains
         // only
         // every Nth sample
-
-        if (format[idx].getFrameSize() != 2) // only 16bit supported
+        if (format[idx].getFrameSize() != 2) {
             return null;
+        }
+
         final double scale = pitchFormat.getSampleRate()
                 / format[idx].getSampleRate();
-        double dpitch = (1.0 + ((pitch - 1) * 0.0204));
-        if (dpitch < 1.0)
+        double dpitch = (1.0 + ((pitch - 1) * PITCH_MULTIPLIER));
+
+        if (dpitch < 1.0) {
             dpitch = 1.0;
+        }
+
         final double fact = dpitch / scale;
         final int len = (int) (soundBuffer[idx].length / (2 * fact)); // length
                                                                       // of
@@ -363,24 +492,30 @@ public class Sound {
                                                                       // buffer
                                                                       // in
                                                                       // samples
-        final byte buf[] = new byte[len * 2];
+        final byte[] buf = new byte[len * 2];
         // create scaled buffer
-        for (int i = 0; i < len; i++) {
-            int pos = (int) (i * fact + 0.5) * 2;
-            if (pos >= soundBuffer[idx].length - 1)
-                pos = soundBuffer[idx].length - 2;
 
-            double val = (soundBuffer[idx][pos] & 0xff)
-                    | (soundBuffer[idx][pos + 1] << 8);
+        for (int i = 0; i < len; i++) {
+            int pos = (int) (i * fact + HALF) * 2;
+
+            if (pos >= soundBuffer[idx].length - 1) {
+                pos = soundBuffer[idx].length - 2;
+            }
+
+            double val = (soundBuffer[idx][pos] & HEX_FF)
+                    | (soundBuffer[idx][pos + 1] << EIGHT);
+
             // fade in
-            if (i < PITCH_FADE_IN)
-                val *= 1.0 - (PITCH_FADE_IN - 1 - i) / 10.0;
+            if (i < PITCH_FADE_IN) {
+                val *= 1.0 - (PITCH_FADE_IN - 1 - i) / TEN_POINT_0;
+            }
+
             // byte order is little endian
             final int ival = (int) val;
             buf[i * 2] = (byte) ival;
-            buf[i * 2 + 1] = (byte) (ival >> 8);
-
+            buf[i * 2 + 1] = (byte) (ival >> EIGHT);
         }
+
         return buf;
     }
 
@@ -390,8 +525,10 @@ public class Sound {
      * @param pitch pitch value 0..99
      */
     public synchronized void playPitched(final int pitch) {
-        if (!GameController.isSoundOn() || getSimulSounds() >= MAX_SIMUL_SOUNDS)
+        if (!GameController.isSoundOn()
+                || getSimulSounds() >= MAX_SIMUL_SOUNDS) {
             return;
+        }
 
         try {
             final Clip c = (Clip) mixers[mixerIdx].getLine(pitchInfo);
@@ -421,10 +558,13 @@ public class Sound {
                 final FloatControl control = (FloatControl) line
                         .getControl(FloatControl.Type.MASTER_GAIN);
                 final double maxGain = Math.pow(10, control.getMaximum() / 20);
-                if (gn == 0)
-                    g = 0.001;
-                else
+
+                if (gn == 0) {
+                    g = MINIMUM_GAIN;
+                } else {
                     g = gn;
+                }
+
                 final float fgain = 20 * (float) Math.log10(g * maxGain);
                 control.setValue(fgain);
             } catch (final IllegalArgumentException ex) {
@@ -447,12 +587,13 @@ public class Sound {
      * @param gn gain (1.0 == 100%)
      */
     public void setGain(final double gn) {
-        if (gn > 1.0)
+        if (gn > 1.0) {
             gain = 1.0;
-        else if (gn < 0)
+        } else if (gn < 0) {
             gain = 0;
-        else
+        } else {
             gain = gn;
+        }
         Core.getProgramProps().set("soundGain", gain);
     }
 

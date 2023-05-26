@@ -15,8 +15,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 
-import GUI.GainDialog;
-import GUI.LevelCodeDialog;
 import Tools.Props;
 import Tools.ToolBox;
 import game.Core;
@@ -29,6 +27,8 @@ import game.Music;
 import game.Player;
 import game.ReplayLevelInfo;
 import gameutil.Sound;
+import gui.GainDialog;
+import gui.LevelCodeDialog;
 
 /**
  * This service class creates the menu system for the lemmini application.

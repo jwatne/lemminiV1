@@ -8,9 +8,9 @@ import javax.swing.ButtonGroup;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 
-import GUI.PlayerDialog;
 import game.Core;
 import game.Player;
+import gui.PlayerDialog;
 
 public final class ManagePlayerMenuItemActionListener
         implements java.awt.event.ActionListener {

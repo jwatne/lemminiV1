@@ -28,6 +28,7 @@ import game.LevelPack;
 import game.Music;
 import game.Player;
 import game.ReplayLevelInfo;
+import gameutil.Sound;
 
 /**
  * This service class creates the menu system for the lemmini application.
@@ -37,12 +38,13 @@ public class MenuCreator {
             implements java.awt.event.ActionListener {
         @Override
         public void actionPerformed(final java.awt.event.ActionEvent e) {
-            final String[] mixerNames = GameController.sound.getMixers();
+            final Sound sound = GameController.getSound();
+            final String[] mixerNames = sound.getMixers();
             final String mixerName = e.getActionCommand();
 
             for (int i = 0; i < mixerNames.length; i++) {
                 if (mixerNames[i].equals(mixerName)) {
-                    GameController.sound.setMixer(i);
+                    sound.setMixer(i);
                     Core.getProgramProps().set("mixerName", mixerName);
                     break;
                 }
@@ -476,7 +478,8 @@ public class MenuCreator {
      */
     private void initializeSFXMixerMenu() {
         jMenuSFX = new JMenu("SFX Mixer");
-        final String[] mixerNames = GameController.sound.getMixers();
+        final Sound sound = GameController.getSound();
+        final String[] mixerNames = sound.getMixers();
         final ButtonGroup mixerGroup = new ButtonGroup();
         String lastMixerName = Core.getProgramProps().get("mixerName",
                 "Java Sound Audio Engine");
@@ -502,7 +505,7 @@ public class MenuCreator {
 
             if (mixerNames[i].equals(lastMixerName)) { // default setting
                 item.setState(true);
-                GameController.sound.setMixer(i);
+                sound.setMixer(i);
             }
 
             jMenuSFX.add(item);

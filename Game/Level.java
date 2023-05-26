@@ -14,9 +14,9 @@ import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.List;
 
-import GameUtil.Sprite;
 import Tools.Props;
 import Tools.ToolBox;
+import gameutil.Sprite;
 
 /*
  * Copyright 2009 Volker Oth

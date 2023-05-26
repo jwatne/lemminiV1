@@ -1,4 +1,4 @@
-package GameUtil;
+package gameutil;
 
 import java.awt.Color;
 import java.awt.Graphics;

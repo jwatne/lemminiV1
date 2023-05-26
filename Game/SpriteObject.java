@@ -3,7 +3,7 @@ package game;
 import java.awt.Image;
 import java.awt.image.PixelGrabber;
 
-import GameUtil.Sprite;
+import gameutil.Sprite;
 
 /*
  * Copyright 2009 Volker Oth

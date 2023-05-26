@@ -1,4 +1,4 @@
-package GameUtil;
+package gameutil;
 
 import Tools.MicrosecondTimer;
 

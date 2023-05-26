@@ -10,8 +10,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import GameUtil.Sprite;
 import Tools.ToolBox;
+import gameutil.Sprite;
 
 /*
  * Copyright 2009 Volker Oth

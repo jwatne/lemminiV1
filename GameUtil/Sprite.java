@@ -1,4 +1,4 @@
-package GameUtil;
+package gameutil;
 
 import java.awt.Image;
 import java.awt.Transparency;

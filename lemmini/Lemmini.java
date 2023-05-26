@@ -24,7 +24,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import GameUtil.Fader;
 import Tools.Props;
 import Tools.ToolBox;
 import game.Core;
@@ -37,6 +36,9 @@ import game.Lemming;
 import game.Level;
 import game.LevelPack;
 import game.ResourceException;
+import game.State;
+import game.TransitionState;
+import gameutil.Fader;
 
 /*
  * Copyright 2009 Volker Oth
@@ -161,8 +163,8 @@ public class Lemmini extends JFrame implements KeyListener {
         this.addWindowListener(new WindowClosingListener(this));
         this.setVisible(true);
         gp.init();
-        GameController.setGameState(GameController.State.INTRO);
-        GameController.setTransition(GameController.TransitionState.NONE);
+        GameController.setGameState(State.INTRO);
+        GameController.setTransition(TransitionState.NONE);
         Fader.setBounds(Core.getDrawWidth(), Core.getDrawHeight());
         Fader.setState(Fader.State.IN);
         final Thread t = new Thread(gp);
@@ -322,7 +324,7 @@ public class Lemmini extends JFrame implements KeyListener {
     public final void keyPressed(final KeyEvent keyevent) {
         final int code = keyevent.getKeyCode();
 
-        if (GameController.getGameState() == GameController.State.LEVEL) {
+        if (GameController.getGameState() == State.LEVEL) {
             switch (code) {
             case KeyEvent.VK_1:
             case KeyEvent.VK_F3:
@@ -558,7 +560,7 @@ public class Lemmini extends JFrame implements KeyListener {
     public final void keyReleased(final KeyEvent keyevent) {
         final int code = keyevent.getKeyCode();
 
-        if (GameController.getGameState() == GameController.State.LEVEL) {
+        if (GameController.getGameState() == State.LEVEL) {
             switch (code) {
             case KeyEvent.VK_SHIFT:
                 gp.setShiftPressed(false);

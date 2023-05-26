@@ -661,7 +661,7 @@ public class GraphicsPane extends JPanel
                 break;
             case TextScreen.BUTTON_SAVEREPLAY:
                 String replayPath = ToolBox.getFileName(Lemmini.getThisFrame(),
-                        Core.resourcePath, Core.REPLAY_EXTENSIONS, false);
+                        Core.getResourcePath(), Core.REPLAY_EXTENSIONS, false);
 
                 if (replayPath != null) {
                     try {

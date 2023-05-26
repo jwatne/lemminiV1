@@ -57,7 +57,7 @@ public class Music {
 		modMusic = new ModMusic();
 
 		// read available musicfiles for random mode
-		final File dir = new File(Core.resourcePath + "music");
+		final File dir = new File(Core.getResourcePath() + "music");
 		final File files[] = dir.listFiles(new MusicFileFilter());
 
 		if (files != null) {
@@ -199,7 +199,7 @@ public class Music {
 				break;
 		}
 
-		Core.programProps.set("musicGain", gain);
+		Core.getProgramProps().set("musicGain", gain);
 	}
 
 	/**

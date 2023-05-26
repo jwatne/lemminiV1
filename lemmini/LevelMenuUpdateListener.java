@@ -27,18 +27,21 @@ public class LevelMenuUpdateListener implements UpdateListener {
     @Override
     public void update() {
         if (GameController.getCurLevelPackIdx() != 0) { // 0 is the dummy pack
-            LevelPack lvlPack = GameController.getLevelPack(GameController.getCurLevelPackIdx());
+            LevelPack lvlPack = GameController
+                    .getLevelPack(GameController.getCurLevelPackIdx());
             String pack = lvlPack.getName();
-            String diff = lvlPack.getDiffLevels()[GameController.getCurDiffLevel()];
+            String diff = lvlPack.getDiffLevels()[GameController
+                    .getCurDiffLevel()];
             // get next level
             int num = GameController.getCurLevelNumber() + 1;
 
-            if (num >= lvlPack.getLevels(GameController.getCurDiffLevel()).length) {
+            if (num >= lvlPack
+                    .getLevels(GameController.getCurDiffLevel()).length) {
                 num = GameController.getCurLevelNumber();
             }
 
             // set next level as available
-            GroupBitfield bf = Core.player.setAvailable(pack, diff, num);
+            GroupBitfield bf = Core.getPlayer().setAvailable(pack, diff, num);
             // update the menu
             this.lemmini.updateLevelMenu(pack, diff, bf);
         }

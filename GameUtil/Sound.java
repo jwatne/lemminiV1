@@ -453,7 +453,7 @@ public class Sound {
             gain = 0;
         else
             gain = gn;
-        Core.programProps.set("soundGain", gain);
+        Core.getProgramProps().set("soundGain", gain);
     }
 
 }

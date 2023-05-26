@@ -17,6 +17,7 @@ import javax.swing.JRadioButtonMenuItem;
 
 import GUI.GainDialog;
 import GUI.LevelCodeDialog;
+import Tools.Props;
 import Tools.ToolBox;
 import game.Core;
 import game.GameController;
@@ -42,7 +43,7 @@ public class MenuCreator {
             for (int i = 0; i < mixerNames.length; i++) {
                 if (mixerNames[i].equals(mixerName)) {
                     GameController.sound.setMixer(i);
-                    Core.programProps.set("mixerName", mixerName);
+                    Core.getProgramProps().set("mixerName", mixerName);
                     break;
                 }
             }
@@ -143,7 +144,7 @@ public class MenuCreator {
         for (int idx = 0; idx < Core.getPlayerNum(); idx++) {
             final JCheckBoxMenuItem item = addPlayerItem(Core.getPlayer(idx));
 
-            if (Core.player.getName().equals(Core.getPlayer(idx))) {
+            if (Core.getPlayer().getName().equals(Core.getPlayer(idx))) {
                 item.setSelected(true);
             }
         }
@@ -192,12 +193,13 @@ public class MenuCreator {
     void exit() {
         // store width and height
         final Dimension d = lemmini.getSize();
-        Core.programProps.set("frameWidth", d.width);
-        Core.programProps.set("frameHeight", d.height);
+        final Props programProps = Core.getProgramProps();
+        programProps.set("frameWidth", d.width);
+        programProps.set("frameHeight", d.height);
         // store frame pos
         final Point p = lemmini.getLocation();
-        Core.programProps.set("framePosX", p.x);
-        Core.programProps.set("framePosY", p.y);
+        programProps.set("framePosX", p.x);
+        programProps.set("framePosY", p.y);
         //
         Core.saveProgramProps();
         System.exit(0);
@@ -224,11 +226,11 @@ public class MenuCreator {
         item.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(final java.awt.event.ActionEvent e) {
-                Core.player.store(); // save player in case it is changed
+                Core.getPlayer().store(); // save player in case it is changed
                 final JMenuItem item = (JMenuItem) e.getSource();
                 final String player = item.getText();
                 final Player p = new Player(player);
-                Core.player = p; // default player
+                Core.setPlayer(p); // default player
                 item.setSelected(true);
                 updateLevelMenus();
             }
@@ -400,7 +402,7 @@ public class MenuCreator {
                             GameController.setClassicalCursor(false);
                         }
 
-                        Core.programProps.set("classicalCursor",
+                        Core.getProgramProps().set("classicalCursor",
                                 GameController.isClassicalCursor());
                     }
                 });
@@ -437,7 +439,7 @@ public class MenuCreator {
                     graphicsPane.setCursor(LemmCursor.Type.NORMAL);
                 }
 
-                Core.programProps.set("advancedSelect",
+                Core.getProgramProps().set("advancedSelect",
                         GameController.isAdvancedSelect());
             }
         });
@@ -476,7 +478,7 @@ public class MenuCreator {
         jMenuSFX = new JMenu("SFX Mixer");
         final String[] mixerNames = GameController.sound.getMixers();
         final ButtonGroup mixerGroup = new ButtonGroup();
-        String lastMixerName = Core.programProps.get("mixerName",
+        String lastMixerName = Core.getProgramProps().get("mixerName",
                 "Java Sound Audio Engine");
 
         // special handling of mixer from INI that doesn't exist (any more)
@@ -524,7 +526,7 @@ public class MenuCreator {
                     GameController.setSoundOn(false);
                 }
 
-                Core.programProps.set("sound", GameController.isSoundOn());
+                Core.getProgramProps().set("sound", GameController.isSoundOn());
             }
         });
 
@@ -548,7 +550,7 @@ public class MenuCreator {
                     GameController.setMusicOn(false);
                 }
 
-                Core.programProps.set("music", GameController.isMusicOn());
+                Core.getProgramProps().set("music", GameController.isMusicOn());
 
                 if (GameController.getLevel() != null) { // to be improved:
                                                          // level is running
@@ -591,7 +593,7 @@ public class MenuCreator {
                                         "All levels and debug mode enabled",
                                         "Cheater!",
                                         JOptionPane.INFORMATION_MESSAGE);
-                                Core.player.enableCheatMode();
+                                Core.getPlayer().enableCheatMode();
                                 updateLevelMenus();
                                 return;
                             }
@@ -611,7 +613,7 @@ public class MenuCreator {
                                         .relLevelNum(lvlPack, lvlAbs);
                                 final int diffLvl = l[0];
                                 final int lvlRel = l[1];
-                                Core.player.setAvailable(lpack.getName(),
+                                Core.getPlayer().setAvailable(lpack.getName(),
                                         lpack.getDiffLevels()[diffLvl], lvlRel);
                                 GameController.requestChangeLevel(lvlPack,
                                         diffLvl, lvlRel, false);
@@ -638,7 +640,7 @@ public class MenuCreator {
             @Override
             public void actionPerformed(final java.awt.event.ActionEvent e) {
                 final String replayPath = ToolBox.getFileName(lemmini,
-                        Core.resourcePath, Core.REPLAY_EXTENSIONS, true);
+                        Core.getResourcePath(), Core.REPLAY_EXTENSIONS, true);
 
                 if (replayPath != null) {
                     try {
@@ -695,8 +697,8 @@ public class MenuCreator {
                     try {
                         if (ToolBox.getExtension(p).equalsIgnoreCase("lvl")) {
                             extract.ExtractLevel.convertLevel(p,
-                                    Core.resourcePath + "/temp.ini");
-                            p = Core.resourcePath + "/temp.ini";
+                                    Core.getResourcePath() + "/temp.ini");
+                            p = Core.getResourcePath() + "/temp.ini";
                         }
 
                         if (ToolBox.getExtension(p).equalsIgnoreCase("ini")) {
@@ -757,7 +759,7 @@ public class MenuCreator {
 
             for (int i = 0; i < difficulties.length; i++) {
                 // get activated levels for this group
-                final GroupBitfield bf = Core.player
+                final GroupBitfield bf = Core.getPlayer()
                         .getBitField(lPack.getName(), difficulties[i]);
                 final String[] names = lPack.getLevels(i);
                 final JMenu jMenuDiff = new JMenu(difficulties[i]);
@@ -769,7 +771,7 @@ public class MenuCreator {
                             i, n);
                     jMenuLvl.addActionListener(lvlListener);
 
-                    if (Core.player.isAvailable(bf, n)) {
+                    if (Core.getPlayer().isAvailable(bf, n)) {
                         jMenuLvl.setEnabled(true);
                     } else {
                         jMenuLvl.setEnabled(false);
@@ -804,7 +806,7 @@ public class MenuCreator {
 
             for (int i = 0; i < difficulties.length; i++) {
                 // get activated levels for this group
-                final GroupBitfield bf = Core.player
+                final GroupBitfield bf = Core.getPlayer()
                         .getBitField(lPack.getName(), difficulties[i]);
                 lemmini.updateLevelMenu(lPack.getName(), difficulties[i], bf);
             }

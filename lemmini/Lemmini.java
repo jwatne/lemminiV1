@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import GameUtil.Fader;
+import Tools.Props;
 import Tools.ToolBox;
 import game.Core;
 import game.GameController;
@@ -190,8 +191,8 @@ public class Lemmini extends JFrame implements KeyListener {
                 .getCenterPoint();
         p.x -= this.getWidth() / 2;
         p.y -= this.getHeight() / 2;
-        posX = Core.programProps.get("framePosX", p.x > 0 ? p.x : 0);
-        posY = Core.programProps.get("framePosY", p.y > 0 ? p.y : 0);
+        posX = Core.getProgramProps().get("framePosX", p.x > 0 ? p.x : 0);
+        posY = Core.getProgramProps().get("framePosY", p.y > 0 ? p.y : 0);
         this.setLocation(posX, posY);
     }
 
@@ -272,7 +273,7 @@ public class Lemmini extends JFrame implements KeyListener {
             // select level, e.g. "All fall down"
             final JMenuItem level = menuItems.get(k);
 
-            if (k == 0 || Core.player.isAvailable(bf, k)) {
+            if (k == 0 || Core.getPlayer().isAvailable(bf, k)) {
                 level.setEnabled(true);
             } else {
                 level.setEnabled(false);
@@ -489,7 +490,7 @@ public class Lemmini extends JFrame implements KeyListener {
      * Toggles cheat mode.
      */
     private void toggleCheatMode() {
-        if (Core.player.isCheat()) {
+        if (Core.getPlayer().isCheat()) {
             GameController.setCheat(!GameController.isCheat());
 
             if (GameController.isCheat()) {
@@ -508,7 +509,8 @@ public class Lemmini extends JFrame implements KeyListener {
             GameController.setSuperLemming(!GameController.isSuperLemming());
         } else {
             try {
-                final File file = new File(Core.resourcePath + "/level.png");
+                final File file = new File(
+                        Core.getResourcePath() + "/level.png");
                 final BufferedImage tmp = GameController.getLevel()
                         .createMiniMap(null, GameController.getBgImage(), 1, 1,
                                 false);
@@ -607,12 +609,13 @@ public class Lemmini extends JFrame implements KeyListener {
     void exit() {
         // store width and height
         final Dimension d = this.getSize();
-        Core.programProps.set("frameWidth", d.width);
-        Core.programProps.set("frameHeight", d.height);
+        Props programProps = Core.getProgramProps();
+        programProps.set("frameWidth", d.width);
+        programProps.set("frameHeight", d.height);
         // store frame pos
         final Point p = this.getLocation();
-        Core.programProps.set("framePosX", p.x);
-        Core.programProps.set("framePosY", p.y);
+        programProps.set("framePosX", p.x);
+        programProps.set("framePosY", p.y);
         //
         Core.saveProgramProps();
         System.exit(0);

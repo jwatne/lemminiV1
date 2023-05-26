@@ -12,7 +12,8 @@ import GUI.PlayerDialog;
 import game.Core;
 import game.Player;
 
-public final class ManagePlayerMenuItemActionListener implements java.awt.event.ActionListener {
+public final class ManagePlayerMenuItemActionListener
+        implements java.awt.event.ActionListener {
     /**
      * The calling {@link MenuCreator}.
      */
@@ -22,7 +23,8 @@ public final class ManagePlayerMenuItemActionListener implements java.awt.event.
     /**
      * @param menuCreator
      */
-    ManagePlayerMenuItemActionListener(final MenuCreator menuCreator, final Component frame) {
+    ManagePlayerMenuItemActionListener(final MenuCreator menuCreator,
+            final Component frame) {
         this.menuCreator = menuCreator;
         this.frame = frame;
     }
@@ -37,14 +39,15 @@ public final class ManagePlayerMenuItemActionListener implements java.awt.event.
 
     @Override
     public void actionPerformed(final java.awt.event.ActionEvent e) {
-        Core.player.store(); // save player in case it is changed
+        final Player corePlayer = Core.getPlayer();
+        corePlayer.store(); // save player in case it is changed
         final PlayerDialog d = new PlayerDialog((JFrame) frame, true);
         d.setVisible(true);
         // blocked until dialog returns
         final List<String> players = d.getPlayers();
 
         if (players != null) {
-            String player = Core.player.getName(); // old player
+            String player = corePlayer.getName(); // old player
             final int playerIdx = d.getSelection();
 
             if (playerIdx != -1) {
@@ -67,16 +70,18 @@ public final class ManagePlayerMenuItemActionListener implements java.awt.event.
             }
 
             // select new default player
-            Core.player = new Player(player);
+            Player newDefaultPlayer = new Player(player);
+            Core.setPlayer(newDefaultPlayer);
 
             // rebuild players menu
             this.menuCreator.playerGroup = new ButtonGroup();
             this.menuCreator.jMenuSelectPlayer.removeAll();
 
             for (int idx = 0; idx < Core.getPlayerNum(); idx++) {
-                final JCheckBoxMenuItem item = this.menuCreator.addPlayerItem(Core.getPlayer(idx));
+                final JCheckBoxMenuItem item = this.menuCreator
+                        .addPlayerItem(Core.getPlayer(idx));
 
-                if (Core.player.getName().equals(Core.getPlayer(idx))) {
+                if (newDefaultPlayer.getName().equals(Core.getPlayer(idx))) {
                     item.setSelected(true);
                 }
             }
@@ -86,15 +91,16 @@ public final class ManagePlayerMenuItemActionListener implements java.awt.event.
     }
 
     /**
-     * Checks for players to delete and deletes them. Returns the currentPlayer or
-     * &quot;default&quot; if currentPlayer is not in the List of players.
+     * Checks for players to delete and deletes them. Returns the currentPlayer
+     * or &quot;default&quot; if currentPlayer is not in the List of players.
      *
      * @param players       the List of players currently in the application.
      * @param currentPlayer the name of the current player.
-     * @return currentPlayer, or &quot;default&quot; if currentPlayer is not in the
-     *         List of players.
+     * @return currentPlayer, or &quot;default&quot; if currentPlayer is not in
+     *         the List of players.
      */
-    private String checkForPlayersToDelete(final List<String> players, final String currentPlayer) {
+    private String checkForPlayersToDelete(final List<String> players,
+            final String currentPlayer) {
         String player = currentPlayer;
 
         // check for players to delete
@@ -102,7 +108,8 @@ public final class ManagePlayerMenuItemActionListener implements java.awt.event.
             final String p = Core.getPlayer(i);
 
             if (!players.contains(p)) {
-                final String pathname = Core.resourcePath + "players/" + p + ".ini";
+                final String pathname = Core.getResourcePath() + "players/" + p
+                        + ".ini";
                 final File f = new File(pathname);
                 final boolean deleted = f.delete();
 

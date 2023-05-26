@@ -50,8 +50,20 @@ import extract.ExtractException;
  */
 public final class Core {
     /**
+     * Vertical padding for draw height, in pixels.
+     */
+    private static final int DRAW_HEIGHT_PADDING = 90;
+    /**
+     * The internal draw width, in pixels.
+     */
+    private static final int INTERNAL_DRAW_WIDTH = 800;
+    /**
+     * Length of &quot;file:&quot; prefix text.
+     */
+    private static final int FILE_LENGTH = 5;
+    /**
      * The revision string for resource compatibility - not necessarily the
-     * version number
+     * version number.
      */
     private static final String REVISION = "0.80";
     /** name of the ini file. */
@@ -66,11 +78,68 @@ public final class Core {
     private static final int WIN_OFS = 120;
 
     /** program properties. */
-    public static Props programProps;
+    private static Props programProps;
+
+    /**
+     * Returns program properties.
+     *
+     * @return program properties.
+     */
+    public static Props getProgramProps() {
+        return programProps;
+    }
+
+    /**
+     * Sets program properties.
+     *
+     * @param properties program properties.
+     */
+    public static void setProgramProps(final Props properties) {
+        Core.programProps = properties;
+    }
+
     /** path of (extracted) resources. */
-    public static String resourcePath;
+    private static String resourcePath;
+
+    /**
+     * Returns path of (extracted) resources.
+     *
+     * @return path of (extracted) resources.
+     */
+    public static String getResourcePath() {
+        return resourcePath;
+    }
+
+    /**
+     * Sets path of (extracted) resources.
+     *
+     * @param path path of (extracted) resources.
+     */
+    public static void setResourcePath(final String path) {
+        Core.resourcePath = path;
+    }
+
     /** current player. */
-    public static Player player;
+    private static Player player;
+
+    /**
+     * Returns current player.
+     *
+     * @return current player.
+     */
+    public static Player getPlayer() {
+        return player;
+    }
+
+    /**
+     * Sets current player.
+     *
+     * @param currentPlayer current player.
+     */
+    public static void setPlayer(final Player currentPlayer) {
+        Core.player = currentPlayer;
+    }
+
     /** name of program properties file. */
     private static String programPropsFileStr;
     /** name of player properties file. */
@@ -113,15 +182,17 @@ public final class Core {
         }
 
         // special handling for JAR
-        final boolean runFromJarFile = (pos = programPropsFileStr.toLowerCase()
-                .indexOf("file:")) != -1;
+        pos = programPropsFileStr.toLowerCase().indexOf("file:");
+        final boolean runFromJarFile = (pos != -1);
 
         if (runFromJarFile) {
-            programPropsFileStr = programPropsFileStr.substring(pos + 5);
+            programPropsFileStr = programPropsFileStr
+                    .substring(pos + FILE_LENGTH);
         }
 
-        if ((pos = programPropsFileStr.toLowerCase()
-                .indexOf(s.toLowerCase())) != -1) {
+        pos = programPropsFileStr.toLowerCase().indexOf(s.toLowerCase());
+
+        if (pos != -1) {
             programPropsFileStr = programPropsFileStr.substring(0, pos);
         }
 
@@ -149,8 +220,9 @@ public final class Core {
             s = (frame.getClass().getName().replace('.', '/') + ".jar")
                     .toLowerCase();
             System.out.println("*** updated s: " + s);
+            pos = programPropsFileStr.toLowerCase().indexOf(s);
 
-            if ((pos = programPropsFileStr.toLowerCase().indexOf(s)) != -1) {
+            if (pos != -1) {
                 programPropsFileStr = programPropsFileStr.substring(0, pos);
             }
 
@@ -177,8 +249,8 @@ public final class Core {
         // read main ini file
         programProps = new Props();
 
-        if (!programProps.load(programPropsFileStr)) {// might exist or not - if
-                                                      // not, it's created
+        if (!programProps.load(programPropsFileStr)) {
+            // might exist or not - if not, it's created
             final LegalDialog ld = new LegalDialog(null, true);
             ld.setVisible(true);
 
@@ -457,26 +529,25 @@ public final class Core {
     }
 
     /**
-     * Get internal Draw Width
+     * Get internal Draw Width.
      *
      * @return internal draw width
      */
     public static int getDrawWidth() {
-        return 800;
+        return INTERNAL_DRAW_WIDTH;
     }
 
     /**
-     * Get internal Draw Height
+     * Get internal Draw Height.
      *
      * @return internal draw width
      */
     public static int getDrawHeight() {
-        return Level.HEIGHT + WIN_OFS + 90; // Core.programProps.get("frameHeight",
-                                            // Level.height+winOfs+60);
+        return Level.HEIGHT + WIN_OFS + DRAW_HEIGHT_PADDING;
     }
 
     /**
-     * Get Zoom scale
+     * Get Zoom scale.
      *
      * @return zoom scale
      */
@@ -485,7 +556,7 @@ public final class Core {
     }
 
     /**
-     * Set zoom scale
+     * Set zoom scale.
      *
      * @param s zoom scale
      */

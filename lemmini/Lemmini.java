@@ -117,7 +117,7 @@ public class Lemmini extends JFrame implements KeyListener {
     @SuppressWarnings("unused")
     private final String lvlPath;
     /** Map to store menu items for difficulty levels.. */
-    private final Map<String, List<LvlMenuItem>> diffLevelMenus = new HashMap<>();
+    private final Map<String, List<LvlMenuItem>> levelMenus = new HashMap<>();
     /** Panel for the game graphics.. */
     private final GraphicsPane gp;
 
@@ -159,8 +159,8 @@ public class Lemmini extends JFrame implements KeyListener {
         this.validate(); // force redraw
         this.setTitle("Lemmini");
         final MenuCreator menuCreator = new MenuCreator(this);
-        this.setJMenuBar(menuCreator.getLemminiMenuBar(this, this.gp,
-                this.diffLevelMenus));
+        this.setJMenuBar(
+                menuCreator.getLemminiMenuBar(this, this.gp, this.levelMenus));
         this.addWindowListener(new WindowClosingListener(this));
         this.setVisible(true);
         gp.init();
@@ -269,7 +269,7 @@ public class Lemmini extends JFrame implements KeyListener {
      */
     public void updateLevelMenu(final String pack, final String diff,
             final GroupBitfield bf) {
-        final List<LvlMenuItem> menuItems = diffLevelMenus
+        final List<LvlMenuItem> menuItems = levelMenus
                 .get(LevelPack.getID(pack, diff));
 
         for (int k = 0; k < menuItems.size(); k++) {
@@ -604,7 +604,9 @@ public class Lemmini extends JFrame implements KeyListener {
     }
 
     @Override
-    public void keyTyped(final KeyEvent keyevent) {}
+    public void keyTyped(final KeyEvent keyevent) {
+
+    }
 
     /**
      * Common exit method to use in exit events.

@@ -5,11 +5,75 @@ package micromod;
  */
 public class Micromod {
     /**
+     * Offset for eparam component in buffer.
+     */
+    private static final int EPARAM_OFFSET = 3;
+    /**
+     * Mask for 9th bit = 0x10.
+     */
+    private static final int BIT_9_MASK = 0x10;
+    /**
+     * Maximum number of rows.
+     */
+    private static final int NUM_ROWS = 64;
+    /**
+     * 4-bit shift.
+     */
+    private static final int SHIFT_4_BITS = 4;
+    /**
+     * Mask for bits 9-16 = 0xF0.
+     */
+    private static final int BITS9_TO_16_MASK = 0xF0;
+    /**
+     * Number fcount values - used for mod calc.
+     */
+    private static final int NUM_FCOUNT_VALUES = 3;
+    /**
+     * Max 2 bit value = 3 (base 10).
+     */
+    private static final int MAX_2_BIT_VALUE = 3;
+    /**
+     * 192 value for p.
+     */
+    private static final int P192 = 192;
+    /**
+     * 64 value for p.
+     */
+    private static final int P64 = 64;
+    /**
+     * 2-bit mask value = 0x3 = 0x03.
+     */
+    private static final int TWO_BIT_MASK = 0x3;
+    /**
+     * Default beats per minute.
+     */
+    private static final int DEFAULT_BPM = 125;
+    /**
+     * Default tick value.
+     */
+    private static final int DEFAULT_TICK = 6;
+    /**
+     * Default tempo value.
+     */
+    private static final int DEFAULT_TEMPO = 6;
+    /**
+     * Cutoff value to check llen against for adjustment.
+     */
+    private static final int LLEN_CUTOFF = 4;
+    /**
+     * Amount to add to index to get llen value in buffer.
+     */
+    private static final int LLEN_OFFSET = 48;
+    /**
+     * Amount to add to index to get lsta value in buffer.
+     */
+    private static final int LSTA_OFFSET = 46;
+    /**
      * Maximum volume value.
      */
     private static final int MAX_VOLUME = 64;
     /**
-     * Amount to add to index to get offset value in buffer.
+     * Amount to add to index to get vol value in buffer.
      */
     private static final int VOL_OFFSET = 45;
     /**
@@ -385,9 +449,9 @@ public class Micromod {
             }
 
             int lsta = ushortbe(modDataBuffer,
-                    inst * INST_MULTIPLIER + 46) << 1;
+                    inst * INST_MULTIPLIER + LSTA_OFFSET) << 1;
             int llen = ushortbe(modDataBuffer,
-                    inst * INST_MULTIPLIER + 48) << 1;
+                    inst * INST_MULTIPLIER + LLEN_OFFSET) << 1;
 
             if (sampleidx + slen - 1 >= modDataBuffer.length) {
                 System.out.println("Module is truncated!");
@@ -398,7 +462,7 @@ public class Micromod {
                 }
             }
 
-            if (llen < 4 || lsta >= slen) {
+            if (llen < LLEN_CUTOFF || lsta >= slen) {
                 lsta = slen - 1;
                 llen = 1;
             }
@@ -408,6 +472,7 @@ public class Micromod {
             if (lend >= slen) {
                 lend = slen - 1;
             }
+
             final int ioffset = (inst + 1) * IN_STRUCT_LEN;
             instruments[ioffset + IN_SAMPLE_INDEX] = sampleidx;
             instruments[ioffset + IN_LOOP_START] = lsta;
@@ -416,11 +481,12 @@ public class Micromod {
             instruments[ioffset + IN_VOLUME] = vol;
             sampleidx += slen;
         }
+
         reset();
     }
 
     /**
-     * return the song length in samples
+     * Return the song length in samples.
      *
      * @return song length in samples
      */
@@ -494,57 +560,70 @@ public class Micromod {
     }
 
     private void reset() {
-        pat = npat = 0;
-        row = nrow = 0;
-        tick = tempo = 6;
-        bpm = 125;
-        loopcount = loopchan = 0;
+        npat = 0;
+        pat = 0;
+        nrow = 0;
+        row = 0;
+        tempo = DEFAULT_TEMPO;
+        tick = DEFAULT_TICK;
+        bpm = DEFAULT_BPM;
+        loopchan = 0;
+        loopcount = 0;
+
         for (int n = 0; n < channels.length; n++) {
             channels[n] = 0;
         }
+
         for (int chan = 0; chan < numchan; chan++) {
             int p = MAX_NUM_PATTERNS;
-            switch (chan & 0x3) {
+
+            switch (chan & TWO_BIT_MASK) {
             case 0:
-                p = 64;
+                p = P64;
                 break;
             case 1:
-                p = 192;
+                p = P192;
                 break;
             case 2:
-                p = 192;
+                p = P192;
                 break;
-            case 3:
-                p = 64;
+            case MAX_2_BIT_VALUE:
+                p = P64;
                 break;
             default:
                 break;
             }
+
             channels[chan * CH_STRUCT_LEN + CH_PANNING] = p;
         }
+
         row();
         tickremain = getticklen();
     }
 
     private boolean tick() {
         tick--;
+
         if (tick <= 0) {
             tick = tempo;
             return row();
         }
+
         // Update channel fx
         for (int chan = 0; chan < numchan; chan++) {
             final int coffset = chan * CH_STRUCT_LEN;
             final int effect = channels[coffset + CH_NOTE_EFFECT];
             final int eparam = channels[coffset + CH_NOTE_EPARAM];
+
             switch (effect) {
             case FX_ARPEGGIO:
-                switch (fcount % 3) {
+                switch (fcount % NUM_FCOUNT_VALUES) {
                 case 0:
                     channels[coffset + CH_ARPEGGIO] = 0;
                     break;
                 case 1:
-                    channels[coffset + CH_ARPEGGIO] = (eparam & 0xF0) >> 4;
+                    channels[coffset + CH_ARPEGGIO] = (eparam
+                            & BITS9_TO_16_MASK) >> SHIFT_4_BITS;
                     break;
                 case 2:
                     channels[coffset + CH_ARPEGGIO] = eparam & EIGHT_BIT_MASK;
@@ -552,6 +631,7 @@ public class Micromod {
                 default:
                     break;
                 }
+
                 break;
             case FX_PORTA_UP:
                 channels[coffset + CH_PERIOD] -= eparam;
@@ -580,7 +660,7 @@ public class Micromod {
                 volslide(coffset, eparam);
                 break;
             case FX_EXTENDED:
-                switch (eparam & 0xF0) {
+                switch (eparam & BITS9_TO_16_MASK) {
                 case EX_RETRIG:
                     int rtparam = eparam & EIGHT_BIT_MASK;
                     if (rtparam == 0) {
@@ -617,21 +697,26 @@ public class Micromod {
     private boolean row() {
         // Decide whether to restart.
         boolean songend = false;
+
         if (npat < pat) {
             songend = true;
         }
+
         if (npat == pat && nrow <= row && loopcount <= 0) {
             songend = true;
         }
+
         // Jump to next row
         pat = npat;
         row = nrow;
         // Decide next row.
         nrow = row + 1;
-        if (nrow == 64) {
+
+        if (nrow == NUM_ROWS) {
             npat = pat + 1;
             nrow = 0;
         }
+
         // Load channels and process fx
         fcount = 0;
         final int poffset = mod[FIRST_PATTERN_INDEX + pat]
@@ -639,21 +724,24 @@ public class Micromod {
         final int roffset = MIN_SAMPLE_INDEX
                 + (poffset * 64 * numchan * FOUR_CHANNELS)
                 + (row * numchan * 4);
+
         for (int chan = 0; chan < numchan; chan++) {
             final int coffset = chan * CH_STRUCT_LEN;
             final int noffset = roffset + (chan * FOUR_CHANNELS);
-            channels[coffset + CH_NOTE_PERIOD] = (mod[noffset + 1] & 0xFF)
-                    | ((mod[noffset] & EIGHT_BIT_MASK) << SHIFT_8_BITS);
             channels[coffset
-                    + CH_NOTE_INSTRU] = ((mod[noffset + 2] & 0xF0) >> 4)
-                            | (mod[noffset] & 0x10);
+                    + CH_NOTE_PERIOD] = (mod[noffset + 1] & SIXTEEN_BIT_MASK)
+                            | ((mod[noffset] & EIGHT_BIT_MASK) << SHIFT_8_BITS);
+            channels[coffset + CH_NOTE_INSTRU] = ((mod[noffset + 2]
+                    & BITS9_TO_16_MASK) >> SHIFT_4_BITS)
+                    | (mod[noffset] & BIT_9_MASK);
             channels[coffset + CH_NOTE_EFFECT] = mod[noffset + 2]
                     & EIGHT_BIT_MASK;
-            channels[coffset + CH_NOTE_EPARAM] = mod[noffset + 3] & 0xFF;
+            channels[coffset + CH_NOTE_EPARAM] = mod[noffset + EPARAM_OFFSET]
+                    & SIXTEEN_BIT_MASK;
             final int effect = channels[coffset + CH_NOTE_EFFECT];
             final int eparam = channels[coffset + CH_NOTE_EPARAM];
             if (!(effect == FX_EXTENDED
-                    && ((eparam & 0xF0) == EX_NOTE_DELAY))) {
+                    && ((eparam & BITS9_TO_16_MASK) == EX_NOTE_DELAY))) {
                 trigger(coffset);
             }
             channels[coffset + CH_ARPEGGIO] = 0;
@@ -705,12 +793,13 @@ public class Micromod {
             case FX_PAT_BREAK:
                 if (loopcount <= 0) {
                     npat = pat + 1;
-                    nrow = ((eparam & 0xF0) >> 4) * TEN
+                    nrow = ((eparam & BITS9_TO_16_MASK) >> SHIFT_4_BITS) * TEN
                             + (eparam & EIGHT_BIT_MASK);
                 }
+
                 break;
             case FX_EXTENDED:
-                switch (eparam & 0xF0) {
+                switch (eparam & BITS9_TO_16_MASK) {
                 case EX_FINE_PORT_UP:
                     channels[coffset + CH_PERIOD] -= (eparam & EIGHT_BIT_MASK);
                     break;
@@ -720,16 +809,20 @@ public class Micromod {
 
                 case EX_SET_FINETUNE:
                     int ftval = eparam & EIGHT_BIT_MASK;
+
                     if (ftval > 7) {
                         ftval -= 16;
                     }
+
                     channels[coffset + CH_FINETUNE] = ftval;
                     break;
                 case EX_PAT_LOOP:
                     final int plparam = eparam & EIGHT_BIT_MASK;
+
                     if (plparam == 0) {
                         channels[coffset + CH_PAT_LOOP_ROW] = row;
                     }
+
                     if (plparam > 0
                             && channels[coffset + CH_PAT_LOOP_ROW] < row) {
                         if (loopcount <= 0) {
@@ -799,7 +892,7 @@ public class Micromod {
         if (npat >= songlen) {
             npat = restart;
         }
-        if (nrow >= 64) {
+        if (nrow >= NUM_ROWS) {
             nrow = 0;
         }
         return songend;
@@ -836,7 +929,7 @@ public class Micromod {
 
     private void volslide(final int coffset, final int eparam) {
         int vol = channels[coffset + CH_VOLUME];
-        vol += (eparam & 0xF0) >> 4;
+        vol += (eparam & BITS9_TO_16_MASK) >> SHIFT_4_BITS;
         vol -= eparam & EIGHT_BIT_MASK;
         if (vol > MAX_VOLUME) {
             vol = MAX_VOLUME;
@@ -867,7 +960,7 @@ public class Micromod {
 
     private void vibrato(final int coffset) {
         final int vparam = channels[coffset + CH_VIBR_PARAM];
-        final int vspeed = (vparam & 0xF0) >> 4;
+        final int vspeed = (vparam & BITS9_TO_16_MASK) >> SHIFT_4_BITS;
         final int vdepth = vparam & EIGHT_BIT_MASK;
         final int vibpos = vspeed * channels[coffset + CH_VIBR_COUNT];
         int tval = sintable[vibpos & 0x1F];
@@ -879,7 +972,7 @@ public class Micromod {
 
     private void tremolo(final int coffset) {
         final int tparam = channels[coffset + CH_TREM_PARAM];
-        final int tspeed = (tparam & 0xF0) >> 4;
+        final int tspeed = (tparam & BITS9_TO_16_MASK) >> SHIFT_4_BITS;
         final int tdepth = tparam & EIGHT_BIT_MASK;
         final int trempos = tspeed * channels[coffset + CH_VIBR_COUNT];
         int tval = sintable[trempos & 0x1F];
@@ -919,7 +1012,7 @@ public class Micromod {
     }
 
     private int ushortbe(final byte[] buf, final int offset) {
-        return ((buf[offset] & 0xFF) << SHIFT_8_BITS)
-                | (buf[offset + 1] & 0xFF);
+        return ((buf[offset] & SIXTEEN_BIT_MASK) << SHIFT_8_BITS)
+                | (buf[offset + 1] & SIXTEEN_BIT_MASK);
     }
 }

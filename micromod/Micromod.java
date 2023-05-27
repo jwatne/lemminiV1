@@ -914,6 +914,7 @@ public class Micromod {
         if (nrow >= NUM_ROWS) {
             nrow = 0;
         }
+
         return songend;
     }
 
@@ -1026,6 +1027,7 @@ public class Micromod {
             if (p < 27) {
                 p = 27;
             }
+
             final int clk = amiga ? 3546894 : 3579364;
             int s = (clk / p << FP_SHIFT) / samplerate;
             s = s * fttable[channels[coffset + CH_FINETUNE] + 8] >> 14;

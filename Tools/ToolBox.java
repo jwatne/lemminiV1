@@ -1,4 +1,4 @@
-package Tools;
+package tools;
 
 import java.awt.Component;
 import java.awt.Graphics2D;

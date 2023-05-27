@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
-import Tools.ToolBox;
+import tools.ToolBox;
 
 /*
  * Copyright 2009 Volker Oth

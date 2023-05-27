@@ -9,8 +9,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import Tools.Props;
-import Tools.ToolBox;
+import tools.Props;
+import tools.ToolBox;
 
 /*
  * Copyright 2009 Volker Oth

@@ -1,6 +1,6 @@
 package gameutil;
 
-import Tools.MicrosecondTimer;
+import tools.MicrosecondTimer;
 
 /*
  * Copyright 2009 Volker Oth

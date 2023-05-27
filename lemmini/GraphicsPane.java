@@ -14,8 +14,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import Tools.MicrosecondTimer;
-import Tools.ToolBox;
 import game.Core;
 import game.GameController;
 import game.Icons;
@@ -31,6 +29,8 @@ import game.TextScreen;
 import game.TransitionState;
 import gameutil.Fader;
 import gameutil.FaderState;
+import tools.MicrosecondTimer;
+import tools.ToolBox;
 
 /**
  * A graphics panel in which the actual game contents is displayed.

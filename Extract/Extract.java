@@ -15,9 +15,9 @@ import java.util.zip.Adler32;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import Tools.FileUtils;
-import Tools.PatchService;
-import Tools.Props;
+import tools.FileUtils;
+import tools.PatchService;
+import tools.Props;
 
 /*
  * Copyright 2009 Volker Oth

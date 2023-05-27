@@ -16,13 +16,13 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import Tools.MicrosecondTimer;
-import Tools.ToolBox;
 import gameutil.Fader;
 import gameutil.FaderState;
 import gameutil.KeyRepeat;
 import gameutil.Sound;
 import gameutil.Sprite;
+import tools.MicrosecondTimer;
+import tools.ToolBox;
 
 /**
  * Game controller. Contains all the game logic.

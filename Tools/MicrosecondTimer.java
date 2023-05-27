@@ -1,4 +1,4 @@
-package Tools;
+package tools;
 
 /*
  * Copyright 2009 Volker Oth

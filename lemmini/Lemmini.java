@@ -24,8 +24,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
-import Tools.Props;
-import Tools.ToolBox;
 import game.Core;
 import game.GameController;
 import game.GroupBitfield;
@@ -40,6 +38,8 @@ import game.GameState;
 import game.TransitionState;
 import gameutil.Fader;
 import gameutil.FaderState;
+import tools.Props;
+import tools.ToolBox;
 
 /*
  * Copyright 2009 Volker Oth

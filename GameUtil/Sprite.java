@@ -4,7 +4,7 @@ import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
-import Tools.ToolBox;
+import tools.ToolBox;
 
 /*
  * Copyright 2009 Volker Oth

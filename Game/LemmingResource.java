@@ -3,7 +3,7 @@ package game;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
-import Tools.ToolBox;
+import tools.ToolBox;
 
 /**
  * Storage class for a Lemming.

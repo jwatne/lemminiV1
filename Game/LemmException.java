@@ -22,20 +22,21 @@ package game;
  * @author Volker Oth
  */
 public class LemmException extends Exception {
-	private final static long serialVersionUID = 0x000000001;
+    private static final long serialVersionUID = 0x000000001;
 
-	/**
-	 * Constructor.
-	 */
-	public LemmException() {
-		super();
-	}
+    /**
+     * Constructor.
+     */
+    public LemmException() {
+        super();
+    }
 
-	/**
-	 * Constructor.
-	 * @param s Exception string
-	 */
-	public LemmException(final String s) {
-		super(s);
-	}
+    /**
+     * Constructor.
+     *
+     * @param s Exception string
+     */
+    public LemmException(final String s) {
+        super(s);
+    }
 }

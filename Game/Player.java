@@ -3,8 +3,8 @@ package game;
 import java.util.HashMap;
 import java.util.Map;
 
-import Tools.FileUtils;
-import Tools.Props;
+import tools.FileUtils;
+import tools.Props;
 
 /*
  * Copyright 2009 Volker Oth

@@ -70,9 +70,9 @@ public class Sound {
      */
     private static final int HEX_80 = 0x80;
     /**
-     * Hexidecimal value 0xff.
+     * Sixteen bit mask = Hexidecimal value 0xff.
      */
-    private static final int HEX_FF = 0xff;
+    private static final int SIXTEEN_BIT_MASK = 0xff;
     /**
      * Value of 0.1.
      */
@@ -418,34 +418,34 @@ public class Sound {
             }
 
             int val;
-
             int val2;
+
             if (from8bit) {
                 if (ofs < ONE_TENTH || pos == sampleNumSrc - 1) {
-                    val = buffer[pos] & HEX_FF;
+                    val = buffer[pos] & SIXTEEN_BIT_MASK;
                 } else {
                     // interpolate between sample points
-                    val = (int) ((buffer[pos] & HEX_FF) * (1.0 - ofs)
-                            + (buffer[pos + 1] & HEX_FF) * ofs);
+                    val = (int) ((buffer[pos] & SIXTEEN_BIT_MASK) * (1.0 - ofs)
+                            + (buffer[pos + 1] & SIXTEEN_BIT_MASK) * ofs);
                 }
                 // byte order is little endian
                 val = (val - HEX_80) << EIGHT;
             } else {
                 if (convertEndian) {
-                    val = (buffer[2 * pos + 1] & HEX_FF)
+                    val = (buffer[2 * pos + 1] & SIXTEEN_BIT_MASK)
                             | (buffer[2 * pos] << EIGHT);
                 } else {
-                    val = (buffer[2 * pos] & HEX_FF)
+                    val = (buffer[2 * pos] & SIXTEEN_BIT_MASK)
                             | (buffer[2 * pos + 1] << EIGHT);
                 }
 
                 if (ofs >= ONE_TENTH && pos < sampleNumSrc - 1) {
                     // interpolate between sample points
                     if (convertEndian) {
-                        val2 = (buffer[2 * pos + THREE] & HEX_FF)
+                        val2 = (buffer[2 * pos + THREE] & SIXTEEN_BIT_MASK)
                                 | (buffer[2 * pos + 2] << EIGHT);
                     } else {
-                        val2 = (buffer[2 * pos + 2] & HEX_FF)
+                        val2 = (buffer[2 * pos + 2] & SIXTEEN_BIT_MASK)
                                 | (buffer[2 * pos + THREE] << EIGHT);
                     }
 
@@ -502,7 +502,7 @@ public class Sound {
                 pos = soundBuffer[idx].length - 2;
             }
 
-            double val = (soundBuffer[idx][pos] & HEX_FF)
+            double val = (soundBuffer[idx][pos] & SIXTEEN_BIT_MASK)
                     | (soundBuffer[idx][pos + 1] << EIGHT);
 
             // fade in

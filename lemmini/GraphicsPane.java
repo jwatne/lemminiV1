@@ -39,26 +39,62 @@ import gameutil.FaderState;
  */
 public class GraphicsPane extends JPanel
         implements Runnable, MouseListener, MouseMotionListener {
-    /** step size in pixels for horizontal scrolling. */
-    final static int X_STEP = 4;
-    /** step size in pixels for fast horizontal scrolling. */
-    final static int X_STEP_FAST = 8;
     /**
-     * size of auto scrolling range in pixels (from the left and right border)
+     * Y scaling value.
      */
-    final static int AUTOSCROLL_RANGE = 20;
+    private static final int Y_SCALE = 8;
+    /**
+     * X scaling value.
+     */
+    private static final int X_SCALE = 16;
+    /**
+     * Milliseconds per second.
+     */
+    private static final int MS_PER_SECOND = 1000;
+    /**
+     * Maximum string length to be displayed for Lemmings under cursor.
+     */
+    private static final int MAX_NUM_LEMMINGS_STRING_LENGTH = 14;
+    /**
+     * Multiplier to convert decimals to percentages.
+     */
+    private static final int ONE_HUNDRED_PERCENT = 100;
+    /**
+     * 8 pixels.
+     */
+    private static final int EIGHT_PIXELS = 8;
+    /**
+     * 32-bit mask = Hexidecimal 0xffff.
+     */
+    private static final int THIRTY_TWO_BIT_MASK = 0xffff;
+    /**
+     * 4 pixels.
+     */
+    private static final int FOUR_PIXELS = 4;
+    /**
+     * Top of mouse action reception area.
+     */
+    private static final int MOUSE_AREA_TOP = 40;
+    /** step size in pixels for horizontal scrolling. */
+    static final int X_STEP = 4;
+    /** step size in pixels for fast horizontal scrolling. */
+    static final int X_STEP_FAST = 8;
+    /**
+     * Size of auto scrolling range in pixels (from the left and right border).
+     */
+    static final int AUTOSCROLL_RANGE = 20;
     /** y coordinate of score display in pixels. */
-    final static int scoreY = Level.HEIGHT;
+    static final int SCORE_Y = Level.HEIGHT;
     /** y coordinate of counter displays in pixels. */
-    final static int counterY = scoreY + 40;
+    static final int COUNTER_Y = SCORE_Y + 40;
     /** y coordinate of icons in pixels. */
-    final static int iconsY = counterY + 14;
+    static final int ICONS_Y = COUNTER_Y + 14;
     /** x coordinate of minimap in pixels. */
-    final static int smallX = 640 - 16/*-32*/ - 200;
+    static final int SMALL_X = 640 - 16/*-32*/ - 200;
     /** y coordinate of minimap in pixels. */
-    final static int smallY = iconsY;
+    static final int SMALL_Y = ICONS_Y;
 
-    private final static long serialVersionUID = 0x01;
+    private static final long serialVersionUID = 0x01;
 
     /** start position of mouse drag (for mouse scrolling). */
     private int mouseDragStartX;
@@ -85,23 +121,26 @@ public class GraphicsPane extends JPanel
     /** graphics object for information string display. */
     private transient Graphics2D outStrGfx;
     /** array of offscreen images (one is active, one is passive). */
-    private transient BufferedImage offImage[];
+    private transient BufferedImage[] offImage;
     /** graphics objects for the two offscreen images. */
-    private transient Graphics2D offGraphics[];
+    private transient Graphics2D[] offGraphics;
     /** index of the active buffer in the image buffer. */
     private int activeBuffer;
     /** monitoring object used for synchronized painting. */
     private final Object paintSemaphore;
-    private JFrame frame;
+    /**
+     * The parent frame.
+     */
+    private final JFrame frame;
 
     /**
      * Constructor.
      *
-     * @param frame the parent component (main frame of the application).
+     * @param parentFrame the parent component (main frame of the application).
      */
-    public GraphicsPane(final JFrame frame) {
+    public GraphicsPane(final JFrame parentFrame) {
         super();
-        this.frame = frame;
+        this.frame = parentFrame;
         paintSemaphore = new Object();
         this.requestFocus();
         this.setCursor(LemmCursor.getCursor());
@@ -138,7 +177,7 @@ public class GraphicsPane extends JPanel
     }
 
     @Override
-    public void paint(final Graphics g) {
+    public final void paint(final Graphics g) {
         // super.paint(iconGfx);
         synchronized (paintSemaphore) {
             if (offImage != null) {
@@ -154,7 +193,7 @@ public class GraphicsPane extends JPanel
     }
 
     @Override
-    public void update(final Graphics g) {
+    public final void update(final Graphics g) {
         // super.update(iconGfx);
         synchronized (paintSemaphore) {
             if (offImage != null) {
@@ -257,12 +296,9 @@ public class GraphicsPane extends JPanel
                     GameController.update();
 
                     // mouse movement
-                    if (yMouseScreen > 40 && yMouseScreen < scoreY * scale) { // avoid
-                                                                              // scrolling
-                                                                              // if
-                                                                              // menu
-                                                                              // is
-                                                                              // selected
+                    if (yMouseScreen > MOUSE_AREA_TOP
+                            && yMouseScreen < SCORE_Y * scale) {
+                        // Avoid scrolling if menu is selected
                         int xOfsTemp;
 
                         if (xMouseScreen > this.getWidth()
@@ -326,16 +362,16 @@ public class GraphicsPane extends JPanel
                     // clear parts of the screen for menu etc.
                     offGfx.setClip(0, Level.HEIGHT, w, this.getHeight());
                     offGfx.setBackground(Color.BLACK);
-                    offGfx.clearRect(0, scoreY, w, this.getHeight());
+                    offGfx.clearRect(0, SCORE_Y, w, this.getHeight());
                     // draw counter, icons, small level pic
                     // draw menu
                     // Icons icons = GameController.getIcons();
-                    GameController.drawIcons(offGfx, 0, iconsY);
+                    GameController.drawIcons(offGfx, 0, ICONS_Y);
                     offGfx.drawImage(MiscGfx.getImage(MiscGfx.Index.BORDER),
-                            smallX - 4, smallY - 4, null);
-                    MiniMap.draw(offGfx, smallX, smallY, xOfsTemp);
+                            SMALL_X - FOUR_PIXELS, SMALL_Y - FOUR_PIXELS, null);
+                    MiniMap.draw(offGfx, SMALL_X, SMALL_Y, xOfsTemp);
                     // draw counters
-                    GameController.drawCounters(offGfx, counterY);
+                    GameController.drawCounters(offGfx, COUNTER_Y);
 
                     // draw lemmings
                     offGfx.setClip(0, 0, w, h);
@@ -404,11 +440,11 @@ public class GraphicsPane extends JPanel
                                     .get(xMouse + yMouse * Level.WIDTH);
                             final String test = "x: " + xMouse + ", y: "
                                     + yMouse + ", mask: "
-                                    + (stencilVal & 0xffff) + " "
+                                    + (stencilVal & THIRTY_TWO_BIT_MASK) + " "
                                     + Stencil.getObjectID(stencilVal);
                             LemmFont.strImage(outStrGfx, test);
-                            offGfx.drawImage(outStrImg, 4, Level.HEIGHT + 8,
-                                    null);
+                            offGfx.drawImage(outStrImg, FOUR_PIXELS,
+                                    Level.HEIGHT + EIGHT_PIXELS, null);
                         }
                     } else {
                         final StringBuffer sb = new StringBuffer();
@@ -422,7 +458,8 @@ public class GraphicsPane extends JPanel
                         }
 
                         sb.append("  IN ");
-                        s = Integer.toString(GameController.getNumLeft() * 100
+                        s = Integer.toString(GameController.getNumLeft()
+                                * ONE_HUNDRED_PERCENT
                                 / GameController.getNumLemmingsMax());
 
                         if (s.length() == 1) {
@@ -448,21 +485,18 @@ public class GraphicsPane extends JPanel
                         }
 
                         if (n != null) {
-                            int ln = n.length();
-
-                            if (ln > 14) {
-                                ln = 14;
-                            }
-
-                            sb.insert(0,
-                                    "              ".substring(0, 14 - ln));
+                            final int ln = Math.min(n.length(),
+                                    MAX_NUM_LEMMINGS_STRING_LENGTH);
+                            sb.insert(0, "              ".substring(0,
+                                    MAX_NUM_LEMMINGS_STRING_LENGTH - ln));
                             sb.insert(0, n);
                         } else {
                             sb.insert(0, "              ");
                         }
 
                         LemmFont.strImage(outStrGfx, sb.toString());
-                        offGfx.drawImage(outStrImg, 4, Level.HEIGHT + 8, null);
+                        offGfx.drawImage(outStrImg, FOUR_PIXELS,
+                                Level.HEIGHT + EIGHT_PIXELS, null);
                     }
 
                     // replay icon
@@ -477,8 +511,9 @@ public class GraphicsPane extends JPanel
 
                     // draw cursor
                     if (lemmUnderCursor != null) {
-                        int lx, ly;
+                        int lx;
 
+                        int ly;
                         if (GameController.isClassicalCursor()) {
                             lx = (int) Math.round(xMouseScreen / scale);
                             ly = (int) Math.round(yMouseScreen / scale);
@@ -493,7 +528,7 @@ public class GraphicsPane extends JPanel
                         lx -= cursorImg.getWidth() / 2;
                         ly -= cursorImg.getHeight() / 2;
                         offGfx.drawImage(cursorImg, lx, ly, null);
-                    } else if (LemmCursor.getEnabled() == false) {
+                    } else if (!LemmCursor.getEnabled()) {
                         enableCursor(true);
                     }
                 }
@@ -514,14 +549,13 @@ public class GraphicsPane extends JPanel
     }
 
     @Override
-    public void run() {
+    public final void run() {
         Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
         final MicrosecondTimer timerRepaint = new MicrosecondTimer();
 
         try {
             while (true) {
-                final GameState gameState = GameController
-                        .getGameState();
+                final GameState gameState = GameController.getGameState();
 
                 // Try to keep the Amiga timing. Note that no frames are skipped
                 // If one frame is too late, the next one will be a little
@@ -540,14 +574,17 @@ public class GraphicsPane extends JPanel
                         // in fast forward or super lemming modes, update the
                         // game mechanics
                         // multiple times per (drawn) frame
-                        if (GameController.isFastForward())
+                        if (GameController.isFastForward()) {
                             for (int f = 0; f < GameController.FAST_FWD_MULTI
-                                    - 1; f++)
+                                    - 1; f++) {
                                 GameController.update();
-                        else if (GameController.isSuperLemming())
+                            }
+                        } else if (GameController.isSuperLemming()) {
                             for (int f = 0; f < GameController.SUPERLEMM_MULTI
-                                    - 1; f++)
+                                    - 1; f++) {
                                 GameController.update();
+                            }
+                        }
                     }
                 } else {
                     try {
@@ -558,8 +595,8 @@ public class GraphicsPane extends JPanel
                         if (diff > GameController.MICROSEC_RESYNC) {
                             timerRepaint.update(); // resync to time base
                             System.out.println("Resynced, diff was "
-                                    + (diff / 1000) + " millis");
-                        } else if (diff > Lemmini.THR_SLEEP * 1000) {
+                                    + (diff / MS_PER_SECOND) + " millis");
+                        } else if (diff > Lemmini.THR_SLEEP * MS_PER_SECOND) {
                             Thread.sleep(Lemmini.MIN_SLEEP);
                         }
                     } catch (final InterruptedException ex) {
@@ -576,7 +613,7 @@ public class GraphicsPane extends JPanel
     }
 
     @Override
-    public void mouseReleased(final MouseEvent mouseevent) {
+    public final void mouseReleased(final MouseEvent mouseevent) {
         final double scale = Core.getScale();
         final int x = (int) Math.round(mouseevent.getX() / scale);
         final int y = (int) Math.round(mouseevent.getY() / scale);
@@ -589,7 +626,7 @@ public class GraphicsPane extends JPanel
 
         switch (GameController.getGameState()) {
         case LEVEL:
-            if (y > iconsY && y < iconsY + Icons.HEIGHT) {
+            if (y > ICONS_Y && y < ICONS_Y + Icons.HEIGHT) {
                 final Icons.Type type = GameController.getIconType(x);
 
                 if (type != Icons.Type.INVALID) {
@@ -613,10 +650,12 @@ public class GraphicsPane extends JPanel
     }
 
     @Override
-    public void mouseClicked(final MouseEvent mouseevent) {}
+    public void mouseClicked(final MouseEvent mouseevent) {
+
+    }
 
     @Override
-    public void mousePressed(final MouseEvent mouseevent) {
+    public final void mousePressed(final MouseEvent mouseevent) {
         final double scale = Core.getScale();
         final int x = (int) Math.round(mouseevent.getX() / scale);
         final int y = (int) Math.round(mouseevent.getY() / scale);
@@ -633,9 +672,8 @@ public class GraphicsPane extends JPanel
 
         switch (GameController.getGameState()) {
         case BRIEFING:
-            MiniMap.init(smallX, smallY, 16, 8, true);
-            GameController
-                    .setTransition(TransitionState.TO_LEVEL);
+            MiniMap.init(SMALL_X, SMALL_Y, X_SCALE, Y_SCALE, true);
+            GameController.setTransition(TransitionState.TO_LEVEL);
             Fader.setState(FaderState.OUT);
             mouseevent.consume();
             break;
@@ -654,8 +692,7 @@ public class GraphicsPane extends JPanel
                 GameController.requestRestartLevel(false);
                 break;
             case TextScreen.BUTTON_MENU:
-                GameController
-                        .setTransition(TransitionState.TO_INTRO);
+                GameController.setTransition(TransitionState.TO_INTRO);
                 Fader.setState(FaderState.OUT);
                 ((JFrame) frame).setTitle("Lemmini");
                 break;
@@ -688,6 +725,8 @@ public class GraphicsPane extends JPanel
                 }
 
                 break;
+            default:
+                break;
             }
 
             mouseevent.consume();
@@ -697,7 +736,7 @@ public class GraphicsPane extends JPanel
             debugDraw(x, y, leftMousePressed);
 
             if (leftMousePressed) {
-                if (y > iconsY && y < iconsY + Icons.HEIGHT) {
+                if (y > ICONS_Y && y < ICONS_Y + Icons.HEIGHT) {
                     final Icons.Type type = GameController.getIconType(x);
 
                     if (type != Icons.Type.INVALID) {
@@ -757,7 +796,7 @@ public class GraphicsPane extends JPanel
     }
 
     @Override
-    public void mouseEntered(final MouseEvent mouseevent) {
+    public final void mouseEntered(final MouseEvent mouseevent) {
         final double scale = Core.getScale();
         mouseDx = 0;
         mouseDy = 0;
@@ -770,7 +809,7 @@ public class GraphicsPane extends JPanel
     }
 
     @Override
-    public void mouseExited(final MouseEvent mouseevent) {
+    public final void mouseExited(final MouseEvent mouseevent) {
         final double scale = Core.getScale();
         int x = xMouseScreen + mouseDx;
 
@@ -829,7 +868,7 @@ public class GraphicsPane extends JPanel
     }
 
     @Override
-    public void mouseDragged(final MouseEvent mouseevent) {
+    public final void mouseDragged(final MouseEvent mouseevent) {
         final double scale = Core.getScale();
         mouseDx = 0;
         mouseDy = 0;
@@ -871,10 +910,11 @@ public class GraphicsPane extends JPanel
     }
 
     @Override
-    public void mouseMoved(final MouseEvent mouseevent) {
+    public final void mouseMoved(final MouseEvent mouseevent) {
         // long t = System.currentTimeMillis();
         final double scale = Core.getScale();
-        int x, y;
+        int x;
+        int y;
         final int oldX = xMouse;
         final int oldY = yMouse;
 

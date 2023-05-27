@@ -77,11 +77,11 @@ public final class GameController {
     /**
      * Hexidecimal value 0x20.
      */
-    private static final int HEX_20 = 0x20;
+    private static final int REPLAY_IMAGE_CUTOFF = 0x20;
     /**
-     * Hexidecimal value 0x3f.
+     * Replay frame mask value = Hexidecimal value 0x3f.
      */
-    private static final int HEX_3F = 0x3f;
+    private static final int REPLAY_FRAME_MASK = 0x3f;
     /**
      * Scale factor.
      */
@@ -99,9 +99,9 @@ public final class GameController {
      */
     private static final int NUM_SAMPLES = 24;
     /**
-     * Hexidecimal value 0xff.
+     * Maximum hexidecimal value for an RGBA color component.
      */
-    private static final int HEX_FF = 0xff;
+    private static final int MAX_COLOR_COMPONENT_VALUE = 0xff;
 
     /** key repeat bitmask for icons. */
     public static final int KEYREPEAT_ICON = 1;
@@ -232,7 +232,8 @@ public final class GameController {
     /** graphics object for the background image. */
     private static Graphics2D bgGfx;
     /** color used to erase the background (black). */
-    private static Color blankColor = new Color(HEX_FF, 0, 0, 0);
+    private static Color blankColor = new Color(MAX_COLOR_COMPONENT_VALUE, 0, 0,
+            0);
     /** flag: fast forward mode is active. */
     private static boolean fastForward;
     /** flag: Superlemming mode is active. */
@@ -722,7 +723,7 @@ public final class GameController {
             return null;
         }
 
-        if ((replayFrame & HEX_3F) > HEX_20) {
+        if ((replayFrame & REPLAY_FRAME_MASK) > REPLAY_IMAGE_CUTOFF) {
             return MiscGfx.getImage(MiscGfx.Index.REPLAY_1);
         } else {
             return MiscGfx.getImage(MiscGfx.Index.REPLAY_2);

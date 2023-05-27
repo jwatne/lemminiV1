@@ -5,6 +5,30 @@ package micromod;
  */
 public class Micromod {
     /**
+     * 13-bit shift.
+     */
+    private static final int SHIFT_13_BITS = 13;
+    /**
+     * 14-bit shift.
+     */
+    private static final int SHIFT_14_BITS = 14;
+    /**
+     * Index offset in fttable.
+     */
+    private static final int FTTABLE_OFFSET = 8;
+    /**
+     * Clock value for all computers OTHER THAN Commodore Amiga.
+     */
+    private static final int STANDARD_CLOCK_VALUE = 3579364;
+    /**
+     * Clock value for Commodore Amiga.
+     */
+    private static final int AMIGA_CLOCK_VALUE = 3546894;
+    /**
+     * Minimum value for p for mix update.
+     */
+    private static final int MIN_P_FOR_MIX_UPDATE = 27;
+    /**
      * 7-bit shift.
      */
     private static final int SHIFT_7_BITS = 7;
@@ -1024,14 +1048,15 @@ public class Micromod {
             int p = channels[coffset + CH_PERIOD]
                     + channels[coffset + CH_VIBR_PERIOD];
 
-            if (p < 27) {
-                p = 27;
+            if (p < MIN_P_FOR_MIX_UPDATE) {
+                p = MIN_P_FOR_MIX_UPDATE;
             }
 
-            final int clk = amiga ? 3546894 : 3579364;
+            final int clk = amiga ? AMIGA_CLOCK_VALUE : STANDARD_CLOCK_VALUE;
             int s = (clk / p << FP_SHIFT) / samplerate;
-            s = s * fttable[channels[coffset + CH_FINETUNE] + 8] >> 14;
-            s = s * arptable[channels[coffset + CH_ARPEGGIO]] >> 13;
+            s = s * fttable[channels[coffset + CH_FINETUNE]
+                    + FTTABLE_OFFSET] >> SHIFT_14_BITS;
+            s = s * arptable[channels[coffset + CH_ARPEGGIO]] >> SHIFT_13_BITS;
             channels[coffset + CH_STEP] = s;
         }
     }

@@ -21,7 +21,7 @@ class Buffer {
     /**
      * Hexidecimal value 0xff.
      */
-    private static final int SIXTEEN_BIT_MASK = 0xff;
+    private static final int EIGHT_BIT_MASK = 0xff;
     /** array of byte which defines the data buffer.. */
     private final byte[] buffer;
     /** byte index in buffer.. */
@@ -90,7 +90,7 @@ class Buffer {
      * @throws ArrayIndexOutOfBoundsException
      */
     int getByte() throws ArrayIndexOutOfBoundsException {
-        return buffer[index++] & SIXTEEN_BIT_MASK;
+        return buffer[index++] & EIGHT_BIT_MASK;
     }
 
     /**

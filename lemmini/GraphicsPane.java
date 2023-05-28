@@ -64,9 +64,9 @@ public class GraphicsPane extends JPanel
      */
     private static final int EIGHT_PIXELS = 8;
     /**
-     * 32-bit mask = Hexidecimal 0xffff.
+     * 16-bit mask = Hexidecimal 0xffff.
      */
-    private static final int THIRTY_TWO_BIT_MASK = 0xffff;
+    private static final int SIXTEEN_BIT_MASK = 0xffff;
     /**
      * 4 pixels.
      */
@@ -440,7 +440,7 @@ public class GraphicsPane extends JPanel
                                     .get(xMouse + yMouse * Level.WIDTH);
                             final String test = "x: " + xMouse + ", y: "
                                     + yMouse + ", mask: "
-                                    + (stencilVal & THIRTY_TWO_BIT_MASK) + " "
+                                    + (stencilVal & SIXTEEN_BIT_MASK) + " "
                                     + Stencil.getObjectID(stencilVal);
                             LemmFont.strImage(outStrGfx, test);
                             offGfx.drawImage(outStrImg, FOUR_PIXELS,

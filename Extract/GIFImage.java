@@ -3,7 +3,7 @@ package extract;
 /**
  * Stores GIF Image in RAM.
  */
-class GIFImage {
+public class GIFImage {
     /** width in pixels. */
     private final int width;
     /** height in pixels. */
@@ -11,7 +11,7 @@ class GIFImage {
     /** pixel data. */
     private final byte[] pixels;
     /** color palette. */
-    final Palette palette;
+    private final Palette palette;
 
     /**
      * Constructor.
@@ -21,7 +21,8 @@ class GIFImage {
      * @param buf pixel data
      * @param p   color palette
      */
-    public GIFImage(final int w, final int h, final byte[] buf, final Palette p) {
+    public GIFImage(final int w, final int h, final byte[] buf,
+            final Palette p) {
         width = w;
         height = h;
         pixels = buf;

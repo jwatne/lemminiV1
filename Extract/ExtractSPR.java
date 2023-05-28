@@ -522,8 +522,8 @@ public class ExtractSPR {
     public static void saveGif(final GIFImage img, final String fname)
             throws ExtractException {
         final GifEncoder gifEnc = new GifEncoder(img.getWidth(),
-                img.getHeight(), img.getPixels(), img.palette.getRed(),
-                img.palette.getGreen(), img.getPalette().getBlue());
+                img.getHeight(), img.getPixels(), img.getPalette().getRed(),
+                img.getPalette().getGreen(), img.getPalette().getBlue());
 
         try (FileOutputStream f = new FileOutputStream(fname)) {
             gifEnc.setTransparentPixel(TRANSPARENT_INDEX);

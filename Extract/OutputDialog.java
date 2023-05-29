@@ -32,178 +32,207 @@ import java.awt.Insets;
 
 /**
  * Dialog used to output extraction progress information.
+ *
  * @author Volker Oth
  */
 public class OutputDialog extends JDialog {
 
-	private static final long serialVersionUID = 1L;
+    /**
+     * Inset of 10 pixels.
+     */
+    private static final int INSET_10 = 10;
+    /**
+     * Inset of 5 pixels.
+     */
+    private static final int INSET_5 = 5;
+    /**
+     * Default height of the dialog.
+     */
+    private static final int DEFAULT_HEIGHT = 352;
+    /**
+     * Default width of the dialog.
+     */
+    private static final int DEFAULT_WIDTH = 500;
+    private static final long serialVersionUID = 1L;
+    /** Content pane. */
+    private JPanel jContentPane = null;
+    /** OK button. */
+    private JButton jButtonOk = null;
+    /** Output scroll pane. */
+    private JScrollPane jScrollPaneOut = null;
+    /** Cancel button. */
+    private JButton jButtonCancel = null;
+    /** Output text area. */
+    private JTextArea jTextAreaOut = null;
 
-	private JPanel jContentPane = null;
+    // own stuff
+    /** Extraction canceled?. */
+    private boolean cancel = false;
 
-	private JButton jButtonOk = null;
+    /**
+     * Constructor for modal dialog in parent frame.
+     *
+     * @param frame parent frame
+     * @param modal create modal dialog?
+     */
+    public OutputDialog(final JFrame frame, final boolean modal) {
+        super(frame, modal);
+        initialize();
 
-	private JScrollPane jScrollPaneOut = null;
+        // own stuff
+        if (frame != null) {
+            Point p = frame.getLocation();
+            this.setLocation(p.x + frame.getWidth() / 2 - getWidth() / 2,
+                    p.y + frame.getHeight() / 2 - getHeight() / 2);
+        } else {
+            GraphicsEnvironment ge = GraphicsEnvironment
+                    .getLocalGraphicsEnvironment();
+            Point p = ge.getCenterPoint();
+            p.x -= this.getWidth() / 2;
+            p.y -= this.getHeight() / 2;
+            this.setLocation(p);
+        }
+    }
 
-	private JButton jButtonCancel = null;
+    /**
+     * Print text to output console.
+     *
+     * @param txt text to print
+     */
+    public void print(final String txt) {
+        jTextAreaOut.insert(txt, jTextAreaOut.getDocument().getLength());
+        jTextAreaOut.setCaretPosition(jTextAreaOut.getDocument().getLength());
+    }
 
-	private JTextArea jTextAreaOut = null;
+    /**
+     * Return cancel state of extraction process.
+     *
+     * @return true if extraction was cancelled, else false
+     */
+    public boolean isCancelled() {
+        return cancel;
+    }
 
-	// own stuff
-	/** Extraction canceled?. */
-	private boolean cancel = false;
+    /**
+     * Enable the Ok button (if extraction was done successfully).
+     */
+    public void enableOk() {
+        jButtonOk.setEnabled(true);
+    }
 
-	/**
-	 * Constructor for modal dialog in parent frame.
-	 * @param frame parent frame
-	 * @param modal create modal dialog?
-	 */
-	public OutputDialog(final JFrame frame, final boolean modal) {
-		super(frame, modal);
-		initialize();
+    /**
+     * Initialize manually generated resources.
+     */
+    private void initialize() {
+        this.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        this.setTitle("Lemmini Resource Extractor");
+        this.setContentPane(getJContentPane());
+    }
 
-		// own stuff
-		if (frame != null) {
-			Point p = frame.getLocation();
-			this.setLocation(p.x+frame.getWidth()/2-getWidth()/2, p.y+frame.getHeight()/2-getHeight()/2);
-		} else {
-			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			Point p = ge.getCenterPoint();
-			p.x -= this.getWidth()/2;
-			p.y -= this.getHeight()/2;
-			this.setLocation(p);
-		}
-	}
+    /**
+     * This method initializes jContentPane.
+     *
+     * @return javax.swing.JPanel
+     */
+    private JPanel getJContentPane() {
+        if (jContentPane == null) {
+            GridBagConstraints gridBagButtonCancel = new GridBagConstraints();
+            gridBagButtonCancel.gridx = 0;
+            gridBagButtonCancel.anchor = GridBagConstraints.WEST;
+            gridBagButtonCancel.insets = new Insets(INSET_5, INSET_5, INSET_5,
+                    INSET_10);
+            gridBagButtonCancel.gridy = 1;
+            GridBagConstraints gridBagScrollPane = new GridBagConstraints();
+            gridBagScrollPane.fill = GridBagConstraints.BOTH;
+            gridBagScrollPane.gridy = 0;
+            gridBagScrollPane.weightx = 1.0;
+            gridBagScrollPane.weighty = 1.0;
+            gridBagScrollPane.gridwidth = 2;
+            gridBagScrollPane.gridx = 0;
+            GridBagConstraints gridBagButtonOk = new GridBagConstraints();
+            gridBagButtonOk.gridx = 1;
+            gridBagButtonOk.insets = new Insets(INSET_5, INSET_5, INSET_5,
+                    INSET_5);
+            gridBagButtonOk.anchor = GridBagConstraints.EAST;
+            gridBagButtonOk.gridy = 1;
+            jContentPane = new JPanel();
+            jContentPane.setLayout(new GridBagLayout());
+            jContentPane.add(getJButtonOk(), gridBagButtonOk);
+            jContentPane.add(getJScrollPaneOut(), gridBagScrollPane);
+            jContentPane.add(getJButtonCancel(), gridBagButtonCancel);
+        }
+        return jContentPane;
+    }
 
-	/**
-	 * Print text to output console.
-	 * @param txt text to print
-	 */
-	public void print(final String txt) {
-		jTextAreaOut.insert(txt, jTextAreaOut.getDocument().getLength());
-		jTextAreaOut.setCaretPosition(jTextAreaOut.getDocument().getLength());
-	}
+    /**
+     * This method initializes jButtonOk.
+     *
+     * @return javax.swing.JButton
+     */
+    private JButton getJButtonOk() {
+        if (jButtonOk == null) {
+            jButtonOk = new JButton();
+            jButtonOk.setText("Ok");
+            jButtonOk.setEnabled(false);
+            jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+                @Override
+                public void actionPerformed(
+                        final java.awt.event.ActionEvent e) {
+                    dispose();
+                }
+            });
+        }
+        return jButtonOk;
+    }
 
-	/**
-	 * Return cancel state of extraction process.
-	 * @return true if extraction was cancelled, else false
-	 */
-	public boolean isCancelled() {
-		return cancel;
-	}
+    /**
+     * This method initializes jScrollPaneOut.
+     *
+     * @return javax.swing.JScrollPane
+     */
+    private JScrollPane getJScrollPaneOut() {
+        if (jScrollPaneOut == null) {
+            jScrollPaneOut = new JScrollPane();
+            jScrollPaneOut.setViewportView(getJTextAreaOut());
+        }
+        return jScrollPaneOut;
+    }
 
-	/**
-	 * Enable the Ok button (if extraction was done successfully)
-	 */
-	public void enableOk() {
-		jButtonOk.setEnabled(true);
-	}
+    /**
+     * This method initializes jButtonCancel.
+     *
+     * @return javax.swing.JButton
+     */
+    private JButton getJButtonCancel() {
+        if (jButtonCancel == null) {
+            jButtonCancel = new JButton();
+            jButtonCancel.setText("Cancel");
+            jButtonCancel
+                    .addActionListener(new java.awt.event.ActionListener() {
+                        @Override
+                        public void actionPerformed(
+                                final java.awt.event.ActionEvent e) {
+                            cancel = true;
+                            dispose();
+                        }
+                    });
+        }
 
-	/**
-	 * Initialize manually generated resources.
-	 */
-	private void initialize() {
-		this.setSize(500, 352);
-		this.setTitle("Lemmini Resource Extractor");
-		this.setContentPane(getJContentPane());
-	}
+        return jButtonCancel;
+    }
 
-	/**
-	 * This method initializes jContentPane
-	 *
-	 * @return javax.swing.JPanel
-	 */
-	private JPanel getJContentPane() {
-		if (jContentPane == null) {
-			GridBagConstraints gridBagButtonCancel = new GridBagConstraints();
-			gridBagButtonCancel.gridx = 0;
-			gridBagButtonCancel.anchor = GridBagConstraints.WEST;
-			gridBagButtonCancel.insets = new Insets(5, 5, 5, 10);
-			gridBagButtonCancel.gridy = 1;
-			GridBagConstraints gridBagScrollPane = new GridBagConstraints();
-			gridBagScrollPane.fill = GridBagConstraints.BOTH;
-			gridBagScrollPane.gridy = 0;
-			gridBagScrollPane.weightx = 1.0;
-			gridBagScrollPane.weighty = 1.0;
-			gridBagScrollPane.gridwidth = 2;
-			gridBagScrollPane.gridx = 0;
-			GridBagConstraints gridBagButtonOk = new GridBagConstraints();
-			gridBagButtonOk.gridx = 1;
-			gridBagButtonOk.insets = new Insets(5, 5, 5, 5);
-			gridBagButtonOk.anchor = GridBagConstraints.EAST;
-			gridBagButtonOk.gridy = 1;
-			jContentPane = new JPanel();
-			jContentPane.setLayout(new GridBagLayout());
-			jContentPane.add(getJButtonOk(), gridBagButtonOk);
-			jContentPane.add(getJScrollPaneOut(), gridBagScrollPane);
-			jContentPane.add(getJButtonCancel(), gridBagButtonCancel);
-		}
-		return jContentPane;
-	}
+    /**
+     * This method initializes jTextAreaOut.
+     *
+     * @return javax.swing.JTextArea
+     */
+    private JTextArea getJTextAreaOut() {
+        if (jTextAreaOut == null) {
+            jTextAreaOut = new JTextArea();
+            jTextAreaOut.setEditable(false);
+        }
 
-	/**
-	 * This method initializes jButtonOk
-	 *
-	 * @return javax.swing.JButton
-	 */
-	private JButton getJButtonOk() {
-		if (jButtonOk == null) {
-			jButtonOk = new JButton();
-			jButtonOk.setText("Ok");
-			jButtonOk.setEnabled(false);
-			jButtonOk.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					dispose();
-				}
-			});
-		}
-		return jButtonOk;
-	}
+        return jTextAreaOut;
+    }
 
-	/**
-	 * This method initializes jScrollPaneOut
-	 *
-	 * @return javax.swing.JScrollPane
-	 */
-	private JScrollPane getJScrollPaneOut() {
-		if (jScrollPaneOut == null) {
-			jScrollPaneOut = new JScrollPane();
-			jScrollPaneOut.setViewportView(getJTextAreaOut());
-		}
-		return jScrollPaneOut;
-	}
-
-	/**
-	 * This method initializes jButtonCancel
-	 *
-	 * @return javax.swing.JButton
-	 */
-	private JButton getJButtonCancel() {
-		if (jButtonCancel == null) {
-			jButtonCancel = new JButton();
-			jButtonCancel.setText("Cancel");
-			jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					cancel =true;
-					dispose();
-				}
-			});
-		}
-		return jButtonCancel;
-	}
-
-	/**
-	 * This method initializes jTextAreaOut
-	 *
-	 * @return javax.swing.JTextArea
-	 */
-	private JTextArea getJTextAreaOut() {
-		if (jTextAreaOut == null) {
-			jTextAreaOut = new JTextArea();
-			jTextAreaOut.setEditable(false);
-		}
-		return jTextAreaOut;
-	}
-
-}  //  @jve:decl-index=0:visual-constraint="10,10"
+} // @jve:decl-index=0:visual-constraint="10,10"

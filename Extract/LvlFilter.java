@@ -8,7 +8,7 @@ import java.io.FilenameFilter;
  *
  * @author Volker Oth
  */
-public class LvlFilter implements FilenameFilter {
+public final class LvlFilter implements FilenameFilter {
     @Override
     public boolean accept(final File dir, final String name) {
         return (name.toLowerCase().indexOf(".lvl") != -1);

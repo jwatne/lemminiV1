@@ -34,13 +34,125 @@ import tools.ToolBox;
  * @author Volker Oth
  */
 public class Lemming {
+    /**
+     * 25 constant.
+     */
+    private static final int TWENTY_FIVE = 25;
+    /**
+     * 16 constant.
+     */
+    private static final int SIXTEEN = 16;
+    /**
+     * 7 constant.
+     */
+    private static final int SEVEN = 7;
+    /**
+     * 4 constant.
+     */
+    private static final int FOUR = 4;
+    /**
+     * 3 constant.
+     */
+    private static final int THREE = 3;
+    /**
+     * 30 constant.
+     */
+    private static final int THIRTY = 30;
+    /**
+     * 29 constant.
+     */
+    private static final int TWENTY_NINE = 29;
+    /**
+     * 28 constant.
+     */
+    private static final int TWENTY_EIGHT = 28;
+    /**
+     * 27 constant.
+     */
+    private static final int TWENTY_SEVEN = 27;
+    /**
+     * 26 constant.
+     */
+    private static final int TWENTY_SIX = 26;
+    /**
+     * Constant 14.
+     */
+    private static final int FOURTEEN = 14;
+    /**
+     * 13 constant.
+     */
+    private static final int THIRTEEN = 13;
+    /**
+     * 12 constant.
+     */
+    private static final int TWELVE = 12;
+    /**
+     * 11 constant.
+     */
+    private static final int ELEVEN = 11;
+    /**
+     * 10 constant.
+     */
+    private static final int TEN = 10;
+    /**
+     *
+     */
+    private static final int TWENTY_ONE = 21;
+    /**
+     * 20 constant.
+     */
+    private static final int TWENTY = 20;
+    /**
+     * 19 constant.
+     */
+    private static final int NINETEEN = 19;
+    /**
+     * 18 constant.
+     */
+    private static final int EIGHTEEN = 18;
+    /**
+     * 5 constant.
+     */
+    private static final int FIVE = 5;
+    /**
+     * 15 constant.
+     */
+    private static final int FIFTEEN = 15;
+    /**
+     * 9 constant.
+     */
+    private static final int NINE = 9;
+    /**
+     * Minimum amount that must be free above lemming.
+     */
+    private static final int MIN_FREE_ABOVE_STEP = 8;
+    /**
+     * Number of pixels to add/subtract when stepping.
+     */
+    private static final int STEP_PIXELS = 4;
+    /**
+     * 6 constant.
+     */
+    private static final int SIX = 6;
+    /**
+     * -6 constant.
+     */
+    private static final int NEGATIVE_SIX = -6;
+    /**
+     * Amount to deduct from y value for climber to walker transition.
+     */
+    private static final int CLIMBER_TO_WALKER_Y_OFFSET = 10;
+    /**
+     * Number of frames to rewind for floater.
+     */
+    private static final int FLOATER_REWIND = 5;
     /** name of the configuration file. */
-    private final static String LEMM_INI_STR = "misc/lemming.ini";
+    private static final String LEMM_INI_STR = "misc/lemming.ini";
     /** number of resources (animations/names). */
-    private final static int NUM_RESOURCES = 17;
+    private static final int NUM_RESOURCES = 17;
 
     /** Lemming skill type. */
-    public static enum Type {
+    public enum Type {
         /** the typical Lemming. */
         WALKER,
         /** a falling Lemming. */
@@ -85,11 +197,15 @@ public class Lemming {
         /** undefined. */
         UNDEFINED;
 
-        private static final Map<Integer, Type> lookup = new HashMap<Integer, Type>();
+        /**
+         * Map for looking up Lemmings by type.
+         */
+        private static final Map<Integer, Type> LOOKUP = new HashMap<>();
 
         static {
-            for (final Type s : EnumSet.allOf(Type.class))
-                lookup.put(s.ordinal(), s);
+            for (final Type s : EnumSet.allOf(Type.class)) {
+                LOOKUP.put(s.ordinal(), s);
+            }
         }
 
         /**
@@ -99,19 +215,28 @@ public class Lemming {
          * @return Parameter with ordinal value val
          */
         public static Type get(final int val) {
-            return lookup.get(val);
+            return LOOKUP.get(val);
         }
     }
 
     /** Lemming heading. */
-    static enum Direction {
-        RIGHT, LEFT, NONE;
+    enum Direction {
+        /** Right. */
+        RIGHT,
+        /** Left. */
+        LEFT,
+        /** No direction. */
+        NONE;
 
-        private static final Map<Integer, Direction> lookup = new HashMap<Integer, Direction>();
+        /**
+         * Lookup Map.
+         */
+        private static final Map<Integer, Direction> LOOKUP = new HashMap<>();
 
         static {
-            for (final Direction s : EnumSet.allOf(Direction.class))
-                lookup.put(s.ordinal(), s);
+            for (final Direction s : EnumSet.allOf(Direction.class)) {
+                LOOKUP.put(s.ordinal(), s);
+            }
         }
 
         /**
@@ -121,57 +246,62 @@ public class Lemming {
          * @return Parameter with ordinal value val
          */
         public static Direction get(final int val) {
-            return lookup.get(val);
+            return LOOKUP.get(val);
         }
 
     }
 
     /** animation type. */
-    static enum Animation {
-        NONE, LOOP, ONCE
+    enum Animation {
+        /** None. */
+        NONE,
+        /** Loop. */
+        LOOP,
+        /** Once. */
+        ONCE
     }
 
     /**
      * display string for skills/types. order must be the same as in the enum!.
      */
-    private final static String LEMM_NAMES[] = {"WALKER", "FALLER", "CLIMBER",
+    private static final String[] LEMM_NAMES = {"WALKER", "FALLER", "CLIMBER",
             "CLIMBER", "FLOATER", "", "BLOCKER", "DROWNING", "", "", "BOMBER",
             "BUILDER", "BUILDER", "DIGGER", "BASHER", "MINER", "WALKER"};
 
     /** a walker walks one pixel per frame. */
-    private final static int WALKER_STEP = 1;
+    private static final int WALKER_STEP = 1;
     /** a climber climbs up 1 pixel every 2nd frame. */
-    private final static int CLIMBER_STEP = 1;
+    private static final int CLIMBER_STEP = 1;
     /** at this height a walker will turn around. */
-    private final static int WALKER_OBSTACLE_HEIGHT = 14;
+    private static final int WALKER_OBSTACLE_HEIGHT = 14;
     /** check N pixels above the lemming's feet. */
-    private final static int BASHER_CHECK_STEP = 12;
+    private static final int BASHER_CHECK_STEP = 12;
     /** from this on a basher will become a faller. */
-    private final static int BASHER_FALL_DISTANCE = 6;
+    private static final int BASHER_FALL_DISTANCE = 6;
     /** from this on a miner will become a faller. */
-    private final static int MINER_FALL_DISTANCE = 4;
+    private static final int MINER_FALL_DISTANCE = 4;
     /** a faller falls down three pixels per frame. */
-    private final static int FALLER_STEP = 3;
+    private static final int FALLER_STEP = 3;
     /** a floater falls down two pixels per frame. */
-    private final static int FLOATER_STEP = 2;
+    private static final int FLOATER_STEP = 2;
     /** a jumper moves up two pixels per frame. */
-    private final static int JUMPER_STEP = 2;
+    private static final int JUMPER_STEP = 2;
     /** if a walker jumps up 6 pixels, it becomes a jumper. */
-    private final static int JUMPER_JUMP = 4;
+    private static final int JUMPER_JUMP = 4;
     /** pixels a floater falls before the parachute begins to open. */
-    private final static int FALL_DISTANCE_FLOAT = 32;
+    private static final int FALL_DISTANCE_FLOAT = 32;
     /** number of free pixels below needed to convert a lemming to a faller. */
-    private final static int FALL_DISTANCE_FALL = 8;
+    private static final int FALL_DISTANCE_FALL = 8;
     /** used as "free below" value to convert most skills into a faller. */
-    private final static int FALL_DISTANCE_FORCE_FALL = 2 * FALL_DISTANCE_FALL;
+    private static final int FALL_DISTANCE_FORCE_FALL = 2 * FALL_DISTANCE_FALL;
     /** number of steps a builder can build. */
-    private final static int STEPS_MAX = 12;
+    private static final int STEPS_MAX = 12;
     /** number of steps before the warning sound is played. */
-    private final static int STEPS_WARNING = 9;
+    private static final int STEPS_WARNING = 9;
     /** Lemmini runs with 50fps instead of 25fps. */
-    private final static int TIME_SCALE = 2;
+    private static final int TIME_SCALE = 2;
     /** explosion counter is decreased every second. */
-    private final static int MAX_EXPLODE_CTR = 1000000
+    private static final int MAX_EXPLODE_CTR = 1000000
             / GameController.MICROSEC_PER_FRAME;
 
     /** resource (animation etc.) for the current Lemming. */
@@ -214,12 +344,12 @@ public class Lemming {
     private int selectCtr;
 
     /** static array of resources for each Lemming skill/type. */
-    private static LemmingResource lemmings[];
+    private static LemmingResource[] lemmings;
     /** font used for the explosion counter. */
     private static ExplodeFont explodeFont;
 
     /**
-     * Constructor: Create Lemming
+     * Constructor: Create Lemming.
      *
      * @param sx x coordinate of foot
      * @param sy y coordinate of foot
@@ -306,12 +436,11 @@ public class Lemming {
         if (trigger) {
             // Trigger condition reached?
             switch (type) {
-            case BOMBER_STOPPER: {
+            case BOMBER_STOPPER:
+
                 final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
                 m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
-            }
-
-            //$FALL-THROUGH$
+                //$FALL-THROUGH$
             case BOMBER:
                 explode();
                 break;
@@ -328,12 +457,13 @@ public class Lemming {
                 type = Type.FLOATER; // should never happen
                 //$FALL-THROUGH$
             case FLOATER:
-                frameIdx -= 5 * TIME_SCALE; // rewind 5 frames
+                frameIdx -= FLOATER_REWIND * TIME_SCALE; // rewind 5 frames
                 break;
             case CLIMBER_TO_WALKER:
                 newType = Type.WALKER;
-                y -= 10; // why is this needed? could be done via foot
-                         // coordinates?
+                y -= CLIMBER_TO_WALKER_Y_OFFSET; // why is this needed? could be
+                                                 // done via foot
+                // coordinates?
                 break;
             case DIGGER:
                 // the dig mask must be applied to the bottom of the lemming
@@ -397,6 +527,8 @@ public class Lemming {
             break;
         case Stencil.MSK_EXIT:
             newType = animateExitLevel(newType, s);
+            break;
+        default:
             break;
         }
 
@@ -528,8 +660,8 @@ public class Lemming {
         free = 0;
         final int xOld = x;
 
-        for (int i = -6; i < 6; i++) { // should be 14 pixels, here it's more
-                                       // like 12
+        for (int i = NEGATIVE_SIX; i < SIX; i++) {
+            // should be 14 pixels, here it's more like 12
             x = xOld + i;
 
             if (x < 0) {
@@ -538,7 +670,9 @@ public class Lemming {
                 x = Level.WIDTH;
             }
 
-            if ((free = freeBelow(FLOATER_STEP)) < freeMin) {
+            free = freeBelow(FLOATER_STEP);
+
+            if (free < freeMin) {
                 freeMin = free;
             }
         }
@@ -817,9 +951,9 @@ public class Lemming {
                 counter++; // step counter;
 
                 if (dir == Direction.RIGHT) {
-                    x += 4; // step forward
+                    x += STEP_PIXELS; // step forward
                 } else {
-                    x -= 4;
+                    x -= STEP_PIXELS;
                 }
 
                 y -= 2; // step up
@@ -827,10 +961,12 @@ public class Lemming {
                                                       // built into a wall ->
                                                       // stop
                 // check for conversion to walker
-                final int fa = freeAbove(8); // check if builder is too close to
-                                             // ceiling
+                final int fa = freeAbove(MIN_FREE_ABOVE_STEP); // check if
+                                                               // builder is too
+                                                               // close to
+                // ceiling
 
-                if (fa < 8 || levitation > 0) {
+                if (fa < MIN_FREE_ABOVE_STEP || levitation > 0) {
                     newType = Type.WALKER;
 
                     // a lemming can jump through the ceiling like in
@@ -848,8 +984,8 @@ public class Lemming {
                 if (counter >= STEPS_MAX) {
                     newType = Type.BUILDER_END;
                 }
-            } else if (idx == 9 * TIME_SCALE) {
-                // stair mask is the same heigth as a lemming
+            } else if (idx == NINE * TIME_SCALE) {
+                // stair mask is the same height as a lemming
                 Mask m;
                 m = lemRes.getMask(dir);
                 final int sx = screenX();
@@ -910,12 +1046,12 @@ public class Lemming {
                 }
 
                 break;
-            case 3 * TIME_SCALE:
-            case 15 * TIME_SCALE:
+            case FALLER_STEP * TIME_SCALE:
+            case FIFTEEN * TIME_SCALE:
                 if (dir == Direction.RIGHT) {
-                    x += 4;
+                    x += STEP_PIXELS;
                 } else {
-                    x -= 4;
+                    x -= STEP_PIXELS;
                 }
 
                 // check for conversion to faller
@@ -929,10 +1065,12 @@ public class Lemming {
                     }
 
                     newType = Type.FALLER;
-                } else if (idx == 15 * TIME_SCALE) {
-                    y += 4;
+                } else if (idx == FIFTEEN * TIME_SCALE) {
+                    y += STEP_PIXELS;
                 }
 
+                break;
+            default:
                 break;
             }
         }
@@ -988,15 +1126,18 @@ public class Lemming {
                     idx = 0;
                 }
 
+                int sx = 0;
+                int sy = 0;
+
                 switch (idx) {
                 case 2 * TIME_SCALE:
-                case 3 * TIME_SCALE:
-                case 4 * TIME_SCALE:
-                case 5 * TIME_SCALE: {
+                case FALLER_STEP * TIME_SCALE:
+                case STEP_PIXELS * TIME_SCALE:
+                case FIVE * TIME_SCALE:
                     // bash mask should have the same height as the lemming
                     m = lemRes.getMask(dir);
-                    final int sx = screenX();
-                    final int sy = screenY();
+                    sx = screenX();
+                    sy = screenY();
                     checkMask = Stencil.MSK_STEEL
                             | ((dir == Direction.LEFT) ? Stencil.MSK_NO_DIG_LEFT
                                     : Stencil.MSK_NO_DIG_RIGHT);
@@ -1010,7 +1151,7 @@ public class Lemming {
                         newType = Type.WALKER;
                     }
 
-                    if (idx == 5 * TIME_SCALE) {
+                    if (idx == FIVE * TIME_SCALE) {
                         // check for conversion to walker because there are no
                         // bricks left
                         if (!canBash()) {
@@ -1020,20 +1161,18 @@ public class Lemming {
                     }
 
                     break;
-                }
-
-                case 18 * TIME_SCALE:
-                case 19 * TIME_SCALE:
-                case 20 * TIME_SCALE:
-                case 21 * TIME_SCALE: {
+                case EIGHTEEN * TIME_SCALE:
+                case NINETEEN * TIME_SCALE:
+                case TWENTY * TIME_SCALE:
+                case TWENTY_ONE * TIME_SCALE:
                     // bash mask should have the same height as the lemming
                     m = lemRes.getMask(dir);
-                    final int sx = screenX();
-                    final int sy = screenY();
+                    sx = screenX();
+                    sy = screenY();
                     checkMask = Stencil.MSK_STEEL
                             | ((dir == Direction.LEFT) ? Stencil.MSK_NO_DIG_LEFT
                                     : Stencil.MSK_NO_DIG_RIGHT);
-                    m.eraseMask(sx, sy, idx / TIME_SCALE - 18, checkMask);
+                    m.eraseMask(sx, sy, idx / TIME_SCALE - EIGHTEEN, checkMask);
 
                     // check for conversion to walker because there are
                     // indestructible pixels
@@ -1044,24 +1183,24 @@ public class Lemming {
                     }
 
                     break;
-                }
-
-                case 10 * TIME_SCALE:
-                case 11 * TIME_SCALE:
-                case 12 * TIME_SCALE:
-                case 13 * TIME_SCALE:
-                case 14 * TIME_SCALE:
-                case 26 * TIME_SCALE:
-                case 27 * TIME_SCALE:
-                case 28 * TIME_SCALE:
-                case 29 * TIME_SCALE:
-                case 30 * TIME_SCALE:
+                case TEN * TIME_SCALE:
+                case ELEVEN * TIME_SCALE:
+                case TWELVE * TIME_SCALE:
+                case THIRTEEN * TIME_SCALE:
+                case FOURTEEN * TIME_SCALE:
+                case TWENTY_SIX * TIME_SCALE:
+                case TWENTY_SEVEN * TIME_SCALE:
+                case TWENTY_EIGHT * TIME_SCALE:
+                case TWENTY_NINE * TIME_SCALE:
+                case THIRTY * TIME_SCALE:
                     if (dir == Direction.RIGHT) {
                         x += 2;
                     } else {
                         x -= 2;
                     }
 
+                    break;
+                default:
                     break;
                 }
             }
@@ -1169,13 +1308,13 @@ public class Lemming {
             case 2:
                 y += FALLER_STEP - FLOATER_STEP;
                 break;
-            case 3:
+            case THREE:
                 y -= FLOATER_STEP - 1; // decelerate a little
                 break;
-            case 4:
-            case 5:
-            case 6:
-            case 7:
+            case FOUR:
+            case FIVE:
+            case SIX:
+            case SEVEN:
                 y -= FLOATER_STEP; // decelerate some more
                 break;
             default:
@@ -1380,11 +1519,12 @@ public class Lemming {
         if (oldType != newType) {
             type = newType;
             lemRes = lemmings[getOrdinal(type)];
-            if (newType == Type.DIGGER)
+            if (newType == Type.DIGGER) {
                 frameIdx = lemRes.frames * TIME_SCALE - 1; // start digging
                                                            // immediately
-            else
+            } else {
                 frameIdx = 0;
+            }
 
             // some types can't change the skill - check this
             switch (newType) {
@@ -1416,15 +1556,15 @@ public class Lemming {
         final Mask m = lemRes.getMask(Direction.RIGHT);
         // check if lemming is standing on steel
         final int sy = y + 1;
-        if (x > 0 && x < Level.WIDTH && sy > 0 && sy < Level.HEIGHT)
-            m.eraseMask(x - m.getWidth() / 2, midY() - m.getHeight() / 2 + 3, 0,
-                    Stencil.MSK_STEEL);
-        // if ((Core.stencil.get(x + sy*Level.width) & Stencil.MSK_STEEL) == 0)
-        // m.eraseMask(x-m.width/2,midY()-m.height/2,0,0);
+
+        if (x > 0 && x < Level.WIDTH && sy > 0 && sy < Level.HEIGHT) {
+            m.eraseMask(x - m.getWidth() / 2,
+                    midY() - m.getHeight() / 2 + THREE, 0, Stencil.MSK_STEEL);
+        }
     }
 
     /**
-     * Get stencil value from the middle of the lemming
+     * Get stencil value from the middle of the lemming.
      *
      * @return stencil value from the middle of the lemming
      */
@@ -1432,10 +1572,13 @@ public class Lemming {
         final int xm = x;
         final int ym = y - lemRes.size;
         int retval;
-        if (xm > 0 && xm < Level.WIDTH && ym > 0 && ym < Level.HEIGHT)
+
+        if (xm > 0 && xm < Level.WIDTH && ym > 0 && ym < Level.HEIGHT) {
             retval = GameController.getStencil().get(xm + Level.WIDTH * ym);
-        else
+        } else {
             retval = Stencil.MSK_EMPTY;
+        }
+
         return retval;
     }
 
@@ -1449,26 +1592,36 @@ public class Lemming {
         final int ypos = Level.WIDTH * (y - BASHER_CHECK_STEP);
         int xb;
         int bricks = 0;
-        for (int i = 16; i < 25; i++) {
-            if (dir == Direction.RIGHT)
+
+        for (int i = SIXTEEN; i < TWENTY_FIVE; i++) {
+            if (dir == Direction.RIGHT) {
                 xb = xm + i;
-            else
+            } else {
                 xb = xm - i;
+            }
+
             final int sval = GameController.getStencil().get(xb + ypos);
-            if ((sval & Stencil.MSK_NO_DIG_LEFT) != 0 && dir == Direction.LEFT)
+
+            if ((sval & Stencil.MSK_NO_DIG_LEFT) != 0
+                    && dir == Direction.LEFT) {
                 return false;
+            }
+
             if ((sval & Stencil.MSK_NO_DIG_RIGHT) != 0
-                    && dir == Direction.RIGHT)
+                    && dir == Direction.RIGHT) {
                 return false;
-            if ((sval & Stencil.MSK_STEEL) != 0)
+            }
+
+            if ((sval & Stencil.MSK_STEEL) != 0) {
                 return false;
-            if ((sval & Stencil.MSK_WALK_ON) == Stencil.MSK_BRICK)
+            }
+
+            if ((sval & Stencil.MSK_WALK_ON) == Stencil.MSK_BRICK) {
                 bricks++;
+            }
         }
-        if (bricks > 0)
-            return true;
-        else
-            return false;
+
+        return bricks > 0;
     }
 
     /**
@@ -1480,8 +1633,9 @@ public class Lemming {
         final int ypos = Level.WIDTH * (y + 1);
         final int xm = x;
         final int sval = GameController.getStencil().get(xm + ypos);
-        if ((sval & Stencil.MSK_WALK_ON) == Stencil.MSK_BRICK)
+        if ((sval & Stencil.MSK_WALK_ON) == Stencil.MSK_BRICK) {
             return true;
+        }
         return false;
     }
 
@@ -1504,43 +1658,58 @@ public class Lemming {
         }
         for (int xb = xMin; xb < xMax; xb++) {
             final int sval = GameController.getStencil().get(xb + ypos);
-            if ((sval & Stencil.MSK_NO_DIG_LEFT) != 0 && dir == Direction.LEFT)
+
+            if ((sval & Stencil.MSK_NO_DIG_LEFT) != 0
+                    && dir == Direction.LEFT) {
                 return false;
+            }
+
             if ((sval & Stencil.MSK_NO_DIG_RIGHT) != 0
-                    && dir == Direction.RIGHT)
+                    && dir == Direction.RIGHT) {
                 return false;
-            if ((sval & Stencil.MSK_STEEL) != 0)
+            }
+
+            if ((sval & Stencil.MSK_STEEL) != 0) {
                 return false;
-            if ((sval & Stencil.MSK_WALK_ON) == Stencil.MSK_BRICK)
+            }
+
+            if ((sval & Stencil.MSK_WALK_ON) == Stencil.MSK_BRICK) {
                 bricks++;
+            }
         }
-        if (bricks > 0)
-            return true;
-        else
-            return false;
+
+        return bricks > 0;
     }
 
     /**
      * Get number of free pixels below the lemming (max of step is checked).
      *
+     * @param step
+     *
      * @return number of free pixels below the lemming
      */
     private int freeBelow(final int step) {
-        if (x < 0 || x >= Level.WIDTH)
+        if (x < 0 || x >= Level.WIDTH) {
             return 0;
+        }
+
         int free = 0;
         int pos = x;
         final Stencil stencil = GameController.getStencil();
         final int yb = y + 1;
         pos = x + yb * Level.WIDTH; // line below the lemming
+
         for (int i = 0; i < step; i++) {
-            if (yb + i >= Level.HEIGHT)
+            if (yb + i >= Level.HEIGHT) {
                 return FALL_DISTANCE_FORCE_FALL; // convert most skill to faller
+            }
+
             final int s = stencil.get(pos);
-            if ((s & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY)
+            if ((s & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY) {
                 free++;
-            else
+            } else {
                 break;
+            }
             pos += Level.WIDTH;
         }
         return free;
@@ -1563,36 +1732,40 @@ public class Lemming {
                 flip = true;
             }
         }
-        if (flip)
+        if (flip) {
             dir = (dir == Direction.RIGHT) ? Direction.LEFT : Direction.RIGHT;
+        }
         return flip;
     }
 
     /**
      * Get number of free pixels above the lemming (max of step is checked).
      *
+     * @param step Step.
+     *
      * @return number of free pixels above the lemming
      */
     private int freeAbove(final int step) {
-        if (x < 0 || x >= Level.WIDTH)
+        if (x < 0 || x >= Level.WIDTH) {
             return 0;
+        }
 
         int free = 0;
         int pos;
         final int ym = midY();
         final Stencil stencil = GameController.getStencil();
         pos = x + ym * Level.WIDTH;
+
         for (int i = 0; i < step; i++) {
-            if (ym - i <= 0)
+            if (ym - i <= 0) {
                 return -1; // splat
-            if ((stencil.get(pos) & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY
-            /*
-             * || (stencil.get(pos+1) & Stencil.MSK_WALK_ON) ==
-             * Stencil.MSK_EMPTY
-             */ )
+            }
+
+            if ((stencil.get(pos) & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY) {
                 free++;
-            else
+            } else {
                 break;
+            }
             pos -= Level.WIDTH;
         }
         return free;
@@ -1619,24 +1792,33 @@ public class Lemming {
      * @return number of pixels of walkable ground above the Lemmings foot.
      */
     private int aboveGround() {
-        if (x < 0 || x >= Level.WIDTH)
+        if (x < 0 || x >= Level.WIDTH) {
             return Level.HEIGHT - 1;
+        }
 
         int ym = y;
-        if (ym >= Level.HEIGHT)
+
+        if (ym >= Level.HEIGHT) {
             return Level.HEIGHT - 1;
+        }
+
         int pos = x;
         final Stencil stencil = GameController.getStencil();
         pos += ym * Level.WIDTH;
-        int levitation;
-        for (levitation = 0; levitation < WALKER_OBSTACLE_HEIGHT; levitation++, pos -= Level.WIDTH, ym--) {
-            if (ym < 0)
+        int lev; // Levitation.
+
+        for (lev = 0; lev < WALKER_OBSTACLE_HEIGHT; lev++, pos -= Level.WIDTH, ym--) {
+            if (ym < 0) {
                 return WALKER_OBSTACLE_HEIGHT + 1; // forbid leaving level to
-                                                   // the top
-            if ((stencil.get(pos) & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY)
+            }
+
+            // the top
+            if ((stencil.get(pos) & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY) {
                 break;
+            }
         }
-        return levitation;
+
+        return lev;
     }
 
     /**
@@ -1645,22 +1827,22 @@ public class Lemming {
      * @return true if climber reached a plateau he can walk on, false otherwise
      */
     private boolean reachedPlateau() {
-        if (x < 2 || x >= Level.WIDTH - 2)
+        if (x < 2 || x >= Level.WIDTH - 2) {
             return false;
+        }
         final int ym = midY();
-        if (ym >= Level.HEIGHT || ym < 0)
+        if (ym >= Level.HEIGHT || ym < 0) {
             return false;
+        }
         int pos = x;
-        if (dir == Direction.LEFT)
+        if (dir == Direction.LEFT) {
             pos -= 2;
-        else
+        } else {
             pos += 2;
+        }
         pos += ym * Level.WIDTH;
-        if ((GameController.getStencil().get(pos)
-                & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY)
-            return true;
-        else
-            return false;
+        return (GameController.getStencil().get(pos)
+                & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY;
     }
 
     /**
@@ -1673,15 +1855,21 @@ public class Lemming {
     public static void patchColors(final int findCol, final int replaceCol) {
         for (int l = 0; l < NUM_RESOURCES; l++) { // go through all the lemmings
             final LemmingResource lr = lemmings[l];
-            for (int f = 0; f < lr.frames; f++) // go through all frames
-                for (int d = 0; d < lr.dirs; d++) // go though all dirs
-                    for (int xp = 0; xp < lr.width; xp++)
+
+            for (int f = 0; f < lr.frames; f++) {
+                for (int d = 0; d < lr.dirs; d++) {
+                    for (int xp = 0; xp < lr.width; xp++) {
                         for (int yp = 0; yp < lr.height; yp++) {
                             final BufferedImage i = lr
                                     .getImage(Direction.get(d), f);
-                            if (i.getRGB(xp, yp) == findCol)
+
+                            if (i.getRGB(xp, yp) == findCol) {
                                 i.setRGB(xp, yp, replaceCol);
+                            }
                         }
+                    }
+                }
+            }
         }
     }
 
@@ -1698,17 +1886,23 @@ public class Lemming {
         // read lemmings definition file
         final String fn = Core.findResource(LEMM_INI_STR);
         final Props p = new Props();
-        if (!p.load(fn))
+
+        if (!p.load(fn)) {
             throw new ResourceException(LEMM_INI_STR);
+        }
+
         lemmings = new LemmingResource[NUM_RESOURCES];
         // read lemmings
-        final int def[] = {-1};
+        final int[] def = {-1};
+
         for (int i = 0; true; i++) {
             int[] val = p.get("lemm_" + i, def);
             int type;
-            if (val.length == 3) {
+
+            if (val.length == THREE) {
                 // frames, directions, animation type
                 type = i;
+
                 if (lemmings[type] == null) {
                     final BufferedImage sourceImg = ToolBox.imageToBuffered(
                             Core.loadImage(tracker, "misc/lemm_" + i + ".gif"),
@@ -1717,16 +1911,20 @@ public class Lemming {
                         tracker.waitForAll();
                     } catch (final InterruptedException ex) {
                     }
+
                     lemmings[type] = new LemmingResource(sourceImg, val[0],
                             val[1]);
                     lemmings[type].animMode = (val[2] == 0) ? Animation.LOOP
                             : Animation.ONCE;
                 }
-            } else
+            } else {
                 break;
+            }
+
             // read mask
             val = p.get("mask_" + i, def);
-            if (val.length == 3) {
+
+            if (val.length == THREE) {
                 // mask_Y: frames, directions, step
                 type = i;
                 final Image sourceImg = Core.loadImage(tracker,
@@ -1735,16 +1933,20 @@ public class Lemming {
                         Transparency.BITMASK), val[0]);
                 lemmings[type].setMask(Direction.RIGHT, mask);
                 final int dirs = val[1];
+
                 if (dirs > 1) {
                     final Mask maskLeft = new Mask(ToolBox.flipImageX(ToolBox
                             .imageToBuffered(sourceImg, Transparency.BITMASK)),
                             val[0]);
                     lemmings[type].setMask(Direction.LEFT, maskLeft);
                 }
+
                 lemmings[type].maskStep = val[2];
             }
+
             // read indestructible mask
             val = p.get("imask_" + i, def);
+
             if (val.length == 2) {
                 // mask_Y: type, frames, directions, step
                 type = i;
@@ -1754,6 +1956,7 @@ public class Lemming {
                         Transparency.BITMASK), val[0]);
                 lemmings[type].setImask(Direction.RIGHT, mask);
                 final int dirs = val[1];
+
                 if (dirs > 1) {
                     final Mask maskLeft = new Mask(ToolBox.flipImageX(ToolBox
                             .imageToBuffered(sourceImg, Transparency.BITMASK)),
@@ -1763,12 +1966,14 @@ public class Lemming {
             }
             // read foot position and size
             val = p.get("pos_" + i, def);
-            if (val.length == 3) {
+
+            if (val.length == THREE) {
                 lemmings[type].footX = val[0];
                 lemmings[type].footY = val[1];
                 lemmings[type].size = val[2];
-            } else
+            } else {
                 break;
+            }
         }
     }
 
@@ -1779,6 +1984,7 @@ public class Lemming {
      */
     public String getName() {
         Type t;
+
         switch (type) {
         case BOMBER_STOPPER:
             t = Type.BOMBER;
@@ -1792,13 +1998,15 @@ public class Lemming {
         String n = LEMM_NAMES[getOrdinal(t)];
         if (n.length() > 0) {
             if (canFloat) {
-                if (canClimb)
+                if (canClimb) {
                     n += "(A)";
-                else if (t != Type.FLOATER)
+                } else if (t != Type.FLOATER) {
                     n += "(F)";
+                }
             } else {
-                if (canClimb && t != Type.CLIMBER)
+                if (canClimb && t != Type.CLIMBER) {
                     n += "(C)";
+                }
             }
         }
         return n;
@@ -1820,8 +2028,10 @@ public class Lemming {
      * @return true if a change was possible, false otherwise
      */
     public boolean setSkill(final Type skill) {
-        if (skill == type || hasDied)
+        if (skill == type || hasDied) {
             return false;
+        }
+
         // check types which can't even get an additional skill anymore
         switch (type) {
         case DROWNING:
@@ -1830,16 +2040,21 @@ public class Lemming {
         case TRAPPED:
         case BOMBER:
             if (skill == Type.NUKE) {
-                if (nuke)
+                if (nuke) {
                     return false;
+                }
+
                 nuke = true;
+
                 if (explodeNumCtr == 0) {
-                    explodeNumCtr = 5;
+                    explodeNumCtr = FIVE;
                     explodeCtr = 0;
                     return true;
-                } else
+                } else {
                     return false;
+                }
             }
+
             return false;
         default:
             break;
@@ -1848,30 +2063,38 @@ public class Lemming {
         // check additional skills
         switch (skill) {
         case CLIMBER:
-            if (canClimb)
+            if (canClimb) {
                 return false;
+            }
+
             canClimb = true;
             return true;
         case FLOATER:
-            if (canFloat)
+            if (canFloat) {
                 return false;
+            }
+
             canFloat = true;
             return true;
         case NUKE: // special case: nuke request
-            if (nuke)
+            if (nuke) {
                 return false;
+            }
+
             nuke = true;
             //$FALL-THROUGH$
         case BOMBER:
             if (explodeNumCtr == 0) {
-                explodeNumCtr = 5;
+                explodeNumCtr = FIVE;
                 explodeCtr = 0;
                 return true;
-            } else
+            } else {
                 return false;
+            }
         default:
             break;
         }
+
         // check main skills
         if (canChangeSkill) {
             switch (skill) {
@@ -1881,45 +2104,47 @@ public class Lemming {
                     changeType(type, skill);
                     counter = 0;
                     return true;
-                } else
+                } else {
                     return false;
+                }
             case MINER:
                 if (canMine()) {
                     // y += 2;
                     changeType(type, skill);
                     counter = 0;
                     return true;
-                } else
+                } else {
                     return false;
+                }
             case BASHER:
                 // if (canBash(true)) {
                 changeType(type, skill);
                 counter = 0;
                 return true;
             // } else return false;
-            case BUILDER: {
+            case BUILDER:
                 // int fa = freeAbove(4);
                 final int fb = freeBelow(FALLER_STEP);
-                if (/* fa <= 0 || */ fb != 0)
+                if (/* fa <= 0 || */ fb != 0) {
                     return false;
+                }
                 // x = x & ~1; // start building at even positions
                 changeType(type, skill);
                 counter = 0;
                 return true;
-            }
-            case STOPPER: {
+            case STOPPER:
                 final Mask m = Lemming.getResource(Type.STOPPER)
                         .getMask(Direction.LEFT);
                 maskX = screenX();
                 maskY = screenY();
-                if (m.checkType(maskX, maskY, 0, Stencil.MSK_STOPPER))
+                if (m.checkType(maskX, maskY, 0, Stencil.MSK_STOPPER)) {
                     return false; // overlaps existing stopper
+                }
                 changeType(type, skill);
                 counter = 0;
                 // set stopper mask
                 m.setStopperMask(maskX, maskY, x);
                 return true;
-            }
             default:
                 break;
             }
@@ -1946,7 +2171,7 @@ public class Lemming {
     }
 
     /**
-     * Get static resource for a skill/type
+     * Get static resource for a skill/type.
      *
      * @param type skill/type
      * @return static resource for this skill/type
@@ -1969,7 +2194,7 @@ public class Lemming {
     }
 
     /**
-     * Get Y coordinate of upper left corner of animation frame
+     * Get Y coordinate of upper left corner of animation frame.
      *
      * @return Y coordinate of upper left corner of animation frame
      */
@@ -1987,7 +2212,7 @@ public class Lemming {
     }
 
     /**
-     * Collision position
+     * Collision position.
      *
      * @return Position inside lemming which is used for collisions
      */
@@ -2019,17 +2244,18 @@ public class Lemming {
      * @return image for explosion countdown (or null if no explosion countdown)
      */
     public BufferedImage getCountdown() {
-        if (explodeNumCtr == 0)
+        if (explodeNumCtr == 0) {
             return null;
-        else
+        } else {
             return explodeFont.getImage(explodeNumCtr - 1);
+        }
     }
 
     /**
      * Used for replay: start to display the selection image.
      */
     public void setSelected() {
-        selectCtr = 20;
+        selectCtr = TWENTY;
     }
 
     /**
@@ -2038,10 +2264,11 @@ public class Lemming {
      * @return the selection image (or null if no selection displayed)
      */
     public BufferedImage getSelectImg() {
-        if (selectCtr == 0)
+        if (selectCtr == 0) {
             return null;
-        else
+        } else {
             return MiscGfx.getImage(MiscGfx.Index.SELECT);
+        }
     }
 
     /**

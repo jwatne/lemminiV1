@@ -28,178 +28,236 @@ import tools.ToolBox;
  *
  * @author Volker Oth
  */
-public class LemmFont {
+public final class LemmFont {
 
-	/** Colors. */
-	public static enum Color {
-		/** green color. */
-		GREEN,
-		/** blue color. */
-		BLUE,
-		/** red color. */
-		RED,
-		/** brown/yellow color. */
-		BROWN,
-		/** turquoise/cyan color. */
-		TURQUOISE,
-		/** violet color. */
-		VIOLET
-	}
+    /**
+     * Maximum green value for ARGB value.
+     */
+    private static final int MAX_GREEN = 0xff00;
+    /**
+     * 7-bit shift.
+     */
+    private static final int SHIFT_7 = 7;
+    /**
+     * 8-bit shift.
+     */
+    private static final int SHIFT_8 = 8;
+    /**
+     * Max RGB color channel value.
+     */
+    private static final int MAX_COLOR = 0xff;
+    /**
+     * 16-bit shift.
+     */
+    private static final int SHIFT_16 = 16;
+    /**
+     * Maximum alpha ARGB value.
+     */
+    private static final int MAX_ALPHA = 0xff000000;
+    /**
+     * Number of color indexes in img.
+     */
+    private static final int NUM_COLORS = 7;
 
-	/** default width of one character in pixels. */
-	private final static int SPACING = 18;
-	/** character map. */
-	private final static String CHARS = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_�abcdefghijklmnopqrstuvwxyz{|}~";
+    /** Colors. */
+    public enum Color {
+        /** green color. */
+        GREEN,
+        /** blue color. */
+        BLUE,
+        /** red color. */
+        RED,
+        /** brown/yellow color. */
+        BROWN,
+        /** turquoise/cyan color. */
+        TURQUOISE,
+        /** violet color. */
+        VIOLET
+    }
 
-	/** width of one character in pixels. */
-	private static int width;
-	/** height of one character pixels. */
-	private static int height;
-	/** array of array of images [color,character]. */
-	static private BufferedImage img[][];
+    /** default width of one character in pixels. */
+    private static final int SPACING = 18;
+    /** character map. */
+    private static final String CHARS = "!\"#$%&'()*+,-./0123456789:"
+            + ";<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]"
+            + "^_�abcdefghijklmnopqrstuvwxyz{|}~";
 
-	/**
-	 * Initialization.
-	 *
-	 * @param frame the parent component (main frame of the application).
-	 * @throws ResourceException
-	 */
-	static public void init(final Component frame) throws ResourceException {
-		final BufferedImage sourceImg = ToolBox.imageToBuffered(Core.loadImage("misc/lemmfont.gif", frame),
-				Transparency.BITMASK);
+    /** width of one character in pixels. */
+    private static int width;
+    /** height of one character pixels. */
+    private static int height;
+    /** array of array of images [color,character]. */
+    private static BufferedImage[][] img;
 
-		width = SPACING; // sourceImg.getWidth(null);
-		height = sourceImg.getHeight(null) / CHARS.length();
-		final BufferedImage redImg = ToolBox.createImage(sourceImg.getWidth(), sourceImg.getHeight(),
-				Transparency.BITMASK);
-		final BufferedImage blueImg = ToolBox.createImage(sourceImg.getWidth(), sourceImg.getHeight(),
-				Transparency.BITMASK);
-		final BufferedImage turquoiseImg = ToolBox.createImage(sourceImg.getWidth(), sourceImg.getHeight(),
-				Transparency.BITMASK);
-		final BufferedImage brownImg = ToolBox.createImage(sourceImg.getWidth(), sourceImg.getHeight(),
-				Transparency.BITMASK);
-		final BufferedImage violetImg = ToolBox.createImage(sourceImg.getWidth(), sourceImg.getHeight(),
-				Transparency.BITMASK);
-		img = new BufferedImage[7][];
-		img[0] = ToolBox.getAnimation(sourceImg, CHARS.length(), Transparency.BITMASK, width);
-		for (int xp = 0; xp < sourceImg.getWidth(null); xp++)
-			for (int yp = 0; yp < sourceImg.getHeight(null); yp++) {
-				int col = sourceImg.getRGB(xp, yp); // A R G B
-				final int a = col & 0xff000000; // transparent part
-				final int r = (col >> 16) & 0xff;
-				final int g = (col >> 8) & 0xff;
-				final int b = col & 0xff;
-				// patch image to red version by swapping red and green components
-				col = a | (g << 16) | (r << 8) | b;
-				redImg.setRGB(xp, yp, col);
-				// patch image to blue version by swapping blue and green components
-				col = a | (r << 16) | (b << 8) | g;
-				blueImg.setRGB(xp, yp, col);
-				// patch image to turquoise version by setting blue component to value of green
-				// component
-				col = a | (r << 16) | (g << 8) | g;
-				turquoiseImg.setRGB(xp, yp, col);
-				// patch image to yellow version by setting red component to value of green
-				// component
-				col = a | (g << 16) | (g << 8) | b;
-				brownImg.setRGB(xp, yp, col);
-				// patch image to violet version by exchanging red and blue with green
-				col = a | (g << 16) | (((r + b) << 7) & 0xff00) | g;
-				violetImg.setRGB(xp, yp, col);
-			}
-		img[Color.RED.ordinal()] = ToolBox.getAnimation(redImg, CHARS.length(), Transparency.BITMASK, width);
-		img[Color.BLUE.ordinal()] = ToolBox.getAnimation(blueImg, CHARS.length(), Transparency.BITMASK, width);
-		img[Color.TURQUOISE.ordinal()] = ToolBox.getAnimation(turquoiseImg, CHARS.length(), Transparency.BITMASK,
-				width);
-		img[Color.BROWN.ordinal()] = ToolBox.getAnimation(brownImg, CHARS.length(), Transparency.BITMASK, width);
-		img[Color.VIOLET.ordinal()] = ToolBox.getAnimation(violetImg, CHARS.length(), Transparency.BITMASK, width);
-	}
+    /**
+     * Private default constructor for utility class.
+     */
+    private LemmFont() {
 
-	/**
-	 * Draw string into graphics object in given color.
-	 *
-	 * @param g     graphics object to draw to.
-	 * @param s     string to draw.
-	 * @param sx    x coordinate in pixels
-	 * @param sy    y coordinate in pixels
-	 * @param color Color
-	 */
-	static public void strImage(final Graphics2D g, final String s, final int sx, final int sy, final Color color) {
-		for (int i = 0, x = sx; i < s.length(); i++, x += SPACING) {
-			final char c = s.charAt(i);
-			if (c == ' ')
-				continue;
-			final int pos = CHARS.indexOf(c);
-			if (pos > -1 && pos < CHARS.length()) {
-				g.drawImage(img[color.ordinal()][pos], x, sy, null);
-			}
-		}
-		return;
-	}
+    }
 
-	/**
-	 * Draw string into graphics object in given color.
-	 *
-	 * @param g     graphics object to draw to.
-	 * @param s     string to draw.
-	 * @param color Color
-	 */
-	static public void strImage(final Graphics2D g, final String s, final Color color) {
-		strImage(g, s, 0, 0, color);
-		return;
-	}
+    /**
+     * Initialization.
+     *
+     * @param frame the parent component (main frame of the application).
+     * @throws ResourceException
+     */
+    public static void init(final Component frame) throws ResourceException {
+        final BufferedImage sourceImg = ToolBox.imageToBuffered(
+                Core.loadImage("misc/lemmfont.gif", frame),
+                Transparency.BITMASK);
 
-	/**
-	 * Create image of string in given color.
-	 *
-	 * @param s     string to draw
-	 * @param color Color
-	 * @return a buffered image of the needed size that contains an image of the
-	 *         given string
-	 */
-	static public BufferedImage strImage(final String s, final Color color) {
-		final BufferedImage image = ToolBox.createImage(width * s.length(), height, Transparency.BITMASK);
-		strImage(image.createGraphics(), s, color);
-		return image;
-	}
+        width = SPACING; // sourceImg.getWidth(null);
+        height = sourceImg.getHeight(null) / CHARS.length();
+        final BufferedImage redImg = ToolBox.createImage(sourceImg.getWidth(),
+                sourceImg.getHeight(), Transparency.BITMASK);
+        final BufferedImage blueImg = ToolBox.createImage(sourceImg.getWidth(),
+                sourceImg.getHeight(), Transparency.BITMASK);
+        final BufferedImage turquoiseImg = ToolBox.createImage(
+                sourceImg.getWidth(), sourceImg.getHeight(),
+                Transparency.BITMASK);
+        final BufferedImage brownImg = ToolBox.createImage(sourceImg.getWidth(),
+                sourceImg.getHeight(), Transparency.BITMASK);
+        final BufferedImage violetImg = ToolBox.createImage(
+                sourceImg.getWidth(), sourceImg.getHeight(),
+                Transparency.BITMASK);
+        img = new BufferedImage[NUM_COLORS][];
+        img[0] = ToolBox.getAnimation(sourceImg, CHARS.length(),
+                Transparency.BITMASK, width);
 
-	/**
-	 * Create image of string in default color (green).
-	 *
-	 * @param s string to draw
-	 * @return a buffered image of the needed size that contains an image of the
-	 *         given string
-	 */
-	static public BufferedImage strImage(final String s) {
-		return strImage(s, Color.GREEN);
-	}
+        for (int xp = 0; xp < sourceImg.getWidth(null); xp++) {
+            for (int yp = 0; yp < sourceImg.getHeight(null); yp++) {
+                int col = sourceImg.getRGB(xp, yp); // A R G B
+                final int a = col & MAX_ALPHA; // transparent part
+                final int r = (col >> SHIFT_16) & MAX_COLOR;
+                final int g = (col >> SHIFT_8) & MAX_COLOR;
+                final int b = col & MAX_COLOR;
+                // patch image to red version by swapping red and green
+                // components
+                col = a | (g << SHIFT_16) | (r << SHIFT_8) | b;
+                redImg.setRGB(xp, yp, col);
+                // patch image to blue version by swapping blue and green
+                // components
+                col = a | (r << SHIFT_16) | (b << SHIFT_8) | g;
+                blueImg.setRGB(xp, yp, col);
+                // patch image to turquoise version by setting blue component to
+                // value of green
+                // component
+                col = a | (r << SHIFT_16) | (g << SHIFT_8) | g;
+                turquoiseImg.setRGB(xp, yp, col);
+                // patch image to yellow version by setting red component to
+                // value of green
+                // component
+                col = a | (g << SHIFT_16) | (g << SHIFT_8) | b;
+                brownImg.setRGB(xp, yp, col);
+                // patch image to violet version by exchanging red and blue with
+                // green
+                col = a | (g << SHIFT_16) | (((r + b) << SHIFT_7) & MAX_GREEN)
+                        | g;
+                violetImg.setRGB(xp, yp, col);
+            }
+        }
+        img[Color.RED.ordinal()] = ToolBox.getAnimation(redImg, CHARS.length(),
+                Transparency.BITMASK, width);
+        img[Color.BLUE.ordinal()] = ToolBox.getAnimation(blueImg,
+                CHARS.length(), Transparency.BITMASK, width);
+        img[Color.TURQUOISE.ordinal()] = ToolBox.getAnimation(turquoiseImg,
+                CHARS.length(), Transparency.BITMASK, width);
+        img[Color.BROWN.ordinal()] = ToolBox.getAnimation(brownImg,
+                CHARS.length(), Transparency.BITMASK, width);
+        img[Color.VIOLET.ordinal()] = ToolBox.getAnimation(violetImg,
+                CHARS.length(), Transparency.BITMASK, width);
+    }
 
-	/**
-	 * Draw string into graphics object in default color (green).
-	 *
-	 * @param g graphics object to draw to.
-	 * @param s string to draw.
-	 */
-	static public void strImage(final Graphics2D g, final String s) {
-		strImage(g, s, Color.GREEN);
-	}
+    /**
+     * Draw string into graphics object in given color.
+     *
+     * @param g     graphics object to draw to.
+     * @param s     string to draw.
+     * @param sx    x coordinate in pixels
+     * @param sy    y coordinate in pixels
+     * @param color Color
+     */
+    public static void strImage(final Graphics2D g, final String s,
+            final int sx, final int sy, final Color color) {
+        for (int i = 0, x = sx; i < s.length(); i++, x += SPACING) {
+            final char c = s.charAt(i);
+            if (c == ' ') {
+                continue;
+            }
+            final int pos = CHARS.indexOf(c);
+            if (pos > -1 && pos < CHARS.length()) {
+                g.drawImage(img[color.ordinal()][pos], x, sy, null);
+            }
+        }
+        return;
+    }
 
-	/**
-	 * Get width of one character in pixels.
-	 *
-	 * @return width of one character in pixels
-	 */
-	public static int getWidth() {
-		return width;
-	}
+    /**
+     * Draw string into graphics object in given color.
+     *
+     * @param g     graphics object to draw to.
+     * @param s     string to draw.
+     * @param color Color
+     */
+    public static void strImage(final Graphics2D g, final String s,
+            final Color color) {
+        strImage(g, s, 0, 0, color);
+        return;
+    }
 
-	/**
-	 * Get height of one character in pixels.
-	 *
-	 * @return height of one character in pixels
-	 */
-	public static int getHeight() {
-		return height;
-	}
+    /**
+     * Create image of string in given color.
+     *
+     * @param s     string to draw
+     * @param color Color
+     * @return a buffered image of the needed size that contains an image of the
+     *         given string
+     */
+    public static BufferedImage strImage(final String s, final Color color) {
+        final BufferedImage image = ToolBox.createImage(width * s.length(),
+                height, Transparency.BITMASK);
+        strImage(image.createGraphics(), s, color);
+        return image;
+    }
+
+    /**
+     * Create image of string in default color (green).
+     *
+     * @param s string to draw
+     * @return a buffered image of the needed size that contains an image of the
+     *         given string
+     */
+    public static BufferedImage strImage(final String s) {
+        return strImage(s, Color.GREEN);
+    }
+
+    /**
+     * Draw string into graphics object in default color (green).
+     *
+     * @param g graphics object to draw to.
+     * @param s string to draw.
+     */
+    public static void strImage(final Graphics2D g, final String s) {
+        strImage(g, s, Color.GREEN);
+    }
+
+    /**
+     * Get width of one character in pixels.
+     *
+     * @return width of one character in pixels
+     */
+    public static int getWidth() {
+        return width;
+    }
+
+    /**
+     * Get height of one character in pixels.
+     *
+     * @return height of one character in pixels
+     */
+    public static int getHeight() {
+        return height;
+    }
 
 }

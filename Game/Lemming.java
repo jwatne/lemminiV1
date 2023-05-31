@@ -489,7 +489,7 @@ public class Lemming {
     private boolean animateLoopOrOnce() {
         boolean trigger = false;
 
-        switch (lemRes.animMode) {
+        switch (lemRes.getAnimMode()) {
         case LOOP:
             trigger = animateLoop(trigger);
             break;
@@ -708,7 +708,7 @@ public class Lemming {
     private boolean animateOnce(final boolean startingTrigger) {
         boolean trigger = startingTrigger;
 
-        if (frameIdx < lemRes.frames * TIME_SCALE - 1) {
+        if (frameIdx < lemRes.getFrames() * TIME_SCALE - 1) {
             frameIdx++;
         } else {
             trigger = true;
@@ -727,12 +727,13 @@ public class Lemming {
     private boolean animateLoop(final boolean startingTrigger) {
         boolean trigger = startingTrigger;
 
-        if (++frameIdx >= lemRes.frames * TIME_SCALE) {
+        if (++frameIdx >= lemRes.getFrames() * TIME_SCALE) {
             frameIdx = 0;
         }
 
-        if (lemRes.maskStep > 0
-                && frameIdx % (lemRes.maskStep * TIME_SCALE) == 0) {
+        int maskStep = lemRes.getMaskStep();
+
+        if (maskStep > 0 && frameIdx % (maskStep * TIME_SCALE) == 0) {
             trigger = true;
         }
 
@@ -945,7 +946,7 @@ public class Lemming {
         } else if (!turnedByStopper()) {
             int idx = frameIdx + 1;
 
-            if (idx >= lemRes.frames * TIME_SCALE) {
+            if (idx >= lemRes.getFrames() * TIME_SCALE) {
                 // step created -> move up
                 idx = 0;
                 counter++; // step counter;
@@ -1024,7 +1025,7 @@ public class Lemming {
             int sy;
             int idx = frameIdx + 1;
 
-            if (idx >= lemRes.frames * TIME_SCALE) {
+            if (idx >= lemRes.getFrames() * TIME_SCALE) {
                 idx = 0;
             }
 
@@ -1122,7 +1123,7 @@ public class Lemming {
                 int checkMask;
                 int idx = frameIdx + 1;
 
-                if (idx >= lemRes.frames * TIME_SCALE) {
+                if (idx >= lemRes.getFrames() * TIME_SCALE) {
                     idx = 0;
                 }
 
@@ -1363,7 +1364,7 @@ public class Lemming {
 
             // check for flip direction
             if (levitation < WALKER_OBSTACLE_HEIGHT
-                    && (y + lemRes.height / 2) > 0) {
+                    && (y + lemRes.getHeight() / 2) > 0) {
                 if (levitation >= JUMPER_JUMP) {
                     y -= JUMPER_STEP;
                     newType = Type.JUMPER;
@@ -1519,9 +1520,10 @@ public class Lemming {
         if (oldType != newType) {
             type = newType;
             lemRes = lemmings[getOrdinal(type)];
+
             if (newType == Type.DIGGER) {
-                frameIdx = lemRes.frames * TIME_SCALE - 1; // start digging
-                                                           // immediately
+                frameIdx = lemRes.getFrames() * TIME_SCALE - 1;
+                // start digging immediately
             } else {
                 frameIdx = 0;
             }
@@ -1570,7 +1572,7 @@ public class Lemming {
      */
     private int stencilMid() {
         final int xm = x;
-        final int ym = y - lemRes.size;
+        final int ym = y - lemRes.getSize();
         int retval;
 
         if (xm > 0 && xm < Level.WIDTH && ym > 0 && ym < Level.HEIGHT) {
@@ -1649,13 +1651,15 @@ public class Lemming {
         int bricks = 0;
         int xMin;
         int xMax;
+
         if (dir == Direction.RIGHT) {
             xMin = x;
-            xMax = x - lemRes.footX + lemRes.width;
+            xMax = x - lemRes.getFootX() + lemRes.getWidth();
         } else {
-            xMin = x - lemRes.footX;
+            xMin = x - lemRes.getFootX();
             xMax = x;
         }
+
         for (int xb = xMin; xb < xMax; xb++) {
             final int sval = GameController.getStencil().get(xb + ypos);
 
@@ -1710,8 +1714,10 @@ public class Lemming {
             } else {
                 break;
             }
+
             pos += Level.WIDTH;
         }
+
         return free;
     }
 
@@ -1723,7 +1729,8 @@ public class Lemming {
      */
     private boolean flipDirBorder() {
         boolean flip = false;
-        if (lemRes.dirs > 1) {
+
+        if (lemRes.getDirs() > 1) {
             if (x < 0) {
                 x = 0;
                 flip = true;
@@ -1732,9 +1739,11 @@ public class Lemming {
                 flip = true;
             }
         }
+
         if (flip) {
             dir = (dir == Direction.RIGHT) ? Direction.LEFT : Direction.RIGHT;
         }
+
         return flip;
     }
 
@@ -1856,10 +1865,10 @@ public class Lemming {
         for (int l = 0; l < NUM_RESOURCES; l++) { // go through all the lemmings
             final LemmingResource lr = lemmings[l];
 
-            for (int f = 0; f < lr.frames; f++) {
-                for (int d = 0; d < lr.dirs; d++) {
-                    for (int xp = 0; xp < lr.width; xp++) {
-                        for (int yp = 0; yp < lr.height; yp++) {
+            for (int f = 0; f < lr.getFrames(); f++) {
+                for (int d = 0; d < lr.getDirs(); d++) {
+                    for (int xp = 0; xp < lr.getWidth(); xp++) {
+                        for (int yp = 0; yp < lr.getHeight(); yp++) {
                             final BufferedImage i = lr
                                     .getImage(Direction.get(d), f);
 
@@ -1914,8 +1923,8 @@ public class Lemming {
 
                     lemmings[type] = new LemmingResource(sourceImg, val[0],
                             val[1]);
-                    lemmings[type].animMode = (val[2] == 0) ? Animation.LOOP
-                            : Animation.ONCE;
+                    lemmings[type].setAnimMode(
+                            (val[2] == 0) ? Animation.LOOP : Animation.ONCE);
                 }
             } else {
                 break;
@@ -1941,7 +1950,7 @@ public class Lemming {
                     lemmings[type].setMask(Direction.LEFT, maskLeft);
                 }
 
-                lemmings[type].maskStep = val[2];
+                lemmings[type].setMaskStep(val[2]);
             }
 
             // read indestructible mask
@@ -1964,13 +1973,14 @@ public class Lemming {
                     lemmings[type].setImask(Direction.LEFT, maskLeft);
                 }
             }
+
             // read foot position and size
             val = p.get("pos_" + i, def);
 
             if (val.length == THREE) {
-                lemmings[type].footX = val[0];
-                lemmings[type].footY = val[1];
-                lemmings[type].size = val[2];
+                lemmings[type].setFootX(val[0]);
+                lemmings[type].setFootY(val[1]);
+                lemmings[type].setSize(val[2]);
             } else {
                 break;
             }
@@ -2149,6 +2159,7 @@ public class Lemming {
                 break;
             }
         }
+
         return false;
     }
 
@@ -2158,7 +2169,7 @@ public class Lemming {
      * @return width of animation frame in pixels
      */
     public int width() {
-        return lemRes.width;
+        return lemRes.getWidth();
     }
 
     /**
@@ -2167,7 +2178,7 @@ public class Lemming {
      * @return height of animation frame in pixels
      */
     public int height() {
-        return lemRes.height;
+        return lemRes.getHeight();
     }
 
     /**
@@ -2186,10 +2197,10 @@ public class Lemming {
      * @return X coordinate of upper left corner of animation frame
      */
     public int screenX() {
-        if (lemRes.dirs == 1 || dir == Direction.RIGHT) {
-            return x - lemRes.footX;
+        if (lemRes.getDirs() == 1 || dir == Direction.RIGHT) {
+            return x - lemRes.getFootX();
         } else {
-            return x - lemRes.width + lemRes.footX;
+            return x - lemRes.getWidth() + lemRes.getFootX();
         }
     }
 
@@ -2199,7 +2210,7 @@ public class Lemming {
      * @return Y coordinate of upper left corner of animation frame
      */
     public int screenY() {
-        return y - lemRes.footY;
+        return y - lemRes.getFootY();
     }
 
     /**
@@ -2217,7 +2228,7 @@ public class Lemming {
      * @return Position inside lemming which is used for collisions
      */
     public int midY() {
-        return y - lemRes.size;
+        return y - lemRes.getSize();
     }
 
     /**

@@ -12,31 +12,205 @@ import tools.ToolBox;
  */
 public class LemmingResource {
     /** relative foot X position in pixels inside bitmap. */
-    int footX;
+    private int footX;
+
+    /**
+     * Returns relative foot X position in pixels inside bitmap.
+     *
+     * @return relative foot X position in pixels inside bitmap.
+     */
+    public final int getFootX() {
+        return footX;
+    }
+
+    /**
+     * Sets relative foot X position in pixels inside bitmap.
+     *
+     * @param xPosition relative foot X position in pixels inside bitmap.
+     */
+    public final void setFootX(final int xPosition) {
+        this.footX = xPosition;
+    }
+
     /** relative foot Y position in pixels inside bitmap. */
-    int footY;
+    private int footY;
+
+    /**
+     * Returns relative foot Y position in pixels inside bitmap.
+     *
+     * @return relative foot Y position in pixels inside bitmap.
+     */
+    public final int getFootY() {
+        return footY;
+    }
+
+    /**
+     * Sets relative foot Y position in pixels inside bitmap.
+     *
+     * @param yPosition relative foot Y position in pixels inside bitmap.
+     */
+    public final void setFootY(final int yPosition) {
+        this.footY = yPosition;
+    }
+
     /** mask collision ("mid") position above foot in pixels. */
-    int size;
+    private int size;
+
+    /**
+     * Returns mask collision ("mid") position above foot in pixels.
+     *
+     * @return mask collision ("mid") position above foot in pixels.
+     */
+    public final int getSize() {
+        return size;
+    }
+
+    /**
+     * Sets mask collision ("mid") position above foot in pixels.
+     *
+     * @param midPosition mask collision ("mid") position above foot in pixels.
+     */
+    public final void setSize(final int midPosition) {
+        this.size = midPosition;
+    }
+
     /** width of image in pixels. */
-    int width;
+    private int width;
+
+    /**
+     * Returns width of image in pixels.
+     *
+     * @return width of image in pixels.
+     */
+    public final int getWidth() {
+        return width;
+    }
+
+    /**
+     * Sets width of image in pixels.
+     *
+     * @param imageWidth width of image in pixels.
+     */
+    public final void setWidth(final int imageWidth) {
+        this.width = imageWidth;
+    }
+
     /** height of image in pixels. */
-    int height;
+    private int height;
+
+    /**
+     * Returns height of image in pixels.
+     *
+     * @return height of image in pixels.
+     */
+    public final int getHeight() {
+        return height;
+    }
+
+    /**
+     * Sets height of image in pixels.
+     *
+     * @param imageHeight height of image in pixels.
+     */
+    public final void setHeight(final int imageHeight) {
+        this.height = imageHeight;
+    }
+
     /** number of animation frames. */
-    int frames;
+    private int frames;
+
+    /**
+     * Returns number of animation frames.
+     *
+     * @return number of animation frames.
+     */
+    public final int getFrames() {
+        return frames;
+    }
+
+    /**
+     * Sets number of animation frames.
+     *
+     * @param numFrames number of animation frames.
+     */
+    public final void setFrames(final int numFrames) {
+        this.frames = numFrames;
+    }
+
     /** animation mode. */
-    Lemming.Animation animMode;
+    private Lemming.Animation animMode;
+
+    /**
+     * Returns animation mode.
+     *
+     * @return animation mode.
+     */
+    public final Lemming.Animation getAnimMode() {
+        return animMode;
+    }
+
+    /**
+     * Sets animation mode.
+     *
+     * @param mode animation mode.
+     */
+    public final void setAnimMode(final Lemming.Animation mode) {
+        this.animMode = mode;
+    }
+
     /** number of directions (1 or 2). */
-    int dirs;
-    int maskStep;
+    private int dirs;
+
+    /**
+     * Returns number of directions (1 or 2).
+     *
+     * @return number of directions (1 or 2).
+     */
+    public final int getDirs() {
+        return dirs;
+    }
+
+    /**
+     * Sets number of directions (1 or 2).
+     *
+     * @param numberOfDirections number of directions (1 or 2).
+     */
+    public final void setDirs(final int numberOfDirections) {
+        this.dirs = numberOfDirections;
+    }
+
+    /**
+     * Mask step.
+     */
+    private int maskStep;
+
+    /**
+     * Returns mask step.
+     *
+     * @return mask step.
+     */
+    public final int getMaskStep() {
+        return maskStep;
+    }
+
+    /**
+     * Sets mask step.
+     *
+     * @param step mask step.
+     */
+    public final void setMaskStep(final int step) {
+        this.maskStep = step;
+    }
+
     /** array of images to store the animation [Direction][AnimationFrame]. */
-    private final BufferedImage img[][];
+    private final BufferedImage[][] img;
     /**
      * array of removal masks used for digging/bashing/mining/explosions etc.
      * [Direction]
      */
-    private final Mask mask[];
+    private final Mask[] mask;
     /** array of check masks for indestructible pixels [Direction]. */
-    private final Mask iMask[];
+    private final Mask[] iMask;
 
     /**
      * Constructor.
@@ -45,7 +219,8 @@ public class LemmingResource {
      * @param animFrames number of animation frames.
      * @param directions number of directions (1 or 2)
      */
-    LemmingResource(final BufferedImage sourceImg, final int animFrames, final int directions) {
+    LemmingResource(final BufferedImage sourceImg, final int animFrames,
+            final int directions) {
         img = new BufferedImage[directions][];
         mask = new Mask[directions];
         iMask = new Mask[directions];
@@ -54,10 +229,13 @@ public class LemmingResource {
         height = sourceImg.getHeight(null) / animFrames;
         dirs = directions;
         animMode = Lemming.Animation.NONE;
-        img[Lemming.Direction.RIGHT.ordinal()] = ToolBox.getAnimation(sourceImg, animFrames, Transparency.BITMASK);
-        if (dirs > 1)
-            img[Lemming.Direction.LEFT.ordinal()] = ToolBox.getAnimation(ToolBox.flipImageX(sourceImg), animFrames,
+        img[Lemming.Direction.RIGHT.ordinal()] = ToolBox.getAnimation(sourceImg,
+                animFrames, Transparency.BITMASK);
+        if (dirs > 1) {
+            img[Lemming.Direction.LEFT.ordinal()] = ToolBox.getAnimation(
+                    ToolBox.flipImageX(sourceImg), animFrames,
                     Transparency.BITMASK);
+        }
     }
 
     /**
@@ -67,10 +245,11 @@ public class LemmingResource {
      * @return mask for stencil manipulation
      */
     Mask getMask(final Lemming.Direction dir) {
-        if (dirs > 1)
+        if (dirs > 1) {
             return mask[dir.ordinal()];
-        else
+        } else {
             return mask[0];
+        }
     }
 
     /**
@@ -80,10 +259,11 @@ public class LemmingResource {
      * @param m   mask for stencil manipulation
      */
     void setMask(final Lemming.Direction dir, final Mask m) {
-        if (dirs > 1)
+        if (dirs > 1) {
             mask[dir.ordinal()] = m;
-        else
+        } else {
             mask[0] = m;
+        }
     }
 
     /**
@@ -93,23 +273,25 @@ public class LemmingResource {
      * @return mask for checking of indestructible pixels
      */
     Mask getImask(final Lemming.Direction dir) {
-        if (dirs > 1)
+        if (dirs > 1) {
             return iMask[dir.ordinal()];
-        else
+        } else {
             return iMask[0];
+        }
     }
 
     /**
-     * Set the mask for checking of indestructible pixels
+     * Set the mask for checking of indestructible pixels.
      *
      * @param dir Direction
      * @param m   mask for checking of indestructible pixels
      */
     void setImask(final Lemming.Direction dir, final Mask m) {
-        if (dirs > 1)
+        if (dirs > 1) {
             iMask[dir.ordinal()] = m;
-        else
+        } else {
             iMask[0] = m;
+        }
     }
 
     /**
@@ -120,9 +302,10 @@ public class LemmingResource {
      * @return specific animation frame
      */
     BufferedImage getImage(final Lemming.Direction dir, final int frame) {
-        if (dirs > 1)
+        if (dirs > 1) {
             return img[dir.ordinal()][frame];
-        else
+        } else {
             return img[0][frame];
+        }
     }
 }

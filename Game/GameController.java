@@ -939,7 +939,7 @@ public final class GameController {
         if (!entryOpened) {
             if (++entryOpenCtr == MAX_ENTRY_OPEN_CTR) {
                 for (int i = 0; i < getLevel().getEntryNum(); i++) {
-                    getLevel().getSprObject(getLevel().getEntry(i).id)
+                    getLevel().getSprObject(getLevel().getEntry(i).getId())
                             .setAnimMode(Sprite.Animation.ONCE);
                 }
 
@@ -987,11 +987,11 @@ public final class GameController {
                 && ++releaseCtr >= releaseBase) {
             releaseCtr = 0;
 
-            // LemmingResource ls = Lemming.getResource(Lemming.TYPE_FALLER);
             try {
                 if (getLevel().getEntryNum() != 0) {
                     final Entry e = getLevel().getEntry(TrapDoor.getNext());
-                    final Lemming l = new Lemming(e.xPos + 2, e.yPos + 20);
+                    final Lemming l = new Lemming(e.getxPos() + 2,
+                            e.getyPos() + 20);
 
                     synchronized (lemmings) {
                         lemmings.add(l);

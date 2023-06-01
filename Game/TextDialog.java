@@ -96,8 +96,9 @@ public class TextDialog {
      */
     public void fillBackground(final BufferedImage tile) {
         for (int x = 0; x < width; x += tile.getWidth()) {
-            for (int y = 0; y < width; y += tile.getHeight())
+            for (int y = 0; y < width; y += tile.getHeight()) {
                 gBack.drawImage(tile, x, y, null);
+            }
         }
         gScreen.drawImage(backBuffer, 0, 0, null);
     }
@@ -133,15 +134,16 @@ public class TextDialog {
     /**
      * Restore a rectangle of the background from backbuffer.
      *
-     * @param x      x position of upper left corner of rectangle
-     * @param y      y position of upper left corner of rectangle
-     * @param width  width of rectangle
-     * @param height height of rectangle
+     * @param x               x position of upper left corner of rectangle
+     * @param y               y position of upper left corner of rectangle
+     * @param rectangleWidth  width of rectangle
+     * @param rectangleHeight height of rectangle
      */
-    public void restoreRect(final int x, final int y, final int width,
-            final int height) {
-        gScreen.drawImage(backBuffer, x, y, x + width, y + height, x, y,
-                x + width, y + height, null);
+    public void restoreRect(final int x, final int y, final int rectangleWidth,
+            final int rectangleHeight) {
+        gScreen.drawImage(backBuffer, x, y, x + rectangleWidth,
+                y + rectangleHeight, x, y, x + rectangleWidth,
+                y + rectangleHeight, null);
     }
 
     /**
@@ -173,7 +175,7 @@ public class TextDialog {
      * @param col LemmFont color
      */
     public void print(final String s, final int x0, final int y0,
-            final LemmFont.Color col) {
+            final LemmingsFontColor col) {
         final int x = x0 * LemmFont.getWidth();
         final int y = y0 * (LemmFont.getHeight() + 4);
         LemmFont.strImage(gScreen, s, centerX + x, centerY + y, col);
@@ -187,7 +189,7 @@ public class TextDialog {
      * @param y Y position relative to center expressed in character heights
      */
     public void print(final String s, final int x, final int y) {
-        print(s, x, y, LemmFont.Color.GREEN);
+        print(s, x, y, LemmingsFontColor.GREEN);
     }
 
     /**
@@ -199,7 +201,7 @@ public class TextDialog {
      * @return Absolute x position
      */
     public int printCentered(final String s, final int y0,
-            final LemmFont.Color col) {
+            final LemmingsFontColor col) {
         final int y = y0 * (LemmFont.getHeight() + 4);
         final int x = centerX - s.length() * LemmFont.getWidth() / 2;
         LemmFont.strImage(gScreen, s, x, centerY + y, col);
@@ -214,7 +216,7 @@ public class TextDialog {
      * @return Absolute x position
      */
     public int printCentered(final String s, final int y) {
-        return printCentered(s, y, LemmFont.Color.GREEN);
+        return printCentered(s, y, LemmingsFontColor.GREEN);
     }
 
     /**
@@ -268,8 +270,8 @@ public class TextDialog {
      * @param cols Button selected text color
      */
     public void addTextButton(final int x0, final int y0, final int id,
-            final String t, final String ts, final LemmFont.Color col,
-            final LemmFont.Color cols) {
+            final String t, final String ts, final LemmingsFontColor col,
+            final LemmingsFontColor cols) {
         final int x = x0 * LemmFont.getWidth();
         final int y = y0 * (LemmFont.getHeight() + 4);
         final TextButton b = new TextButton(centerX + x, centerY + y, id);
@@ -288,8 +290,9 @@ public class TextDialog {
     public int handleLeftClick(final int x, final int y) {
         for (int i = 0; i < buttons.size(); i++) {
             final Button b = buttons.get(i);
-            if (b.inside(x, y))
-                return b.id;
+            if (b.inside(x, y)) {
+                return b.getId();
+            }
         }
         return -1;
     }
@@ -303,10 +306,7 @@ public class TextDialog {
     public void handleMouseMove(final int x, final int y) {
         for (int i = 0; i < buttons.size(); i++) {
             final Button b = buttons.get(i);
-            if (b.inside(x, y))
-                b.selected = true;
-            else
-                b.selected = false;
+            b.setSelected(b.inside(x, y));
         }
     }
 
@@ -314,8 +314,9 @@ public class TextDialog {
      * Draw buttons on screen.
      */
     public void drawButtons() {
-        for (int i = 0; i < buttons.size(); i++)
+        for (int i = 0; i < buttons.size(); i++) {
             buttons.get(i).draw(gScreen);
+        }
     }
 
     /**
@@ -328,152 +329,12 @@ public class TextDialog {
     public int handleRightClick(final int x, final int y) {
         for (int i = 0; i < buttons.size(); i++) {
             final Button b = buttons.get(i);
-            if (b.inside(x, y))
-                return b.id;
+
+            if (b.inside(x, y)) {
+                return b.getId();
+            }
         }
+
         return -1;
-    }
-
-}
-
-/**
- * Button class for TextDialog.
- *
- * @author Volker Oth
- */
-class Button {
-    /** x coordinate in pixels. */
-    private final int x;
-    /** y coordinate in pixels. */
-    private final int y;
-    /** width in pixels. */
-    protected int width;
-    /** height in pixels. */
-    protected int height;
-    /** button identifier. */
-    protected int id;
-    /** true if button is selected. */
-    protected boolean selected;
-    /** normal button image. */
-    protected BufferedImage image;
-    /** selected button image. */
-    protected BufferedImage imgSelected;
-
-    /**
-     * Constructor
-     *
-     * @param xi  x position in pixels
-     * @param yi  y position in pixels
-     * @param idi identifier
-     */
-    Button(final int xi, final int yi, final int idi) {
-        x = xi;
-        y = yi;
-        id = idi;
-    }
-
-    /**
-     * Set normal button image.
-     *
-     * @param img image
-     */
-    void setImage(final BufferedImage img) {
-        image = img;
-        if (image.getHeight() > height)
-            height = image.getHeight();
-        if (image.getWidth() > width)
-            width = image.getWidth();
-    }
-
-    /**
-     * Set selected button image.
-     *
-     * @param img image
-     */
-    void setImageSelected(final BufferedImage img) {
-        imgSelected = img;
-        if (imgSelected.getHeight() > height)
-            height = imgSelected.getHeight();
-        if (imgSelected.getWidth() > width)
-            width = imgSelected.getWidth();
-    }
-
-    /**
-     * Return current button image (normal or selected, depending on state).
-     *
-     * @return current button image
-     */
-    BufferedImage getImage() {
-        if (selected)
-            return imgSelected;
-        else
-            return image;
-    }
-
-    /**
-     * Draw the button.
-     *
-     * @param g graphics object to draw on
-     */
-    void draw(final Graphics2D g) {
-        g.drawImage(getImage(), x, y, null);
-    }
-
-    /**
-     * Check if a (mouse) position is inside this button.
-     *
-     * @param xi
-     * @param yi
-     * @return true if the coordinates are inside this button, false if not
-     */
-    boolean inside(final int xi, final int yi) {
-        return (xi >= x && xi < x + width && yi >= y && yi < y + height);
-    }
-
-}
-
-/**
- * Button class for TextDialog.
- *
- * @author Volker Oth
- */
-class TextButton extends Button {
-    /**
-     * Constructor
-     *
-     * @param xi  x position in pixels
-     * @param yi  y position in pixels
-     * @param idi identifier
-     */
-    TextButton(final int xi, final int yi, final int idi) {
-        super(xi, yi, idi);
-    }
-
-    /**
-     * Set text which is used as button.
-     *
-     * @param s     String which contains the button text
-     * @param color Color of the button (LemmFont color!)
-     */
-    void setText(final String s, final LemmFont.Color color) {
-        image = LemmFont.strImage(s, color);
-        if (image.getHeight() > height)
-            height = image.getHeight();
-        if (image.getWidth() > width)
-            width = image.getWidth();
-    }
-
-    /**
-     * Set text for selected button.
-     *
-     * @param s     String which contains the selected button text
-     * @param color Color of the button (LemmFont color!)
-     */
-    void setTextSelected(final String s, final LemmFont.Color color) {
-        imgSelected = LemmFont.strImage(s, color);
-        if (imgSelected.getHeight() > height)
-            height = imgSelected.getHeight();
-        if (imgSelected.getWidth() > width)
-            width = imgSelected.getWidth();
     }
 }

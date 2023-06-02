@@ -18,15 +18,19 @@ public final class ManagePlayerMenuItemActionListener
      * The calling {@link MenuCreator}.
      */
     private final MenuCreator menuCreator;
+    /** Frame. */
     private Component frame;
 
     /**
-     * @param menuCreator
+     * Constructor.
+     *
+     * @param creator the menu creator.
+     * @param parent  the parent frame.
      */
-    ManagePlayerMenuItemActionListener(final MenuCreator menuCreator,
-            final Component frame) {
-        this.menuCreator = menuCreator;
-        this.frame = frame;
+    ManagePlayerMenuItemActionListener(final MenuCreator creator,
+            final Component parent) {
+        this.menuCreator = creator;
+        this.frame = parent;
     }
 
     /**
@@ -70,7 +74,7 @@ public final class ManagePlayerMenuItemActionListener
             }
 
             // select new default player
-            Player newDefaultPlayer = new Player(player);
+            final Player newDefaultPlayer = new Player(player);
             Core.setPlayer(newDefaultPlayer);
 
             // rebuild players menu

@@ -242,6 +242,6 @@ public class SpriteObject extends Sprite {
      * @return mask value (ARGB).
      */
     public int getMask(final int xPosition, final int yPosition) {
-        return mask[yPosition * width + xPosition];
+        return mask[yPosition * getWidth() + xPosition];
     }
 }

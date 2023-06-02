@@ -38,188 +38,249 @@ import javax.swing.event.HyperlinkListener;
 
 /**
  * Dialog with legal information.
+ *
  * @author Volker Oth
  */
 public class LegalDialog extends JDialog {
 
-	private static final long serialVersionUID = 1L;
+    /**
+     * Inset of 5.
+     */
+    private static final int INSET_5 = 5;
 
-	private JPanel jContentPane = null;
+    /**
+     * Default height in pixels.
+     */
+    private static final int DEFAULT_HEIGHT = 450;
 
-	private JButton jButtonCancel = null;
+    /**
+     * Default width in pixels.
+     */
+    private static final int DEFAULT_WIDTH = 640;
 
-	private JButton jButtonOk = null;
+    private static final long serialVersionUID = 1L;
 
-	private JScrollPane jScrollPane = null;
+    /**
+     * Content pane.
+     */
+    private JPanel jContentPane = null;
 
-	private JEditorPane thisEditor = null;
+    /**
+     * Cancel button.
+     */
+    private JButton jButtonCancel = null;
 
-	// own stuff
-	private boolean ok = false;
+    /**
+     * OK button.
+     */
+    private JButton jButtonOk = null;
 
-	private URL thisURL;
+    /**
+     * Scroll pane.
+     */
+    private JScrollPane jScrollPane = null;
 
-	/**
-	 * Initialize manually generated resources.
-	 */
-	private void init() {
-		ClassLoader loader = LegalDialog.class.getClassLoader();
-		thisURL = loader.getResource("disclaimer.htm");
-		try {
-			thisEditor = new JEditorPane( thisURL );
-			thisEditor.setEditable( false );
-			// needed to open browser via clicking on a link
-			thisEditor.addHyperlinkListener(new HyperlinkListener() {
-				@Override
-				public void hyperlinkUpdate(HyperlinkEvent e) {
-					URL url = e.getURL();
-					if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-						try {
-							if (url.sameFile(thisURL))
-								thisEditor.setPage(url);
-							else
-								Desktop.getDesktop().browse(url.toURI());
-						} catch (IOException ex) {
-						} catch (URISyntaxException ex) {
-						}
-					} else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-						if (url.sameFile(thisURL))
-							thisEditor.setToolTipText(url.getRef());
-						else
-							thisEditor.setToolTipText(url.toExternalForm());
-					} else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
-						thisEditor.setToolTipText(null);
-					}
-				}
-			});
-			jScrollPane.setViewportView(thisEditor);  // Generated
-		} catch (IOException ex) {ex.printStackTrace();};
-	}
+    /**
+     * Editor.
+     */
+    private JEditorPane thisEditor = null;
 
+    // own stuff
+    /**
+     * Ok.
+     */
+    private boolean ok = false;
 
-	/**
-	 * Constructor for modal dialog in parent frame.
-	 * @param frame parent frame
-	 * @param modal create modal dialog?
-	 */
-	public LegalDialog(final JFrame frame, final boolean modal) {
-		super(frame, modal);
-		initialize();
+    /**
+     * This URL.
+     */
+    private URL thisURL;
 
-		// own stuff
-		if (frame != null) {
-			Point p = frame.getLocation();
-			this.setLocation(p.x+frame.getWidth()/2-getWidth()/2, p.y+frame.getHeight()/2-getHeight()/2);
-		} else {
-			GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-			Point p = ge.getCenterPoint();
-			p.x -= this.getWidth()/2;
-			p.y -= this.getHeight()/2;
-			this.setLocation(p);
-		}
-		init();
-	}
+    /**
+     * Initialize manually generated resources.
+     */
+    private void init() {
+        ClassLoader loader = LegalDialog.class.getClassLoader();
+        thisURL = loader.getResource("disclaimer.htm");
 
-	/**
-	 * Automatically generated init.
-	 */
-	private void initialize() {
-		this.setSize(640, 450);
-		this.setTitle("Lemmini - Disclaimer");
-		this.setContentPane(getJContentPane());
-	}
+        try {
+            thisEditor = new JEditorPane(thisURL);
+            thisEditor.setEditable(false);
+            // needed to open browser via clicking on a link
+            thisEditor.addHyperlinkListener(getHyperlinkListener());
+            jScrollPane.setViewportView(thisEditor); // Generated
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
-	/**
-	 * This method initializes jContentPane
-	 *
-	 * @return javax.swing.JPanel
-	 */
-	private JPanel getJContentPane() {
-		if (jContentPane == null) {
-			GridBagConstraints gridBagScrollPane = new GridBagConstraints();
-			gridBagScrollPane.fill = GridBagConstraints.BOTH;
-			gridBagScrollPane.gridy = 0;
-			gridBagScrollPane.weightx = 1.0;
-			gridBagScrollPane.weighty = 1.0;
-			gridBagScrollPane.gridwidth = 2;
-			gridBagScrollPane.gridx = 0;
-			GridBagConstraints gridBagButtonOk = new GridBagConstraints();
-			gridBagButtonOk.gridx = 1;
-			gridBagButtonOk.anchor = GridBagConstraints.EAST;
-			gridBagButtonOk.insets = new Insets(5, 0, 5, 5);
-			gridBagButtonOk.gridy = 1;
-			GridBagConstraints gridBagButtonCancel = new GridBagConstraints();
-			gridBagButtonCancel.gridx = 0;
-			gridBagButtonCancel.insets = new Insets(5, 5, 5, 0);
-			gridBagButtonCancel.gridy = 1;
-			jContentPane = new JPanel();
-			jContentPane.setLayout(new GridBagLayout());
-			jContentPane.add(getJButtonCancel(), gridBagButtonCancel);
-			jContentPane.add(getJButtonOk(), gridBagButtonOk);
-			jContentPane.add(getJScrollPane(), gridBagScrollPane);
-		}
-		return jContentPane;
-	}
+    private HyperlinkListener getHyperlinkListener() {
+        return new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(final HyperlinkEvent e) {
+                URL url = e.getURL();
 
-	/**
-	 * This method initializes jButtonCancel
-	 *
-	 * @return javax.swing.JButton
-	 */
-	private JButton getJButtonCancel() {
-		if (jButtonCancel == null) {
-			jButtonCancel = new JButton();
-			jButtonCancel.setText("I disagree");
-			jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					ok = false;
-					dispose();
-				}
-			});
-		}
-		return jButtonCancel;
-	}
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                    try {
+                        if (url.sameFile(thisURL)) {
+                            thisEditor.setPage(url);
+                        } else {
+                            Desktop.getDesktop().browse(url.toURI());
+                        }
+                    } catch (IOException ex) {
+                    } catch (URISyntaxException ex) {
+                    }
+                } else if (e
+                        .getEventType() == HyperlinkEvent.EventType.ENTERED) {
+                    if (url.sameFile(thisURL)) {
+                        thisEditor.setToolTipText(url.getRef());
+                    } else {
+                        thisEditor.setToolTipText(url.toExternalForm());
+                    }
+                } else if (e
+                        .getEventType() == HyperlinkEvent.EventType.EXITED) {
+                    thisEditor.setToolTipText(null);
+                }
+            }
+        };
+    }
 
-	/**
-	 * This method initializes jButtonOk
-	 *
-	 * @return javax.swing.JButton
-	 */
-	private JButton getJButtonOk() {
-		if (jButtonOk == null) {
-			jButtonOk = new JButton();
-			jButtonOk.setText("I agree");
-			jButtonOk.addActionListener(new java.awt.event.ActionListener() {
-				@Override
-				public void actionPerformed(java.awt.event.ActionEvent e) {
-					ok = true;
-					dispose();
-				}
-			});
-		}
-		return jButtonOk;
-	}
+    /**
+     * Constructor for modal dialog in parent frame.
+     *
+     * @param frame parent frame
+     * @param modal create modal dialog?
+     */
+    public LegalDialog(final JFrame frame, final boolean modal) {
+        super(frame, modal);
+        initialize();
 
-	/**
-	 * This method initializes jScrollPane
-	 *
-	 * @return javax.swing.JScrollPane
-	 */
-	private JScrollPane getJScrollPane() {
-		if (jScrollPane == null) {
-			jScrollPane = new JScrollPane();
-			jScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		}
-		return jScrollPane;
-	}
+        // own stuff
+        if (frame != null) {
+            Point p = frame.getLocation();
+            this.setLocation(p.x + frame.getWidth() / 2 - getWidth() / 2,
+                    p.y + frame.getHeight() / 2 - getHeight() / 2);
+        } else {
+            GraphicsEnvironment ge = GraphicsEnvironment
+                    .getLocalGraphicsEnvironment();
+            Point p = ge.getCenterPoint();
+            p.x -= this.getWidth() / 2;
+            p.y -= this.getHeight() / 2;
+            this.setLocation(p);
+        }
+        init();
+    }
 
-	/**
-	 * Ok button was pressed.
-	 * @return true: ok button was pressed.
-	 */
-	public boolean isOk() {
-		return ok;
-	}
+    /**
+     * Automatically generated init.
+     */
+    private void initialize() {
+        this.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        this.setTitle("Lemmini - Disclaimer");
+        this.setContentPane(getJContentPane());
+    }
 
-}  //  @jve:decl-index=0:visual-constraint="10,10"
+    /**
+     * This method initializes jContentPane.
+     *
+     * @return javax.swing.JPanel
+     */
+    private JPanel getJContentPane() {
+        if (jContentPane == null) {
+            GridBagConstraints gridBagScrollPane = new GridBagConstraints();
+            gridBagScrollPane.fill = GridBagConstraints.BOTH;
+            gridBagScrollPane.gridy = 0;
+            gridBagScrollPane.weightx = 1.0;
+            gridBagScrollPane.weighty = 1.0;
+            gridBagScrollPane.gridwidth = 2;
+            gridBagScrollPane.gridx = 0;
+            GridBagConstraints gridBagButtonOk = new GridBagConstraints();
+            gridBagButtonOk.gridx = 1;
+            gridBagButtonOk.anchor = GridBagConstraints.EAST;
+            gridBagButtonOk.insets = new Insets(INSET_5, 0, INSET_5, INSET_5);
+            gridBagButtonOk.gridy = 1;
+            GridBagConstraints gridBagButtonCancel = new GridBagConstraints();
+            gridBagButtonCancel.gridx = 0;
+            gridBagButtonCancel.insets = new Insets(INSET_5, INSET_5, INSET_5,
+                    0);
+            gridBagButtonCancel.gridy = 1;
+            jContentPane = new JPanel();
+            jContentPane.setLayout(new GridBagLayout());
+            jContentPane.add(getJButtonCancel(), gridBagButtonCancel);
+            jContentPane.add(getJButtonOk(), gridBagButtonOk);
+            jContentPane.add(getJScrollPane(), gridBagScrollPane);
+        }
+
+        return jContentPane;
+    }
+
+    /**
+     * This method initializes jButtonCancel.
+     *
+     * @return javax.swing.JButton
+     */
+    private JButton getJButtonCancel() {
+        if (jButtonCancel == null) {
+            jButtonCancel = new JButton();
+            jButtonCancel.setText("I disagree");
+            jButtonCancel
+                    .addActionListener(new java.awt.event.ActionListener() {
+                        @Override
+                        public void actionPerformed(
+                                final java.awt.event.ActionEvent e) {
+                            ok = false;
+                            dispose();
+                        }
+                    });
+        }
+
+        return jButtonCancel;
+    }
+
+    /**
+     * This method initializes jButtonOk.
+     *
+     * @return javax.swing.JButton
+     */
+    private JButton getJButtonOk() {
+        if (jButtonOk == null) {
+            jButtonOk = new JButton();
+            jButtonOk.setText("I agree");
+            jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+                @Override
+                public void actionPerformed(
+                        final java.awt.event.ActionEvent e) {
+                    ok = true;
+                    dispose();
+                }
+            });
+        }
+
+        return jButtonOk;
+    }
+
+    /**
+     * This method initializes jScrollPane.
+     *
+     * @return javax.swing.JScrollPane
+     */
+    private JScrollPane getJScrollPane() {
+        if (jScrollPane == null) {
+            jScrollPane = new JScrollPane();
+            jScrollPane.setHorizontalScrollBarPolicy(
+                    ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        }
+
+        return jScrollPane;
+    }
+
+    /**
+     * Ok button was pressed.
+     *
+     * @return true: ok button was pressed.
+     */
+    public boolean isOk() {
+        return ok;
+    }
+
+} // @jve:decl-index=0:visual-constraint="10,10"

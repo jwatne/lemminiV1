@@ -1,22 +1,34 @@
 package game;
 
 /**
- * Trapdoor/Entry class
- * Trapdoor logic: for numbers >1, just take the next door for each lemming and
- * wrap around to 1 when
- * the last one is reached.
- * Special rule for 3 trapdoors: the order is 1, 2, 3, 2 (loop), not 1, 2, 3
- * (loop)
+ * Trapdoor/Entry class Trapdoor logic: for numbers >1, just take the next door
+ * for each lemming and wrap around to 1 when the last one is reached. Special
+ * rule for 3 trapdoors: the order is 1, 2, 3, 2 (loop), not 1, 2, 3 (loop)
  *
  * @author Volker Oth
  */
-public class TrapDoor {
+public final class TrapDoor {
+    /**
+     * Exactly 4 entries.
+     */
+    private static final int FOUR_ENTRIES = 4;
+    /**
+     * Exactly 3 entries.
+     */
+    private static final int THREE_ENTRIES = 3;
     /** pattern for three entries. */
-    private final static int[] PATTERN3 = { 0, 1, 2, 1 };
+    private static final int[] PATTERN3 = {0, 1, 2, 1};
     /** number of entries. */
     private static int entries;
     /** entry counter. */
     private static int counter;
+
+    /**
+     * Private constructor for utility class.
+     */
+    private TrapDoor() {
+
+    }
 
     /**
      * Reset to new number of entries.
@@ -37,7 +49,7 @@ public class TrapDoor {
         final int retVal = counter;
         counter++;
 
-        if (entries != 3) {
+        if (entries != THREE_ENTRIES) {
             if (counter >= entries) {
                 counter = 0;
             }
@@ -46,7 +58,7 @@ public class TrapDoor {
         }
 
         // special case: 3
-        if (counter >= 4) {
+        if (counter >= FOUR_ENTRIES) {
             counter = 0;
         }
 

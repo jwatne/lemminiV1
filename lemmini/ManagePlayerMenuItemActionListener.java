@@ -78,8 +78,8 @@ public final class ManagePlayerMenuItemActionListener
             Core.setPlayer(newDefaultPlayer);
 
             // rebuild players menu
-            this.menuCreator.playerGroup = new ButtonGroup();
-            this.menuCreator.jMenuSelectPlayer.removeAll();
+            this.menuCreator.setPlayerGroup(new ButtonGroup());
+            this.menuCreator.getjMenuSelectPlayer().removeAll();
 
             for (int idx = 0; idx < Core.getPlayerNum(); idx++) {
                 final JCheckBoxMenuItem item = this.menuCreator

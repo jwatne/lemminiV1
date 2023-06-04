@@ -59,6 +59,22 @@ public final class LemmFont {
      */
     private static final int NUM_COLORS = 7;
 
+    /** Colors. */
+    public enum Color {
+        /** green color. */
+        GREEN,
+        /** blue color. */
+        BLUE,
+        /** red color. */
+        RED,
+        /** brown/yellow color. */
+        BROWN,
+        /** turquoise/cyan color. */
+        TURQUOISE,
+        /** violet color. */
+        VIOLET
+    }
+
     /** default width of one character in pixels. */
     private static final int SPACING = 18;
     /** character map. */
@@ -141,16 +157,16 @@ public final class LemmFont {
                 violetImg.setRGB(xp, yp, col);
             }
         }
-        img[LemmingsFontColor.RED.ordinal()] = ToolBox.getAnimation(redImg,
+        img[Color.RED.ordinal()] = ToolBox.getAnimation(redImg, CHARS.length(),
+                Transparency.BITMASK, width);
+        img[Color.BLUE.ordinal()] = ToolBox.getAnimation(blueImg,
                 CHARS.length(), Transparency.BITMASK, width);
-        img[LemmingsFontColor.BLUE.ordinal()] = ToolBox.getAnimation(blueImg,
+        img[Color.TURQUOISE.ordinal()] = ToolBox.getAnimation(turquoiseImg,
                 CHARS.length(), Transparency.BITMASK, width);
-        img[LemmingsFontColor.TURQUOISE.ordinal()] = ToolBox.getAnimation(
-                turquoiseImg, CHARS.length(), Transparency.BITMASK, width);
-        img[LemmingsFontColor.BROWN.ordinal()] = ToolBox.getAnimation(brownImg,
+        img[Color.BROWN.ordinal()] = ToolBox.getAnimation(brownImg,
                 CHARS.length(), Transparency.BITMASK, width);
-        img[LemmingsFontColor.VIOLET.ordinal()] = ToolBox.getAnimation(
-                violetImg, CHARS.length(), Transparency.BITMASK, width);
+        img[Color.VIOLET.ordinal()] = ToolBox.getAnimation(violetImg,
+                CHARS.length(), Transparency.BITMASK, width);
     }
 
     /**
@@ -163,7 +179,7 @@ public final class LemmFont {
      * @param color Color
      */
     public static void strImage(final Graphics2D g, final String s,
-            final int sx, final int sy, final LemmingsFontColor color) {
+            final int sx, final int sy, final Color color) {
         for (int i = 0, x = sx; i < s.length(); i++, x += SPACING) {
             final char c = s.charAt(i);
             if (c == ' ') {
@@ -185,7 +201,7 @@ public final class LemmFont {
      * @param color Color
      */
     public static void strImage(final Graphics2D g, final String s,
-            final LemmingsFontColor color) {
+            final Color color) {
         strImage(g, s, 0, 0, color);
         return;
     }
@@ -198,8 +214,7 @@ public final class LemmFont {
      * @return a buffered image of the needed size that contains an image of the
      *         given string
      */
-    public static BufferedImage strImage(final String s,
-            final LemmingsFontColor color) {
+    public static BufferedImage strImage(final String s, final Color color) {
         final BufferedImage image = ToolBox.createImage(width * s.length(),
                 height, Transparency.BITMASK);
         strImage(image.createGraphics(), s, color);
@@ -214,7 +229,7 @@ public final class LemmFont {
      *         given string
      */
     public static BufferedImage strImage(final String s) {
-        return strImage(s, LemmingsFontColor.GREEN);
+        return strImage(s, Color.GREEN);
     }
 
     /**
@@ -224,7 +239,7 @@ public final class LemmFont {
      * @param s string to draw.
      */
     public static void strImage(final Graphics2D g, final String s) {
-        strImage(g, s, LemmingsFontColor.GREEN);
+        strImage(g, s, Color.GREEN);
     }
 
     /**

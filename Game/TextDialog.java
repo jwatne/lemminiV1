@@ -96,8 +96,9 @@ public class TextDialog {
      */
     public void fillBackground(final BufferedImage tile) {
         for (int x = 0; x < width; x += tile.getWidth()) {
-            for (int y = 0; y < width; y += tile.getHeight())
+            for (int y = 0; y < width; y += tile.getHeight()) {
                 gBack.drawImage(tile, x, y, null);
+            }
         }
         gScreen.drawImage(backBuffer, 0, 0, null);
     }
@@ -133,15 +134,16 @@ public class TextDialog {
     /**
      * Restore a rectangle of the background from backbuffer.
      *
-     * @param x      x position of upper left corner of rectangle
-     * @param y      y position of upper left corner of rectangle
-     * @param width  width of rectangle
-     * @param height height of rectangle
+     * @param x               x position of upper left corner of rectangle
+     * @param y               y position of upper left corner of rectangle
+     * @param rectangleWidth  width of rectangle
+     * @param rectangleHeight height of rectangle
      */
-    public void restoreRect(final int x, final int y, final int width,
-            final int height) {
-        gScreen.drawImage(backBuffer, x, y, x + width, y + height, x, y,
-                x + width, y + height, null);
+    public void restoreRect(final int x, final int y, final int rectangleWidth,
+            final int rectangleHeight) {
+        gScreen.drawImage(backBuffer, x, y, x + rectangleWidth,
+                y + rectangleHeight, x, y, x + rectangleWidth,
+                y + rectangleHeight, null);
     }
 
     /**
@@ -288,9 +290,12 @@ public class TextDialog {
     public int handleLeftClick(final int x, final int y) {
         for (int i = 0; i < buttons.size(); i++) {
             final Button b = buttons.get(i);
-            if (b.inside(x, y))
-                return b.id;
+
+            if (b.inside(x, y)) {
+                return b.getId();
+            }
         }
+
         return -1;
     }
 
@@ -303,10 +308,7 @@ public class TextDialog {
     public void handleMouseMove(final int x, final int y) {
         for (int i = 0; i < buttons.size(); i++) {
             final Button b = buttons.get(i);
-            if (b.inside(x, y))
-                b.selected = true;
-            else
-                b.selected = false;
+            b.setSelected(b.inside(x, y));
         }
     }
 
@@ -314,8 +316,9 @@ public class TextDialog {
      * Draw buttons on screen.
      */
     public void drawButtons() {
-        for (int i = 0; i < buttons.size(); i++)
+        for (int i = 0; i < buttons.size(); i++) {
             buttons.get(i).draw(gScreen);
+        }
     }
 
     /**
@@ -327,10 +330,13 @@ public class TextDialog {
      */
     public int handleRightClick(final int x, final int y) {
         for (int i = 0; i < buttons.size(); i++) {
+
             final Button b = buttons.get(i);
-            if (b.inside(x, y))
-                return b.id;
+            if (b.inside(x, y)) {
+                return b.getId();
+            }
         }
+
         return -1;
     }
 
@@ -347,20 +353,20 @@ class Button {
     /** y coordinate in pixels. */
     private final int y;
     /** width in pixels. */
-    protected int width;
+    private int width;
     /** height in pixels. */
-    protected int height;
+    private int height;
     /** button identifier. */
-    protected int id;
+    private int id;
     /** true if button is selected. */
-    protected boolean selected;
+    private boolean selected;
     /** normal button image. */
-    protected BufferedImage image;
+    private BufferedImage image;
     /** selected button image. */
-    protected BufferedImage imgSelected;
+    private BufferedImage imgSelected;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param xi  x position in pixels
      * @param yi  y position in pixels
@@ -379,10 +385,12 @@ class Button {
      */
     void setImage(final BufferedImage img) {
         image = img;
-        if (image.getHeight() > height)
+        if (image.getHeight() > height) {
             height = image.getHeight();
-        if (image.getWidth() > width)
+        }
+        if (image.getWidth() > width) {
             width = image.getWidth();
+        }
     }
 
     /**
@@ -392,10 +400,12 @@ class Button {
      */
     void setImageSelected(final BufferedImage img) {
         imgSelected = img;
-        if (imgSelected.getHeight() > height)
+        if (imgSelected.getHeight() > height) {
             height = imgSelected.getHeight();
-        if (imgSelected.getWidth() > width)
+        }
+        if (imgSelected.getWidth() > width) {
             width = imgSelected.getWidth();
+        }
     }
 
     /**
@@ -404,10 +414,11 @@ class Button {
      * @return current button image
      */
     BufferedImage getImage() {
-        if (selected)
+        if (selected) {
             return imgSelected;
-        else
+        } else {
             return image;
+        }
     }
 
     /**
@@ -430,6 +441,54 @@ class Button {
         return (xi >= x && xi < x + width && yi >= y && yi < y + height);
     }
 
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(final int pixelsWidth) {
+        this.width = pixelsWidth;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(final int pixelsHeight) {
+        this.height = pixelsHeight;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(final int identifier) {
+        this.id = identifier;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(final boolean buttonSelected) {
+        this.selected = buttonSelected;
+    }
+
+    public BufferedImage getImgSelected() {
+        return imgSelected;
+    }
+
+    public void setImgSelected(final BufferedImage selectedImage) {
+        this.imgSelected = selectedImage;
+    }
+
 }
 
 /**
@@ -439,7 +498,7 @@ class Button {
  */
 class TextButton extends Button {
     /**
-     * Constructor
+     * Constructor.
      *
      * @param xi  x position in pixels
      * @param yi  y position in pixels
@@ -456,11 +515,19 @@ class TextButton extends Button {
      * @param color Color of the button (LemmFont color!)
      */
     void setText(final String s, final LemmFont.Color color) {
-        image = LemmFont.strImage(s, color);
-        if (image.getHeight() > height)
-            height = image.getHeight();
-        if (image.getWidth() > width)
-            width = image.getWidth();
+        setImage(LemmFont.strImage(s, color));
+        final BufferedImage image = getImage();
+        final int height = image.getHeight();
+
+        if (height > getHeight()) {
+            setHeight(height);
+        }
+
+        final int width = image.getWidth();
+
+        if (width > getWidth()) {
+            setWidth(width);
+        }
     }
 
     /**
@@ -470,10 +537,18 @@ class TextButton extends Button {
      * @param color Color of the button (LemmFont color!)
      */
     void setTextSelected(final String s, final LemmFont.Color color) {
-        imgSelected = LemmFont.strImage(s, color);
-        if (imgSelected.getHeight() > height)
-            height = imgSelected.getHeight();
-        if (imgSelected.getWidth() > width)
-            width = imgSelected.getWidth();
+        setImgSelected(LemmFont.strImage(s, color));
+        final BufferedImage imgSelected = getImgSelected();
+        final int height = imgSelected.getHeight();
+
+        if (height > getHeight()) {
+            setHeight(height);
+        }
+
+        final int width = imgSelected.getWidth();
+
+        if (width > getWidth()) {
+            setWidth(width);
+        }
     }
 }

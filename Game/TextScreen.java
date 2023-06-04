@@ -1,6 +1,6 @@
 package game;
 
-import static game.LemmFont.Color.*;
+// import static game.LemmFont.Color.*;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -28,386 +28,463 @@ import tools.ToolBox;
  */
 
 /**
- * Class to print text screens which can be navigated with the mouse.
- * Uses {@link TextDialog}
+ * Class to print text screens which can be navigated with the mouse. Uses
+ * {@link TextDialog}
  *
  * @author Volker Oth
  */
-public class TextScreen {
+public final class TextScreen {
 
-	/** Mode (type of screen to present). */
-	public static enum Mode {
-		/** initial state. */
-		INIT,
-		/** main introduction screen. */
-		INTRO,
-		/** level briefing screen. */
-		BRIEFING,
-		/** level debriefing screen. */
-		DEBRIEFING
-	}
+    /** Mode (type of screen to present). */
+    public enum Mode {
+        /** initial state. */
+        INIT,
+        /** main introduction screen. */
+        INTRO,
+        /** level briefing screen. */
+        BRIEFING,
+        /** level debriefing screen. */
+        DEBRIEFING
+    }
 
-	/** Button: continue. */
-	public final static int BUTTON_CONTINUE = 0;
-	/** Button: restart level. */
-	public final static int BUTTON_RESTART = 1;
-	/** Button: back to menu. */
-	public final static int BUTTON_MENU = 2;
-	/** Button: replay level. */
-	public final static int BUTTON_REPLAY = 3;
-	/** Button: save replay. */
-	public final static int BUTTON_SAVEREPLAY = 4;
+    /** Button: continue. */
+    public static final int BUTTON_CONTINUE = 0;
+    /** Button: restart level. */
+    public static final int BUTTON_RESTART = 1;
+    /** Button: back to menu. */
+    public static final int BUTTON_MENU = 2;
+    /** Button: replay level. */
+    public static final int BUTTON_REPLAY = 3;
+    /** Button: save replay. */
+    public static final int BUTTON_SAVEREPLAY = 4;
 
-	/** y position of scroll text - pixels relative to center. */
-	private final static int SCROLL_Y = 150;
-	/** width of scroll text in characters. */
-	private final static int SCROLL_WIDTH = 39;
-	/** height of scroll text in pixels. */
-	private final static int SCROLL_HEIGHT = LemmFont.getHeight() * 2;
-	/** step width of scroll text in pixels. */
-	private final static int SCROLL_STEP = 2;
-	/** scroll text. */
-	private final static String SCROLL_TEXT = "                                           " +
-			"Lemmini - a game engine for Lemmings (tm) in Java. " +
-			"Thanks to Martin Cameron for his MicroMod Library, " +
-			"Jef Poskanzer for his GifEncoder Library, " +
-			"Mindless for his MOD conversions of the original Amiga Lemmings tunes, " +
-			"the guys of DMA Design for writing the original Lemmings, " +
-			"ccexplore and the other nice folks at the Lemmingswelt Forum for discussion and advice " +
-			"and to Sun for maintaining Java and providing the community with a free development environment.";
+    /** y position of scroll text - pixels relative to center. */
+    private static final int SCROLL_Y = 150;
+    /** width of scroll text in characters. */
+    private static final int SCROLL_WIDTH = 39;
+    /** height of scroll text in pixels. */
+    private static final int SCROLL_HEIGHT = LemmFont.getHeight() * 2;
+    /** step width of scroll text in pixels. */
+    private static final int SCROLL_STEP = 2;
+    /** scroll text. */
+    private static final String SCROLL_TEXT = "                                           "
+            + "Lemmini - a game engine for Lemmings (tm) in Java. "
+            + "Thanks to Martin Cameron for his MicroMod Library, "
+            + "Jef Poskanzer for his GifEncoder Library, "
+            + "Mindless for his MOD conversions of the original Amiga Lemmings tunes, "
+            + "the guys of DMA Design for writing the original Lemmings, "
+            + "ccexplore and the other nice folks at the Lemmingswelt Forum for discussion and advice "
+            + "and to Oracle and the OpenJDK community for maintaining Java and providing the community with a free development environment.";
 
-	/** TextDialog used as base component. */
-	private static TextDialog textScreen;
-	/** factor used for the rotation animation. */
-	private static double rotFact = 1.0;
-	/** delta used for the rotation animation. */
-	private static double rotDelta;
-	/** source image for rotation animation. */
-	private static BufferedImage imgSrc;
-	/** target image for rotation animation. */
-	private static BufferedImage imgTrg;
-	/** graphics for rotation animation. */
-	private static Graphics2D imgGfx;
-	/** flip state for rotation: true - image is flipped in Y direction. */
-	private static boolean flip;
-	/** affine transformation used for rotation animation. */
-	private static AffineTransform at;
-	/**
-	 * counter used to trigger the rotation animation (in animation update frames)
-	 */
-	private static int rotCtr;
-	/**
-	 * counter threshold used to trigger the rotation animation (in animation update
-	 * frames)
-	 */
-	private static final int maxRotCtr = 99;
-	/**
-	 * used to stop the rotation only after it was flipped twice -> original
-	 * direction
-	 */
-	private static int flipCtr;
-	/** counter for scrolled characters. */
-	private static int scrollCharCtr;
-	/** counter for scrolled pixels. */
-	private static int scrollPixCtr;
-	/** image used for scroller. */
-	private static BufferedImage scrollerImg;
-	/** graphics used for scroller. */
-	private static Graphics2D scrollerGfx;
-	/** screen type to display. */
-	private static Mode mode;
-	/** synchronization monitor. */
-	private static Object monitor = new Object();
+    /** TextDialog used as base component. */
+    private static TextDialog textScreen;
+    /** factor used for the rotation animation. */
+    private static double rotFact = 1.0;
+    /** delta used for the rotation animation. */
+    private static double rotDelta;
+    /** source image for rotation animation. */
+    private static BufferedImage imgSrc;
+    /** target image for rotation animation. */
+    private static BufferedImage imgTrg;
+    /** graphics for rotation animation. */
+    private static Graphics2D imgGfx;
+    /** flip state for rotation: true - image is flipped in Y direction. */
+    private static boolean flip;
+    /** affine transformation used for rotation animation. */
+    private static AffineTransform at;
+    /**
+     * counter used to trigger the rotation animation (in animation update
+     * frames)
+     */
+    private static int rotCtr;
+    /**
+     * counter threshold used to trigger the rotation animation (in animation
+     * update frames)
+     */
+    private static final int maxRotCtr = 99;
+    /**
+     * used to stop the rotation only after it was flipped twice -> original
+     * direction
+     */
+    private static int flipCtr;
+    /** counter for scrolled characters. */
+    private static int scrollCharCtr;
+    /** counter for scrolled pixels. */
+    private static int scrollPixCtr;
+    /** image used for scroller. */
+    private static BufferedImage scrollerImg;
+    /** graphics used for scroller. */
+    private static Graphics2D scrollerGfx;
+    /** screen type to display. */
+    private static Mode mode;
+    /** synchronization monitor. */
+    private static Object monitor = new Object();
 
-	private static double oldScale = Core.getScale();
+    private static double oldScale = Core.getScale();
 
-	/**
-	 * Set mode.
-	 *
-	 * @param m mode.
-	 */
-	public static void setMode(final Mode m) {
-		synchronized (monitor) {
-			final double scale = Core.getScale();
-			if (mode != m || oldScale != scale) {
-				switch (m) {
-					case INTRO:
-						textScreen.init();
-						textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_BROWN));
-						textScreen.printCentered("A game engine for Lemmings(tm) in Java", 0, RED);
-						textScreen.printCentered("Release 1.00 06/2023", 1, BLUE);
-						textScreen.printCentered("Coded by Volker Oth 2005-2017", 2, VIOLET);
-						textScreen.printCentered("Updated by John Watne 2023", 3, BLUE);
-						textScreen.printCentered("www.lemmini.de", 4, GREEN);
-						textScreen.copyToBackBuffer();
-						break;
-					case BRIEFING:
-						initBriefing();
-						break;
-					case DEBRIEFING:
-						initDebriefing();
-						break;
-					default:
-						break;
-				}
-			}
-			mode = m;
-			oldScale = scale;
-		}
-	}
+    /**
+     * Private constructor for utility class.
+     */
+    private TextScreen() {
 
-	/**
-	 * Initialize the briefing dialog.
-	 */
-	static void initBriefing() {
-		textScreen.init();
-		textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_GREEN));
-		final Level level = GameController.getLevel();
-		// LevelInfo li;
-		textScreen.restore();
-		// li =
-		// GameController.levelPack[GameController.curLevelPack].getInfo(GameController.curDiffLevel,
-		// GameController.curLevelNumber);
-		final String rating = GameController.getCurLevelPack().getDiffLevels()[GameController.getCurDiffLevel()];
-		textScreen.drawImage(GameController.getMapPreview(), -200);
-		textScreen.printCentered("Level " + (GameController.getCurLevelNumber() + 1) + " " + level.getLevelName(), -2,
-				RED);
-		textScreen.print("Number of Lemmings " + level.getNumLemmings(), -9, 0, BLUE);
-		textScreen.print("" + (level.getNumToRescue() * 100 / level.getNumLemmings()) + "% to be saved", -9, 1, GREEN);
-		textScreen.print("Release Rate " + level.getReleaseRate(), -9, 2, BROWN);
-		final int minutes = level.getTimeLimitSeconds() / 60;
-		final int seconds = level.getTimeLimitSeconds() % 60;
-		if (seconds == 0)
-			textScreen.print("Time         " + minutes + " Minutes", -9, 3, TURQUOISE);
-		else
-			textScreen.print("Time         " + minutes + "-" + seconds + " Minutes", -9, 3, TURQUOISE);
-		textScreen.print("Rating       " + rating, -9, 4, VIOLET);
-		textScreen.copyToBackBuffer(); // though not really needed
-	}
+    }
 
-	/**
-	 * Initialize the debriefing dialog.
-	 */
-	static void initDebriefing() {
-		textScreen.init();
-		textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_GREEN));
-		final int toRescue = GameController.getNumToRecue() * 100 / GameController.getNumLemmingsMax(); // % to rescue
-																										// of
-		// total number
-		final int rescued = GameController.getNumLeft() * 100 / GameController.getNumLemmingsMax(); // % rescued of
-																									// total
-		// number
-		final int rescuedOfToRescue = GameController.getNumLeft() * 100 / GameController.getNumToRecue(); // % rescued
-																											// of no.
-		// to rescue
-		textScreen.restore();
-		if (GameController.getTime() == 0)
-			textScreen.printCentered("Time is up.", -7, TURQUOISE);
-		else
-			textScreen.printCentered("All lemmings accounted for.", -7, TURQUOISE);
-		textScreen.print("You needed:  " + Integer.toString(toRescue) + "%", -7, -5, VIOLET);
-		textScreen.print("You rescued: " + Integer.toString(rescued) + "%", -7, -4, VIOLET);
-		if (GameController.wasLost()) {
-			if (rescued == 0) {
-				textScreen.printCentered("ROCK BOTTOM! I hope for your sake", -2, RED);
-				textScreen.printCentered("that you nuked that level", -1, RED);
-			} else if (rescuedOfToRescue < 50) {
-				textScreen.printCentered("Better rethink your strategy before", -2, RED);
-				textScreen.printCentered("you try this level again!", -1, RED);
-			} else if (rescuedOfToRescue < 95) {
-				textScreen.printCentered("A little more practice on this level", -2, RED);
-				textScreen.printCentered("is definitely recommended.", -1, RED);
-			} else {
-				textScreen.printCentered("You got pretty close that time.", -2, RED);
-				textScreen.printCentered("Now try again for that few % extra.", -1, RED);
-			}
-			textScreen.addTextButton(-2, 5, BUTTON_RESTART, "Retry", "Retry", BLUE, BROWN);
-		} else {
-			if (rescued == 100) {
-				textScreen.printCentered("Superb! You rescued every lemming on", -2, RED);
-				textScreen.printCentered("that level. Can you do it again....?", -1, RED);
-			} else if (rescued > toRescue) {
-				textScreen.printCentered("You totally stormed that level!", -2, RED);
-				textScreen.printCentered("Let's see if you can storm the next...", -1, RED);
-			} else if (rescued == toRescue) {
-				textScreen.printCentered("SPOT ON. You can't get much closer", -2, RED);
-				textScreen.printCentered("than that. Let's try the next....", -1, RED);
-			} else {
-				textScreen.printCentered("That level seemed no problem to you on", -2, RED);
-				textScreen.printCentered("that attempt. Onto the next....       ", -1, RED);
-			}
-			final LevelPack lp = GameController.getCurLevelPack();
-			final int ln = GameController.getCurLevelNumber();
-			if (lp.getLevels(GameController.getCurDiffLevel()).length > ln + 1) {
-				textScreen.printCentered("Your access code for level " + (ln + 2), 1, BROWN);
-				final int absLevel = GameController.absLevelNum(GameController.getCurLevelPackIdx(),
-						GameController.getCurDiffLevel(), ln + 1);
-				final String code = LevelCode.create(lp.getCodeSeed(), absLevel, rescued, 0, lp.getCodeOffset());
-				textScreen.printCentered("is " + code, 2, BROWN);
-				textScreen.addTextButton(-4, 5, BUTTON_CONTINUE, "Continue", "Continue", BLUE, BROWN);
-			} else {
-				textScreen.printCentered("Congratulations!", 1, BROWN);
-				textScreen.printCentered(
-						"You finished all the " + lp.getDiffLevels()[GameController.getCurDiffLevel()] + " levels!", 2,
-						GREEN);
-			}
-		}
-		textScreen.copyToBackBuffer(); // though not really needed
-		textScreen.addTextButton(-12, 4, BUTTON_REPLAY, "Replay", "Replay", BLUE, BROWN);
-		if (GameController.getCurLevelPackIdx() != 0) // not for single levels started via "load level"
-			textScreen.addTextButton(-4, 4, BUTTON_SAVEREPLAY, "Save Replay", "Save Replay", BLUE, BROWN);
-		textScreen.addTextButton(9, 4, BUTTON_MENU, "Menu", "Menu", BLUE, BROWN);
-	}
+    /**
+     * Set mode.
+     *
+     * @param m mode.
+     */
+    public static void setMode(final Mode m) {
+        synchronized (monitor) {
+            final double scale = Core.getScale();
+            if (mode != m || oldScale != scale) {
+                switch (m) {
+                case INTRO:
+                    textScreen.init();
+                    textScreen.fillBackground(
+                            MiscGfx.getImage(MiscGfx.Index.TILE_BROWN));
+                    textScreen.printCentered(
+                            "A game engine for Lemmings(tm) in Java", 0,
+                            LemmFont.Color.RED);
+                    textScreen.printCentered("Release 1.00 06/2023", 1,
+                            LemmFont.Color.BLUE);
+                    textScreen.printCentered("Coded by Volker Oth 2005-2017", 2,
+                            LemmFont.Color.VIOLET);
+                    textScreen.printCentered("Updated by John Watne 2023", 3,
+                            LemmFont.Color.BLUE);
+                    textScreen.printCentered("www.lemmini.de", 4,
+                            LemmFont.Color.GREEN);
+                    textScreen.copyToBackBuffer();
+                    break;
+                case BRIEFING:
+                    initBriefing();
+                    break;
+                case DEBRIEFING:
+                    initDebriefing();
+                    break;
+                default:
+                    break;
+                }
+            }
+            mode = m;
+            oldScale = scale;
+        }
+    }
 
-	/**
-	 * Get text dialog.
-	 *
-	 * @return text dialog.
-	 */
-	public static TextDialog getDialog() {
-		synchronized (monitor) {
-			return textScreen;
-		}
-	}
+    /**
+     * Initialize the briefing dialog.
+     */
+    static void initBriefing() {
+        textScreen.init();
+        textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_GREEN));
+        final Level level = GameController.getLevel();
+        // LevelInfo li;
+        textScreen.restore();
+        // li =
+        // GameController.levelPack[GameController.curLevelPack].getInfo(GameController.curDiffLevel,
+        // GameController.curLevelNumber);
+        final String rating = GameController.getCurLevelPack()
+                .getDiffLevels()[GameController.getCurDiffLevel()];
+        textScreen.drawImage(GameController.getMapPreview(), -200);
+        textScreen
+                .printCentered(
+                        "Level " + (GameController.getCurLevelNumber() + 1)
+                                + " " + level.getLevelName(),
+                        -2, LemmFont.Color.RED);
+        textScreen.print("Number of Lemmings " + level.getNumLemmings(), -9, 0,
+                LemmFont.Color.BLUE);
+        textScreen.print(
+                "" + (level.getNumToRescue() * 100 / level.getNumLemmings())
+                        + "% to be saved",
+                -9, 1, LemmFont.Color.GREEN);
+        textScreen.print("Release Rate " + level.getReleaseRate(), -9, 2,
+                LemmFont.Color.BROWN);
+        final int minutes = level.getTimeLimitSeconds() / 60;
+        final int seconds = level.getTimeLimitSeconds() % 60;
+        if (seconds == 0) {
+            textScreen.print("Time         " + minutes + " Minutes", -9, 3,
+                    LemmFont.Color.TURQUOISE);
+        } else {
+            textScreen.print(
+                    "Time         " + minutes + "-" + seconds + " Minutes", -9,
+                    3, LemmFont.Color.TURQUOISE);
+        }
+        textScreen.print("Rating       " + rating, -9, 4,
+                LemmFont.Color.VIOLET);
+        textScreen.copyToBackBuffer(); // though not really needed
+    }
 
-	/**
-	 * Initialize text screen.
-	 *
-	 * @param width  width in pixels
-	 * @param height height in pixels
-	 */
-	public static void init(final int width, final int height) {
-		synchronized (monitor) {
-			rotFact = 1.0;
-			rotDelta = -0.1;
-			imgSrc = MiscGfx.getImage(MiscGfx.Index.LEMMINI);
-			at = new AffineTransform();
-			flip = false;
-			rotCtr = 0;
-			flipCtr = 0;
-			imgTrg = ToolBox.createImage(imgSrc.getWidth(), imgSrc.getHeight(), Transparency.TRANSLUCENT);
-			imgGfx = imgTrg.createGraphics();
-			imgGfx.setBackground(new Color(0, 0, 0, 0)); // invisible
-			scrollCharCtr = 0;
-			scrollPixCtr = 0;
+    /**
+     * Initialize the debriefing dialog.
+     */
+    static void initDebriefing() {
+        textScreen.init();
+        textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_GREEN));
+        final int toRescue = GameController.getNumToRecue() * 100
+                / GameController.getNumLemmingsMax(); // % to rescue
+                                                      // of
+        // total number
+        final int rescued = GameController.getNumLeft() * 100
+                / GameController.getNumLemmingsMax(); // % rescued of
+                                                      // total
+        // number
+        final int rescuedOfToRescue = GameController.getNumLeft() * 100
+                / GameController.getNumToRecue(); // % rescued
+                                                  // of no.
+        // to rescue
+        textScreen.restore();
+        if (GameController.getTime() == 0) {
+            textScreen.printCentered("Time is up.", -7,
+                    LemmFont.Color.TURQUOISE);
+        } else {
+            textScreen.printCentered("All lemmings accounted for.", -7,
+                    LemmFont.Color.TURQUOISE);
+        }
+        textScreen.print("You needed:  " + Integer.toString(toRescue) + "%", -7,
+                -5, LemmFont.Color.VIOLET);
+        textScreen.print("You rescued: " + Integer.toString(rescued) + "%", -7,
+                -4, LemmFont.Color.VIOLET);
+        if (GameController.wasLost()) {
+            if (rescued == 0) {
+                textScreen.printCentered("ROCK BOTTOM! I hope for your sake",
+                        -2, LemmFont.Color.RED);
+                textScreen.printCentered("that you nuked that level", -1,
+                        LemmFont.Color.RED);
+            } else if (rescuedOfToRescue < 50) {
+                textScreen.printCentered("Better rethink your strategy before",
+                        -2, LemmFont.Color.RED);
+                textScreen.printCentered("you try this level again!", -1,
+                        LemmFont.Color.RED);
+            } else if (rescuedOfToRescue < 95) {
+                textScreen.printCentered("A little more practice on this level",
+                        -2, LemmFont.Color.RED);
+                textScreen.printCentered("is definitely recommended.", -1,
+                        LemmFont.Color.RED);
+            } else {
+                textScreen.printCentered("You got pretty close that time.", -2,
+                        LemmFont.Color.RED);
+                textScreen.printCentered("Now try again for that few % extra.",
+                        -1, LemmFont.Color.RED);
+            }
+            textScreen.addTextButton(-2, 5, BUTTON_RESTART, "Retry", "Retry",
+                    LemmFont.Color.BLUE, LemmFont.Color.BROWN);
+        } else {
+            if (rescued == 100) {
+                textScreen.printCentered("Superb! You rescued every lemming on",
+                        -2, LemmFont.Color.RED);
+                textScreen.printCentered("that level. Can you do it again....?",
+                        -1, LemmFont.Color.RED);
+            } else if (rescued > toRescue) {
+                textScreen.printCentered("You totally stormed that level!", -2,
+                        LemmFont.Color.RED);
+                textScreen.printCentered(
+                        "Let's see if you can storm the next...", -1,
+                        LemmFont.Color.RED);
+            } else if (rescued == toRescue) {
+                textScreen.printCentered("SPOT ON. You can't get much closer",
+                        -2, LemmFont.Color.RED);
+                textScreen.printCentered("than that. Let's try the next....",
+                        -1, LemmFont.Color.RED);
+            } else {
+                textScreen.printCentered(
+                        "That level seemed no problem to you on", -2,
+                        LemmFont.Color.RED);
+                textScreen.printCentered(
+                        "that attempt. Onto the next....       ", -1,
+                        LemmFont.Color.RED);
+            }
+            final LevelPack lp = GameController.getCurLevelPack();
+            final int ln = GameController.getCurLevelNumber();
+            if (lp.getLevels(GameController.getCurDiffLevel()).length > ln
+                    + 1) {
+                textScreen.printCentered(
+                        "Your access code for level " + (ln + 2), 1,
+                        LemmFont.Color.BROWN);
+                final int absLevel = GameController.absLevelNum(
+                        GameController.getCurLevelPackIdx(),
+                        GameController.getCurDiffLevel(), ln + 1);
+                final String code = LevelCode.create(lp.getCodeSeed(), absLevel,
+                        rescued, 0, lp.getCodeOffset());
+                textScreen.printCentered("is " + code, 2, LemmFont.Color.BROWN);
+                textScreen.addTextButton(-4, 5, BUTTON_CONTINUE, "Continue",
+                        "Continue", LemmFont.Color.BLUE, LemmFont.Color.BROWN);
+            } else {
+                textScreen.printCentered("Congratulations!", 1,
+                        LemmFont.Color.BROWN);
+                textScreen.printCentered("You finished all the "
+                        + lp.getDiffLevels()[GameController.getCurDiffLevel()]
+                        + " levels!", 2, LemmFont.Color.GREEN);
+            }
+        }
+        textScreen.copyToBackBuffer(); // though not really needed
+        textScreen.addTextButton(-12, 4, BUTTON_REPLAY, "Replay", "Replay",
+                LemmFont.Color.BLUE, LemmFont.Color.BROWN);
+        if (GameController.getCurLevelPackIdx() != 0) {
+            textScreen.addTextButton(-4, 4, BUTTON_SAVEREPLAY, "Save Replay",
+                    "Save Replay", LemmFont.Color.BLUE, LemmFont.Color.BROWN);
+        }
+        textScreen.addTextButton(9, 4, BUTTON_MENU, "Menu", "Menu",
+                LemmFont.Color.BLUE, LemmFont.Color.BROWN);
+    }
 
-			scrollerImg = ToolBox.createImage(LemmFont.getWidth() * (1 + SCROLL_WIDTH), SCROLL_HEIGHT,
-					Transparency.BITMASK);
-			scrollerGfx = scrollerImg.createGraphics();
-			scrollerGfx.setBackground(new Color(0, 0, 0, 0));
+    /**
+     * Get text dialog.
+     *
+     * @return text dialog.
+     */
+    public static TextDialog getDialog() {
+        synchronized (monitor) {
+            return textScreen;
+        }
+    }
 
-			textScreen = new TextDialog(width, height);
-		}
-	}
+    /**
+     * Initialize text screen.
+     *
+     * @param width  width in pixels
+     * @param height height in pixels
+     */
+    public static void init(final int width, final int height) {
+        synchronized (monitor) {
+            rotFact = 1.0;
+            rotDelta = -0.1;
+            imgSrc = MiscGfx.getImage(MiscGfx.Index.LEMMINI);
+            at = new AffineTransform();
+            flip = false;
+            rotCtr = 0;
+            flipCtr = 0;
+            imgTrg = ToolBox.createImage(imgSrc.getWidth(), imgSrc.getHeight(),
+                    Transparency.TRANSLUCENT);
+            imgGfx = imgTrg.createGraphics();
+            imgGfx.setBackground(new Color(0, 0, 0, 0)); // invisible
+            scrollCharCtr = 0;
+            scrollPixCtr = 0;
 
-	/**
-	 * Update the text screen (for animations)
-	 */
-	public static void update() {
-		synchronized (monitor) {
-			textScreen.restore();
+            scrollerImg = ToolBox.createImage(
+                    LemmFont.getWidth() * (1 + SCROLL_WIDTH), SCROLL_HEIGHT,
+                    Transparency.BITMASK);
+            scrollerGfx = scrollerImg.createGraphics();
+            scrollerGfx.setBackground(new Color(0, 0, 0, 0));
 
-			switch (mode) {
-				case INTRO:
-					update_intro();
-					break;
-				case BRIEFING:
-					update_briefing();
-					break;
-				case DEBRIEFING:
-					update_debriefing();
-					break;
-				default:
-					break;
-			}
-		}
-	}
+            textScreen = new TextDialog(width, height);
+        }
+    }
 
-	/**
-	 * Update the into screen.
-	 */
-	private static void update_intro() {
-		// manage logo rotation
-		if (++rotCtr > maxRotCtr) {
-			// animate
-			rotFact += rotDelta;
-			if (rotFact <= 0.0) {
-				// minimum size reached -> flip and increase again
-				rotFact = 0.1;
-				rotDelta = -rotDelta;
-				flip = !flip;
-			} else if (rotFact > 1.0) {
-				// maximum size reached -> decrease again
-				rotFact = 1.0;
-				rotDelta = -rotDelta;
-				// reset only after two rounds (flipped back)
-				if (++flipCtr > 1)
-					rotCtr = 0;
-			}
-			if (flip) {
-				at.setToScale(1, -rotFact);
-				at.translate(1, -imgSrc.getHeight());
-			} else
-				at.setToScale(1, rotFact);
-			final AffineTransformOp op = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-			imgGfx.clearRect(0, 0, imgTrg.getWidth(), imgTrg.getHeight());
-			op.filter(imgSrc, imgTrg);
-			textScreen.drawImage(imgTrg, -120 - (int) (imgSrc.getHeight() / 2 * Math.abs(rotFact) + 0.5));
-		} else {
-			// display original image
-			flipCtr = 0;
-			textScreen.drawImage(imgSrc, -120 - imgSrc.getHeight() / 2);
-		}
-		// manage scroller
-		String out;
-		boolean wrapAround = false;
-		int endIdx = scrollCharCtr + SCROLL_WIDTH + 1;
-		if (endIdx > SCROLL_TEXT.length()) {
-			endIdx = SCROLL_TEXT.length();
-			wrapAround = true;
-		}
-		out = SCROLL_TEXT.substring(scrollCharCtr, endIdx);
-		if (wrapAround)
-			out += SCROLL_TEXT.substring(0, scrollCharCtr + SCROLL_WIDTH + 1 - SCROLL_TEXT.length());
-		scrollerGfx.clearRect(0, 0, scrollerImg.getWidth(), scrollerImg.getHeight());
-		LemmFont.strImage(scrollerGfx, out, BLUE);
-		final int w = SCROLL_WIDTH * LemmFont.getWidth();
-		final int dx = (textScreen.getScreen().getWidth() - w) / 2;
-		final int dy = (textScreen.getScreen().getHeight() / 2) + SCROLL_Y;
-		textScreen.getScreen().createGraphics().drawImage(
-				scrollerImg, dx, dy, dx + w, dy + SCROLL_HEIGHT, scrollPixCtr, 0, scrollPixCtr + w, SCROLL_HEIGHT / 2,
-				null);
+    /**
+     * Update the text screen (for animations)
+     */
+    public static void update() {
+        synchronized (monitor) {
+            textScreen.restore();
 
-		scrollPixCtr += SCROLL_STEP;
-		if (scrollPixCtr >= LemmFont.getWidth()) {
-			scrollCharCtr++;
-			scrollPixCtr = 0;
-			if (scrollCharCtr >= SCROLL_TEXT.length())
-				scrollCharCtr = 0;
-		}
-	}
+            switch (mode) {
+            case INTRO:
+                update_intro();
+                break;
+            case BRIEFING:
+                update_briefing();
+                break;
+            case DEBRIEFING:
+                update_debriefing();
+                break;
+            default:
+                break;
+            }
+        }
+    }
 
-	/**
-	 * Update the briefing screen.
-	 */
-	private static void update_briefing() {
-	}
+    /**
+     * Update the into screen.
+     */
+    private static void update_intro() {
+        // manage logo rotation
+        if (++rotCtr > maxRotCtr) {
+            // animate
+            rotFact += rotDelta;
+            if (rotFact <= 0.0) {
+                // minimum size reached -> flip and increase again
+                rotFact = 0.1;
+                rotDelta = -rotDelta;
+                flip = !flip;
+            } else if (rotFact > 1.0) {
+                // maximum size reached -> decrease again
+                rotFact = 1.0;
+                rotDelta = -rotDelta;
+                // reset only after two rounds (flipped back)
+                if (++flipCtr > 1) {
+                    rotCtr = 0;
+                }
+            }
+            if (flip) {
+                at.setToScale(1, -rotFact);
+                at.translate(1, -imgSrc.getHeight());
+            } else {
+                at.setToScale(1, rotFact);
+            }
+            final AffineTransformOp op = new AffineTransformOp(at,
+                    AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+            imgGfx.clearRect(0, 0, imgTrg.getWidth(), imgTrg.getHeight());
+            op.filter(imgSrc, imgTrg);
+            textScreen.drawImage(imgTrg, -120
+                    - (int) (imgSrc.getHeight() / 2 * Math.abs(rotFact) + 0.5));
+        } else {
+            // display original image
+            flipCtr = 0;
+            textScreen.drawImage(imgSrc, -120 - imgSrc.getHeight() / 2);
+        }
+        // manage scroller
+        String out;
+        boolean wrapAround = false;
+        int endIdx = scrollCharCtr + SCROLL_WIDTH + 1;
+        if (endIdx > SCROLL_TEXT.length()) {
+            endIdx = SCROLL_TEXT.length();
+            wrapAround = true;
+        }
+        out = SCROLL_TEXT.substring(scrollCharCtr, endIdx);
+        if (wrapAround) {
+            out += SCROLL_TEXT.substring(0,
+                    scrollCharCtr + SCROLL_WIDTH + 1 - SCROLL_TEXT.length());
+        }
+        scrollerGfx.clearRect(0, 0, scrollerImg.getWidth(),
+                scrollerImg.getHeight());
+        LemmFont.strImage(scrollerGfx, out, LemmFont.Color.BLUE);
+        final int w = SCROLL_WIDTH * LemmFont.getWidth();
+        final int dx = (textScreen.getScreen().getWidth() - w) / 2;
+        final int dy = (textScreen.getScreen().getHeight() / 2) + SCROLL_Y;
+        textScreen.getScreen().createGraphics().drawImage(scrollerImg, dx, dy,
+                dx + w, dy + SCROLL_HEIGHT, scrollPixCtr, 0, scrollPixCtr + w,
+                SCROLL_HEIGHT / 2, null);
 
-	/**
-	 * Update the debriefing screen.
-	 */
-	private static void update_debriefing() {
-		textScreen.drawButtons();
-	}
+        scrollPixCtr += SCROLL_STEP;
+        if (scrollPixCtr >= LemmFont.getWidth()) {
+            scrollCharCtr++;
+            scrollPixCtr = 0;
+            if (scrollCharCtr >= SCROLL_TEXT.length()) {
+                scrollCharCtr = 0;
+            }
+        }
+    }
 
-	/**
-	 * Get image of text screen
-	 *
-	 * @return image of text screen
-	 */
-	public static BufferedImage getScreen() {
-		synchronized (monitor) {
-			return textScreen.getScreen();
-		}
-	}
+    /**
+     * Update the briefing screen.
+     */
+    private static void update_briefing() {}
+
+    /**
+     * Update the debriefing screen.
+     */
+    private static void update_debriefing() {
+        textScreen.drawButtons();
+    }
+
+    /**
+     * Get image of text screen
+     *
+     * @return image of text screen
+     */
+    public static BufferedImage getScreen() {
+        synchronized (monitor) {
+            return textScreen.getScreen();
+        }
+    }
 }

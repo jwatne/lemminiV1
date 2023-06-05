@@ -1,4 +1,5 @@
 package lemmini;
+
 /**
  * A customized {@link java.awt.event.WindowAdapter} that handles closing a
  * {@link Lemmini} window.
@@ -10,10 +11,10 @@ public final class WindowClosingListener extends java.awt.event.WindowAdapter {
     private final Lemmini lemmini;
 
     /**
-     * @param lemmini
+     * @param app the Lemmini application.
      */
-    WindowClosingListener(final Lemmini lemmini) {
-        this.lemmini = lemmini;
+    WindowClosingListener(final Lemmini app) {
+        this.lemmini = app;
     }
 
     @Override

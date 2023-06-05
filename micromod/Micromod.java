@@ -732,26 +732,13 @@ public class Micromod {
 
     private boolean row() {
         // Decide whether to restart.
-        boolean songend = false;
-
-        if (npat < pat) {
-            songend = true;
-        }
-
-        if (npat == pat && nrow <= row && loopcount <= 0) {
-            songend = true;
-        }
+        boolean songend = isSongEnd();
 
         // Jump to next row
         pat = npat;
         row = nrow;
         // Decide next row.
-        nrow = row + 1;
-
-        if (nrow == NUM_ROWS) {
-            npat = pat + 1;
-            nrow = 0;
-        }
+        getNextRow();
 
         // Load channels and process fx
         fcount = 0;
@@ -776,50 +763,37 @@ public class Micromod {
                     & EIGHT_BIT_MASK;
             final int effect = channels[coffset + CH_NOTE_EFFECT];
             final int eparam = channels[coffset + CH_NOTE_EPARAM];
+
             if (!(effect == FX_EXTENDED
                     && ((eparam & BITS_5_TO_8_MASK) == EX_NOTE_DELAY))) {
                 trigger(coffset);
             }
+
             channels[coffset + CH_ARPEGGIO] = 0;
             channels[coffset + CH_VIBR_PERIOD] = 0;
             channels[coffset + CH_TREM_VOLUME] = 0;
-            switch (effect) {
 
+            switch (effect) {
             case FX_TONE_PORTA:
-                if (eparam != 0) {
-                    channels[coffset + CH_PORTA_PARAM] = eparam;
-                }
+                handleFXTonePortA(coffset, eparam);
                 break;
             case FX_VIBRATO:
-                if (eparam != 0) {
-                    channels[coffset + CH_VIBR_PARAM] = eparam;
-                }
-                vibrato(coffset);
+                handleFXVibrato(coffset, eparam);
                 break;
-
             case FX_VIBRATO_VOL:
                 vibrato(coffset);
                 break;
             case FX_TREMOLO:
-                if (eparam != 0) {
-                    channels[coffset + CH_TREM_PARAM] = eparam;
-                }
-                tremolo(coffset);
+                handleFXTremolo(coffset, eparam);
                 break;
             case FX_SET_PANNING:
-                if (!amiga) {
-                    channels[coffset + CH_PANNING] = eparam;
-                }
+                handleFXSetpanning(coffset, eparam);
                 break;
             case FX_SET_SPOS:
                 channels[coffset + CH_SPOS] = eparam << FP_SHIFT + SHIFT_8_BITS;
                 break;
-
             case FX_PAT_JUMP:
-                if (loopcount <= 0) {
-                    npat = eparam;
-                    nrow = 0;
-                }
+                handleFXPatJump(eparam);
                 break;
             case FX_SET_VOLUME:
                 channels[coffset + CH_VOLUME] = (eparam > MAX_VOLUME)
@@ -827,101 +801,13 @@ public class Micromod {
                         : eparam;
                 break;
             case FX_PAT_BREAK:
-                if (loopcount <= 0) {
-                    npat = pat + 1;
-                    nrow = ((eparam & BITS_5_TO_8_MASK) >> SHIFT_4_BITS) * TEN
-                            + (eparam & FOUR_BIT_MASK);
-                }
-
+                handleFXPatBreak(eparam);
                 break;
             case FX_EXTENDED:
-                switch (eparam & BITS_5_TO_8_MASK) {
-                case EX_FINE_PORT_UP:
-                    channels[coffset + CH_PERIOD] -= (eparam & FOUR_BIT_MASK);
-                    break;
-                case EX_FINE_PORT_DN:
-                    channels[coffset + CH_PERIOD] += (eparam & FOUR_BIT_MASK);
-                    break;
-
-                case EX_SET_FINETUNE:
-                    int ftval = eparam & FOUR_BIT_MASK;
-
-                    if (ftval > MAX7) {
-                        ftval -= REDUCTION16;
-                    }
-
-                    channels[coffset + CH_FINETUNE] = ftval;
-                    break;
-                case EX_PAT_LOOP:
-                    final int plparam = eparam & FOUR_BIT_MASK;
-
-                    if (plparam == 0) {
-                        channels[coffset + CH_PAT_LOOP_ROW] = row;
-                    }
-
-                    if (plparam > 0
-                            && channels[coffset + CH_PAT_LOOP_ROW] < row) {
-                        if (loopcount <= 0) {
-                            loopcount = plparam;
-                            loopchan = chan;
-                            nrow = channels[coffset + CH_PAT_LOOP_ROW];
-                            npat = pat;
-                        } else if (loopchan == chan) {
-                            if (loopcount == 1) {
-                                channels[coffset + CH_PAT_LOOP_ROW] = row + 1;
-                            } else {
-                                nrow = channels[coffset + CH_PAT_LOOP_ROW];
-                                npat = pat;
-                            }
-                            loopcount--;
-                        }
-                    }
-                    break;
-
-                case EX_FINE_VOL_UP:
-                    int fvolup = channels[coffset + CH_VOLUME]
-                            + (eparam & FOUR_BIT_MASK);
-                    if (fvolup > MAX_VOLUME) {
-                        fvolup = MAX_VOLUME;
-                    }
-                    channels[coffset + CH_VOLUME] = fvolup;
-                    break;
-                case EX_FINE_VOL_DN:
-                    int fvoldn = channels[coffset + CH_VOLUME]
-                            - (eparam & FOUR_BIT_MASK);
-                    if (fvoldn > MAX_VOLUME) {
-                        fvoldn = 0;
-                    }
-                    channels[coffset + CH_VOLUME] = fvoldn;
-                    break;
-                case EX_NOTE_CUT:
-                    if ((eparam & FOUR_BIT_MASK) == fcount) {
-                        channels[coffset + CH_VOLUME] = 0;
-                    }
-
-                    break;
-                case EX_NOTE_DELAY:
-                    if ((eparam & FOUR_BIT_MASK) == fcount) {
-                        trigger(coffset);
-                    }
-
-                    break;
-                case EX_PAT_DELAY:
-                    tick = tempo + tempo * (eparam & FOUR_BIT_MASK);
-                    break;
-                default:
-                    break;
-                }
-
+                handleFXExtended(chan, coffset, eparam);
                 break;
             case FX_SET_SPEED:
-                if (eparam < INT_BITS) {
-                    tempo = eparam;
-                    tick = eparam;
-                } else {
-                    bpm = eparam;
-                }
-
+                handleFXSetSpeed(eparam);
                 break;
             default:
                 break;
@@ -942,24 +828,186 @@ public class Micromod {
         return songend;
     }
 
+    private void handleFXSetSpeed(final int eparam) {
+        if (eparam < INT_BITS) {
+            tempo = eparam;
+            tick = eparam;
+        } else {
+            bpm = eparam;
+        }
+    }
+
+    private void handleFXExtended(final int chan, final int coffset,
+            final int eparam) {
+        switch (eparam & BITS_5_TO_8_MASK) {
+        case EX_FINE_PORT_UP:
+            channels[coffset + CH_PERIOD] -= (eparam & FOUR_BIT_MASK);
+            break;
+        case EX_FINE_PORT_DN:
+            channels[coffset + CH_PERIOD] += (eparam & FOUR_BIT_MASK);
+            break;
+
+        case EX_SET_FINETUNE:
+            int ftval = eparam & FOUR_BIT_MASK;
+
+            if (ftval > MAX7) {
+                ftval -= REDUCTION16;
+            }
+
+            channels[coffset + CH_FINETUNE] = ftval;
+            break;
+        case EX_PAT_LOOP:
+            final int plparam = eparam & FOUR_BIT_MASK;
+
+            if (plparam == 0) {
+                channels[coffset + CH_PAT_LOOP_ROW] = row;
+            }
+
+            if (plparam > 0 && channels[coffset + CH_PAT_LOOP_ROW] < row) {
+                if (loopcount <= 0) {
+                    loopcount = plparam;
+                    loopchan = chan;
+                    nrow = channels[coffset + CH_PAT_LOOP_ROW];
+                    npat = pat;
+                } else if (loopchan == chan) {
+                    if (loopcount == 1) {
+                        channels[coffset + CH_PAT_LOOP_ROW] = row + 1;
+                    } else {
+                        nrow = channels[coffset + CH_PAT_LOOP_ROW];
+                        npat = pat;
+                    }
+                    loopcount--;
+                }
+            }
+            break;
+
+        case EX_FINE_VOL_UP:
+            int fvolup = channels[coffset + CH_VOLUME]
+                    + (eparam & FOUR_BIT_MASK);
+
+            if (fvolup > MAX_VOLUME) {
+                fvolup = MAX_VOLUME;
+            }
+
+            channels[coffset + CH_VOLUME] = fvolup;
+            break;
+        case EX_FINE_VOL_DN:
+            int fvoldn = channels[coffset + CH_VOLUME]
+                    - (eparam & FOUR_BIT_MASK);
+
+            if (fvoldn > MAX_VOLUME) {
+                fvoldn = 0;
+            }
+
+            channels[coffset + CH_VOLUME] = fvoldn;
+            break;
+        case EX_NOTE_CUT:
+            if ((eparam & FOUR_BIT_MASK) == fcount) {
+                channels[coffset + CH_VOLUME] = 0;
+            }
+
+            break;
+        case EX_NOTE_DELAY:
+            if ((eparam & FOUR_BIT_MASK) == fcount) {
+                trigger(coffset);
+            }
+
+            break;
+        case EX_PAT_DELAY:
+            tick = tempo + tempo * (eparam & FOUR_BIT_MASK);
+            break;
+        default:
+            break;
+        }
+    }
+
+    private void handleFXPatBreak(final int eparam) {
+        if (loopcount <= 0) {
+            npat = pat + 1;
+            nrow = ((eparam & BITS_5_TO_8_MASK) >> SHIFT_4_BITS) * TEN
+                    + (eparam & FOUR_BIT_MASK);
+        }
+    }
+
+    private void handleFXPatJump(final int eparam) {
+        if (loopcount <= 0) {
+            npat = eparam;
+            nrow = 0;
+        }
+    }
+
+    private void handleFXSetpanning(final int coffset, final int eparam) {
+        if (!amiga) {
+            channels[coffset + CH_PANNING] = eparam;
+        }
+    }
+
+    private void handleFXTremolo(final int coffset, final int eparam) {
+        if (eparam != 0) {
+            channels[coffset + CH_TREM_PARAM] = eparam;
+        }
+
+        tremolo(coffset);
+    }
+
+    private void handleFXVibrato(final int coffset, final int eparam) {
+        if (eparam != 0) {
+            channels[coffset + CH_VIBR_PARAM] = eparam;
+        }
+
+        vibrato(coffset);
+    }
+
+    private void handleFXTonePortA(final int coffset, final int eparam) {
+        if (eparam != 0) {
+            channels[coffset + CH_PORTA_PARAM] = eparam;
+        }
+    }
+
+    private void getNextRow() {
+        nrow = row + 1;
+
+        if (nrow == NUM_ROWS) {
+            npat = pat + 1;
+            nrow = 0;
+        }
+    }
+
+    private boolean isSongEnd() {
+        boolean songend = false;
+
+        if (npat < pat) {
+            songend = true;
+        }
+
+        if (npat == pat && nrow <= row && loopcount <= 0) {
+            songend = true;
+        }
+        return songend;
+    }
+
     private void trigger(final int coffset) {
         final int period = channels[coffset + CH_NOTE_PERIOD];
         final int instru = channels[coffset + CH_NOTE_INSTRU];
         final int effect = channels[coffset + CH_NOTE_EFFECT];
+
         if (instru != 0) {
             channels[coffset + CH_ASSIGNED] = instru;
             final int ioffset = instru * IN_STRUCT_LEN;
             channels[coffset + CH_VOLUME] = instruments[ioffset + IN_VOLUME];
             channels[coffset + CH_FINETUNE] = instruments[ioffset
                     + IN_FINETUNE];
+
             if (amiga) {
                 final int atlsta = instruments[ioffset + IN_LOOP_START];
                 final int atlend = instruments[ioffset + IN_LOOP_END];
+
                 if (atlend > atlsta) {
                     channels[coffset + CH_INSTRUMENT] = instru;
                 }
             }
         }
+
         if (period != 0) {
             channels[coffset + CH_INSTRUMENT] = channels[coffset + CH_ASSIGNED];
             channels[coffset + CH_PORTA_PERIOD] = period;

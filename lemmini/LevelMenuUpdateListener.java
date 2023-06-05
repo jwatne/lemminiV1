@@ -18,14 +18,14 @@ public class LevelMenuUpdateListener implements UpdateListener {
     private final Lemmini lemmini;
 
     /**
-     * @param lemmini
+     * @param app the Lemmini application.
      */
-    LevelMenuUpdateListener(Lemmini lemmini) {
-        this.lemmini = lemmini;
+    LevelMenuUpdateListener(final Lemmini app) {
+        this.lemmini = app;
     }
 
     @Override
-    public void update() {
+    public final void update() {
         if (GameController.getCurLevelPackIdx() != 0) { // 0 is the dummy pack
             LevelPack lvlPack = GameController
                     .getLevelPack(GameController.getCurLevelPackIdx());

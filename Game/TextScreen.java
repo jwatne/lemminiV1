@@ -35,6 +35,83 @@ import tools.ToolBox;
  */
 public final class TextScreen {
 
+    /**
+     * One half.
+     */
+    private static final double HALF = 0.5;
+    /**
+     * Y position = -120.
+     */
+    private static final int Y_120 = -120;
+    /**
+     * Rotation factor = 0.1.
+     */
+    private static final double FACTOR_POINT_ONE = 0.1;
+    /**
+     * Delta value used for rotation animation = -0.1.
+     */
+    private static final double DELTA_NEG_POINT_ONE = -0.1;
+    /**
+     * 9 charcters to the right.
+     */
+    private static final int X9 = 9;
+    /**
+     * 12 characters to the left.
+     */
+    private static final int X_12 = -12;
+    /**
+     * Line 5 relative to line 0.
+     */
+    private static final int L5 = 5;
+    /**
+     * 95 percent.
+     */
+    private static final int NINETY_FIVE_PERCENT = 95;
+    /**
+     * 50 per cent.
+     */
+    private static final int FIFTY_PERCENT = 50;
+    /**
+     * Line -4 relative to line 0.
+     */
+    private static final int L_4 = -4;
+    /**
+     * Line -5 relative to line 0.
+     */
+    private static final int L_5 = -5;
+    /**
+     * Line -7 relative to line 0.
+     */
+    private static final int L_7 = -7;
+    /**
+     * Number of seconds per minute.
+     */
+    private static final int SECONDS_PER_MINUTE = 60;
+    /**
+     * 100% = multiplier to convert decimal value to percentage.
+     */
+    private static final int ONE_HUNDRED_PERCENT = 100;
+    /**
+     * 9 characters to the left.
+     */
+    private static final int X_9 = -9;
+    /**
+     * Line -2 relative to line 0.
+     */
+    private static final int L_2 = -2;
+    /**
+     * Preview map y-position.
+     */
+    private static final int MAP_PREVIEW_Y = -200;
+    /**
+     * Line 4, relative to line 0, of text on screen.
+     */
+    private static final int L4 = 4;
+    /**
+     * Line 3, relative to line 0, of text on screen.
+     */
+    private static final int L3 = 3;
+
     /** Mode (type of screen to present). */
     public enum Mode {
         /** initial state. */
@@ -67,14 +144,20 @@ public final class TextScreen {
     /** step width of scroll text in pixels. */
     private static final int SCROLL_STEP = 2;
     /** scroll text. */
-    private static final String SCROLL_TEXT = "                                           "
-            + "Lemmini - a game engine for Lemmings (tm) in Java. "
-            + "Thanks to Martin Cameron for his MicroMod Library, "
-            + "Jef Poskanzer for his GifEncoder Library, "
-            + "Mindless for his MOD conversions of the original Amiga Lemmings tunes, "
-            + "the guys of DMA Design for writing the original Lemmings, "
-            + "ccexplore and the other nice folks at the Lemmingswelt Forum for discussion and advice "
-            + "and to Oracle and the OpenJDK community for maintaining Java and providing the community with a free development environment.";
+    private static final String SCROLL_TEXT = """
+             \s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s
+             \s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\s\
+            Lemmini - a game engine for Lemmings (tm) in Java.\s\
+            Thanks to Martin Cameron for his MicroMod Library,\s\
+            Jef Poskanzer for his GifEncoder Library,\s\
+            Mindless for his MOD conversions of the original Amiga
+             Lemmings tunes,\s\
+            the guys of DMA Design for writing the original Lemmings,\s\
+            ccexplore and the other nice folks at the Lemmingswelt Forum
+             for discussion and advice\s\
+            and to Oracle and the OpenJDK community for maintaining Java
+             and providing the community with a free development
+              environment.""";
 
     /** TextDialog used as base component. */
     private static TextDialog textScreen;
@@ -93,18 +176,18 @@ public final class TextScreen {
     /** affine transformation used for rotation animation. */
     private static AffineTransform at;
     /**
-     * counter used to trigger the rotation animation (in animation update
-     * frames)
+     * Counter used to trigger the rotation animation (in animation update
+     * frames).
      */
     private static int rotCtr;
     /**
-     * counter threshold used to trigger the rotation animation (in animation
-     * update frames)
+     * Counter threshold used to trigger the rotation animation (in animation
+     * update frames).
      */
-    private static final int maxRotCtr = 99;
+    private static final int MAX_ROT_CTR = 99;
     /**
-     * used to stop the rotation only after it was flipped twice -> original
-     * direction
+     * Used to stop the rotation only after it was flipped twice -> original
+     * direction.
      */
     private static int flipCtr;
     /** counter for scrolled characters. */
@@ -119,7 +202,9 @@ public final class TextScreen {
     private static Mode mode;
     /** synchronization monitor. */
     private static Object monitor = new Object();
-
+    /**
+     * Initial value of zoom scale.
+     */
     private static double oldScale = Core.getScale();
 
     /**
@@ -150,9 +235,9 @@ public final class TextScreen {
                             LemmFont.Color.BLUE);
                     textScreen.printCentered("Coded by Volker Oth 2005-2017", 2,
                             LemmFont.Color.VIOLET);
-                    textScreen.printCentered("Updated by John Watne 2023", 3,
+                    textScreen.printCentered("Updated by John Watne 2023", L3,
                             LemmFont.Color.BLUE);
-                    textScreen.printCentered("www.lemmini.de", 4,
+                    textScreen.printCentered("www.lemmini.de", L4,
                             LemmFont.Color.GREEN);
                     textScreen.copyToBackBuffer();
                     break;
@@ -180,36 +265,35 @@ public final class TextScreen {
         final Level level = GameController.getLevel();
         // LevelInfo li;
         textScreen.restore();
-        // li =
-        // GameController.levelPack[GameController.curLevelPack].getInfo(GameController.curDiffLevel,
-        // GameController.curLevelNumber);
         final String rating = GameController.getCurLevelPack()
                 .getDiffLevels()[GameController.getCurDiffLevel()];
-        textScreen.drawImage(GameController.getMapPreview(), -200);
+        textScreen.drawImage(GameController.getMapPreview(), MAP_PREVIEW_Y);
         textScreen
                 .printCentered(
                         "Level " + (GameController.getCurLevelNumber() + 1)
                                 + " " + level.getLevelName(),
-                        -2, LemmFont.Color.RED);
-        textScreen.print("Number of Lemmings " + level.getNumLemmings(), -9, 0,
+                        L_2, LemmFont.Color.RED);
+        textScreen.print("Number of Lemmings " + level.getNumLemmings(), X_9, 0,
                 LemmFont.Color.BLUE);
         textScreen.print(
-                "" + (level.getNumToRescue() * 100 / level.getNumLemmings())
-                        + "% to be saved",
-                -9, 1, LemmFont.Color.GREEN);
-        textScreen.print("Release Rate " + level.getReleaseRate(), -9, 2,
+                "" + (level.getNumToRescue() * ONE_HUNDRED_PERCENT
+                        / level.getNumLemmings()) + "% to be saved",
+                X_9, 1, LemmFont.Color.GREEN);
+        textScreen.print("Release Rate " + level.getReleaseRate(), X_9, 2,
                 LemmFont.Color.BROWN);
-        final int minutes = level.getTimeLimitSeconds() / 60;
-        final int seconds = level.getTimeLimitSeconds() % 60;
+        final int minutes = level.getTimeLimitSeconds() / SECONDS_PER_MINUTE;
+        final int seconds = level.getTimeLimitSeconds() % SECONDS_PER_MINUTE;
+
         if (seconds == 0) {
-            textScreen.print("Time         " + minutes + " Minutes", -9, 3,
+            textScreen.print("Time         " + minutes + " Minutes", X_9, L3,
                     LemmFont.Color.TURQUOISE);
         } else {
             textScreen.print(
-                    "Time         " + minutes + "-" + seconds + " Minutes", -9,
-                    3, LemmFont.Color.TURQUOISE);
+                    "Time         " + minutes + "-" + seconds + " Minutes", X_9,
+                    L3, LemmFont.Color.TURQUOISE);
         }
-        textScreen.print("Rating       " + rating, -9, 4,
+
+        textScreen.print("Rating       " + rating, X_9, L4,
                 LemmFont.Color.VIOLET);
         textScreen.copyToBackBuffer(); // though not really needed
     }
@@ -234,67 +318,72 @@ public final class TextScreen {
         // to rescue
         textScreen.restore();
         if (GameController.getTime() == 0) {
-            textScreen.printCentered("Time is up.", -7,
+            textScreen.printCentered("Time is up.", L_7,
                     LemmFont.Color.TURQUOISE);
         } else {
-            textScreen.printCentered("All lemmings accounted for.", -7,
+            textScreen.printCentered("All lemmings accounted for.", L_7,
                     LemmFont.Color.TURQUOISE);
         }
-        textScreen.print("You needed:  " + Integer.toString(toRescue) + "%", -7,
-                -5, LemmFont.Color.VIOLET);
-        textScreen.print("You rescued: " + Integer.toString(rescued) + "%", -7,
-                -4, LemmFont.Color.VIOLET);
+
+        textScreen.print("You needed:  " + Integer.toString(toRescue) + "%",
+                L_7, L_5, LemmFont.Color.VIOLET);
+        textScreen.print("You rescued: " + Integer.toString(rescued) + "%", L_7,
+                L_4, LemmFont.Color.VIOLET);
+
         if (GameController.wasLost()) {
             if (rescued == 0) {
                 textScreen.printCentered("ROCK BOTTOM! I hope for your sake",
-                        -2, LemmFont.Color.RED);
+                        L_2, LemmFont.Color.RED);
                 textScreen.printCentered("that you nuked that level", -1,
                         LemmFont.Color.RED);
-            } else if (rescuedOfToRescue < 50) {
+            } else if (rescuedOfToRescue < FIFTY_PERCENT) {
                 textScreen.printCentered("Better rethink your strategy before",
-                        -2, LemmFont.Color.RED);
+                        L_2, LemmFont.Color.RED);
                 textScreen.printCentered("you try this level again!", -1,
                         LemmFont.Color.RED);
-            } else if (rescuedOfToRescue < 95) {
+            } else if (rescuedOfToRescue < NINETY_FIVE_PERCENT) {
                 textScreen.printCentered("A little more practice on this level",
-                        -2, LemmFont.Color.RED);
+                        L_2, LemmFont.Color.RED);
                 textScreen.printCentered("is definitely recommended.", -1,
                         LemmFont.Color.RED);
             } else {
-                textScreen.printCentered("You got pretty close that time.", -2,
+                textScreen.printCentered("You got pretty close that time.", L_2,
                         LemmFont.Color.RED);
                 textScreen.printCentered("Now try again for that few % extra.",
                         -1, LemmFont.Color.RED);
             }
-            textScreen.addTextButton(-2, 5, BUTTON_RESTART, "Retry", "Retry",
+
+            textScreen.addTextButton(L_2, L5, BUTTON_RESTART, "Retry", "Retry",
                     LemmFont.Color.BLUE, LemmFont.Color.BROWN);
         } else {
-            if (rescued == 100) {
+            if (rescued == ONE_HUNDRED_PERCENT) {
                 textScreen.printCentered("Superb! You rescued every lemming on",
-                        -2, LemmFont.Color.RED);
+                        L_2, LemmFont.Color.RED);
                 textScreen.printCentered("that level. Can you do it again....?",
                         -1, LemmFont.Color.RED);
             } else if (rescued > toRescue) {
-                textScreen.printCentered("You totally stormed that level!", -2,
+                textScreen.printCentered("You totally stormed that level!", L_2,
                         LemmFont.Color.RED);
                 textScreen.printCentered(
                         "Let's see if you can storm the next...", -1,
                         LemmFont.Color.RED);
             } else if (rescued == toRescue) {
                 textScreen.printCentered("SPOT ON. You can't get much closer",
-                        -2, LemmFont.Color.RED);
+                        L_2, LemmFont.Color.RED);
                 textScreen.printCentered("than that. Let's try the next....",
                         -1, LemmFont.Color.RED);
             } else {
                 textScreen.printCentered(
-                        "That level seemed no problem to you on", -2,
+                        "That level seemed no problem to you on", L_2,
                         LemmFont.Color.RED);
                 textScreen.printCentered(
                         "that attempt. Onto the next....       ", -1,
                         LemmFont.Color.RED);
             }
+
             final LevelPack lp = GameController.getCurLevelPack();
             final int ln = GameController.getCurLevelNumber();
+
             if (lp.getLevels(GameController.getCurDiffLevel()).length > ln
                     + 1) {
                 textScreen.printCentered(
@@ -306,7 +395,7 @@ public final class TextScreen {
                 final String code = LevelCode.create(lp.getCodeSeed(), absLevel,
                         rescued, 0, lp.getCodeOffset());
                 textScreen.printCentered("is " + code, 2, LemmFont.Color.BROWN);
-                textScreen.addTextButton(-4, 5, BUTTON_CONTINUE, "Continue",
+                textScreen.addTextButton(L_4, L5, BUTTON_CONTINUE, "Continue",
                         "Continue", LemmFont.Color.BLUE, LemmFont.Color.BROWN);
             } else {
                 textScreen.printCentered("Congratulations!", 1,
@@ -316,14 +405,17 @@ public final class TextScreen {
                         + " levels!", 2, LemmFont.Color.GREEN);
             }
         }
+
         textScreen.copyToBackBuffer(); // though not really needed
-        textScreen.addTextButton(-12, 4, BUTTON_REPLAY, "Replay", "Replay",
+        textScreen.addTextButton(X_12, L4, BUTTON_REPLAY, "Replay", "Replay",
                 LemmFont.Color.BLUE, LemmFont.Color.BROWN);
+
         if (GameController.getCurLevelPackIdx() != 0) {
-            textScreen.addTextButton(-4, 4, BUTTON_SAVEREPLAY, "Save Replay",
+            textScreen.addTextButton(L_4, L4, BUTTON_SAVEREPLAY, "Save Replay",
                     "Save Replay", LemmFont.Color.BLUE, LemmFont.Color.BROWN);
         }
-        textScreen.addTextButton(9, 4, BUTTON_MENU, "Menu", "Menu",
+
+        textScreen.addTextButton(X9, L4, BUTTON_MENU, "Menu", "Menu",
                 LemmFont.Color.BLUE, LemmFont.Color.BROWN);
     }
 
@@ -347,7 +439,7 @@ public final class TextScreen {
     public static void init(final int width, final int height) {
         synchronized (monitor) {
             rotFact = 1.0;
-            rotDelta = -0.1;
+            rotDelta = DELTA_NEG_POINT_ONE;
             imgSrc = MiscGfx.getImage(MiscGfx.Index.LEMMINI);
             at = new AffineTransform();
             flip = false;
@@ -371,7 +463,7 @@ public final class TextScreen {
     }
 
     /**
-     * Update the text screen (for animations)
+     * Update the text screen (for animations).
      */
     public static void update() {
         synchronized (monitor) {
@@ -379,13 +471,13 @@ public final class TextScreen {
 
             switch (mode) {
             case INTRO:
-                update_intro();
+                updateIntro();
                 break;
             case BRIEFING:
-                update_briefing();
+                updateBriefing();
                 break;
             case DEBRIEFING:
-                update_debriefing();
+                updateDebriefing();
                 break;
             default:
                 break;
@@ -396,55 +488,65 @@ public final class TextScreen {
     /**
      * Update the into screen.
      */
-    private static void update_intro() {
+    private static void updateIntro() {
         // manage logo rotation
-        if (++rotCtr > maxRotCtr) {
+        if (++rotCtr > MAX_ROT_CTR) {
             // animate
             rotFact += rotDelta;
+
             if (rotFact <= 0.0) {
                 // minimum size reached -> flip and increase again
-                rotFact = 0.1;
+                rotFact = FACTOR_POINT_ONE;
                 rotDelta = -rotDelta;
                 flip = !flip;
             } else if (rotFact > 1.0) {
                 // maximum size reached -> decrease again
                 rotFact = 1.0;
                 rotDelta = -rotDelta;
+
                 // reset only after two rounds (flipped back)
                 if (++flipCtr > 1) {
                     rotCtr = 0;
                 }
             }
+
             if (flip) {
                 at.setToScale(1, -rotFact);
                 at.translate(1, -imgSrc.getHeight());
             } else {
                 at.setToScale(1, rotFact);
             }
+
             final AffineTransformOp op = new AffineTransformOp(at,
                     AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
             imgGfx.clearRect(0, 0, imgTrg.getWidth(), imgTrg.getHeight());
             op.filter(imgSrc, imgTrg);
-            textScreen.drawImage(imgTrg, -120
-                    - (int) (imgSrc.getHeight() / 2 * Math.abs(rotFact) + 0.5));
+            textScreen.drawImage(imgTrg,
+                    Y_120 - (int) (imgSrc.getHeight() / 2 * Math.abs(rotFact)
+                            + HALF));
         } else {
             // display original image
             flipCtr = 0;
-            textScreen.drawImage(imgSrc, -120 - imgSrc.getHeight() / 2);
+            textScreen.drawImage(imgSrc, Y_120 - imgSrc.getHeight() / 2);
         }
+
         // manage scroller
         String out;
         boolean wrapAround = false;
         int endIdx = scrollCharCtr + SCROLL_WIDTH + 1;
+
         if (endIdx > SCROLL_TEXT.length()) {
             endIdx = SCROLL_TEXT.length();
             wrapAround = true;
         }
+
         out = SCROLL_TEXT.substring(scrollCharCtr, endIdx);
+
         if (wrapAround) {
             out += SCROLL_TEXT.substring(0,
                     scrollCharCtr + SCROLL_WIDTH + 1 - SCROLL_TEXT.length());
         }
+
         scrollerGfx.clearRect(0, 0, scrollerImg.getWidth(),
                 scrollerImg.getHeight());
         LemmFont.strImage(scrollerGfx, out, LemmFont.Color.BLUE);
@@ -456,6 +558,7 @@ public final class TextScreen {
                 SCROLL_HEIGHT / 2, null);
 
         scrollPixCtr += SCROLL_STEP;
+
         if (scrollPixCtr >= LemmFont.getWidth()) {
             scrollCharCtr++;
             scrollPixCtr = 0;
@@ -468,17 +571,19 @@ public final class TextScreen {
     /**
      * Update the briefing screen.
      */
-    private static void update_briefing() {}
+    private static void updateBriefing() {
+
+    }
 
     /**
      * Update the debriefing screen.
      */
-    private static void update_debriefing() {
+    private static void updateDebriefing() {
         textScreen.drawButtons();
     }
 
     /**
-     * Get image of text screen
+     * Get image of text screen.
      *
      * @return image of text screen
      */

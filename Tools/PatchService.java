@@ -22,28 +22,41 @@ import extract.ExtractException;
  * Service for patching files.
  */
 public class PatchService {
-    /*
-     * Allows to use this module for creation of the CRC.ini
+    /**
+     * 4 kilobytes.
+     */
+    private static final int FOUR_KB = 4096;
+    /**
+     * Number of continuous bytes needed for re-synchronization.
+     */
+    private static final int RESYNC_LENGTH = 4;
+    /**
+     * Windows length for diff checking.
+     */
+    private static final int DIF_WINDOWS_LENGTH = 512;
+    /**
+     * Allows to use this module for creation of the CRC.ini.
      */
     private static final boolean DO_CREATE_CRC = false;
-    /*
-     * File name of patching configuration
+    /**
+     * File name of patching configuration.
      */
     private static final String PATCH_INI_NAME = "patch.ini";
     /**
-     * index for CRCs - static since multiple runs are possible
+     * index for CRCs - static since multiple runs are possible.
      */
     private static int crcNo = 0;
     /**
-     * index for files to be extracted - static since multiple runs are possible
+     * index for files to be extracted - static since multiple runs are
+     * possible.
      */
     private static int extractNo = 0;
     /**
-     * index for files to be checked - static since multiple runs are possible
+     * index for files to be checked - static since multiple runs are possible.
      */
     private static int checkNo = 0;
     /**
-     * index for files to be patched - static since multiple runs are possible
+     * index for files to be patched - static since multiple runs are possible.
      */
     private static int patchNo = 0;
     /** path of the DIF files. */
@@ -132,7 +145,7 @@ public class PatchService {
         Extract.out("\nExtract files");
 
         for (int i = 0; true; i++) {
-            String copy[] = {null, null};
+            String[] copy = {null, null};
             // 0: name 1: crc
             copy = pprops.get("extract_" + Integer.toString(i), copy);
 
@@ -162,14 +175,15 @@ public class PatchService {
     /**
      * Create CRCs for resources (development).
      *
-     * @param rPath     The root path with the files to create CRCs for
-     * @param sDir      SubDir to create patches for
-     * @param fCRCList  FileWriter to create crc.ini
-     * @param ignoreExt Array of extensions to be ignored - read from ini.
+     * @param rPath             The root path with the files to create CRCs for
+     * @param sDir              SubDir to create patches for
+     * @param fCRCList          FileWriter to create crc.ini
+     * @param ignoredExtensions Array of extensions to be ignored - read from
+     *                          ini.
      * @throws ExtractException if an extraction error occurs.
      */
     private void createCRCs(final String rPath, final String sDir,
-            final FileWriter fCRCList, final String[] ignoreExt)
+            final FileWriter fCRCList, final String[] ignoredExtensions)
             throws ExtractException {
         // add separators and create missing directories
         final String rootPath = Extract.addSeparator(rPath + sDir);
@@ -198,8 +212,8 @@ public class PatchService {
             if (pos > -1) {
                 final String ext = files[i].getName().substring(pos + 1);
 
-                for (int n = 0; n < ignoreExt.length; n++) {
-                    if (ignoreExt[n].equalsIgnoreCase(ext)) {
+                for (int n = 0; n < ignoredExtensions.length; n++) {
+                    if (ignoredExtensions[n].equalsIgnoreCase(ext)) {
                         continue outerLoop;
                     }
                 }
@@ -210,7 +224,7 @@ public class PatchService {
             try {
                 Extract.out(fnIn);
                 // read src file
-                final byte src[] = Extract.readFile(fnIn);
+                final byte[] src = Extract.readFile(fnIn);
                 final Adler32 crc32 = new Adler32();
                 crc32.update(src);
                 out = subDir + files[i].getName() + ", " + src.length + ", 0x"
@@ -233,14 +247,14 @@ public class PatchService {
      * Step 7 of Extract thread run: create patches and patch.ini.
      *
      * @param props           the Properties for the game.
-     * @param patchPath       Path of the DIF files.
+     * @param difPath         Path of the DIF files.
      * @param referencePath   Reference path for creation of DIF files.
      * @param destinationPath Destination path (Lemmini resource) for
      *                        extraction.
      * @param createdFiles    Map of files created.
      * @throws ExtractException if unable to create patches or patch.ini.
      */
-    private void createPatches(final Props props, final String patchPath,
+    private void createPatches(final Props props, final String difPath,
             final String referencePath, final String destinationPath,
             final Map<String, Object> createdFiles) throws ExtractException {
         // step seven: create patches and patch.ini
@@ -249,7 +263,7 @@ public class PatchService {
         Extract.out("\nCreate patch ini");
 
         try (FileWriter fPatchList = new FileWriter(
-                patchPath + PATCH_INI_NAME);) {
+                difPath + PATCH_INI_NAME);) {
             for (int i = 0; true; i++) {
                 String ppath;
                 ppath = props.get("ppatch_" + Integer.toString(i), "");
@@ -258,11 +272,11 @@ public class PatchService {
                     break;
                 }
 
-                createPatches(referencePath, destinationPath, ppath, patchPath,
+                createPatches(referencePath, destinationPath, ppath, difPath,
                         fPatchList, createdFiles);
             }
         } catch (final IOException ex) {
-            throw new ExtractException("Error processing " + patchPath
+            throw new ExtractException("Error processing " + difPath
                     + PATCH_INI_NAME + ": " + ex.getMessage());
         }
 
@@ -275,7 +289,7 @@ public class PatchService {
      *
      * @param sPath        The path with the original (wanted) files
      * @param dPath        The patch with the differing (to be patched) files
-     * @param subDir       SubDir to create patches for
+     * @param sDir         SubDir to create patches for
      * @param pPath        The patch to write the patches to
      * @param fPatchList   FileWriter to create patch.ini
      * @param createdFiles Map of created files.
@@ -317,7 +331,7 @@ public class PatchService {
                     + " doesn't exist or IO error occured.");
         }
 
-        Diff.setParameters(512, 4);
+        Diff.setParameters(DIF_WINDOWS_LENGTH, RESYNC_LENGTH);
         final String subDir = Extract.addSeparator(sDir);
         final String subDirDecorated = subDir.replace('/', '@');
 
@@ -357,8 +371,8 @@ public class PatchService {
             try {
                 Extract.out(fnIn);
                 // read src file
-                final byte src[] = Extract.readFile(fnIn);
-                byte trg[] = null;
+                final byte[] src = Extract.readFile(fnIn);
+                byte[] trg = null;
                 // read target file
                 boolean fileExists = targetFileExists(fnOut, createdFiles);
 
@@ -377,7 +391,7 @@ public class PatchService {
                 }
 
                 // create diff
-                final byte patch[] = Diff.diffBuffers(trg, src);
+                final byte[] patch = Diff.diffBuffers(trg, src);
                 final int crc = Diff.getTargetCRC(); // crc of target buffer
                 out = subDir + files[i].getName() + ", 0x"
                         + Integer.toHexString(crc);
@@ -425,6 +439,7 @@ public class PatchService {
      * @param filesIndex Index into <code>files</code> for the File currently
      *                   being processed.
      * @param src        The bytes read from the source file being processed.
+     * @return The path and filename of the extracted file.
      */
     private String copyMissingFilesToPatchDirectory(final FileWriter fPatchList,
             final File[] files, final String subDir, final int filesIndex,
@@ -493,7 +508,7 @@ public class PatchService {
         Extract.out("\nPatch files");
 
         for (int i = 0; true; i++) {
-            String ppath[] = {null, null};
+            String[] ppath = {null, null};
             // 0: name 1: crc
             ppath = pprops.get("patch_" + Integer.toString(i), ppath);
 
@@ -517,11 +532,11 @@ public class PatchService {
                         + ppath[0] + " failed.\n");
             }
 
-            final byte dif[] = readFile(urlDif);
-            final byte src[] = Extract.readFile(destinationPath + ppath[0]);
+            final byte[] dif = readFile(urlDif);
+            final byte[] src = Extract.readFile(destinationPath + ppath[0]);
 
             try {
-                final byte trg[] = Diff.patchbuffers(src, dif);
+                final byte[] trg = Diff.patchbuffers(src, dif);
                 // write new file
                 writeFile(destinationPath + ppath[0], trg);
             } catch (final DiffException ex) {
@@ -566,9 +581,8 @@ public class PatchService {
      */
     private void copyFile(final URL source, final String destination)
             throws FileNotFoundException, IOException {
-        try (final InputStream fSrc = source.openStream();
-                final FileOutputStream fDest = new FileOutputStream(
-                        destination);) {
+        try (InputStream fSrc = source.openStream();
+                FileOutputStream fDest = new FileOutputStream(destination);) {
             Extract.writeFromInputStreamToOutputStream(fSrc, fDest);
         }
     }
@@ -581,10 +595,10 @@ public class PatchService {
      * @throws ExtractException
      */
     private byte[] readFile(final URL fname) throws ExtractException {
-        byte buf[] = null;
+        byte[] buf = null;
 
-        try (final InputStream f = fname.openStream();) {
-            final byte buffer[] = new byte[4096];
+        try (InputStream f = fname.openStream();) {
+            final byte[] buffer = new byte[FOUR_KB];
             // URLs/InputStreams suck: we can't read a length
             int len;
             final List<Byte> lbuf = new ArrayList<Byte>();
@@ -618,9 +632,9 @@ public class PatchService {
      * @param buf   array of byte
      * @throws ExtractException
      */
-    private void writeFile(final String fname, final byte buf[])
+    private void writeFile(final String fname, final byte[] buf)
             throws ExtractException {
-        try (final FileOutputStream f = new FileOutputStream(fname);) {
+        try (FileOutputStream f = new FileOutputStream(fname);) {
             f.write(buf);
         } catch (final IOException ex) {
             throw new ExtractException(

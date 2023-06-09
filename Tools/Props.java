@@ -31,13 +31,21 @@ import java.util.Properties;
  */
 public class Props {
 
+    /**
+     * Radix for octal numbers.
+     */
+    private static final int OCTAL_RADIX = 8;
+    /**
+     * Radix for hexadecimal numbers.
+     */
+    private static final int HEX_RADIX = 16;
     /** extended hash to store properties. */
     private final Properties hash;
     /** header string. */
     private String header;
 
     /**
-     * Constructor
+     * Constructor.
      */
     public Props() {
         hash = new Properties();
@@ -45,7 +53,7 @@ public class Props {
     }
 
     /**
-     * Set the property file header
+     * Set the property file header.
      *
      * @param h String containing Header information
      */
@@ -54,14 +62,14 @@ public class Props {
     }
 
     /**
-     * Clear all properties
+     * Clear all properties.
      */
     public void clear() {
         hash.clear();
     }
 
     /**
-     * Remove key
+     * Remove key.
      *
      * @param key Name of key
      */
@@ -70,7 +78,7 @@ public class Props {
     }
 
     /**
-     * Set string property
+     * Set string property.
      *
      * @param key   Name of the key to set value for
      * @param value Value to set
@@ -80,7 +88,7 @@ public class Props {
     }
 
     /**
-     * Set integer property
+     * Set integer property.
      *
      * @param key   Name of the key to set value for
      * @param value Value to set
@@ -90,7 +98,7 @@ public class Props {
     }
 
     /**
-     * Set boolean property
+     * Set boolean property.
      *
      * @param key   Name of the key to set value for
      * @param value Value to set
@@ -100,7 +108,7 @@ public class Props {
     }
 
     /**
-     * Set double property
+     * Set double property.
      *
      * @param key   Name of the key to set value for
      * @param value Value to set
@@ -110,7 +118,7 @@ public class Props {
     }
 
     /**
-     * Get string property
+     * Get string property.
      *
      * @param key Name of the key to get value for
      * @param def Default value in case key is not found
@@ -122,7 +130,7 @@ public class Props {
     }
 
     /**
-     * Get integer property
+     * Get integer property.
      *
      * @param key Name of the key to get value for
      * @param def Default value in case key is not found
@@ -130,15 +138,17 @@ public class Props {
      */
     public int get(final String key, final int def) {
         String s = hash.getProperty(key);
+
         if (s == null) {
             return def;
         }
+
         s = removeComment(s);
         return parseString(s);
     }
 
     /**
-     * Get integer array property
+     * Get integer array property.
      *
      * @param key Name of the key to get value for
      * @param def Default value in case key is not found
@@ -146,11 +156,14 @@ public class Props {
      */
     public int[] get(final String key, final int[] def) {
         String s = hash.getProperty(key);
+
         if (s == null) {
             return def;
         }
+
         s = removeComment(s);
         final String[] members = s.split(",");
+
         // remove trailing and leading spaces
         for (int i = 0; i < members.length; i++) {
             members[i] = trim(members[i]);
@@ -158,6 +171,7 @@ public class Props {
 
         int[] ret;
         ret = new int[members.length];
+
         for (int i = 0; i < members.length; i++) {
             ret[i] = parseString(members[i]);
         }
@@ -166,7 +180,7 @@ public class Props {
     }
 
     /**
-     * Get string array property
+     * Get string array property.
      *
      * @param key Name of the key to get value for
      * @param def Default value in case key is not found
@@ -174,11 +188,14 @@ public class Props {
      */
     public String[] get(final String key, final String[] def) {
         String s = hash.getProperty(key);
+
         if (s == null) {
             return def;
         }
+
         s = removeComment(s);
         final String[] members = s.split(",");
+
         // remove trailing and leading spaces
         for (int i = 0; i < members.length; i++) {
             members[i] = trim(members[i]);
@@ -188,7 +205,7 @@ public class Props {
     }
 
     /**
-     * Get boolean property
+     * Get boolean property.
      *
      * @param key Name of the key to get value for
      * @param def Default value in case key is not found
@@ -196,15 +213,17 @@ public class Props {
      */
     public boolean get(final String key, final boolean def) {
         String s = hash.getProperty(key);
+
         if (s == null) {
             return def;
         }
+
         s = removeComment(s);
         return Boolean.valueOf(s).booleanValue();
     }
 
     /**
-     * Get double property
+     * Get double property.
      *
      * @param key Name of the key to get value for
      * @param def default value in case key is not found
@@ -222,13 +241,13 @@ public class Props {
     }
 
     /**
-     * Save property file
+     * Save property file.
      *
      * @param fname File name of property file
      * @return True if OK, false if exception occurred
      */
     public boolean save(final String fname) {
-        try (final FileOutputStream f = new FileOutputStream(fname)) {
+        try (FileOutputStream f = new FileOutputStream(fname)) {
             hash.store(f, header);
             return true;
         } catch (final FileNotFoundException e) {
@@ -239,13 +258,13 @@ public class Props {
     }
 
     /**
-     * Load property file
+     * Load property file.
      *
      * @param file File handle of property file
      * @return True if OK, false if exception occurred
      */
     public boolean load(final URL file) {
-        try (final InputStream f = file.openStream()) {
+        try (InputStream f = file.openStream()) {
             hash.load(f);
             return true;
         } catch (final FileNotFoundException e) {
@@ -256,13 +275,13 @@ public class Props {
     }
 
     /**
-     * Load property file
+     * Load property file.
      *
      * @param fname File name of property file
      * @return True if OK, false if exception occurred
      */
     public boolean load(final String fname) {
-        try (final FileInputStream f = new FileInputStream(fname)) {
+        try (FileInputStream f = new FileInputStream(fname)) {
             hash.load(f);
             return true;
         } catch (final FileNotFoundException e) {
@@ -273,7 +292,7 @@ public class Props {
     }
 
     /**
-     * Parse hex, binary or octal number
+     * Parse hex, binary or octal number.
      *
      * @param s String that contains one number
      * @return Integer value of string
@@ -287,11 +306,11 @@ public class Props {
             if (s.length() == 1) {
                 return 0;
             } else if (s.length() > 2 && s.charAt(1) == 'x') {
-                return Integer.parseInt(s.substring(2), 16); // hex
+                return Integer.parseInt(s.substring(2), HEX_RADIX); // hex
             } else if (s.charAt(1) == 'b') { // binary
                 return Integer.parseInt(s.substring(2), 2);
             } else {
-                return Integer.parseInt(s, 8); // octal
+                return Integer.parseInt(s, OCTAL_RADIX); // octal
             }
         }
 
@@ -323,7 +342,7 @@ public class Props {
     }
 
     /**
-     * Remove trailing and leading spaces from a string
+     * Remove trailing and leading spaces from a string.
      *
      * @param s String to process
      * @return String without leading and trailing spaces
@@ -331,15 +350,21 @@ public class Props {
     private static String trim(final String s) {
         // search first character that is not a space
         int spos;
+
         for (spos = 0; spos < s.length(); spos++) {
-            if (s.charAt(spos) != ' ')
+            if (s.charAt(spos) != ' ') {
                 break;
+            }
         }
+
         int epos;
+
         for (epos = s.length() - 1; epos > spos; epos--) {
-            if (s.charAt(epos) != ' ')
+            if (s.charAt(epos) != ' ') {
                 break;
+            }
         }
+
         return s.substring(spos, epos + 1);
     }
 }

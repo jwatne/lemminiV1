@@ -16,10 +16,9 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import game.Lemming.Type;
 import gameutil.Fader;
 import gameutil.FaderState;
-import gameutil.KeyRepeat;
-import gameutil.Sound;
 import gameutil.Sprite;
 import tools.MicrosecondTimer;
 import tools.ToolBox;
@@ -30,42 +29,6 @@ import tools.ToolBox;
  * @author Volker Oth
  */
 public final class GameController {
-    /**
-     * Horizontal spacing between lemming skill selection icons, in pixels.
-     */
-    private static final int ICON_HORIZONTAL_SPACING = 8;
-    /**
-     * Index for the diggers selection button.
-     */
-    private static final int DIGGERS_INDEX = 9;
-    /**
-     * Index for the miners selection button.
-     */
-    private static final int MINERS_INDEX = 8;
-    /**
-     * Index for the bashers selection button.
-     */
-    private static final int BASHERS_INDEX = 7;
-    /**
-     * Index for the builders selection button.
-     */
-    private static final int BUILDERS_INDEX = 6;
-    /**
-     * Index for the blockers selection button.
-     */
-    private static final int BLOCKERS_INDEX = 5;
-    /**
-     * Index for the bombers selection button.
-     */
-    private static final int BOMBERS_INDEX = 4;
-    /**
-     * Index for the floaters selection button.
-     */
-    private static final int FLOATERS_INDEX = 3;
-    /**
-     * The base lemming release rate.
-     */
-    private static final int BASE_RELEASE_RATE = 8;
     /**
      * Standard value of 10.
      */
@@ -95,10 +58,6 @@ public final class GameController {
      */
     private static final int INITIAL_CAPACITY = 10;
     /**
-     * Number of sound samples to use.
-     */
-    private static final int NUM_SAMPLES = 24;
-    /**
      * Maximum hexidecimal value for an RGBA color component.
      */
     private static final int MAX_COLOR_COMPONENT_VALUE = 0xff;
@@ -107,55 +66,6 @@ public final class GameController {
     public static final int KEYREPEAT_ICON = 1;
     /** key repeat bitmask for keys. */
     public static final int KEYREPEAT_KEY = 2;
-
-    /** bang sound. */
-    public static final int SND_BANG = 0;
-    /** brick wheel trap sound. */
-    public static final int SND_CHAIN = 1;
-    /** setting new skill sound. */
-    public static final int SND_CHANGE_OP = 2;
-    /** only some builder steps left sound. */
-    public static final int SND_CHINK = 3;
-    /** dieing sound. */
-    public static final int SND_DIE = 4;
-    /** trap door opening sound. */
-    public static final int SND_DOOR = 5;
-    /** electric sound. */
-    public static final int SND_ELECTRIC = 6;
-    /** explode sound. */
-    public static final int SND_EXPLODE = 7;
-    /** fire sound. */
-    public static final int SND_FIRE = 8;
-    /** drowning sound. */
-    public static final int SND_GLUG = 9;
-    /** start of level sound. */
-    public static final int SND_LETSGO = 10;
-    /** bear/twiner trap sound. */
-    public static final int SND_MANTRAP = 11;
-    /** mouse clicked sound. */
-    public static final int SND_MOUSEPRE = 12;
-    /** nuke command sound. */
-    public static final int SND_OHNO = 13;
-    /** leaving exit sound. */
-    public static final int SND_OING = 14;
-    /** scrape sound. */
-    public static final int SND_SCRAPE = 15;
-    /** slicer sound. */
-    public static final int SND_SLICER = 16;
-    /** splash sound. */
-    public static final int SND_SPLASH = 17;
-    /** faller splat sound. */
-    public static final int SND_SPLAT = 18;
-    /** ten tons sound, also pipe sucking lemmings in. */
-    public static final int SND_TEN_TONS = 19;
-    /** icycle, brick stamper sound. */
-    public static final int SND_THUD = 20;
-    /** thunk sound. */
-    public static final int SND_THUNK = 21;
-    /** ting sound. */
-    public static final int SND_TING = 22;
-    /** yipee sound. */
-    public static final int SND_YIPEE = 23;
 
     /** updates 5 frames instead of 1 in fast forward mode. */
     public static final int FAST_FWD_MULTI = 5;
@@ -177,54 +87,11 @@ public final class GameController {
     /** one second is 33.33 ticks (integer would cause error). */
     private static final double MAX_SECOND_CTR = 1000.0 * 1000
             / MICROSEC_PER_FRAME;
-    /** maximum release rate. */
-    private static final int MAX_RELEASE_RATE = 99;
-
-    /**
-     * Nuke icon: maximum time between two mouse clicks for double click
-     * detection (in microseconds).
-     */
-    private static final long MICROSEC_NUKE_DOUBLE_CLICK = 240 * 1000;
-
-    /**
-     * +/- icons: maximum time between two mouse clicks for double click
-     * detection (in microseconds).
-     */
-    private static final long MICROSEC_RELEASE_DOUBLE_CLICK = 200 * 1000;
-    /** +/- icons: time for key repeat to kick in. */
-    private static final long MICROSEC_KEYREPEAT_START = 250 * 1000;
-    /** +/- icons: time for key repeat rate. */
-    private static final long MICROSEC_KEYREPEAT_REPEAT = 67 * 1000;
-
-    /** sound object. */
-    private static Sound sound;
-
-    /**
-     * Returns sound object.
-     *
-     * @return sound object.
-     */
-    public static Sound getSound() {
-        return sound;
-    }
-
-    /**
-     * Sets sound object.
-     *
-     * @param soundObject sound object.
-     */
-    public static void setSound(final Sound soundObject) {
-        GameController.sound = soundObject;
-    }
 
     /** the background stencil. */
     private static Stencil stencil;
     /** the background image. */
     private static BufferedImage bgImage;
-    /** flag: play music. */
-    private static boolean musicOn;
-    /** flag: play sounds. */
-    private static boolean soundOn;
     /** flag: use advanced mouse selection methods. */
     private static boolean advancedSelect;
     /** flag: use classical mouse cursor behavior. */
@@ -242,11 +109,9 @@ public final class GameController {
     private static GameState gameState;
     /** transition (fading) state. */
     private static TransitionState transitionState;
-    /** skill to assign to lemming (skill icon). */
-    private static Lemming.Type lemmSkill;
     /** flag: entry is openend. */
     private static boolean entryOpened;
-    /** flag: nuke was acticated. */
+    /** flag: nuke was activated. */
     private static boolean nuke;
     /** flag: game is paused. */
     private static boolean paused;
@@ -260,8 +125,6 @@ public final class GameController {
     private static double secondCtr;
     /** frame counter used to handle release of new Lemmings. */
     private static int releaseCtr;
-    /** threshold to release a new Lemming. */
-    private static int releaseBase;
     /** frame counter used to update animated sprite objects. */
     private static int animCtr;
     /** level object. */
@@ -288,12 +151,25 @@ public final class GameController {
     private static LevelPack[] levelPack;
     /** small preview version of level used in briefing screen. */
     private static BufferedImage mapPreview;
-    /** timer used for nuking. */
-    private static MicrosecondTimer timerNuke;
-    /** key repeat object for plus key/icon. */
-    private static KeyRepeat plus;
-    /** key repeat object for minus key/icon. */
-    private static KeyRepeat minus;
+
+    /**
+     * Indicates whether nuke was activated.
+     *
+     * @return <code>true</code> if nuke was activated.
+     */
+    public static boolean isNuke() {
+        return nuke;
+    }
+
+    /**
+     * Sets whether nuke was activated.
+     *
+     * @param nukeActivated <code>true</code> if nuke was activated.
+     */
+    public static void setNuke(final boolean nukeActivated) {
+        GameController.nuke = nukeActivated;
+    }
+
     /** Lemming for which skill change is requested. */
     private static Lemming lemmSkillRequest;
     /** horizontal scrolling offset for level. */
@@ -318,8 +194,7 @@ public final class GameController {
     private static UpdateListener levelMenuUpdateListener;
     /** number of Lemmings which left the level. */
     private static int numLeft;
-    /** release rate 0..99. */
-    private static int releaseRate;
+
     /** number of Lemmings available. */
     private static int numLemmingsMax;
     /** number of Lemmings who entered the level. */
@@ -328,28 +203,8 @@ public final class GameController {
     private static int numToRecue;
     /** time left in seconds. */
     private static int time;
-    /** number of climber skills left to be assigned. */
-    private static int numClimbers;
-    /** number of floater skills left to be assigned. */
-    private static int numFloaters;
-    /** number of bomber skills left to be assigned. */
-    private static int numBombers;
-    /** number of blocker skills left to be assigned. */
-    private static int numBlockers;
-    /** number of builder skills left to be assigned. */
-    private static int numBuilders;
-    /** number of basher skills left to be assigned. */
-    private static int numBashers;
-    /** number of miner skills left to be assigned. */
-    private static int numMiners;
-    /** number of digger skills left to be assigned. */
-    private static int numDiggers;
     /** free running update counter. */
     private static int updateCtr;
-    /** gain for sound 0..1.0. */
-    private static double soundGain = 1.0;
-    /** gain for music 0..1.0. */
-    private static double musicGain = 1.0;
 
     /**
      * Private constructor for utility class.
@@ -370,8 +225,7 @@ public final class GameController {
                 Transparency.BITMASK);
         bgGfx = bgImage.createGraphics();
         gameState = GameState.INIT;
-        sound = new Sound(NUM_SAMPLES, SND_MOUSEPRE);
-        sound.setGain(soundGain);
+        SoundController.initSound();
         Icons.init(frame);
         Explosion.init(frame);
         Lemming.loadLemmings(frame);
@@ -383,13 +237,10 @@ public final class GameController {
         NumFont.init(frame);
         LemmCursor.init(frame);
         Music.init();
-        Music.setGain(musicGain);
+        Music.setGain(SoundController.getMusicGain());
         MiscGfx.init(frame);
-        plus = new KeyRepeat(MICROSEC_KEYREPEAT_START,
-                MICROSEC_KEYREPEAT_REPEAT, MICROSEC_RELEASE_DOUBLE_CLICK);
-        minus = new KeyRepeat(MICROSEC_KEYREPEAT_START,
-                MICROSEC_KEYREPEAT_REPEAT, MICROSEC_RELEASE_DOUBLE_CLICK);
-        timerNuke = new MicrosecondTimer();
+        ReleaseRateHandler.init();
+        SkillHandler.setTimerNuke(new MicrosecondTimer());
         level = new Level();
         // read level packs
         final File dir = new File(Core.getResourcePath() + "levels");
@@ -585,32 +436,25 @@ public final class GameController {
         entryOpenCtr = 0;
         secondCtr = 0;
         releaseCtr = 0;
-        lemmSkill = Lemming.Type.UNDEFINED;
-        plus.init();
-        minus.init();
+        SkillHandler.setLemmSkill(Lemming.Type.UNDEFINED);
+        ReleaseRateHandler.initLevel();
         numLeft = 0;
-        releaseRate = getLevel().getReleaseRate();
+        final int releaseRate = getLevel().getReleaseRate();
+        ReleaseRateHandler.setReleaseRate(releaseRate);
         numLemmingsMax = getLevel().getNumLemmings();
         numLemmingsOut = 0;
         numToRecue = getLevel().getNumToRescue();
         time = getLevel().getTimeLimitSeconds();
-        numClimbers = getLevel().getNumClimbers();
-        numFloaters = getLevel().getNumFloaters();
-        numBombers = getLevel().getNumBombers();
-        numBlockers = getLevel().getNumBlockers();
-        numBuilders = getLevel().getNumBuilders();
-        numBashers = getLevel().getNumBashers();
-        numMiners = getLevel().getNumMiners();
-        numDiggers = getLevel().getMumDiggers();
+        SkillHandler.initLevel(getLevel());
         setxPos(getLevel().getXpos());
-        calcReleaseBase();
+        ReleaseRateHandler.calcReleaseBase();
         mapPreview = getLevel().createMiniMap(mapPreview, bgImage, SCALE_FACTOR,
                 SCALE_FACTOR, false);
         setSuperLemming(getLevel().isSuperLemming());
         replayFrame = 0;
         stopReplayMode = false;
         releaseRateOld = releaseRate;
-        lemmSkillOld = lemmSkill;
+        lemmSkillOld = SkillHandler.getLemmSkill();
         nukeOld = false;
         xPosOld = getLevel().getXpos();
         gameState = GameState.BRIEFING;
@@ -731,70 +575,6 @@ public final class GameController {
     }
 
     /**
-     * Get a Lemming under the selection cursor.
-     *
-     * @param type cursor type
-     * @return fitting Lemming or null if none found
-     */
-    public static synchronized Lemming lemmUnderCursor(
-            final LemmCursor.Type type) {
-        // search for level without the skill
-        for (int i = 0; i < getLemmsUnderCursor().size(); i++) {
-            final Lemming l = getLemmsUnderCursor().get(i);
-
-            // Walker only cursor: ignore non-walkers
-            if (type == LemmCursor.Type.WALKER
-                    && l.getSkill() != Lemming.Type.WALKER) {
-                continue;
-            }
-
-            if (type == LemmCursor.Type.LEFT
-                    && l.getDirection() != Lemming.Direction.LEFT) {
-                continue;
-            }
-
-            if (type == LemmCursor.Type.RIGHT
-                    && l.getDirection() != Lemming.Direction.RIGHT) {
-                continue;
-            }
-
-            switch (lemmSkill) {
-            case CLIMBER:
-                if (!l.canClimb()) {
-                    return l;
-                }
-                break;
-            case FLOATER:
-                if (!l.canFloat()) {
-                    return l;
-                }
-                break;
-            default:
-                if (l.canChangeSkill() && l.getSkill() != lemmSkill
-                        && l.getName().length() > 0) {
-                    // System.out.println(l.getName());
-                    return l;
-                }
-            }
-
-            break;
-        }
-
-        if (type == LemmCursor.Type.NORMAL
-                && getLemmsUnderCursor().size() > 0) {
-            final Lemming l = getLemmsUnderCursor().get(0);
-
-            if (l.getName().length() == 0) {
-                return null;
-            }
-
-            return l;
-        }
-
-        return null;
-    }
-
-    /**
      * Lemming has left the Level.
      */
     static synchronized void increaseLeft() {
@@ -804,7 +584,7 @@ public final class GameController {
     /**
      * Stop replay.
      */
-    private static void stopReplayMode() {
+    public static void stopReplayMode() {
         if (replayMode) {
             stopReplayMode = true;
         }
@@ -841,7 +621,7 @@ public final class GameController {
         }
 
         // check +/- buttons also if paused
-        checkPlusMinusButtons();
+        ReleaseRateHandler.checkPlusMinusButtons();
 
         if (isPaused()) {
             return;
@@ -943,16 +723,13 @@ public final class GameController {
                             .setAnimMode(Sprite.Animation.ONCE);
                 }
 
-                sound.play(SND_DOOR);
+                SoundController.playTrapDoorOpenSound();
             } else if (entryOpenCtr == MAX_ENTRY_OPEN_CTR
                     + DECIMAL_10 * MAX_ANIM_CTR) {
-                // System.out.println("opened");
                 entryOpened = true;
-                releaseCtr = releaseBase; // first lemming to enter at once
-
-                if (musicOn) {
-                    Music.play();
-                }
+                releaseCtr = ReleaseRateHandler.getReleaseBase();
+                // first lemming to enter at once
+                SoundController.playMusicIfMusicOn();
             }
         }
     }
@@ -984,7 +761,7 @@ public final class GameController {
     private static void releaseLemmings(final boolean nukeTemp) {
         if (entryOpened && !nukeTemp && !isPaused()
                 && numLemmingsOut < getNumLemmingsMax()
-                && ++releaseCtr >= releaseBase) {
+                && ++releaseCtr >= ReleaseRateHandler.getReleaseBase()) {
             releaseCtr = 0;
 
             try {
@@ -1032,14 +809,16 @@ public final class GameController {
         while ((r = replay.getNext(replayFrame)) != null) {
             switch (r.type) {
             case ReplayStream.ASSIGN_SKILL:
-                assignSkillAndDecrementAvailable((ReplayAssignSkillEvent) r);
-                sound.play(SND_CHANGE_OP);
+                SkillHandler.assignSkillAndDecrementAvailable(
+                        (ReplayAssignSkillEvent) r, lemmings);
+                SoundController.playSettingNewSKillSound();
                 break;
             case ReplayStream.SET_RELEASE_RATE:
                 final ReplayReleaseRateEvent rr = (ReplayReleaseRateEvent) r;
-                releaseRate = rr.releaseRate;
-                calcReleaseBase();
-                sound.playPitched(releaseRate);
+                ReleaseRateHandler.setReleaseRate(rr.releaseRate);
+                ReleaseRateHandler.calcReleaseBase();
+                SoundController
+                        .playPitched(ReleaseRateHandler.getReleaseRate());
                 break;
             case ReplayStream.NUKE:
                 nuke = true;
@@ -1049,93 +828,11 @@ public final class GameController {
                 setxPos(rx.xPos);
                 break;
             case ReplayStream.SELECT_SKILL:
-                selectSkill((ReplaySelectSkillEvent) r);
+                SkillHandler.selectSkill((ReplaySelectSkillEvent) r);
                 break;
             default:
                 break;
             }
-        }
-    }
-
-    /**
-     * Selects the specified skill.
-     *
-     * @param rsse the ReplayEvent for selecting the skill.
-     */
-    private static void selectSkill(final ReplaySelectSkillEvent rsse) {
-        lemmSkill = rsse.skill;
-
-        switch (lemmSkill) {
-        case FLOATER:
-            Icons.press(Icons.Type.FLOAT);
-            break;
-        case CLIMBER:
-            Icons.press(Icons.Type.CLIMB);
-            break;
-        case BOMBER:
-            Icons.press(Icons.Type.BOMB);
-            break;
-        case DIGGER:
-            Icons.press(Icons.Type.DIG);
-            break;
-        case BASHER:
-            Icons.press(Icons.Type.BASH);
-            break;
-        case BUILDER:
-            Icons.press(Icons.Type.BUILD);
-            break;
-        case MINER:
-            Icons.press(Icons.Type.MINE);
-            break;
-        case STOPPER:
-            Icons.press(Icons.Type.BLOCK);
-            break;
-        default:
-            break;
-        }
-    }
-
-    /**
-     * Assigns the selected skill to a lemming and decrements the count of
-     * available number of that skill by 1.
-     *
-     * @param rs the ReplayAssignSkillEvent for assigning the skill.
-     */
-    private static void assignSkillAndDecrementAvailable(
-            final ReplayAssignSkillEvent rs) {
-        synchronized (lemmings) {
-            final Lemming l = lemmings.get(rs.lemming);
-            l.setSkill(rs.skill);
-            l.setSelected();
-        }
-
-        switch (rs.skill) {
-        case FLOATER:
-            numFloaters -= 1;
-            break;
-        case CLIMBER:
-            numClimbers -= 1;
-            break;
-        case BOMBER:
-            numBombers -= 1;
-            break;
-        case DIGGER:
-            numDiggers -= 1;
-            break;
-        case BASHER:
-            numBashers -= 1;
-            break;
-        case BUILDER:
-            numBuilders -= 1;
-            break;
-        case MINER:
-            numMiners -= 1;
-            break;
-        case STOPPER:
-            numBlockers -= 1;
-            break;
-        default:
-            break;
         }
     }
 
@@ -1145,6 +842,8 @@ public final class GameController {
     private static void handleNonReplayModeUpdate() {
         if (!wasCheated) {
             // replay: release rate changed?
+            final int releaseRate = ReleaseRateHandler.getReleaseRate();
+
             if (releaseRate != releaseRateOld) {
                 replay.addReleaseRateEvent(replayFrame, releaseRate);
                 releaseRateOld = releaseRate;
@@ -1161,6 +860,8 @@ public final class GameController {
                 replay.addXPosEvent(replayFrame, getxPos());
                 xPosOld = getxPos();
             }
+
+            final Type lemmSkill = SkillHandler.getLemmSkill();
 
             // skill changed
             if (lemmSkill != lemmSkillOld) {
@@ -1185,53 +886,15 @@ public final class GameController {
     }
 
     /**
-     * Processes clicks of plus and minus buttons.
-     */
-    private static void checkPlusMinusButtons() {
-        KeyRepeat.Event fired = plus.fired();
-
-        if (fired != KeyRepeat.Event.NONE) {
-            if (releaseRate < MAX_RELEASE_RATE) {
-                if (fired == KeyRepeat.Event.DOUBLE_CLICK) {
-                    releaseRate = MAX_RELEASE_RATE;
-                } else {
-                    releaseRate += 1;
-                }
-
-                calcReleaseBase();
-                sound.playPitched(releaseRate);
-            } else {
-                sound.play(SND_TING);
-            }
-        }
-
-        fired = minus.fired();
-
-        if (fired != KeyRepeat.Event.NONE) {
-            if (releaseRate > getLevel().getReleaseRate()) {
-                if (fired == KeyRepeat.Event.DOUBLE_CLICK) {
-                    releaseRate = getLevel().getReleaseRate();
-                } else {
-                    releaseRate -= 1;
-                }
-
-                calcReleaseBase();
-                sound.playPitched(releaseRate);
-            } else {
-                sound.play(SND_TING);
-            }
-        }
-    }
-
-    /**
      * Request a skill change for a Lemming (currently selected skill).
      *
      * @param lemm Lemming
      */
     public static synchronized void requestSkill(final Lemming lemm) {
-        if (lemmSkill != Lemming.Type.UNDEFINED) {
+        if (SkillHandler.getLemmSkill() != Lemming.Type.UNDEFINED) {
             lemmSkillRequest = lemm;
         }
+
         stopReplayMode();
     }
 
@@ -1241,7 +904,9 @@ public final class GameController {
      * @param delete flag: reset the current skill request
      */
     private static synchronized void assignSkill(final boolean delete) {
-        if (lemmSkillRequest == null || lemmSkill == Lemming.Type.UNDEFINED) {
+        final Type lemmSkill = SkillHandler.getLemmSkill();
+
+        if (lemmSkillRequest == null || Lemming.Type.UNDEFINED == lemmSkill) {
             return;
         }
 
@@ -1256,7 +921,7 @@ public final class GameController {
 
         if (canSet) {
             lemmSkillRequest = null; // erase request
-            sound.play(SND_MOUSEPRE);
+            SoundController.playMouseClickedSound();
 
             if (isPaused()) {
                 setPaused(false);
@@ -1278,7 +943,7 @@ public final class GameController {
                 }
             }
         } else if (delete) {
-            sound.play(SND_TING);
+            SoundController.playTingSound();
         }
     }
 
@@ -1293,235 +958,12 @@ public final class GameController {
         boolean canSet = false;
 
         if (isCheat()) {
-            canSet = lemm.setSkill(lemmSkill);
+            canSet = lemm.setSkill(SkillHandler.getLemmSkill());
         } else {
-            canSet = canSetSkillOfLemmingIfNotCheatMode(lemm);
+            canSet = SkillHandler.canSetSkillOfLemmingIfNotCheatMode(lemm);
         }
 
         return canSet;
-    }
-
-    /**
-     * Indicates whether the lemming's skill can be set to the selected one,
-     * given that cheat mode is NOT enabled.
-     *
-     * @param lemm the lemming whose skill is to be set, if possible.
-     * @return <code>true</code> if the lemming's skill can be set to the
-     *         selected one, given that cheat mode is NOT enabled.
-     */
-    private static boolean canSetSkillOfLemmingIfNotCheatMode(
-            final Lemming lemm) {
-        boolean canSet = false;
-
-        switch (lemmSkill) {
-        case BASHER:
-            if (numBashers > 0 && lemm.setSkill(lemmSkill)) {
-                numBashers -= 1;
-                canSet = true;
-            }
-
-            break;
-        case BOMBER:
-            if (numBombers > 0 && lemm.setSkill(lemmSkill)) {
-                numBombers -= 1;
-                canSet = true;
-            }
-
-            break;
-        case BUILDER:
-            if (numBuilders > 0 && lemm.setSkill(lemmSkill)) {
-                numBuilders -= 1;
-                canSet = true;
-            }
-
-            break;
-        case CLIMBER:
-            if (numClimbers > 0 && lemm.setSkill(lemmSkill)) {
-                numClimbers -= 1;
-                canSet = true;
-            }
-
-            break;
-        case DIGGER:
-            if (numDiggers > 0 && lemm.setSkill(lemmSkill)) {
-                numDiggers -= 1;
-                canSet = true;
-            }
-
-            break;
-        case FLOATER:
-            if (numFloaters > 0 && lemm.setSkill(lemmSkill)) {
-                numFloaters -= 1;
-                canSet = true;
-            }
-
-            break;
-        case MINER:
-            if (numMiners > 0 && lemm.setSkill(lemmSkill)) {
-                numMiners -= 1;
-                canSet = true;
-            }
-
-            break;
-        case STOPPER:
-            if (numBlockers > 0 && lemm.setSkill(lemmSkill)) {
-                numBlockers -= 1;
-                canSet = true;
-            }
-
-            break;
-        default:
-            break;
-        }
-
-        return canSet;
-    }
-
-    /**
-     * Calculate the counter threshold for releasing a new Lemmings.
-     */
-    private static void calcReleaseBase() {
-        // the original formula is: release lemming every 4+(99-speed)/2 time
-        // steps
-        // where one step is 60ms (3s/50) or 66ms (4s/60).
-        // Lemmini runs at 30ms/33ms, so the term has to be multiplied by 2
-        // 8+(99-releaseRate) should be correct
-        releaseBase = BASE_RELEASE_RATE + (MAX_RELEASE_RATE - releaseRate);
-    }
-
-    /**
-     * Handle pressing of an icon button.
-     *
-     * @param type icon type
-     */
-    public static synchronized void handleIconButton(final Icons.Type type) {
-        final Lemming.Type startingSkill = lemmSkill;
-        boolean ok = false;
-
-        switch (type) {
-        case FLOAT:
-            if (isCheat() || numFloaters > 0) {
-                lemmSkill = Lemming.Type.FLOATER;
-            }
-
-            stopReplayMode();
-            break;
-        case CLIMB:
-            if (isCheat() || numClimbers > 0) {
-                lemmSkill = Lemming.Type.CLIMBER;
-            }
-
-            stopReplayMode();
-            break;
-        case BOMB:
-            if (isCheat() || numBombers > 0) {
-                lemmSkill = Lemming.Type.BOMBER;
-            }
-
-            stopReplayMode();
-            break;
-        case DIG:
-            if (isCheat() || numDiggers > 0) {
-                lemmSkill = Lemming.Type.DIGGER;
-            }
-
-            stopReplayMode();
-            break;
-        case BASH:
-            if (isCheat() || numBashers > 0) {
-                lemmSkill = Lemming.Type.BASHER;
-            }
-
-            stopReplayMode();
-            break;
-        case BUILD:
-            if (isCheat() || numBuilders > 0) {
-                lemmSkill = Lemming.Type.BUILDER;
-            }
-
-            stopReplayMode();
-            break;
-        case MINE:
-            if (isCheat() || numMiners > 0) {
-                lemmSkill = Lemming.Type.MINER;
-            }
-
-            stopReplayMode();
-            break;
-        case BLOCK:
-            if (isCheat() || numBlockers > 0) {
-                lemmSkill = Lemming.Type.STOPPER;
-            }
-
-            stopReplayMode();
-            break;
-        case NUKE:
-            ok = true;
-            handleNukeIconButton();
-            break;
-        case PAUSE:
-            setPaused(!isPaused());
-            ok = true;
-            break;
-        case FFWD:
-            setFastForward(!isFastForward());
-            ok = true;
-            break;
-        case PLUS:
-            ok = true; // supress sound
-            plus.pressed(KEYREPEAT_ICON);
-            stopReplayMode();
-            break;
-        case MINUS:
-            ok = true; // supress sound
-            minus.pressed(KEYREPEAT_ICON);
-            stopReplayMode();
-            break;
-        default:
-            break;
-        }
-
-        playIconButtonPressSound(type, startingSkill, ok);
-    }
-
-    /**
-     * Plays the sound appropriate for the icon button pressed, if any.
-     *
-     * @param type          the icon type.
-     * @param startingSkill the lemming skill before pressing the button.
-     * @param ok            <code>true</code> if suppressing default icon button
-     *                      press sound.
-     */
-    private static void playIconButtonPressSound(final Icons.Type type,
-            final Lemming.Type startingSkill, final boolean ok) {
-        if (ok || lemmSkill != startingSkill) {
-            switch (type) {
-            case PLUS:
-                // supress sound
-            default:
-                sound.play(SND_CHANGE_OP);
-            }
-
-            Icons.press(type);
-        } else {
-            sound.play(SND_TING);
-        }
-    }
-
-    /**
-     * Handle pressing of nuke icon button.
-     */
-    private static void handleNukeIconButton() {
-        stopReplayMode();
-
-        if (timerNuke.delta() < MICROSEC_NUKE_DOUBLE_CLICK) {
-            if (!nuke) {
-                nuke = true;
-                sound.play(SND_OHNO);
-            }
-        } else {
-            timerNuke.deltaUpdate();
-        }
     }
 
     /**
@@ -1585,7 +1027,7 @@ public final class GameController {
      * Fade to level.
      */
     private static void fadeToLevel() {
-        GameController.sound.play(SND_LETSGO);
+        SoundController.playStartOfLevelSound();
 
         try {
             Music.load("music/"
@@ -1643,58 +1085,6 @@ public final class GameController {
      */
     public static void drawIcons(final Graphics2D g, final int x, final int y) {
         g.drawImage(Icons.getImg(), x, y, null);
-    }
-
-    /**
-     * Draw the skill/release rate values.
-     *
-     * @param g graphics object
-     * @param y y offset in pixels
-     */
-    public static void drawCounters(final Graphics2D g, final int y) {
-        // draw counters
-        int val = 0;
-
-        for (int i = 0; i < DECIMAL_10; i++) {
-            switch (i) {
-            case 0:
-                val = level.getReleaseRate();
-                break;
-            case 1:
-                val = releaseRate;
-                break;
-            case 2:
-                val = numClimbers;
-                break;
-            case FLOATERS_INDEX:
-                val = numFloaters;
-                break;
-            case BOMBERS_INDEX:
-                val = numBombers;
-                break;
-            case BLOCKERS_INDEX:
-                val = numBlockers;
-                break;
-            case BUILDERS_INDEX:
-                val = numBuilders;
-                break;
-            case BASHERS_INDEX:
-                val = numBashers;
-                break;
-            case MINERS_INDEX:
-                val = numMiners;
-                break;
-            case DIGGERS_INDEX:
-                val = numDiggers;
-                break;
-            default:
-                break;
-            }
-
-            g.drawImage(NumFont.numImage(val),
-                    Icons.WIDTH * i + ICON_HORIZONTAL_SPACING, y, null);
-        }
-
     }
 
     /**
@@ -1963,42 +1353,6 @@ public final class GameController {
     }
 
     /**
-     * Plus was pressed.
-     *
-     * @param d bitmask: key or icon
-     */
-    public static void pressPlus(final int d) {
-        plus.pressed(d);
-    }
-
-    /**
-     * Plus was released.
-     *
-     * @param d bitmask: key or icon
-     */
-    public static void releasePlus(final int d) {
-        plus.released(d);
-    }
-
-    /**
-     * Minus was pressed.
-     *
-     * @param d bitmask: key or icon
-     */
-    public static void pressMinus(final int d) {
-        minus.pressed(d);
-    }
-
-    /**
-     * Minus was released.
-     *
-     * @param d bitmask: key or icon
-     */
-    public static void releaseMinus(final int d) {
-        minus.released(d);
-    }
-
-    /**
      * Get list of all Lemmings under the mouse cursor.
      *
      * @return list of all Lemmings under the mouse cursor
@@ -2017,28 +1371,15 @@ public final class GameController {
     }
 
     /**
-     * Set sound gain.
-     *
-     * @param g gain (0..1.0)
-     */
-    public static void setSoundGain(final double g) {
-        soundGain = g;
-
-        if (sound != null) {
-            sound.setGain(soundGain);
-        }
-    }
-
-    /**
      * Set music gain.
      *
      * @param g gain (0..1.0)
      */
     public static void setMusicGain(final double g) {
-        musicGain = g;
+        SoundController.setMusicGain(g);
 
         if (Music.getType() != null) {
-            Music.setGain(musicGain);
+            Music.setGain(g);
         }
     }
 
@@ -2094,42 +1435,6 @@ public final class GameController {
      */
     public static Stencil getStencil() {
         return stencil;
-    }
-
-    /**
-     * Enable music.
-     *
-     * @param on true: music on, false otherwise
-     */
-    public static void setMusicOn(final boolean on) {
-        musicOn = on;
-    }
-
-    /**
-     * Get music enable state.
-     *
-     * @return true: music is on, false otherwise
-     */
-    public static boolean isMusicOn() {
-        return musicOn;
-    }
-
-    /**
-     * Enable sound.
-     *
-     * @param on true: sound on, false otherwise
-     */
-    public static void setSoundOn(final boolean on) {
-        soundOn = on;
-    }
-
-    /**
-     * Get sound enable state.
-     *
-     * @return true: sound is on, false otherwise
-     */
-    public static boolean isSoundOn() {
-        return soundOn;
     }
 
     /**

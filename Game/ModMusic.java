@@ -34,8 +34,28 @@ import micromod.Micromod;
  * @author Volker Oth
  */
 public class ModMusic implements Runnable {
+    /**
+     * Thread sleep time = 40 ms.
+     */
+    private static final int SLEEP_40MS = 40;
+
+    /**
+     * 3 added to base index within array.
+     */
+    private static final int OFFSET_3 = 3;
+
+    /**
+     * 8-bit shift.
+     */
+    private static final int SHIFT_8 = 8;
+
+    /**
+     * 8-bit mask = 0xff.
+     */
+    private static final int EIGHT_BIT_MASK = 0xFF;
+
     /** sample frequency. */
-    private final static int SAMPLE_RATE = 44100;
+    private static final int SAMPLE_RATE = 44100;
 
     /** object to play MODs. */
     private Micromod micromod;
@@ -104,7 +124,7 @@ public class ModMusic implements Runnable {
      * stop has been called.
      */
     @Override
-    public void run() {
+    public final void run() {
         final int buflen = 2048;
         final int[] lbuf = new int[buflen];
         final int[] rbuf = new int[buflen];
@@ -115,7 +135,8 @@ public class ModMusic implements Runnable {
                     false);
             final DataLine.Info lineInfo = new DataLine.Info(
                     SourceDataLine.class, af);
-            line = (SourceDataLine) GameController.getSound().getLine(lineInfo);
+            line = (SourceDataLine) SoundController.getSound()
+                    .getLine(lineInfo);
             line.open();
             line.start();
             setGain(Music.getGain());
@@ -126,31 +147,34 @@ public class ModMusic implements Runnable {
                 if (play) {
                     int count = buflen;
 
-                    if (count > remain)
+                    if (count > remain) {
                         count = remain;
+                    }
 
                     micromod.mix(lbuf, rbuf, 0, count);
 
                     for (int ix = 0; ix < count; ix++) {
                         final int ox = ix << 2;
-                        obuf[ox] = (byte) (lbuf[ix] & 0xFF);
-                        obuf[ox + 1] = (byte) (lbuf[ix] >> 8);
-                        obuf[ox + 2] = (byte) (rbuf[ix] & 0xFF);
-                        obuf[ox + 3] = (byte) (rbuf[ix] >> 8);
-                        lbuf[ix] = rbuf[ix] = 0;
+                        obuf[ox] = (byte) (lbuf[ix] & EIGHT_BIT_MASK);
+                        obuf[ox + 1] = (byte) (lbuf[ix] >> SHIFT_8);
+                        obuf[ox + 2] = (byte) (rbuf[ix] & EIGHT_BIT_MASK);
+                        obuf[ox + OFFSET_3] = (byte) (rbuf[ix] >> SHIFT_8);
+                        rbuf[ix] = 0;
+                        lbuf[ix] = 0;
                     }
 
                     line.write(obuf, 0, count << 2);
                     remain -= count;
 
-                    if (remain == 0 && songloop)
+                    if (remain == 0 && songloop) {
                         remain = songlen;
+                    }
 
                     Thread.yield();
                 } else {
                     try {
                         line.flush();
-                        Thread.sleep(40);
+                        Thread.sleep(SLEEP_40MS);
                     } catch (final InterruptedException ex) {
                     }
                 }
@@ -168,8 +192,9 @@ public class ModMusic implements Runnable {
      * Instruct the run() method to finish playing and return.
      */
     public void stop() {
-        if (mmThread != null)
+        if (mmThread != null) {
             mmThread.interrupt();
+        }
         play = false;
     }
 
@@ -177,8 +202,9 @@ public class ModMusic implements Runnable {
      * Instruct the run() method to resume playing.
      */
     public void play() {
-        if (mmThread != null)
+        if (mmThread != null) {
             mmThread.interrupt();
+        }
         play = true;
     }
 
@@ -196,22 +222,24 @@ public class ModMusic implements Runnable {
     }
 
     /**
-     * Set gain (volume) of MOD output
+     * Set gain (volume) of MOD output.
      *
      * @param gn gain factor: 0.0 (off) .. 1.0 (full volume)
      */
     public void setGain(final double gn) {
         double gain;
 
-        if (gn > 1.0)
+        if (gn > 1.0) {
             gain = 1.0;
-        else if (gn < 0)
+        } else if (gn < 0) {
             gain = 0;
-        else
+        } else {
             gain = gn;
+        }
 
-        if (line != null)
-            GameController.getSound().setLineGain(line, gain);
+        if (line != null) {
+            SoundController.getSound().setLineGain(line, gain);
+        }
     }
 
 }

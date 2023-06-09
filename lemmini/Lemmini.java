@@ -33,7 +33,9 @@ import game.LemmException;
 import game.Lemming;
 import game.Level;
 import game.LevelPack;
+import game.ReleaseRateHandler;
 import game.ResourceException;
+import game.SkillHandler;
 import game.GameState;
 import game.TransitionState;
 import gameutil.Fader;
@@ -329,35 +331,35 @@ public class Lemmini extends JFrame implements KeyListener {
             switch (code) {
             case KeyEvent.VK_1:
             case KeyEvent.VK_F3:
-                GameController.handleIconButton(Icons.Type.CLIMB);
+                SkillHandler.handleIconButton(Icons.Type.CLIMB);
                 break;
             case KeyEvent.VK_2:
             case KeyEvent.VK_F4:
-                GameController.handleIconButton(Icons.Type.FLOAT);
+                SkillHandler.handleIconButton(Icons.Type.FLOAT);
                 break;
             case KeyEvent.VK_3:
             case KeyEvent.VK_F5:
-                GameController.handleIconButton(Icons.Type.BOMB);
+                SkillHandler.handleIconButton(Icons.Type.BOMB);
                 break;
             case KeyEvent.VK_4:
             case KeyEvent.VK_F6:
-                GameController.handleIconButton(Icons.Type.BLOCK);
+                SkillHandler.handleIconButton(Icons.Type.BLOCK);
                 break;
             case KeyEvent.VK_5:
             case KeyEvent.VK_F7:
-                GameController.handleIconButton(Icons.Type.BUILD);
+                SkillHandler.handleIconButton(Icons.Type.BUILD);
                 break;
             case KeyEvent.VK_6:
             case KeyEvent.VK_F8:
-                GameController.handleIconButton(Icons.Type.BASH);
+                SkillHandler.handleIconButton(Icons.Type.BASH);
                 break;
             case KeyEvent.VK_7:
             case KeyEvent.VK_F9:
-                GameController.handleIconButton(Icons.Type.MINE);
+                SkillHandler.handleIconButton(Icons.Type.MINE);
                 break;
             case KeyEvent.VK_8:
             case KeyEvent.VK_F10:
-                GameController.handleIconButton(Icons.Type.DIG);
+                SkillHandler.handleIconButton(Icons.Type.DIG);
                 break;
             case KeyEvent.VK_D:
                 toggleDebugDraw();
@@ -405,15 +407,15 @@ public class Lemmini extends JFrame implements KeyListener {
             case KeyEvent.VK_PLUS:
             case KeyEvent.VK_ADD:
             case KeyEvent.VK_F2:
-                GameController.pressPlus(GameController.KEYREPEAT_KEY);
+                ReleaseRateHandler.pressPlus(GameController.KEYREPEAT_KEY);
                 break;
             case KeyEvent.VK_MINUS:
             case KeyEvent.VK_SUBTRACT:
             case KeyEvent.VK_F1:
-                GameController.pressMinus(GameController.KEYREPEAT_KEY);
+                ReleaseRateHandler.pressMinus(GameController.KEYREPEAT_KEY);
                 break;
             case KeyEvent.VK_F12:
-                GameController.handleIconButton(Icons.Type.NUKE);
+                SkillHandler.handleIconButton(Icons.Type.NUKE);
                 break;
             default:
                 break;
@@ -569,12 +571,12 @@ public class Lemmini extends JFrame implements KeyListener {
             case KeyEvent.VK_PLUS:
             case KeyEvent.VK_ADD:
             case KeyEvent.VK_F2:
-                GameController.releasePlus(GameController.KEYREPEAT_KEY);
+                ReleaseRateHandler.releasePlus(GameController.KEYREPEAT_KEY);
                 break;
             case KeyEvent.VK_MINUS:
             case KeyEvent.VK_SUBTRACT:
             case KeyEvent.VK_F1:
-                GameController.releaseMinus(GameController.KEYREPEAT_KEY);
+                ReleaseRateHandler.releaseMinus(GameController.KEYREPEAT_KEY);
                 break;
             case KeyEvent.VK_F12:
                 GameController.releaseIcon(Icons.Type.NUKE);

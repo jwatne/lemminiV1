@@ -10,8 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
-import game.GameController;
 import game.Music;
+import game.SoundController;
 
 /*
  * Copyright 2009 Volker Oth
@@ -196,7 +196,7 @@ public class GainDialog extends JDialog {
         this.setLocation(p.x + frame.getWidth() / 2 - getWidth() / 2,
                 p.y + frame.getHeight() / 2 - getHeight() / 2);
         jSliderSound.setValue((int) (ONE_HUNDRED_PERCENT
-                * GameController.getSound().getGain()));
+                * SoundController.getSound().getGain()));
         jSliderMusic.setValue((int) (ONE_HUNDRED_PERCENT * Music.getGain()));
     }
 
@@ -291,7 +291,7 @@ public class GainDialog extends JDialog {
                 public void actionPerformed(
                         final java.awt.event.ActionEvent e) {
                     Music.setGain(jSliderMusic.getValue() / PERCENT_DIVISOR);
-                    GameController.getSound()
+                    SoundController.getSound()
                             .setGain(jSliderSound.getValue() / PERCENT_DIVISOR);
                     dispose();
                 }

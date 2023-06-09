@@ -25,6 +25,7 @@ import game.LevelPack;
 import game.Music;
 import game.Player;
 import game.ReplayLevelInfo;
+import game.SoundController;
 import gameutil.Sound;
 import gui.GainDialog;
 import gui.LevelCodeDialog;
@@ -64,7 +65,7 @@ public class MenuCreator {
             implements ActionListener {
         @Override
         public void actionPerformed(final java.awt.event.ActionEvent e) {
-            final Sound sound = GameController.getSound();
+            final Sound sound = SoundController.getSound();
             final String[] mixerNames = sound.getMixers();
             final String mixerName = e.getActionCommand();
 
@@ -521,7 +522,7 @@ public class MenuCreator {
      */
     private void initializeSFXMixerMenu() {
         jMenuSFX = new JMenu("SFX Mixer");
-        final Sound sound = GameController.getSound();
+        final Sound sound = SoundController.getSound();
         final String[] mixerNames = sound.getMixers();
         final ButtonGroup mixerGroup = new ButtonGroup();
         String lastMixerName = Core.getProgramProps().get("mixerName",
@@ -567,16 +568,17 @@ public class MenuCreator {
                 final boolean selected = jMenuItemSound.isSelected();
 
                 if (selected) {
-                    GameController.setSoundOn(true);
+                    SoundController.setSoundOn(true);
                 } else {
-                    GameController.setSoundOn(false);
+                    SoundController.setSoundOn(false);
                 }
 
-                Core.getProgramProps().set("sound", GameController.isSoundOn());
+                Core.getProgramProps().set("sound",
+                        SoundController.isSoundOn());
             }
         });
 
-        jMenuItemSound.setSelected(GameController.isSoundOn());
+        jMenuItemSound.setSelected(SoundController.isSoundOn());
     }
 
     /**
@@ -584,24 +586,24 @@ public class MenuCreator {
      */
     private void initializeMusicCheckboxMenuItem() {
         jMenuItemMusic = new JCheckBoxMenuItem("Music", false);
+        final boolean musicOn = SoundController.isMusicOn();
         jMenuItemMusic.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final java.awt.event.ActionEvent e) {
                 final boolean selected = jMenuItemMusic.isSelected();
-                // jMenuItemMusic.setSelected(selected);
 
                 if (selected) {
-                    GameController.setMusicOn(true);
+                    SoundController.setMusicOn(true);
                 } else {
-                    GameController.setMusicOn(false);
+                    SoundController.setMusicOn(false);
                 }
 
-                Core.getProgramProps().set("music", GameController.isMusicOn());
+                Core.getProgramProps().set("music", musicOn);
 
                 if (GameController.getLevel() != null) { // to be improved:
                                                          // level is running
                                                          // (game state)
-                    if (GameController.isMusicOn()) {
+                    if (musicOn) {
                         Music.play();
                     } else {
                         Music.stop();
@@ -610,7 +612,7 @@ public class MenuCreator {
             }
         });
 
-        jMenuItemMusic.setSelected(GameController.isMusicOn());
+        jMenuItemMusic.setSelected(musicOn);
     }
 
     /**

@@ -269,13 +269,13 @@ public final class Core {
         resourcePath = programProps.get("resourcePath", "");
         final String sourcePath = programProps.get("sourcePath", "");
         final String rev = programProps.get("revision", "");
-        GameController.setMusicOn(programProps.get("music", false));
-        GameController.setSoundOn(programProps.get("sound", true));
+        SoundController.setMusicOn(programProps.get("music", false));
+        SoundController.setSoundOn(programProps.get("sound", true));
         double gain;
         gain = programProps.get("musicGain", 1.0);
         GameController.setMusicGain(gain);
         gain = programProps.get("soundGain", 1.0);
-        GameController.setSoundGain(gain);
+        SoundController.setSoundGain(gain);
         GameController
                 .setAdvancedSelect(programProps.get("advancedSelect", true));
         GameController

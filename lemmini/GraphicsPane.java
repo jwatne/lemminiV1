@@ -23,6 +23,8 @@ import game.Lemming;
 import game.Level;
 import game.MiniMap;
 import game.MiscGfx;
+import game.ReleaseRateHandler;
+import game.SkillHandler;
 import game.GameState;
 import game.Stencil;
 import game.TextScreen;
@@ -323,11 +325,11 @@ public class GraphicsPane extends JPanel
                     SMALL_X - FOUR_PIXELS, SMALL_Y - FOUR_PIXELS, null);
             MiniMap.draw(offGfx, SMALL_X, SMALL_Y, xOfsTemp);
             // draw counters
-            GameController.drawCounters(offGfx, COUNTER_Y);
+            SkillHandler.drawCounters(offGfx, COUNTER_Y);
 
             // draw lemmings
             drawLemmings(offGfx, xOfsTemp, w, h);
-            final Lemming lemmUnderCursor = GameController
+            final Lemming lemmUnderCursor = SkillHandler
                     .lemmUnderCursor(LemmCursor.getType());
             offGfx.setClip(0, 0, w, h);
             // draw explosions
@@ -643,8 +645,8 @@ public class GraphicsPane extends JPanel
             // always release icons which don't stay pressed
             // this is to avoid the icons get stuck when they're pressed,
             // the the mouse is dragged out and released outside
-            GameController.releasePlus(GameController.KEYREPEAT_ICON);
-            GameController.releaseMinus(GameController.KEYREPEAT_ICON);
+            ReleaseRateHandler.releasePlus(GameController.KEYREPEAT_ICON);
+            ReleaseRateHandler.releaseMinus(GameController.KEYREPEAT_ICON);
             GameController.releaseIcon(Icons.Type.MINUS);
             GameController.releaseIcon(Icons.Type.PLUS);
             GameController.releaseIcon(Icons.Type.NUKE);
@@ -746,10 +748,10 @@ public class GraphicsPane extends JPanel
                     final Icons.Type type = GameController.getIconType(x);
 
                     if (type != Icons.Type.INVALID) {
-                        GameController.handleIconButton(type);
+                        SkillHandler.handleIconButton(type);
                     }
                 } else {
-                    final Lemming l = GameController
+                    final Lemming l = SkillHandler
                             .lemmUnderCursor(LemmCursor.getType());
 
                     if (l != null) {

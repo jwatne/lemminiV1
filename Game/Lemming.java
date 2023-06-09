@@ -649,7 +649,7 @@ public class Lemming {
 
         // check for conversion to walker when hitting steel
         if (lemRes.getImask(dir).checkType(sx, sy, 0, Stencil.MSK_STEEL)) {
-            GameController.getSound().play(GameController.SND_CHINK);
+            SoundController.playLastFewStepsSound();
             newType = Type.WALKER;
         } else {
             y += 2; // move down
@@ -731,7 +731,7 @@ public class Lemming {
             frameIdx = 0;
         }
 
-        int maskStep = lemRes.getMaskStep();
+        final int maskStep = lemRes.getMaskStep();
 
         if (maskStep > 0 && frameIdx % (maskStep * TIME_SCALE) == 0) {
             trigger = true;
@@ -762,7 +762,7 @@ public class Lemming {
             final SpriteObject spr = GameController.getLevel()
                     .getSprObject(Stencil.getObjectID(s));
             newType = Type.EXITING;
-            GameController.getSound().play(spr.getSound());
+            SoundController.getSound().play(spr.getSound());
             break;
         default:
             break;
@@ -782,11 +782,11 @@ public class Lemming {
 
         if (spr.canBeTriggered()) {
             if (spr.trigger()) {
-                GameController.getSound().play(spr.getSound());
+                SoundController.getSound().play(spr.getSound());
                 hasDied = true;
             }
         } else {
-            GameController.getSound().play(spr.getSound());
+            SoundController.getSound().play(spr.getSound());
             hasDied = true;
         }
 
@@ -815,11 +815,11 @@ public class Lemming {
 
             if (spr.canBeTriggered()) {
                 if (spr.trigger()) {
-                    GameController.getSound().play(spr.getSound());
+                    SoundController.getSound().play(spr.getSound());
                     newType = Type.TRAPPED;
                 }
             } else {
-                GameController.getSound().play(spr.getSound());
+                SoundController.getSound().play(spr.getSound());
                 newType = Type.TRAPPED;
             }
 
@@ -849,7 +849,7 @@ public class Lemming {
             newType = Type.DROWNING;
             final SpriteObject spr = GameController.getLevel()
                     .getSprObject(Stencil.getObjectID(s));
-            GameController.getSound().play(spr.getSound());
+            SoundController.getSound().play(spr.getSound());
         }
 
         return newType;
@@ -995,7 +995,7 @@ public class Lemming {
                         GameController.getLevel().getDebrisColor());
 
                 if (counter >= STEPS_WARNING) {
-                    GameController.getSound().play(GameController.SND_TING);
+                    SoundController.getSound().play(SoundController.SND_TING);
                 }
             }
         }
@@ -1042,7 +1042,7 @@ public class Lemming {
                 m.eraseMask(sx, sy, idx / TIME_SCALE - 1, checkMask);
 
                 if (lemRes.getImask(dir).checkType(sx, sy, 0, checkMask)) {
-                    GameController.getSound().play(GameController.SND_CHINK);
+                    SoundController.playLastFewStepsSound();
                     newType = Type.WALKER;
                 }
 
@@ -1147,8 +1147,7 @@ public class Lemming {
                     // check for conversion to walker because there are
                     // indestructible pixels
                     if (lemRes.getImask(dir).checkType(sx, sy, 0, checkMask)) {
-                        GameController.getSound()
-                                .play(GameController.SND_CHINK);
+                        SoundController.playLastFewStepsSound();
                         newType = Type.WALKER;
                     }
 
@@ -1178,8 +1177,7 @@ public class Lemming {
                     // check for conversion to walker because there are
                     // indestructible pixels
                     if (lemRes.getImask(dir).checkType(sx, sy, 0, checkMask)) {
-                        GameController.getSound()
-                                .play(GameController.SND_CHINK);
+                        SoundController.playLastFewStepsSound();
                         newType = Type.WALKER;
                     }
 
@@ -1219,7 +1217,7 @@ public class Lemming {
         if (explode) {
             explode();
         } else if (frameIdx == 0) { // looped once
-            GameController.getSound().play(GameController.SND_SPLAT);
+            SoundController.getSound().play(SoundController.SND_SPLAT);
         }
     }
 
@@ -1464,7 +1462,7 @@ public class Lemming {
      */
     private void playOhNoIfNotToBeNuked() {
         if (!nuke) {
-            GameController.getSound().play(GameController.SND_OHNO);
+            SoundController.playNukeSound();
         }
     }
 
@@ -1549,7 +1547,7 @@ public class Lemming {
      * Let the Lemming explode.
      */
     private void explode() {
-        GameController.getSound().play(GameController.SND_EXPLODE);
+        SoundController.getSound().play(SoundController.SND_EXPLODE);
         // create particle explosion
         GameController.addExplosion(midX(), midY());
         hasDied = true;
@@ -1789,7 +1787,7 @@ public class Lemming {
     private boolean crossedLowerBorder() {
         if (y >= Level.HEIGHT) {
             hasDied = true;
-            GameController.getSound().play(GameController.SND_DIE);
+            SoundController.getSound().play(SoundController.SND_DIE);
             return true;
         }
         return false;
@@ -1814,9 +1812,9 @@ public class Lemming {
         int pos = x;
         final Stencil stencil = GameController.getStencil();
         pos += ym * Level.WIDTH;
-        int lev; // Levitation.
+        int l; // Levitation.
 
-        for (lev = 0; lev < WALKER_OBSTACLE_HEIGHT; lev++, pos -= Level.WIDTH, ym--) {
+        for (l = 0; l < WALKER_OBSTACLE_HEIGHT; l++, pos -= Level.WIDTH, ym--) {
             if (ym < 0) {
                 return WALKER_OBSTACLE_HEIGHT + 1; // forbid leaving level to
             }
@@ -1827,7 +1825,7 @@ public class Lemming {
             }
         }
 
-        return lev;
+        return l;
     }
 
     /**

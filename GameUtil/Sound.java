@@ -16,8 +16,8 @@ import javax.sound.sampled.LineListener;
 import javax.sound.sampled.Mixer;
 
 import game.Core;
-import game.GameController;
 import game.ResourceException;
+import game.SoundController;
 
 /*
  * Copyright 2009 Volker Oth
@@ -354,7 +354,7 @@ public class Sound {
      * @param idx index of the sound to be played
      */
     public synchronized void play(final int idx) {
-        if (!GameController.isSoundOn()
+        if (!SoundController.isSoundOn()
                 || getSimulSounds() >= MAX_SIMUL_SOUNDS /* || clips==null */) {
             return;
         }
@@ -525,7 +525,7 @@ public class Sound {
      * @param pitch pitch value 0..99
      */
     public synchronized void playPitched(final int pitch) {
-        if (!GameController.isSoundOn()
+        if (!SoundController.isSoundOn()
                 || getSimulSounds() >= MAX_SIMUL_SOUNDS) {
             return;
         }

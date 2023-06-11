@@ -187,10 +187,6 @@ public class Lemming {
     private static final int STEPS_WARNING = 9;
     /** Lemmini runs with 50fps instead of 25fps. */
     private static final int TIME_SCALE = 2;
-    /** explosion counter is decreased every second. */
-    private static final int MAX_EXPLODE_CTR = 1000000
-            / GameController.MICROSEC_PER_FRAME;
-
     /** resource (animation etc.) for the current Lemming. */
     private LemmingResource lemRes;
     /** animation frame. */
@@ -211,8 +207,6 @@ public class Lemming {
     private int counter;
     /** another counter used for internal state changes. */
     private int counter2;
-    /** explosion counter when nuked. */
-    private int explodeNumCtr;
     /** Lemming can float. */
     private boolean canFloat;
     /** Lemming can climb. */
@@ -225,8 +219,6 @@ public class Lemming {
     private boolean hasDied;
     /** Lemming has left the level. */
     private boolean hasLeft;
-    /** counter used to manage the explosion. */
-    private int explodeCtr;
     /** counter used to display the select image in replay mode. */
     private int selectCtr;
 
@@ -234,6 +226,10 @@ public class Lemming {
     private static LemmingResource[] lemmings;
     /** font used for the explosion counter. */
     private static ExplodeFont explodeFont;
+    /**
+     * Class for handling explosions, if any, for the current Lemming.
+     */
+    private LemmingExplosion exploder;
 
     /**
      * Constructor: Create Lemming.
@@ -246,7 +242,6 @@ public class Lemming {
         type = Type.FALLER; // always start with a faller
         lemRes = lemmings[getOrdinal(type)];
         counter = 0;
-        explodeNumCtr = 0;
         selectCtr = 0;
         dir = Direction.RIGHT; // always start walking to the right
         x = sx;
@@ -259,6 +254,7 @@ public class Lemming {
         hasDied = false; // not yet
         hasLeft = false; // not yet
         nuke = false;
+        exploder = new LemmingExplosion();
     }
 
     /**
@@ -285,7 +281,7 @@ public class Lemming {
         final Type oldType = type;
         Type newType = type;
         final int oldX = x;
-        final boolean explode = checkExplodeState();
+        final boolean explode = exploder.checkExplodeState();
 
         if (selectCtr > 0) {
             selectCtr--;
@@ -1354,29 +1350,6 @@ public class Lemming {
     }
 
     /**
-     * Indicates whether the Lemming has finished exploding.
-     *
-     * @return <code>true</code> if the Lemming has finished exploding.
-     */
-    private boolean checkExplodeState() {
-        boolean explode = false;
-
-        // first check explode state
-        if (explodeNumCtr != 0) {
-            if (++explodeCtr >= MAX_EXPLODE_CTR) {
-                explodeCtr -= MAX_EXPLODE_CTR;
-                explodeNumCtr--;
-
-                if (explodeNumCtr == 0) {
-                    explode = true;
-                }
-            }
-        }
-
-        return explode;
-    }
-
-    /**
      * Check if a Lemming is to be turned by a stopper/blocker.
      *
      * @return true if Lemming is to be turned, false otherwise
@@ -1941,9 +1914,9 @@ public class Lemming {
 
                 nuke = true;
 
-                if (explodeNumCtr == 0) {
-                    explodeNumCtr = FIVE;
-                    explodeCtr = 0;
+                if (exploder.getExplodeNumCtr() == 0) {
+                    exploder.setExplodeNumCtr(FIVE);
+                    exploder.setExplodeCtr(0);
                     return true;
                 } else {
                     return false;
@@ -1979,9 +1952,9 @@ public class Lemming {
             nuke = true;
             //$FALL-THROUGH$
         case BOMBER:
-            if (explodeNumCtr == 0) {
-                explodeNumCtr = FIVE;
-                explodeCtr = 0;
+            if (exploder.getExplodeNumCtr() == 0) {
+                exploder.setExplodeNumCtr(FIVE);
+                exploder.setExplodeCtr(0);
                 return true;
             } else {
                 return false;
@@ -2140,6 +2113,8 @@ public class Lemming {
      * @return image for explosion countdown (or null if no explosion countdown)
      */
     public BufferedImage getCountdown() {
+        final int explodeNumCtr = exploder.getExplodeNumCtr();
+
         if (explodeNumCtr == 0) {
             return null;
         } else {

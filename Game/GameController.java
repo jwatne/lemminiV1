@@ -16,7 +16,6 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-import game.Lemming.Type;
 import gameutil.Fader;
 import gameutil.FaderState;
 import gameutil.Sprite;
@@ -185,7 +184,7 @@ public final class GameController {
     /** old value of horizontal scrolling position. */
     private static int xPosOld;
     /** old value of selected skill. */
-    private static Lemming.Type lemmSkillOld;
+    private static Type lemmSkillOld;
     /** flag: replay mode is active. */
     private static boolean replayMode;
     /** flag: replay mode should be stopped. */
@@ -436,7 +435,7 @@ public final class GameController {
         entryOpenCtr = 0;
         secondCtr = 0;
         releaseCtr = 0;
-        SkillHandler.setLemmSkill(Lemming.Type.UNDEFINED);
+        SkillHandler.setLemmSkill(Type.UNDEFINED);
         ReleaseRateHandler.initLevel();
         numLeft = 0;
         final int releaseRate = getLevel().getReleaseRate();
@@ -744,7 +743,7 @@ public final class GameController {
             synchronized (lemmings) {
                 for (final Lemming l : lemmings) {
                     if (!l.nuke() && !l.hasDied() && !l.hasLeft()) {
-                        l.setSkill(Lemming.Type.NUKE);
+                        l.setSkill(Type.NUKE);
                         // System.out.println("nuked!");
                         break;
                     }
@@ -807,7 +806,7 @@ public final class GameController {
         ReplayEvent r;
 
         while ((r = replay.getNext(replayFrame)) != null) {
-            switch (r.type) {
+            switch (r.getType()) {
             case ReplayStream.ASSIGN_SKILL:
                 SkillHandler.assignSkillAndDecrementAvailable(
                         (ReplayAssignSkillEvent) r, lemmings);
@@ -815,7 +814,7 @@ public final class GameController {
                 break;
             case ReplayStream.SET_RELEASE_RATE:
                 final ReplayReleaseRateEvent rr = (ReplayReleaseRateEvent) r;
-                ReleaseRateHandler.setReleaseRate(rr.releaseRate);
+                ReleaseRateHandler.setReleaseRate(rr.getReleaseRate());
                 ReleaseRateHandler.calcReleaseBase();
                 SoundController
                         .playPitched(ReleaseRateHandler.getReleaseRate());
@@ -825,7 +824,7 @@ public final class GameController {
                 break;
             case ReplayStream.MOVE_XPOS:
                 final ReplayMoveXPosEvent rx = (ReplayMoveXPosEvent) r;
-                setxPos(rx.xPos);
+                setxPos(rx.getxPos());
                 break;
             case ReplayStream.SELECT_SKILL:
                 SkillHandler.selectSkill((ReplaySelectSkillEvent) r);
@@ -891,7 +890,7 @@ public final class GameController {
      * @param lemm Lemming
      */
     public static synchronized void requestSkill(final Lemming lemm) {
-        if (SkillHandler.getLemmSkill() != Lemming.Type.UNDEFINED) {
+        if (SkillHandler.getLemmSkill() != Type.UNDEFINED) {
             lemmSkillRequest = lemm;
         }
 
@@ -906,7 +905,7 @@ public final class GameController {
     private static synchronized void assignSkill(final boolean delete) {
         final Type lemmSkill = SkillHandler.getLemmSkill();
 
-        if (lemmSkillRequest == null || Lemming.Type.UNDEFINED == lemmSkill) {
+        if (lemmSkillRequest == null || Type.UNDEFINED == lemmSkill) {
             return;
         }
 

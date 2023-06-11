@@ -70,7 +70,7 @@ public final class SkillHandler {
     /** number of digger skills left to be assigned. */
     private static int numDiggers;
     /** skill to assign to lemming (skill icon). */
-    private static Lemming.Type lemmSkill;
+    private static Type lemmSkill;
     /** timer used for nuking. */
     private static MicrosecondTimer timerNuke;
 
@@ -104,7 +104,7 @@ public final class SkillHandler {
      *
      * @return skill to assign to lemming (skill icon).
      */
-    public static Lemming.Type getLemmSkill() {
+    public static Type getLemmSkill() {
         return lemmSkill;
     }
 
@@ -113,7 +113,7 @@ public final class SkillHandler {
      *
      * @param skill skill to assign to lemming (skill icon).
      */
-    public static void setLemmSkill(final Lemming.Type skill) {
+    public static void setLemmSkill(final Type skill) {
         SkillHandler.lemmSkill = skill;
     }
 
@@ -144,12 +144,12 @@ public final class SkillHandler {
             final ReplayAssignSkillEvent rs,
             final LinkedList<Lemming> lemmings) {
         synchronized (lemmings) {
-            final Lemming l = lemmings.get(rs.lemming);
-            l.setSkill(rs.skill);
+            final Lemming l = lemmings.get(rs.getLemming());
+            l.setSkill(rs.getSkill());
             l.setSelected();
         }
 
-        switch (rs.skill) {
+        switch (rs.getSkill()) {
         case FLOATER:
             numFloaters -= 1;
             break;
@@ -323,18 +323,17 @@ public final class SkillHandler {
             final Lemming l = lemmsUnderCursor.get(i);
 
             // Walker only cursor: ignore non-walkers
-            if (type == LemmCursor.Type.WALKER
-                    && l.getSkill() != Lemming.Type.WALKER) {
+            if (type == LemmCursor.Type.WALKER && l.getSkill() != Type.WALKER) {
                 continue;
             }
 
             if (type == LemmCursor.Type.LEFT
-                    && l.getDirection() != Lemming.Direction.LEFT) {
+                    && l.getDirection() != Direction.LEFT) {
                 continue;
             }
 
             if (type == LemmCursor.Type.RIGHT
-                    && l.getDirection() != Lemming.Direction.RIGHT) {
+                    && l.getDirection() != Direction.RIGHT) {
                 continue;
             }
 
@@ -379,7 +378,7 @@ public final class SkillHandler {
      * @param rsse the ReplayEvent for selecting the skill.
      */
     public static void selectSkill(final ReplaySelectSkillEvent rsse) {
-        lemmSkill = rsse.skill;
+        lemmSkill = rsse.getSkill();
 
         switch (lemmSkill) {
         case FLOATER:
@@ -417,62 +416,62 @@ public final class SkillHandler {
      * @param type icon type
      */
     public static synchronized void handleIconButton(final Icons.Type type) {
-        final Lemming.Type startingSkill = lemmSkill;
+        final Type startingSkill = lemmSkill;
         boolean ok = false;
 
         switch (type) {
         case FLOAT:
             if (GameController.isCheat() || numFloaters > 0) {
-                lemmSkill = Lemming.Type.FLOATER;
+                lemmSkill = Type.FLOATER;
             }
 
             GameController.stopReplayMode();
             break;
         case CLIMB:
             if (GameController.isCheat() || numClimbers > 0) {
-                lemmSkill = Lemming.Type.CLIMBER;
+                lemmSkill = Type.CLIMBER;
             }
 
             GameController.stopReplayMode();
             break;
         case BOMB:
             if (GameController.isCheat() || numBombers > 0) {
-                lemmSkill = Lemming.Type.BOMBER;
+                lemmSkill = Type.BOMBER;
             }
 
             GameController.stopReplayMode();
             break;
         case DIG:
             if (GameController.isCheat() || numDiggers > 0) {
-                lemmSkill = Lemming.Type.DIGGER;
+                lemmSkill = Type.DIGGER;
             }
 
             GameController.stopReplayMode();
             break;
         case BASH:
             if (GameController.isCheat() || numBashers > 0) {
-                lemmSkill = Lemming.Type.BASHER;
+                lemmSkill = Type.BASHER;
             }
 
             GameController.stopReplayMode();
             break;
         case BUILD:
             if (GameController.isCheat() || numBuilders > 0) {
-                lemmSkill = Lemming.Type.BUILDER;
+                lemmSkill = Type.BUILDER;
             }
 
             GameController.stopReplayMode();
             break;
         case MINE:
             if (GameController.isCheat() || numMiners > 0) {
-                lemmSkill = Lemming.Type.MINER;
+                lemmSkill = Type.MINER;
             }
 
             GameController.stopReplayMode();
             break;
         case BLOCK:
             if (GameController.isCheat() || numBlockers > 0) {
-                lemmSkill = Lemming.Type.STOPPER;
+                lemmSkill = Type.STOPPER;
             }
 
             GameController.stopReplayMode();
@@ -532,7 +531,7 @@ public final class SkillHandler {
      *                      press sound.
      */
     private static void playIconButtonPressSound(final Icons.Type type,
-            final Lemming.Type startingSkill, final boolean ok) {
+            final Type startingSkill, final boolean ok) {
         if (ok || lemmSkill != startingSkill) {
             switch (type) {
             case PLUS:

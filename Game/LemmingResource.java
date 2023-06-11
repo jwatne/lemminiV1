@@ -138,14 +138,14 @@ public class LemmingResource {
     }
 
     /** animation mode. */
-    private Lemming.Animation animMode;
+    private Animation animMode;
 
     /**
      * Returns animation mode.
      *
      * @return animation mode.
      */
-    public final Lemming.Animation getAnimMode() {
+    public final Animation getAnimMode() {
         return animMode;
     }
 
@@ -154,7 +154,7 @@ public class LemmingResource {
      *
      * @param mode animation mode.
      */
-    public final void setAnimMode(final Lemming.Animation mode) {
+    public final void setAnimMode(final Animation mode) {
         this.animMode = mode;
     }
 
@@ -228,11 +228,11 @@ public class LemmingResource {
         width = sourceImg.getWidth(null);
         height = sourceImg.getHeight(null) / animFrames;
         dirs = directions;
-        animMode = Lemming.Animation.NONE;
-        img[Lemming.Direction.RIGHT.ordinal()] = ToolBox.getAnimation(sourceImg,
+        animMode = Animation.NONE;
+        img[Direction.RIGHT.ordinal()] = ToolBox.getAnimation(sourceImg,
                 animFrames, Transparency.BITMASK);
         if (dirs > 1) {
-            img[Lemming.Direction.LEFT.ordinal()] = ToolBox.getAnimation(
+            img[Direction.LEFT.ordinal()] = ToolBox.getAnimation(
                     ToolBox.flipImageX(sourceImg), animFrames,
                     Transparency.BITMASK);
         }
@@ -244,7 +244,7 @@ public class LemmingResource {
      * @param dir Direction
      * @return mask for stencil manipulation
      */
-    Mask getMask(final Lemming.Direction dir) {
+    Mask getMask(final Direction dir) {
         if (dirs > 1) {
             return mask[dir.ordinal()];
         } else {
@@ -258,7 +258,7 @@ public class LemmingResource {
      * @param dir Direction
      * @param m   mask for stencil manipulation
      */
-    void setMask(final Lemming.Direction dir, final Mask m) {
+    void setMask(final Direction dir, final Mask m) {
         if (dirs > 1) {
             mask[dir.ordinal()] = m;
         } else {
@@ -272,7 +272,7 @@ public class LemmingResource {
      * @param dir Direction
      * @return mask for checking of indestructible pixels
      */
-    Mask getImask(final Lemming.Direction dir) {
+    Mask getImask(final Direction dir) {
         if (dirs > 1) {
             return iMask[dir.ordinal()];
         } else {
@@ -286,7 +286,7 @@ public class LemmingResource {
      * @param dir Direction
      * @param m   mask for checking of indestructible pixels
      */
-    void setImask(final Lemming.Direction dir, final Mask m) {
+    void setImask(final Direction dir, final Mask m) {
         if (dirs > 1) {
             iMask[dir.ordinal()] = m;
         } else {
@@ -301,7 +301,7 @@ public class LemmingResource {
      * @param frame Index of animation frame.
      * @return specific animation frame
      */
-    BufferedImage getImage(final Lemming.Direction dir, final int frame) {
+    BufferedImage getImage(final Direction dir, final int frame) {
         if (dirs > 1) {
             return img[dir.ordinal()][frame];
         } else {

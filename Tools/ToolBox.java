@@ -38,11 +38,21 @@ import javax.swing.JOptionPane;
  *
  * @author Volker Oth
  */
-public class ToolBox {
+public final class ToolBox {
 
+    /**
+     * Configuration for the local graphics environment.
+     */
     private static GraphicsConfiguration gc = GraphicsEnvironment
             .getLocalGraphicsEnvironment().getDefaultScreenDevice()
             .getDefaultConfiguration();
+
+    /**
+     * Private constructor for utility class.
+     */
+    private ToolBox() {
+
+    }
 
     /**
      * Create a compatible buffered image.
@@ -115,7 +125,7 @@ public class ToolBox {
             arrImg.add(frame);
             g.dispose();
         }
-        final BufferedImage images[] = new BufferedImage[arrImg.size()];
+        final BufferedImage[] images = new BufferedImage[arrImg.size()];
         return arrImg.toArray(images);
     }
 
@@ -157,12 +167,14 @@ public class ToolBox {
      */
     public static String addSeparator(final String fName) {
         int pos = fName.lastIndexOf(File.separator);
-        if (pos != fName.length() - 1)
+        if (pos != fName.length() - 1) {
             pos = fName.lastIndexOf("/");
-        if (pos != fName.length() - 1)
+        }
+        if (pos != fName.length() - 1) {
             return fName + "/";
-        else
+        } else {
             return fName;
+        }
     }
 
     /**
@@ -175,8 +187,9 @@ public class ToolBox {
     public static String exchangeSeparators(final String fName) {
         int pos;
         final StringBuffer sb = new StringBuffer(fName);
-        while ((pos = sb.indexOf("\\")) != -1)
+        while ((pos = sb.indexOf("\\")) != -1) {
             sb.setCharAt(pos, '/');
+        }
         return sb.toString();
     }
 
@@ -189,12 +202,14 @@ public class ToolBox {
     public static String getFileName(final String path) {
         int p1 = path.lastIndexOf("/");
         final int p2 = path.lastIndexOf("\\");
-        if (p2 > p1)
+        if (p2 > p1) {
             p1 = p2;
-        if (p1 < 0)
+        }
+        if (p1 < 0) {
             p1 = 0;
-        else
+        } else {
             p1++;
+        }
         return path.substring(p1);
     }
 
@@ -209,8 +224,9 @@ public class ToolBox {
         final int p1 = path.lastIndexOf("/");
         final int p2 = path.lastIndexOf("\\");
         final int p = path.lastIndexOf(".");
-        if (p == -1 || p < p1 || p < p2)
+        if (p == -1 || p < p1 || p < p2) {
             return null;
+        }
         return path.substring(p + 1);
     }
 
@@ -222,14 +238,14 @@ public class ToolBox {
      * @return Array of bytes (size num) from the beginning of the file
      */
     public static byte[] getFileID(final String fname, final int num) {
-        final byte buf[] = new byte[num];
+        final byte[] buf = new byte[num];
         final File f = new File(fname);
 
         if (f.length() < num) {
             return null;
         }
 
-        try (final FileInputStream fi = new FileInputStream(fname)) {
+        try (FileInputStream fi = new FileInputStream(fname)) {
             if (fi.read(buf) < 1) {
                 System.out.println("0 bytes read from file " + fname);
             }
@@ -249,10 +265,12 @@ public class ToolBox {
     public static String getPathName(final String path) {
         int p1 = path.lastIndexOf("/");
         final int p2 = path.lastIndexOf("\\");
-        if (p2 > p1)
+        if (p2 > p1) {
             p1 = p2;
-        if (p1 < 0)
+        }
+        if (p1 < 0) {
             p1 = 0;
+        }
         return path.substring(0, p1);
     }
 
@@ -265,11 +283,13 @@ public class ToolBox {
         String m;
         m = "<html>";
         m += ex.getClass().getName() + "<p>";
-        if (ex.getMessage() != null)
+        if (ex.getMessage() != null) {
             m += ex.getMessage() + "<p>";
-        final StackTraceElement ste[] = ex.getStackTrace();
-        for (int i = 0; i < ste.length; i++)
+        }
+        final StackTraceElement[] ste = ex.getStackTrace();
+        for (int i = 0; i < ste.length; i++) {
             m += ste[i].toString() + "<p>";
+        }
         m += "</html>";
         ex.printStackTrace();
         JOptionPane.showMessageDialog(null, m, "Error",
@@ -289,7 +309,8 @@ public class ToolBox {
     public static String getFileName(final Component parent, final String path,
             final List<String> ext, final boolean load) {
         String p = path;
-        if (p.length() == 0) {
+
+        if ((p == null) || (p.length() == 0)) {
             p = ".";
         }
 

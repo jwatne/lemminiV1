@@ -40,14 +40,6 @@ public class Lemming {
      */
     private static final int SIXTEEN = 16;
     /**
-     * 7 constant.
-     */
-    private static final int SEVEN = 7;
-    /**
-     * 4 constant.
-     */
-    private static final int FOUR = 4;
-    /**
      * 3 constant.
      */
     private static final int THREE = 3;
@@ -159,8 +151,6 @@ public class Lemming {
     private static final int BASHER_FALL_DISTANCE = 6;
     /** from this on a miner will become a faller. */
     private static final int MINER_FALL_DISTANCE = 4;
-    /** a floater falls down two pixels per frame. */
-    private static final int FLOATER_STEP = 2;
     /** a jumper moves up two pixels per frame. */
     private static final int JUMPER_STEP = 2;
     /** if a walker jumps up 6 pixels, it becomes a jumper. */
@@ -259,6 +249,16 @@ public class Lemming {
     private Direction dir;
     /** Lemming's skill/type. */
     private Type type;
+
+    /**
+     * Set the Lemming's skill/type.
+     *
+     * @param skill the new Lemming's skill/type.
+     */
+    public final void setType(final Type skill) {
+        this.type = skill;
+    }
+
     /** counter used for internal state changes. */
     private int counter;
 
@@ -344,6 +344,20 @@ public class Lemming {
     private Faller faller;
 
     /**
+     * Returns the object handling falling for the current Lemming.
+     *
+     * @return the object handling falling for the current Lemming.
+     */
+    public Faller getFaller() {
+        return faller;
+    }
+
+    /**
+     * Class for handling floater skill, if assigned to the current Lemming.
+     */
+    private Floater floater;
+
+    /**
      * Constructor: Create Lemming.
      *
      * @param sx x coordinate of foot
@@ -369,6 +383,7 @@ public class Lemming {
         exploder = new LemmingExplosion();
         builder = new Builder(this);
         faller = new Faller(this);
+        floater = new Floater(this);
     }
 
     /**
@@ -568,10 +583,10 @@ public class Lemming {
             newType = animateWalker(newType, oldX, explode);
             break;
         case FLOATER_START:
-            animateFloaterStart(explode);
+            floater.animateFloaterStart(explode);
             //$FALL-THROUGH$
         case FLOATER:
-            newType = animateFloater(newType, explode);
+            newType = floater.animateFloater(newType, explode);
             break;
         case CLIMBER:
             newType = animateClimber(newType, explode);
@@ -602,7 +617,7 @@ public class Lemming {
             break;
         case BOMBER_STOPPER:
             // don't erase stopper mask before stopper finally explodes or falls
-            free = freeBelow(FLOATER_STEP);
+            free = freeBelow(Floater.FLOATER_STEP);
 
             if (free > 0) {
                 // stopper falls -> erase mask and convert to normal stopper.
@@ -667,7 +682,7 @@ public class Lemming {
                 x = Level.WIDTH;
             }
 
-            free = freeBelow(FLOATER_STEP);
+            free = freeBelow(Floater.FLOATER_STEP);
 
             if (free < freeMin) {
                 freeMin = free;
@@ -857,7 +872,7 @@ public class Lemming {
      */
     private void animateBomber() {
         int free;
-        free = freeBelow(FLOATER_STEP);
+        free = freeBelow(Floater.FLOATER_STEP);
 
         if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
             y += Faller.FALLER_STEP;
@@ -896,7 +911,7 @@ public class Lemming {
             playOhNoIfNotToBeNuked();
         } else {
             // check for conversion to faller
-            free = freeBelow(FLOATER_STEP);
+            free = freeBelow(Floater.FLOATER_STEP);
 
             if (free > 0) {
                 if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
@@ -1022,7 +1037,7 @@ public class Lemming {
             if (turnedByStopper()) {
                 newType = Type.WALKER;
             } else {
-                free = freeBelow(FLOATER_STEP);
+                free = freeBelow(Floater.FLOATER_STEP);
 
                 if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
                     y += Faller.FALLER_STEP;
@@ -1173,74 +1188,6 @@ public class Lemming {
         }
 
         return newType;
-    }
-
-    /**
-     * Animates floater.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @param explode         <code>true</code> if the Lemming is to explode.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateFloater(final Type startingNewType,
-            final boolean explode) {
-        Type newType = startingNewType;
-        int free;
-
-        if (explode) {
-            explode();
-        } else {
-            free = freeBelow(FLOATER_STEP);
-
-            if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
-                y += FLOATER_STEP;
-            } else {
-                y += free; // max: FLOATER_STEP
-            }
-
-            if (!faller.crossedLowerBorder()) {
-                counter += free; // fall counter
-
-                // check ground hit
-                if (free == 0) {
-                    newType = Type.WALKER;
-                    counter = 0;
-                }
-            }
-        }
-
-        return newType;
-    }
-
-    /**
-     * Starts animating floater.
-     *
-     * @param explode <code>true</code> if the Lemming is to explode.
-     */
-    private void animateFloaterStart(final boolean explode) {
-        if (explode) {
-            explode();
-        } else {
-            switch (counter2++) {
-            case 0:
-            case 1: // keep falling with faller speed
-            case 2:
-                y += Faller.FALLER_STEP - FLOATER_STEP;
-                break;
-            case THREE:
-                y -= FLOATER_STEP - 1; // decelerate a little
-                break;
-            case FOUR:
-            case FIVE:
-            case SIX:
-            case SEVEN:
-                y -= FLOATER_STEP; // decelerate some more
-                break;
-            default:
-                type = Type.FLOATER;
-            }
-        }
     }
 
     /**
@@ -1405,7 +1352,7 @@ public class Lemming {
     /**
      * Let the Lemming explode.
      */
-    private void explode() {
+    public void explode() {
         SoundController.getSound().play(SoundController.SND_EXPLODE);
         // create particle explosion
         GameController.addExplosion(midX(), midY());

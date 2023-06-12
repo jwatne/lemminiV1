@@ -159,20 +159,12 @@ public class Lemming {
     private static final int BASHER_FALL_DISTANCE = 6;
     /** from this on a miner will become a faller. */
     private static final int MINER_FALL_DISTANCE = 4;
-    /** a faller falls down three pixels per frame. */
-    private static final int FALLER_STEP = 3;
     /** a floater falls down two pixels per frame. */
     private static final int FLOATER_STEP = 2;
     /** a jumper moves up two pixels per frame. */
     private static final int JUMPER_STEP = 2;
     /** if a walker jumps up 6 pixels, it becomes a jumper. */
     private static final int JUMPER_JUMP = 4;
-    /** pixels a floater falls before the parachute begins to open. */
-    private static final int FALL_DISTANCE_FLOAT = 32;
-    /** number of free pixels below needed to convert a lemming to a faller. */
-    private static final int FALL_DISTANCE_FALL = 8;
-    /** used as "free below" value to convert most skills into a faller. */
-    private static final int FALL_DISTANCE_FORCE_FALL = 2 * FALL_DISTANCE_FALL;
     /** Lemmini runs with 50fps instead of 25fps. */
     public static final int TIME_SCALE = 2;
     /** resource (animation etc.) for the current Lemming. */
@@ -290,6 +282,25 @@ public class Lemming {
 
     /** another counter used for internal state changes. */
     private int counter2;
+
+    /**
+     * Returns another counter used for internal state changes.
+     *
+     * @return another counter used for internal state changes.
+     */
+    public final int getCounter2() {
+        return counter2;
+    }
+
+    /**
+     * Sets another counter used for internal state changes.
+     *
+     * @param anotherCounter another counter used for internal state changes.
+     */
+    public final void setCounter2(final int anotherCounter) {
+        this.counter2 = anotherCounter;
+    }
+
     /** Lemming can float. */
     private boolean canFloat;
     /** Lemming can climb. */
@@ -300,6 +311,16 @@ public class Lemming {
     private boolean nuke;
     /** Lemming has died. */
     private boolean hasDied;
+
+    /**
+     * Set whether Lemming has died.
+     *
+     * @param dead <code>true</code> if Lemming has died.
+     */
+    public final void setHasDied(final boolean dead) {
+        this.hasDied = dead;
+    }
+
     /** Lemming has left the level. */
     private boolean hasLeft;
     /** counter used to display the select image in replay mode. */
@@ -317,6 +338,10 @@ public class Lemming {
      * Class for handling builder skill, if assigned to the current Lemming.
      */
     private Builder builder;
+    /**
+     * Class for handling falling for current Lemming.
+     */
+    private Faller faller;
 
     /**
      * Constructor: Create Lemming.
@@ -343,6 +368,7 @@ public class Lemming {
         nuke = false;
         exploder = new LemmingExplosion();
         builder = new Builder(this);
+        faller = new Faller(this);
     }
 
     /**
@@ -525,7 +551,7 @@ public class Lemming {
             if (explode) {
                 explode();
             } else {
-                newType = animateFaller(newType);
+                newType = faller.animateFaller(newType);
             }
 
             break;
@@ -659,8 +685,8 @@ public class Lemming {
             // newType = Type.FALLER;
             // }
 
-            if (free >= FALLER_STEP) {
-                y += FALLER_STEP;
+            if (free >= Faller.FALLER_STEP) {
+                y += Faller.FALLER_STEP;
             } else {
                 y += free;
             }
@@ -833,13 +859,13 @@ public class Lemming {
         int free;
         free = freeBelow(FLOATER_STEP);
 
-        if (free == FALL_DISTANCE_FORCE_FALL) {
-            y += FALLER_STEP;
+        if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
+            y += Faller.FALLER_STEP;
         } else {
             y += free;
         }
 
-        crossedLowerBorder();
+        faller.crossedLowerBorder();
     }
 
     /**
@@ -873,15 +899,15 @@ public class Lemming {
             free = freeBelow(FLOATER_STEP);
 
             if (free > 0) {
-                if (free == FALL_DISTANCE_FORCE_FALL) {
-                    y += FALLER_STEP;
+                if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
+                    y += Faller.FALLER_STEP;
                 } else {
                     y += free;
                 }
 
                 counter += free;
 
-                if (counter >= FALL_DISTANCE_FALL) {
+                if (counter >= Faller.FALL_DISTANCE_FALL) {
                     newType = Type.FALLER;
                 } else {
                     newType = Type.WALKER;
@@ -942,7 +968,7 @@ public class Lemming {
                 }
 
                 break;
-            case FALLER_STEP * TIME_SCALE:
+            case Faller.FALLER_STEP * TIME_SCALE:
             case FIFTEEN * TIME_SCALE:
                 if (dir == Direction.RIGHT) {
                     x += STEP_PIXELS;
@@ -954,8 +980,8 @@ public class Lemming {
                 free = freeBelow(MINER_FALL_DISTANCE);
 
                 if (free >= MINER_FALL_DISTANCE) {
-                    if (free == FALL_DISTANCE_FORCE_FALL) {
-                        y += FALLER_STEP;
+                    if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
+                        y += Faller.FALLER_STEP;
                     } else {
                         y += free;
                     }
@@ -998,8 +1024,8 @@ public class Lemming {
             } else {
                 free = freeBelow(FLOATER_STEP);
 
-                if (free == FALL_DISTANCE_FORCE_FALL) {
-                    y += FALLER_STEP;
+                if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
+                    y += Faller.FALLER_STEP;
                 } else {
                     y += free;
                 }
@@ -1027,7 +1053,7 @@ public class Lemming {
 
                 switch (idx) {
                 case 2 * TIME_SCALE:
-                case FALLER_STEP * TIME_SCALE:
+                case Faller.FALLER_STEP * TIME_SCALE:
                 case STEP_PIXELS * TIME_SCALE:
                 case FIVE * TIME_SCALE:
                     // bash mask should have the same height as the lemming
@@ -1167,13 +1193,13 @@ public class Lemming {
         } else {
             free = freeBelow(FLOATER_STEP);
 
-            if (free == FALL_DISTANCE_FORCE_FALL) {
+            if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
                 y += FLOATER_STEP;
             } else {
                 y += free; // max: FLOATER_STEP
             }
 
-            if (!crossedLowerBorder()) {
+            if (!faller.crossedLowerBorder()) {
                 counter += free; // fall counter
 
                 // check ground hit
@@ -1200,7 +1226,7 @@ public class Lemming {
             case 0:
             case 1: // keep falling with faller speed
             case 2:
-                y += FALLER_STEP - FLOATER_STEP;
+                y += Faller.FALLER_STEP - FLOATER_STEP;
                 break;
             case THREE:
                 y -= FLOATER_STEP - 1; // decelerate a little
@@ -1244,10 +1270,10 @@ public class Lemming {
             boolean doBreak = false;
 
             // check
-            free = freeBelow(FALL_DISTANCE_FALL);
+            free = freeBelow(Faller.FALL_DISTANCE_FALL);
 
-            if (free >= FALL_DISTANCE_FALL) {
-                y += FALLER_STEP;
+            if (free >= Faller.FALL_DISTANCE_FALL) {
+                y += Faller.FALLER_STEP;
             } else {
                 y += free;
                 counter = free;
@@ -1279,10 +1305,10 @@ public class Lemming {
 
             if (!doBreak && (free > 0)) {
                 // check for conversion to faller
-                counter += FALLER_STEP; // @check: is this ok? increasing
-                                        // counter, but using free???
+                counter += Faller.FALLER_STEP; // @check: is this ok? increasing
+                // counter, but using free???
 
-                if (free >= FALL_DISTANCE_FALL) {
+                if (free >= Faller.FALL_DISTANCE_FALL) {
                     newType = Type.FALLER;
                 }
             }
@@ -1308,45 +1334,6 @@ public class Lemming {
             // conversion to walker
             y -= levitation;
             newType = Type.WALKER;
-        }
-
-        return newType;
-    }
-
-    /**
-     * Animates faller.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateFaller(final Type startingNewType) {
-        Type newType = startingNewType;
-        int free;
-        free = freeBelow(FALLER_STEP);
-
-        if (free == FALL_DISTANCE_FORCE_FALL) {
-            y += FALLER_STEP;
-        } else {
-            y += free; // max: FALLER_STEP
-        }
-
-        if (!crossedLowerBorder()) {
-            counter += free; // fall counter
-
-            // check conversion to floater
-            if (canFloat && counter >= FALL_DISTANCE_FLOAT) {
-                newType = Type.FLOATER_START;
-                counter2 = 0; // used for parachute opening "jump" up
-            } else if (free == 0) { // check ground hit
-                // System.out.println(counter);
-                if (counter > GameController.getLevel().getMaxFallDistance()) {
-                    newType = Type.SPLAT;
-                } else {
-                    newType = Type.WALKER;
-                    counter = 0;
-                }
-            }
         }
 
         return newType;
@@ -1562,7 +1549,7 @@ public class Lemming {
      *
      * @return number of free pixels below the lemming
      */
-    private int freeBelow(final int step) {
+    public int freeBelow(final int step) {
         if (x < 0 || x >= Level.WIDTH) {
             return 0;
         }
@@ -1575,10 +1562,12 @@ public class Lemming {
 
         for (int i = 0; i < step; i++) {
             if (yb + i >= Level.HEIGHT) {
-                return FALL_DISTANCE_FORCE_FALL; // convert most skill to faller
+                return Faller.FALL_DISTANCE_FORCE_FALL; // convert most skill to
+                                                        // faller
             }
 
             final int s = stencil.get(pos);
+
             if ((s & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY) {
                 free++;
             } else {
@@ -1648,21 +1637,6 @@ public class Lemming {
             pos -= Level.WIDTH;
         }
         return free;
-    }
-
-    /**
-     * Check if Lemming has fallen to/through the bottom of the level.
-     *
-     * @return true if Lemming has fallen to/through the bottom of the level,
-     *         false otherwise
-     */
-    private boolean crossedLowerBorder() {
-        if (y >= Level.HEIGHT) {
-            hasDied = true;
-            SoundController.getSound().play(SoundController.SND_DIE);
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -1989,7 +1963,6 @@ public class Lemming {
                 }
             case MINER:
                 if (canMine()) {
-                    // y += 2;
                     changeType(type, skill);
                     counter = 0;
                     return true;
@@ -1997,18 +1970,16 @@ public class Lemming {
                     return false;
                 }
             case BASHER:
-                // if (canBash(true)) {
                 changeType(type, skill);
                 counter = 0;
                 return true;
-            // } else return false;
             case BUILDER:
-                // int fa = freeAbove(4);
-                final int fb = freeBelow(FALLER_STEP);
-                if (/* fa <= 0 || */ fb != 0) {
+                final int fb = freeBelow(Faller.FALLER_STEP);
+
+                if (fb != 0) {
                     return false;
                 }
-                // x = x & ~1; // start building at even positions
+
                 changeType(type, skill);
                 counter = 0;
                 return true;
@@ -2017,9 +1988,11 @@ public class Lemming {
                         .getMask(Direction.LEFT);
                 maskX = screenX();
                 maskY = screenY();
+
                 if (m.checkType(maskX, maskY, 0, Stencil.MSK_STOPPER)) {
                     return false; // overlaps existing stopper
                 }
+
                 changeType(type, skill);
                 counter = 0;
                 // set stopper mask

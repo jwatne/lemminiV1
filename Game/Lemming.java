@@ -116,17 +116,9 @@ public class Lemming {
      */
     private static final int FIFTEEN = 15;
     /**
-     * 9 constant.
-     */
-    private static final int NINE = 9;
-    /**
-     * Minimum amount that must be free above lemming.
-     */
-    private static final int MIN_FREE_ABOVE_STEP = 8;
-    /**
      * Number of pixels to add/subtract when stepping.
      */
-    private static final int STEP_PIXELS = 4;
+    public static final int STEP_PIXELS = 4;
     /**
      * 6 constant.
      */
@@ -160,7 +152,7 @@ public class Lemming {
     /** a climber climbs up 1 pixel every 2nd frame. */
     private static final int CLIMBER_STEP = 1;
     /** at this height a walker will turn around. */
-    private static final int WALKER_OBSTACLE_HEIGHT = 14;
+    public static final int WALKER_OBSTACLE_HEIGHT = 14;
     /** check N pixels above the lemming's feet. */
     private static final int BASHER_CHECK_STEP = 12;
     /** from this on a basher will become a faller. */
@@ -181,20 +173,92 @@ public class Lemming {
     private static final int FALL_DISTANCE_FALL = 8;
     /** used as "free below" value to convert most skills into a faller. */
     private static final int FALL_DISTANCE_FORCE_FALL = 2 * FALL_DISTANCE_FALL;
-    /** number of steps a builder can build. */
-    private static final int STEPS_MAX = 12;
-    /** number of steps before the warning sound is played. */
-    private static final int STEPS_WARNING = 9;
     /** Lemmini runs with 50fps instead of 25fps. */
-    private static final int TIME_SCALE = 2;
+    public static final int TIME_SCALE = 2;
     /** resource (animation etc.) for the current Lemming. */
     private LemmingResource lemRes;
+
+    /**
+     * Returns resource (animation etc.) for the current Lemming.
+     *
+     * @return resource (animation etc.) for the current Lemming.
+     */
+    public final LemmingResource getLemRes() {
+        return lemRes;
+    }
+
+    /**
+     * Sets resource (animation etc.) for the current Lemming.
+     *
+     * @param resource resource (animation etc.) for the current Lemming.
+     */
+    public final void setLemRes(final LemmingResource resource) {
+        this.lemRes = resource;
+    }
+
     /** animation frame. */
     private int frameIdx;
+
+    /**
+     * Returns animation frame.
+     *
+     * @return animation frame.
+     */
+    public final int getFrameIdx() {
+        return frameIdx;
+    }
+
+    /**
+     * Sets animation frame.
+     *
+     * @param frame animation frame.
+     */
+    public final void setFrameIdx(final int frame) {
+        this.frameIdx = frame;
+    }
+
     /** x coordinate of foot in pixels. */
     private int x;
+
+    /**
+     * Returns x coordinate of foot in pixels.
+     *
+     * @return x coordinate of foot in pixels.
+     */
+    public final int getX() {
+        return x;
+    }
+
+    /**
+     * Sets x coordinate of foot in pixels.
+     *
+     * @param xCoordinate x coordinate of foot in pixels.
+     */
+    public final void setX(final int xCoordinate) {
+        this.x = xCoordinate;
+    }
+
     /** y coordinate of foot in pixels. */
     private int y;
+
+    /**
+     * Returns y coordinate of foot in pixels.
+     *
+     * @return y coordinate of foot in pixels.
+     */
+    public final int getY() {
+        return y;
+    }
+
+    /**
+     * Sets y coordinate of foot in pixels.
+     *
+     * @param yCoordinate y coordinate of foot in pixels.
+     */
+    public final void setY(final int yCoordinate) {
+        this.y = yCoordinate;
+    }
+
     /** x coordinate for mask in pixels. */
     private int maskX;
     /** y coordinate for mask in pixels. */
@@ -205,6 +269,25 @@ public class Lemming {
     private Type type;
     /** counter used for internal state changes. */
     private int counter;
+
+    /**
+     * Returns counter used for internal state changes.
+     *
+     * @return counter used for internal state changes.
+     */
+    public final int getCounter() {
+        return counter;
+    }
+
+    /**
+     * Sets counter used for internal state changes.
+     *
+     * @param stateChangeCounter counter used for internal state changes.
+     */
+    public final void setCounter(final int stateChangeCounter) {
+        this.counter = stateChangeCounter;
+    }
+
     /** another counter used for internal state changes. */
     private int counter2;
     /** Lemming can float. */
@@ -230,6 +313,10 @@ public class Lemming {
      * Class for handling explosions, if any, for the current Lemming.
      */
     private LemmingExplosion exploder;
+    /**
+     * Class for handling builder skill, if assigned to the current Lemming.
+     */
+    private Builder builder;
 
     /**
      * Constructor: Create Lemming.
@@ -255,6 +342,7 @@ public class Lemming {
         hasLeft = false; // not yet
         nuke = false;
         exploder = new LemmingExplosion();
+        builder = new Builder(this);
     }
 
     /**
@@ -481,7 +569,7 @@ public class Lemming {
 
             break;
         case BUILDER:
-            newType = animateBuilder(newType, oldX, explode);
+            newType = builder.animateBuilder(newType, oldX, explode);
             break;
         case STOPPER:
             newType = animateStopper(newType, explode);
@@ -804,82 +892,6 @@ public class Lemming {
                 m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
             } else {
                 counter = 0;
-            }
-        }
-
-        return newType;
-    }
-
-    /**
-     * Animates builder.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @param oldX            the old X value of the foot in pixels.
-     * @param explode         <code>true</code> if the Lemming is to explode.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateBuilder(final Type startingNewType, final int oldX,
-            final boolean explode) {
-        Type newType = startingNewType;
-
-        if (explode) {
-            newType = Type.BOMBER;
-            playOhNoIfNotToBeNuked();
-        } else if (!turnedByStopper()) {
-            int idx = frameIdx + 1;
-
-            if (idx >= lemRes.getFrames() * TIME_SCALE) {
-                // step created -> move up
-                idx = 0;
-                counter++; // step counter;
-
-                if (dir == Direction.RIGHT) {
-                    x += STEP_PIXELS; // step forward
-                } else {
-                    x -= STEP_PIXELS;
-                }
-
-                y -= 2; // step up
-                final int levitation = aboveGround(); // should be 0, if not, we
-                                                      // built into a wall ->
-                                                      // stop
-                // check for conversion to walker
-                final int fa = freeAbove(MIN_FREE_ABOVE_STEP); // check if
-                                                               // builder is too
-                                                               // close to
-                // ceiling
-
-                if (fa < MIN_FREE_ABOVE_STEP || levitation > 0) {
-                    newType = Type.WALKER;
-
-                    // a lemming can jump through the ceiling like in
-                    // Mayhem2-Boiler Room
-                    if (levitation >= WALKER_OBSTACLE_HEIGHT) {
-                        // avoid getting stuck
-                        x = oldX;
-                        y += 2;
-                    }
-
-                    dir = (dir == Direction.RIGHT) ? Direction.LEFT
-                            : Direction.RIGHT;
-                } else
-                // check for last step used
-                if (counter >= STEPS_MAX) {
-                    newType = Type.BUILDER_END;
-                }
-            } else if (idx == NINE * TIME_SCALE) {
-                // stair mask is the same height as a lemming
-                Mask m;
-                m = lemRes.getMask(dir);
-                final int sx = screenX();
-                final int sy = screenY();
-                m.paintStep(sx, sy, 0,
-                        GameController.getLevel().getDebrisColor());
-
-                if (counter >= STEPS_WARNING) {
-                    SoundController.getSound().play(SoundController.SND_TING);
-                }
             }
         }
 
@@ -1343,7 +1355,7 @@ public class Lemming {
     /**
      * Plays &quot;oh no&quot; sound if Lemming is not (already) to be nuked.
      */
-    private void playOhNoIfNotToBeNuked() {
+    public void playOhNoIfNotToBeNuked() {
         if (!nuke) {
             SoundController.playNukeSound();
         }
@@ -1354,7 +1366,7 @@ public class Lemming {
      *
      * @return true if Lemming is to be turned, false otherwise
      */
-    private boolean turnedByStopper() {
+    public boolean turnedByStopper() {
         final int s = (stencilMid() & Stencil.MSK_STOPPER);
 
         if (s == Stencil.MSK_STOPPER_LEFT && dir == Direction.RIGHT) {
@@ -1612,7 +1624,7 @@ public class Lemming {
      *
      * @return number of free pixels above the lemming
      */
-    private int freeAbove(final int step) {
+    public int freeAbove(final int step) {
         if (x < 0 || x >= Level.WIDTH) {
             return 0;
         }
@@ -1658,7 +1670,7 @@ public class Lemming {
      *
      * @return number of pixels of walkable ground above the Lemmings foot.
      */
-    private int aboveGround() {
+    public int aboveGround() {
         if (x < 0 || x >= Level.WIDTH) {
             return Level.HEIGHT - 1;
         }
@@ -2096,6 +2108,15 @@ public class Lemming {
      */
     public Direction getDirection() {
         return dir;
+    }
+
+    /**
+     * Sets heading of Lemming.
+     *
+     * @param direction heading of Lemming.
+     */
+    public void setDirection(final Direction direction) {
+        this.dir = direction;
     }
 
     /**

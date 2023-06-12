@@ -141,8 +141,6 @@ public class Lemming {
 
     /** a walker walks one pixel per frame. */
     private static final int WALKER_STEP = 1;
-    /** a climber climbs up 1 pixel every 2nd frame. */
-    private static final int CLIMBER_STEP = 1;
     /** at this height a walker will turn around. */
     public static final int WALKER_OBSTACLE_HEIGHT = 14;
     /** check N pixels above the lemming's feet. */
@@ -356,6 +354,10 @@ public class Lemming {
      * Class for handling floater skill, if assigned to the current Lemming.
      */
     private Floater floater;
+    /**
+     * Class for handling climber skill, if assigned to the current Lemming.
+     */
+    private Climber climber;
 
     /**
      * Constructor: Create Lemming.
@@ -384,6 +386,7 @@ public class Lemming {
         builder = new Builder(this);
         faller = new Faller(this);
         floater = new Floater(this);
+        climber = new Climber(this);
     }
 
     /**
@@ -589,7 +592,7 @@ public class Lemming {
             newType = floater.animateFloater(newType, explode);
             break;
         case CLIMBER:
-            newType = animateClimber(newType, explode);
+            newType = climber.animateClimber(newType, explode);
             break;
         case SPLAT:
             animateSplat(explode);
@@ -1158,39 +1161,6 @@ public class Lemming {
     }
 
     /**
-     * Animates climber.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @param explode         <code>true</code> if the Lemming is to explode.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateClimber(final Type startingNewType,
-            final boolean explode) {
-        Type newType = startingNewType;
-
-        if (explode) {
-            explode();
-        } else {
-            if ((++counter & 1) == 1) { // only every other step
-                y -= CLIMBER_STEP;
-            }
-
-            if (midY() < 0 || freeAbove(2) < 2) {
-                dir = (dir == Direction.RIGHT) ? Direction.LEFT
-                        : Direction.RIGHT;
-                newType = Type.FALLER;
-                counter = 0;
-            } else if (reachedPlateau()) {
-                counter = 0;
-                newType = Type.CLIMBER_TO_WALKER;
-            }
-        }
-
-        return newType;
-    }
-
-    /**
      * Animates walker.
      *
      * @param startingNewType the original new Type to be assigned to the
@@ -1619,30 +1589,6 @@ public class Lemming {
         }
 
         return l;
-    }
-
-    /**
-     * Check if climber reached a plateau he can walk on.
-     *
-     * @return true if climber reached a plateau he can walk on, false otherwise
-     */
-    private boolean reachedPlateau() {
-        if (x < 2 || x >= Level.WIDTH - 2) {
-            return false;
-        }
-        final int ym = midY();
-        if (ym >= Level.HEIGHT || ym < 0) {
-            return false;
-        }
-        int pos = x;
-        if (dir == Direction.LEFT) {
-            pos -= 2;
-        } else {
-            pos += 2;
-        }
-        pos += ym * Level.WIDTH;
-        return (GameController.getStencil().get(pos)
-                & Stencil.MSK_WALK_ON) == Stencil.MSK_EMPTY;
     }
 
     /**

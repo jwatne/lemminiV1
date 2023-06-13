@@ -104,10 +104,6 @@ public class Lemming {
      */
     private static final int FIVE = 5;
     /**
-     * 15 constant.
-     */
-    private static final int FIFTEEN = 15;
-    /**
      * Number of pixels to add/subtract when stepping.
      */
     public static final int STEP_PIXELS = 4;
@@ -143,8 +139,6 @@ public class Lemming {
     private static final int BASHER_CHECK_STEP = 12;
     /** from this on a basher will become a faller. */
     private static final int BASHER_FALL_DISTANCE = 6;
-    /** from this on a miner will become a faller. */
-    private static final int MINER_FALL_DISTANCE = 4;
     /** a jumper moves up two pixels per frame. */
     public static final int JUMPER_STEP = 2;
     /** Lemmini runs with 50fps instead of 25fps. */
@@ -356,6 +350,10 @@ public class Lemming {
      * Class for handling walking for the current Lemming.
      */
     private final Walker walker;
+    /**
+     * Class for handling mining skill for the current Lemming, if assigned.
+     */
+    private Miner miner;
 
     /**
      * Constructor: Create Lemming.
@@ -386,6 +384,7 @@ public class Lemming {
         floater = new Floater(this);
         climber = new Climber(this);
         walker = new Walker(this);
+        miner = new Miner(this);
     }
 
     /**
@@ -600,7 +599,7 @@ public class Lemming {
             newType = animateBasher(newType, explode);
             break;
         case MINER:
-            newType = animateMiner(newType, explode);
+            newType = miner.animateMiner(newType, explode);
             break;
         case DIGGER:
         case BUILDER_END:
@@ -935,82 +934,6 @@ public class Lemming {
                 m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
             } else {
                 counter = 0;
-            }
-        }
-
-        return newType;
-    }
-
-    /**
-     * Animates miner.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @param explode         <code>true</code> if the Lemming is to explode.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateMiner(final Type startingNewType,
-            final boolean explode) {
-        Type newType = startingNewType;
-        int free;
-
-        if (explode) {
-            newType = Type.BOMBER;
-            playOhNoIfNotToBeNuked();
-        } else if (!turnedByStopper()) {
-            Mask m;
-            int sx;
-            int sy;
-            int idx = frameIdx + 1;
-
-            if (idx >= lemRes.getFrames() * TIME_SCALE) {
-                idx = 0;
-            }
-
-            switch (idx) {
-            case 1 * TIME_SCALE:
-            case 2 * TIME_SCALE:
-                // check for steel in mask
-                m = lemRes.getMask(dir);
-                sx = screenX();
-                sy = screenY();
-                final int checkMask = Stencil.MSK_STEEL
-                        | ((dir == Direction.LEFT) ? Stencil.MSK_NO_DIG_LEFT
-                                : Stencil.MSK_NO_DIG_RIGHT);
-                m.eraseMask(sx, sy, idx / TIME_SCALE - 1, checkMask);
-
-                if (lemRes.getImask(dir).checkType(sx, sy, 0, checkMask)) {
-                    SoundController.playLastFewStepsSound();
-                    newType = Type.WALKER;
-                }
-
-                break;
-            case Faller.FALLER_STEP * TIME_SCALE:
-            case FIFTEEN * TIME_SCALE:
-                if (dir == Direction.RIGHT) {
-                    x += STEP_PIXELS;
-                } else {
-                    x -= STEP_PIXELS;
-                }
-
-                // check for conversion to faller
-                free = freeBelow(MINER_FALL_DISTANCE);
-
-                if (free >= MINER_FALL_DISTANCE) {
-                    if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
-                        y += Faller.FALLER_STEP;
-                    } else {
-                        y += free;
-                    }
-
-                    newType = Type.FALLER;
-                } else if (idx == FIFTEEN * TIME_SCALE) {
-                    y += STEP_PIXELS;
-                }
-
-                break;
-            default:
-                break;
             }
         }
 

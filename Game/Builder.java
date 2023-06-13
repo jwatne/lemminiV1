@@ -75,7 +75,7 @@ public class Builder {
 
                     // a lemming can jump through the ceiling like in
                     // Mayhem2-Boiler Room
-                    if (levitation >= Lemming.WALKER_OBSTACLE_HEIGHT) {
+                    if (levitation >= Walker.WALKER_OBSTACLE_HEIGHT) {
                         // avoid getting stuck
                         lemming.setX(oldX);
                         lemming.setY(lemming.getY() + 2);

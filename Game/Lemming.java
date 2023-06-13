@@ -139,10 +139,6 @@ public class Lemming {
             "CLIMBER", "FLOATER", "", "BLOCKER", "DROWNING", "", "", "BOMBER",
             "BUILDER", "BUILDER", "DIGGER", "BASHER", "MINER", "WALKER"};
 
-    /** a walker walks one pixel per frame. */
-    private static final int WALKER_STEP = 1;
-    /** at this height a walker will turn around. */
-    public static final int WALKER_OBSTACLE_HEIGHT = 14;
     /** check N pixels above the lemming's feet. */
     private static final int BASHER_CHECK_STEP = 12;
     /** from this on a basher will become a faller. */
@@ -150,9 +146,7 @@ public class Lemming {
     /** from this on a miner will become a faller. */
     private static final int MINER_FALL_DISTANCE = 4;
     /** a jumper moves up two pixels per frame. */
-    private static final int JUMPER_STEP = 2;
-    /** if a walker jumps up 6 pixels, it becomes a jumper. */
-    private static final int JUMPER_JUMP = 4;
+    public static final int JUMPER_STEP = 2;
     /** Lemmini runs with 50fps instead of 25fps. */
     public static final int TIME_SCALE = 2;
     /** resource (animation etc.) for the current Lemming. */
@@ -331,15 +325,15 @@ public class Lemming {
     /**
      * Class for handling explosions, if any, for the current Lemming.
      */
-    private LemmingExplosion exploder;
+    private final LemmingExplosion exploder;
     /**
      * Class for handling builder skill, if assigned to the current Lemming.
      */
-    private Builder builder;
+    private final Builder builder;
     /**
      * Class for handling falling for current Lemming.
      */
-    private Faller faller;
+    private final Faller faller;
 
     /**
      * Returns the object handling falling for the current Lemming.
@@ -353,11 +347,15 @@ public class Lemming {
     /**
      * Class for handling floater skill, if assigned to the current Lemming.
      */
-    private Floater floater;
+    private final Floater floater;
     /**
      * Class for handling climber skill, if assigned to the current Lemming.
      */
-    private Climber climber;
+    private final Climber climber;
+    /**
+     * Class for handling walking for the current Lemming.
+     */
+    private final Walker walker;
 
     /**
      * Constructor: Create Lemming.
@@ -387,6 +385,7 @@ public class Lemming {
         faller = new Faller(this);
         floater = new Floater(this);
         climber = new Climber(this);
+        walker = new Walker(this);
     }
 
     /**
@@ -583,7 +582,7 @@ public class Lemming {
 
             break;
         case WALKER:
-            newType = animateWalker(newType, oldX, explode);
+            newType = walker.animateWalker(newType, oldX, explode);
             break;
         case FLOATER_START:
             floater.animateFloaterStart(explode);
@@ -1161,80 +1160,6 @@ public class Lemming {
     }
 
     /**
-     * Animates walker.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @param oldX            the old X value of the foot in pixels.
-     * @param explode         <code>true</code> if the Lemming is to explode.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateWalker(final Type startingNewType, final int oldX,
-            final boolean explode) {
-        Type newType = startingNewType;
-        int free;
-
-        if (explode) {
-            newType = Type.BOMBER;
-            playOhNoIfNotToBeNuked();
-        } else if (!turnedByStopper()) {
-            if (dir == Direction.RIGHT) {
-                x += WALKER_STEP;
-            } else if (dir == Direction.LEFT) {
-                x -= WALKER_STEP;
-            }
-
-            boolean doBreak = false;
-
-            // check
-            free = freeBelow(Faller.FALL_DISTANCE_FALL);
-
-            if (free >= Faller.FALL_DISTANCE_FALL) {
-                y += Faller.FALLER_STEP;
-            } else {
-                y += free;
-                counter = free;
-            }
-
-            final int levitation = aboveGround();
-
-            // check for flip direction
-            if (levitation < WALKER_OBSTACLE_HEIGHT
-                    && (y + lemRes.getHeight() / 2) > 0) {
-                if (levitation >= JUMPER_JUMP) {
-                    y -= JUMPER_STEP;
-                    newType = Type.JUMPER;
-                    doBreak = true; // Stop processing after enclosing if/else.
-                } else {
-                    y -= levitation;
-                }
-            } else {
-                x = oldX;
-
-                if (canClimb) {
-                    newType = Type.CLIMBER;
-                    doBreak = true; // Stop processing after enclosing if/else.
-                } else {
-                    dir = (dir == Direction.RIGHT) ? Direction.LEFT
-                            : Direction.RIGHT;
-                }
-            }
-
-            if (!doBreak && (free > 0)) {
-                // check for conversion to faller
-                counter += Faller.FALLER_STEP; // @check: is this ok? increasing
-                // counter, but using free???
-
-                if (free >= Faller.FALL_DISTANCE_FALL) {
-                    newType = Type.FALLER;
-                }
-            }
-        }
-
-        return newType;
-    }
-
-    /**
      * Animates jumper.
      *
      * @param startingNewType the original new Type to be assigned to the
@@ -1576,10 +1501,12 @@ public class Lemming {
         final Stencil stencil = GameController.getStencil();
         pos += ym * Level.WIDTH;
         int l; // Levitation.
+        final int walkerObstacleHeight = Walker.WALKER_OBSTACLE_HEIGHT;
 
-        for (l = 0; l < WALKER_OBSTACLE_HEIGHT; l++, pos -= Level.WIDTH, ym--) {
+        for (l = 0; l < walkerObstacleHeight; l++, pos -= Level.WIDTH, ym--) {
             if (ym < 0) {
-                return WALKER_OBSTACLE_HEIGHT + 1; // forbid leaving level to
+                return walkerObstacleHeight + 1; // forbid leaving
+                                                 // level to
             }
 
             // the top

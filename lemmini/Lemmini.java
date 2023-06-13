@@ -69,6 +69,12 @@ import tools.ToolBox;
  * isn't nearly as clean as it should be. During the porting to 1.5, I cleaned
  * up some things here and there, but didn't want to redesign the whole thing
  * from scratch.
+ * <p>
+ * For the LemminiV1 fork, John Watne adapted for JDK 17 and dropped separate
+ * logic for runtimes prior to JDK 1.5. Extensive refactoring to modularize the
+ * code into more cohesive Objects and methods. Implemented several Checkstyle
+ * fixes compliant with the standard Sun checks.
+ * </p>
  *
  * @author Volker Oth
  */

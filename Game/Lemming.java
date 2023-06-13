@@ -167,8 +167,46 @@ public class Lemming {
 
     /** x coordinate for mask in pixels. */
     private int maskX;
+
+    /**
+     * Returns x coordinate for mask in pixels.
+     *
+     * @return x coordinate for mask in pixels.
+     */
+    public int getMaskX() {
+        return maskX;
+    }
+
+    /**
+     * Sets x coordinate for mask in pixels.
+     *
+     * @param maskXCoordinate x coordinate for mask in pixels.
+     */
+    public void setMaskX(final int maskXCoordinate) {
+        this.maskX = maskXCoordinate;
+    }
+
     /** y coordinate for mask in pixels. */
     private int maskY;
+
+    /**
+     * Returns y coordinate for mask in pixels.
+     *
+     * @return y coordinate for mask in pixels.
+     */
+    public int getMaskY() {
+        return maskY;
+    }
+
+    /**
+     * Sets y coordinate for mask in pixels.
+     *
+     * @param maskYCoordinate y coordinate for mask in pixels.
+     */
+    public void setMaskY(final int maskYCoordinate) {
+        this.maskY = maskYCoordinate;
+    }
+
     /** Lemming's heading. */
     private Direction dir;
     /** Lemming's skill/type. */
@@ -252,6 +290,16 @@ public class Lemming {
 
     /** static array of resources for each Lemming skill/type. */
     private static LemmingResource[] lemmings;
+
+    /**
+     * Returns static array of resources for each Lemming skill/type.
+     *
+     * @return static array of resources for each Lemming skill/type.
+     */
+    public static LemmingResource[] getLemmings() {
+        return lemmings;
+    }
+
     /** font used for the explosion counter. */
     private static ExplodeFont explodeFont;
     /**
@@ -296,6 +344,10 @@ public class Lemming {
      * Class for handling basher skill for the current Lemming, if assigned.
      */
     private final Basher basher;
+    /**
+     * Class for handling Stopper skill for the current Lemming, if assigned.
+     */
+    private Stopper stopper;
 
     /**
      * Constructor: Create Lemming.
@@ -328,6 +380,7 @@ public class Lemming {
         walker = new Walker(this);
         miner = new Miner(this);
         basher = new Basher(this);
+        stopper = new Stopper(this);
     }
 
     /**
@@ -557,7 +610,7 @@ public class Lemming {
             newType = builder.animateBuilder(newType, oldX, explode);
             break;
         case STOPPER:
-            newType = animateStopper(newType, explode);
+            newType = stopper.animateStopper(newType, explode);
             break;
         case BOMBER_STOPPER:
             // don't erase stopper mask before stopper finally explodes or falls
@@ -834,53 +887,6 @@ public class Lemming {
         final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
         m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
         type = Type.BOMBER;
-    }
-
-    /**
-     * Animates stopper.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @param explode         <code>true</code> if the Lemming is to explode.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateStopper(final Type startingNewType,
-            final boolean explode) {
-        Type newType = startingNewType;
-        int free;
-
-        if (explode) {
-            // don't erase stopper mask!
-            newType = Type.BOMBER_STOPPER;
-            playOhNoIfNotToBeNuked();
-        } else {
-            // check for conversion to faller
-            free = freeBelow(Floater.FLOATER_STEP);
-
-            if (free > 0) {
-                if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
-                    y += Faller.FALLER_STEP;
-                } else {
-                    y += free;
-                }
-
-                counter += free;
-
-                if (counter >= Faller.FALL_DISTANCE_FALL) {
-                    newType = Type.FALLER;
-                } else {
-                    newType = Type.WALKER;
-                }
-
-                // conversion to faller or walker -> erase stopper mask
-                final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
-                m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
-            } else {
-                counter = 0;
-            }
-        }
-
-        return newType;
     }
 
     /**

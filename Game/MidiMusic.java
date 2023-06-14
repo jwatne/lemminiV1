@@ -37,103 +37,123 @@ import javax.sound.midi.Synthesizer;
  */
 public class MidiMusic {
 
-	/** Midi sequencer. */
-	private Sequencer sequencer;
-	/** flag: initialization is finished and midi file can be played. */
-	private boolean canPlay;
+    /**
+     * Maximum value assignable to a Controller = 127.0.
+     */
+    private static final double MAX_CONTROLLER_VALUE = 127.0;
+    /**
+     * MIDI Controller 7.
+     */
+    private static final int CONTROLLER_7 = 7;
+    /**
+     * Metamessage type to start MIDI music(?).
+     */
+    private static final int START_MUSIC = 47;
+    /** Midi sequencer. */
+    private Sequencer sequencer;
+    /** flag: initialization is finished and midi file can be played. */
+    private boolean canPlay;
 
-	/**
-	 * Constructor.
-	 *
-	 * @param fName file name
-	 * @throws ResourceException
-	 * @throws LemmException
-	 */
-	public MidiMusic(final String fName) throws ResourceException, LemmException {
-		try (FileInputStream f = new FileInputStream(Core.findResource(fName))) {
-			canPlay = false;
-			sequencer = MidiSystem.getSequencer();
+    /**
+     * Constructor.
+     *
+     * @param fName file name
+     * @throws ResourceException
+     * @throws LemmException
+     */
+    public MidiMusic(final String fName)
+            throws ResourceException, LemmException {
+        try (FileInputStream f = new FileInputStream(
+                Core.findResource(fName))) {
+            canPlay = false;
+            sequencer = MidiSystem.getSequencer();
 
-			if (sequencer == null) {
-				throw new LemmException("Midi not supported");
-			} else {
-				// Acquire resources and make operational.
-				sequencer.open();
-				final Sequence mySeq = MidiSystem.getSequence(f);
-				setGain(Music.getGain());
-				sequencer.setSequence(mySeq);
-				canPlay = true;
-				sequencer.addMetaEventListener(new MetaEventListener() {
-					@Override
-					public void meta(final MetaMessage event) {
-						final int type = event.getType();
-						// System.out.println("midi message: "+type+" "+event.toString());
+            if (sequencer == null) {
+                throw new LemmException("Midi not supported");
+            } else {
+                // Acquire resources and make operational.
+                sequencer.open();
+                final Sequence mySeq = MidiSystem.getSequence(f);
+                setGain(Music.getGain());
+                sequencer.setSequence(mySeq);
+                canPlay = true;
+                sequencer.addMetaEventListener(new MetaEventListener() {
+                    @Override
+                    public void meta(final MetaMessage event) {
+                        final int type = event.getType();
+                        // System.out.println("midi message: "+type+"
+                        // "+event.toString());
 
-						if (type == 47) {
-							sequencer.setTickPosition(0);
-							sequencer.start();
-						}
-					}
-				});
-			}
-		} catch (final MidiUnavailableException ex) {
-			throw new LemmException("Midi not supported");
-		} catch (final InvalidMidiDataException ex) {
-			throw new ResourceException(fName + " (Invalid midi data)");
-		} catch (final FileNotFoundException ex) {
-			throw new ResourceException(fName);
-		} catch (final IOException ex) {
-			throw new ResourceException(fName + " (IO exception)");
-		}
-	}
+                        if (type == START_MUSIC) {
+                            sequencer.setTickPosition(0);
+                            sequencer.start();
+                        }
+                    }
+                });
+            }
+        } catch (final MidiUnavailableException ex) {
+            throw new LemmException("Midi not supported");
+        } catch (final InvalidMidiDataException ex) {
+            throw new ResourceException(fName + " (Invalid midi data)");
+        } catch (final FileNotFoundException ex) {
+            throw new ResourceException(fName);
+        } catch (final IOException ex) {
+            throw new ResourceException(fName + " (IO exception)");
+        }
+    }
 
-	/**
-	 * Play current midi file.
-	 */
-	public void play() {
-		if (canPlay)
-			sequencer.start();
-	}
+    /**
+     * Play current midi file.
+     */
+    public void play() {
+        if (canPlay) {
+            sequencer.start();
+        }
+    }
 
-	/**
-	 * Stop current midi file.
-	 */
-	public void stop() {
-		if (canPlay)
-			sequencer.stop();
-	}
+    /**
+     * Stop current midi file.
+     */
+    public void stop() {
+        if (canPlay) {
+            sequencer.stop();
+        }
+    }
 
-	/**
-	 * Close current midi file.
-	 */
-	public void close() {
-		stop();
+    /**
+     * Close current midi file.
+     */
+    public void close() {
+        stop();
 
-		if (sequencer != null) {
-			sequencer.close();
-		}
-	}
+        if (sequencer != null) {
+            sequencer.close();
+        }
+    }
 
-	/**
-	 * Set gain (volume) of midi output
-	 *
-	 * @param gn gain factor: 0.0 (off) .. 1.0 (full volume)
-	 */
-	public void setGain(final double gn) {
-		double gain;
-		if (gn > 1.0)
-			gain = 1.0;
-		else if (gn < 0)
-			gain = 0;
-		else
-			gain = gn;
-		if (sequencer != null && sequencer instanceof Synthesizer) {
-			final Synthesizer synthesizer = (Synthesizer) sequencer;
-			final MidiChannel[] channels = synthesizer.getChannels();
+    /**
+     * Set gain (volume) of midi output.
+     *
+     * @param gn gain factor: 0.0 (off) .. 1.0 (full volume)
+     */
+    public void setGain(final double gn) {
+        double gain;
+        if (gn > 1.0) {
+            gain = 1.0;
+        } else if (gn < 0) {
+            gain = 0;
+        } else {
+            gain = gn;
+        }
 
-			for (int i = 0; i < channels.length; i++) {
-				channels[i].controlChange(7, (int) (gain * 127.0));
-			}
-		}
-	}
+        if (sequencer != null && sequencer instanceof Synthesizer) {
+            final Synthesizer synthesizer = (Synthesizer) sequencer;
+            final MidiChannel[] channels = synthesizer.getChannels();
+
+            for (int i = 0; i < channels.length; i++) {
+                channels[i].controlChange(CONTROLLER_7,
+                        (int) (gain * MAX_CONTROLLER_VALUE));
+            }
+        }
+    }
 }

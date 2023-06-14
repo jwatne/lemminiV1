@@ -22,58 +22,64 @@ package game;
  * @author Volker Oth
  */
 public class LevelInfo {
-	/** level name. */
-	private String name;
-	/** name of music for this level. */
-	private String music;
-	/** file name of the INI file containing the level information. */
-	private String fileName;
+    /** level name. */
+    private String name;
+    /** name of music for this level. */
+    private String music;
+    /** file name of the INI file containing the level information. */
+    private String fileName;
 
-	/**
-	 * Set the file name
-	 * @param fileName file name
-	 */
-	public void setFileName(final String fileName) {
-		this.fileName = fileName;
-	}
+    /**
+     * Set the file name.
+     *
+     * @param levelFileName file name
+     */
+    public void setFileName(final String levelFileName) {
+        this.fileName = levelFileName;
+    }
 
-	/**
-	 * Get the file name.
-	 * @return file name
-	 */
-	public String getFileName() {
-		return fileName;
-	}
+    /**
+     * Get the file name.
+     *
+     * @return file name
+     */
+    public String getFileName() {
+        return fileName;
+    }
 
-	/**
-	 * Set name of music.
-	 * @param music name of music
-	 */
-	public void setMusic(final String music) {
-		this.music = music;
-	}
+    /**
+     * Set name of music.
+     *
+     * @param musicName name of music
+     */
+    public void setMusic(final String musicName) {
+        this.music = musicName;
+    }
 
-	/**
-	 * Get name of music.
-	 * @return name of music.
-	 */
-	public String getMusic() {
-		return music;
-	}
+    /**
+     * Get name of music.
+     *
+     * @return name of music.
+     */
+    public String getMusic() {
+        return music;
+    }
 
-	/**
-	 * Set level name.
-	 * @param name level name
-	 */
-	public void setName(final String name) {
-		this.name = name;
-	}
+    /**
+     * Set level name.
+     *
+     * @param levelName level name
+     */
+    public void setName(final String levelName) {
+        this.name = levelName;
+    }
 
-	/**
-	 * Get level name.
-	 * @return level name
-	 */
-	public String getName() {
-		return name;
-	}
+    /**
+     * Get level name.
+     *
+     * @return level name
+     */
+    public String getName() {
+        return name;
+    }
 }

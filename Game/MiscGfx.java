@@ -29,10 +29,27 @@ import tools.ToolBox;
  *
  * @author Volker Oth
  */
-public class MiscGfx {
+public final class MiscGfx {
+
+    /**
+     * 8-bit shift.
+     */
+    private static final int SHIFT_8 = 8;
+    /**
+     * 8-bit mask.
+     */
+    private static final int EIGHT_BIT_MASK = 0xff;
+    /**
+     * 16-bit shift.
+     */
+    private static final int SHIFT_16 = 16;
+    /**
+     * Maximum alpha ARGB value.
+     */
+    private static final int MAX_ALPHA = 0xff000000;
 
     /** Index of images. */
-    public static enum Index {
+    public enum Index {
         /** border for the mini map. */
         BORDER,
         /** Lemmin i logo. */
@@ -50,7 +67,14 @@ public class MiscGfx {
     }
 
     /** array of images. */
-    private static BufferedImage image[];
+    private static BufferedImage[] image;
+
+    /**
+     * Private constructor for utility class.
+     */
+    private MiscGfx() {
+
+    }
 
     /**
      * Initialization.
@@ -78,22 +102,25 @@ public class MiscGfx {
         // patch brown version of tile
         final BufferedImage brownImg = ToolBox.createImage(img.getWidth(),
                 img.getHeight(), Transparency.BITMASK);
-        for (int xp = 0; xp < img.getWidth(null); xp++)
+
+        for (int xp = 0; xp < img.getWidth(null); xp++) {
             for (int yp = 0; yp < img.getHeight(null); yp++) {
                 int col = img.getRGB(xp, yp); // A R G B
-                final int a = col & 0xff000000; // transparent part
-                int r = (col >> 16) & 0xff;
-                final int g = (col >> 8) & 0xff;
-                int b = col & 0xff;
+                final int a = col & MAX_ALPHA; // transparent part
+                int r = (col >> SHIFT_16) & EIGHT_BIT_MASK;
+                final int g = (col >> SHIFT_8) & EIGHT_BIT_MASK;
+                int b = col & EIGHT_BIT_MASK;
                 // patch image to brown version by manipulating red component
-                r = (r * 2) & 0xff;
+                r = (r * 2) & EIGHT_BIT_MASK;
                 b = b / 2;
-                col = a | (g << 16) | (r << 8) | b;
+                col = a | (g << SHIFT_16) | (r << SHIFT_8) | b;
                 brownImg.setRGB(xp, yp, col);
             }
+        }
+
         images.add(brownImg);
         /* 4: REPLAY_1 */
-        final BufferedImage anim[] = ToolBox.getAnimation(
+        final BufferedImage[] anim = ToolBox.getAnimation(
                 Core.loadImage("misc/replay.gif", frame), 2,
                 Transparency.BITMASK);
         images.add(anim[0]);

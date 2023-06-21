@@ -237,22 +237,7 @@ public final class ExtractLevel {
         LevelBuffer b;
 
         try {
-            final File f = new File(fnIn);
-
-            if (f.length() != MAX_FILE_SIZE) {
-                throw new Exception(
-                        "Lemmings level files must be 2048 bytes in size!");
-            }
-
-            try (FileInputStream fi = new FileInputStream(fnIn)) {
-                final byte[] buffer = new byte[(int) f.length()];
-
-                if (fi.read(buffer) < 1) {
-                    System.out.println("0 bytes read from file " + fnIn);
-                }
-
-                b = new LevelBuffer(buffer);
-            }
+            b = getLevelBuffer(fnIn);
         } catch (final FileNotFoundException e) {
             throw new Exception("File " + fnIn + " not found");
         } catch (final IOException e) {
@@ -262,48 +247,11 @@ public final class ExtractLevel {
         // output file
         try (FileWriter fo = new FileWriter(fnOut)) {
             // add only file name without the path in the first line
-            int p1 = fnIn.lastIndexOf("/");
-            final int p2 = fnIn.lastIndexOf("\\");
-
-            if (p2 > p1) {
-                p1 = p2;
-            }
-
-            if (p1 < 0) {
-                p1 = 0;
-            } else {
-                p1++;
-            }
-
-            final String fn = fnIn.substring(p1);
+            final String fn = addFileNameWithoutPathInFirstLine(fnIn);
             // analyze buffer
             fo.write("# LVL extracted by Lemmini # " + fn + "\n");
             // read configuration in big endian word
-            releaseRate = b.getWord();
-            fo.write("releaseRate = " + releaseRate + "\n");
-            numLemmings = b.getWord();
-            fo.write("numLemmings = " + numLemmings + "\n");
-            numToRescue = b.getWord();
-            fo.write("numToRescue = " + numToRescue + "\n");
-            timeLimit = b.getWord();
-            fo.write("timeLimit = " + timeLimit + "\n");
-            numClimbers = b.getWord();
-            fo.write("numClimbers = " + numClimbers + "\n");
-            numFloaters = b.getWord();
-            fo.write("numFloaters = " + numFloaters + "\n");
-            numBombers = b.getWord();
-            fo.write("numBombers = " + numBombers + "\n");
-            numBlockers = b.getWord();
-            fo.write("numBlockers = " + numBlockers + "\n");
-            numBuilders = b.getWord();
-            fo.write("numBuilders = " + numBuilders + "\n");
-            numBashers = b.getWord();
-            fo.write("numBashers = " + numBashers + "\n");
-            numMiners = b.getWord();
-            fo.write("numMiners = " + numMiners + "\n");
-            numDiggers = b.getWord();
-            fo.write("numDiggers = " + numDiggers + "\n");
-            xPos = b.getWord();
+            readConfiguration(b, fo);
 
             // bugfix: in some levels, the position is negative (?)
             if (xPos < 0) {
@@ -324,94 +272,180 @@ public final class ExtractLevel {
                     + "4=NO_OVERWRITE, 0=FULL (only one value possible)\n");
             final byte[] by = new byte[BUFFER_SIZE];
             objects = new ArrayList<LvlObject>();
-            int idx = 0;
-
-            for (int i = 0; i < NUM_OBJECTS; i++) {
-                int sum = 0;
-
-                for (int j = 0; j < BUFFER_SIZE; j++) {
-                    by[j] = b.getByte();
-                    sum += by[j] & EIGHT_BIT_MASK;
-                }
-
-                if (sum != 0) {
-                    final LvlObject obj = new LvlObject(by, SCALE);
-                    objects.add(obj);
-                    fo.write("object_" + idx + " = " + obj.getId() + ", "
-                            + obj.getxPos() + ", " + obj.getyPos() + ", "
-                            + obj.getPaintMode() + ", "
-                            + (obj.isUpsideDown() ? 1 : 0) + "\n");
-                    idx++;
-                }
-            }
-
+            readAndWriteObjects(b, fo, by);
             // read terrain
-            fo.write("\n# Terrain" + "\n");
-            fo.write("# id, xpos, ypos, modifier" + "\n");
-            fo.write("# modifier: 8=NO_OVERWRITE, "
-                    + "4=UPSIDE_DOWN, 2=REMOVE (combining allowed, 0=FULL)\n");
-            terrain = new ArrayList<Terrain>();
-            idx = 0;
-
-            for (int i = 0; i < NUM_TILES; i++) {
-                int mask = EIGHT_BIT_MASK;
-
-                for (int j = 0; j < BYTES_PER_TILE; j++) {
-                    by[j] = b.getByte();
-                    mask &= by[j];
-                }
-
-                if (mask != EIGHT_BIT_MASK) {
-                    final Terrain ter = new Terrain(by, SCALE);
-                    terrain.add(ter);
-                    fo.write("terrain_" + idx + " = " + ter.getId() + ", "
-                            + ter.getxPos() + ", " + ter.getyPos() + ", "
-                            + ter.getModifier() + "\n");
-                    idx++;
-                }
-            }
-
+            readTerrain(b, fo, by);
             // read steel blocks
-            fo.write("\n#Steel" + "\n");
-            fo.write("# id, xpos, ypos, width, height" + "\n");
-            steel = new ArrayList<Steel>();
-            idx = 0;
-
-            for (int i = 0; i < NUM_OBJECTS; i++) {
-                int sum = 0;
-
-                for (int j = 0; j < BYTES_PER_TILE; j++) {
-                    by[j] = b.getByte();
-                    sum += by[j] & EIGHT_BIT_MASK;
-                }
-
-                if (sum != 0) {
-                    final Steel stl = new Steel(by, SCALE);
-                    steel.add(stl);
-                    fo.write("steel_" + idx + " = " + stl.getxPos() + ", "
-                            + stl.getyPos() + ", " + stl.getWidth() + ", "
-                            + stl.getHeight() + "\n");
-                    idx++;
-                }
-            }
-
+            readSteelBlocks(b, fo, by);
             // read name
-            fo.write("\n#Name" + "\n");
-            final char[] cName = new char[LEVEL_NAME_SIZE];
+            readName(b, fo);
+        }
+    }
 
-            for (int j = 0; j < LEVEL_NAME_SIZE; j++) {
-                // replace wrong apostrophes
-                char c = (char) (b.getByte() & EIGHT_BIT_MASK);
+    private static String addFileNameWithoutPathInFirstLine(final String fnIn) {
+        int p1 = fnIn.lastIndexOf("/");
+        final int p2 = fnIn.lastIndexOf("\\");
 
-                if (c == '�' || c == '`') {
-                    c = '\'';
-                }
+        if (p2 > p1) {
+            p1 = p2;
+        }
 
-                cName[j] = c;
+        if (p1 < 0) {
+            p1 = 0;
+        } else {
+            p1++;
+        }
+
+        final String fn = fnIn.substring(p1);
+        return fn;
+    }
+
+    private static void readConfiguration(final LevelBuffer b,
+            final FileWriter fo) throws IOException {
+        releaseRate = b.getWord();
+        fo.write("releaseRate = " + releaseRate + "\n");
+        numLemmings = b.getWord();
+        fo.write("numLemmings = " + numLemmings + "\n");
+        numToRescue = b.getWord();
+        fo.write("numToRescue = " + numToRescue + "\n");
+        timeLimit = b.getWord();
+        fo.write("timeLimit = " + timeLimit + "\n");
+        numClimbers = b.getWord();
+        fo.write("numClimbers = " + numClimbers + "\n");
+        numFloaters = b.getWord();
+        fo.write("numFloaters = " + numFloaters + "\n");
+        numBombers = b.getWord();
+        fo.write("numBombers = " + numBombers + "\n");
+        numBlockers = b.getWord();
+        fo.write("numBlockers = " + numBlockers + "\n");
+        numBuilders = b.getWord();
+        fo.write("numBuilders = " + numBuilders + "\n");
+        numBashers = b.getWord();
+        fo.write("numBashers = " + numBashers + "\n");
+        numMiners = b.getWord();
+        fo.write("numMiners = " + numMiners + "\n");
+        numDiggers = b.getWord();
+        fo.write("numDiggers = " + numDiggers + "\n");
+        xPos = b.getWord();
+    }
+
+    private static LevelBuffer getLevelBuffer(final String fnIn)
+            throws Exception, IOException, FileNotFoundException {
+        LevelBuffer b;
+        final File f = new File(fnIn);
+
+        if (f.length() != MAX_FILE_SIZE) {
+            throw new Exception(
+                    "Lemmings level files must be 2048 bytes in size!");
+        }
+
+        try (FileInputStream fi = new FileInputStream(fnIn)) {
+            final byte[] buffer = new byte[(int) f.length()];
+
+            if (fi.read(buffer) < 1) {
+                System.out.println("0 bytes read from file " + fnIn);
             }
 
-            lvlName = String.valueOf(cName);
-            fo.write("name = " + lvlName + "\n");
+            b = new LevelBuffer(buffer);
         }
+
+        return b;
+    }
+
+    private static void readAndWriteObjects(final LevelBuffer b,
+            final FileWriter fo, final byte[] by) throws IOException {
+        int idx = 0;
+        for (int i = 0; i < NUM_OBJECTS; i++) {
+            int sum = 0;
+
+            for (int j = 0; j < BUFFER_SIZE; j++) {
+                by[j] = b.getByte();
+                sum += by[j] & EIGHT_BIT_MASK;
+            }
+
+            if (sum != 0) {
+                final LvlObject obj = new LvlObject(by, SCALE);
+                objects.add(obj);
+                fo.write("object_" + idx + " = " + obj.getId() + ", "
+                        + obj.getxPos() + ", " + obj.getyPos() + ", "
+                        + obj.getPaintMode() + ", "
+                        + (obj.isUpsideDown() ? 1 : 0) + "\n");
+                idx++;
+            }
+        }
+    }
+
+    private static void readTerrain(final LevelBuffer b, final FileWriter fo,
+            final byte[] by) throws IOException {
+        fo.write("\n# Terrain" + "\n");
+        fo.write("# id, xpos, ypos, modifier" + "\n");
+        fo.write("# modifier: 8=NO_OVERWRITE, "
+                + "4=UPSIDE_DOWN, 2=REMOVE (combining allowed, 0=FULL)\n");
+        terrain = new ArrayList<Terrain>();
+        int idx = 0;
+
+        for (int i = 0; i < NUM_TILES; i++) {
+            int mask = EIGHT_BIT_MASK;
+
+            for (int j = 0; j < BYTES_PER_TILE; j++) {
+                by[j] = b.getByte();
+                mask &= by[j];
+            }
+
+            if (mask != EIGHT_BIT_MASK) {
+                final Terrain ter = new Terrain(by, SCALE);
+                terrain.add(ter);
+                fo.write("terrain_" + idx + " = " + ter.getId() + ", "
+                        + ter.getxPos() + ", " + ter.getyPos() + ", "
+                        + ter.getModifier() + "\n");
+                idx++;
+            }
+        }
+    }
+
+    private static void readSteelBlocks(final LevelBuffer b,
+            final FileWriter fo, final byte[] by) throws IOException {
+        fo.write("\n#Steel" + "\n");
+        fo.write("# id, xpos, ypos, width, height" + "\n");
+        steel = new ArrayList<Steel>();
+        int idx = 0;
+
+        for (int i = 0; i < NUM_OBJECTS; i++) {
+            int sum = 0;
+
+            for (int j = 0; j < BYTES_PER_TILE; j++) {
+                by[j] = b.getByte();
+                sum += by[j] & EIGHT_BIT_MASK;
+            }
+
+            if (sum != 0) {
+                final Steel stl = new Steel(by, SCALE);
+                steel.add(stl);
+                fo.write("steel_" + idx + " = " + stl.getxPos() + ", "
+                        + stl.getyPos() + ", " + stl.getWidth() + ", "
+                        + stl.getHeight() + "\n");
+                idx++;
+            }
+        }
+    }
+
+    private static void readName(final LevelBuffer b, final FileWriter fo)
+            throws IOException {
+        fo.write("\n#Name" + "\n");
+        final char[] cName = new char[LEVEL_NAME_SIZE];
+
+        for (int j = 0; j < LEVEL_NAME_SIZE; j++) {
+            // replace wrong apostrophes
+            char c = (char) (b.getByte() & EIGHT_BIT_MASK);
+
+            if (c == '�' || c == '`') {
+                c = '\'';
+            }
+
+            cName[j] = c;
+        }
+
+        lvlName = String.valueOf(cName);
+        fo.write("name = " + lvlName + "\n");
     }
 }

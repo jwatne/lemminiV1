@@ -157,6 +157,28 @@ public final class Diff {
         setDWord(patch, DATA_ID);
 
         // examine source buffer
+        int ofs = writeSourceToDest(patch, src, trg);
+
+        // if the files end identically, the offset needs to be written
+        writeOffsetIfFilesEndIdentically(patch, ofs);
+
+        // check for stuff to insert in target
+        checkForStuffToInsertInTarget(patch, trg);
+
+        if (patch.size() == 0) {
+            return null;
+        }
+
+        out("Patch length: " + patch.size());
+
+        // convert patch list to output byte array
+        final byte[] retVal = convertPatchListToOutputByteAArray(patch);
+
+        return retVal;
+    }
+
+    private static int writeSourceToDest(final List<Byte> patch,
+            final Buffer src, final Buffer trg) {
         int ofs = 0;
 
         while (src.getIndex() < src.length()) {
@@ -182,7 +204,6 @@ public final class Diff {
             int lend;
             int lenr;
             int[] lens;
-            int state = -1;
 
             leni = checkInsert(src, trg);
             lend = checkDelete(src, trg);
@@ -191,6 +212,7 @@ public final class Diff {
             len = Math.min(leni, lend);
             len = Math.min(len, lenr);
             len = Math.min(len, lens[1]);
+            int state = -1;
 
             if (len > windowLength) {
                 // completely lost synchronisation
@@ -218,62 +240,22 @@ public final class Diff {
                 state = SUBSTITUTE;
             }
 
-            switch (state) {
-            case INSERT:
-                // insert
-                out("Insert: " + len);
-                patch.add(INSERT);
-                setLen(patch, len);
-
-                for (int i = 0; i < len; i++) {
-                    patch.add((byte) trg.getByte());
-                }
-
-                break;
-            case DELETE:
-                // delete
-                out("Delete: " + len);
-                patch.add(DELETE);
-                setLen(patch, len);
-                src.setIndex(src.getIndex() + len);
-                break;
-            case REPLACE:
-                // replace
-                out("Replace: " + len);
-                patch.add(REPLACE);
-                setLen(patch, len);
-
-                for (int i = 0; i < len; i++) {
-                    patch.add((byte) trg.getByte());
-                }
-
-                src.setIndex(src.getIndex() + len);
-                break;
-            case SUBSTITUTE:
-                // replace
-                out("Substitute: " + lens[0] + "/" + lens[1]);
-                patch.add(SUBSTITUTE);
-                setLen(patch, lens[0]);
-                setLen(patch, lens[1]);
-
-                for (int i = 0; i < lens[1]; i++) {
-                    patch.add((byte) trg.getByte());
-                }
-
-                src.setIndex(src.getIndex() + lens[0]);
-                break;
-            default:
-                break;
-            }
+            handleState(patch, src, trg, len, lens, state);
         }
 
-        // if the files end identically, the offset needs to be written
+        return ofs;
+    }
+
+    private static void writeOffsetIfFilesEndIdentically(final List<Byte> patch,
+            final int ofs) {
         if (ofs != 0) {
             out("Offset: " + ofs);
             setLen(patch, ofs);
         }
+    }
 
-        // check for stuff to insert in target
+    private static void checkForStuffToInsertInTarget(final List<Byte> patch,
+            final Buffer trg) {
         if (trg.getIndex() < trg.length()) {
             patch.add(INSERT);
             final int len = trg.length() - trg.getIndex();
@@ -284,21 +266,68 @@ public final class Diff {
                 patch.add((byte) trg.getByte());
             }
         }
+    }
 
-        if (patch.size() == 0) {
-            return null;
-        }
-
-        out("Patch length: " + patch.size());
-
-        // convert patch list to output byte array
+    private static byte[] convertPatchListToOutputByteAArray(
+            final List<Byte> patch) {
         final byte[] retVal = new byte[patch.size()];
 
         for (int i = 0; i < retVal.length; i++) {
             retVal[i] = patch.get(i).byteValue();
         }
-
         return retVal;
+    }
+
+    private static void handleState(final List<Byte> patch, final Buffer src,
+            final Buffer trg, final int len, final int[] lens,
+            final int state) {
+        switch (state) {
+        case INSERT:
+            // insert
+            out("Insert: " + len);
+            patch.add(INSERT);
+            setLen(patch, len);
+
+            for (int i = 0; i < len; i++) {
+                patch.add((byte) trg.getByte());
+            }
+
+            break;
+        case DELETE:
+            // delete
+            out("Delete: " + len);
+            patch.add(DELETE);
+            setLen(patch, len);
+            src.setIndex(src.getIndex() + len);
+            break;
+        case REPLACE:
+            // replace
+            out("Replace: " + len);
+            patch.add(REPLACE);
+            setLen(patch, len);
+
+            for (int i = 0; i < len; i++) {
+                patch.add((byte) trg.getByte());
+            }
+
+            src.setIndex(src.getIndex() + len);
+            break;
+        case SUBSTITUTE:
+            // replace
+            out("Substitute: " + lens[0] + "/" + lens[1]);
+            patch.add(SUBSTITUTE);
+            setLen(patch, lens[0]);
+            setLen(patch, lens[1]);
+
+            for (int i = 0; i < lens[1]; i++) {
+                patch.add((byte) trg.getByte());
+            }
+
+            src.setIndex(src.getIndex() + lens[0]);
+            break;
+        default:
+            break;
+        }
     }
 
     /**

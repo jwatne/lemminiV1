@@ -59,12 +59,15 @@ public class Player {
         if (props.load(iniFileStr)) {
             // might exist or not - if not, it's created
             // file existed, now extract entries
-            final String sdef[] = {null, null};
+            final String[] sdef = {null, null};
+
             for (int idx = 0; true; idx++) {
-                final String s[] = props.get("group" + Integer.toString(idx),
+                final String[] s = props.get("group" + Integer.toString(idx),
                         sdef);
-                if (s == null || s.length != 2 || s[0] == null)
+                if (s == null || s.length != 2 || s[0] == null) {
                     break;
+                }
+
                 // first string is the level group key identifier
                 // second string is a GroupBitfield used as bitfield to store
                 // won levels
@@ -112,8 +115,11 @@ public class Player {
         // get current bitfield
         final String id = LevelPack.getID(pack, diff);
         GroupBitfield bf = lvlGroup.get(id);
-        if (bf == null)
+
+        if (bf == null) {
             bf = GroupBitfield.ONE; // first level is always available
+        }
+
         bf = new GroupBitfield(bf.setBit(num)); // set bit in bitfield (just
                                                 // overwrite existing bit)
         // store new value
@@ -131,13 +137,18 @@ public class Player {
      */
     public boolean isAvailable(final String pack, final String diff,
             final int num) {
-        if (isCheat())
+        if (isCheat()) {
             return true;
+        }
+
         // get current bitfield
         final String id = LevelPack.getID(pack, diff);
         GroupBitfield bf = lvlGroup.get(id);
-        if (bf == null)
+
+        if (bf == null) {
             bf = GroupBitfield.ONE; // first level is always available
+        }
+
         return (bf.testBit(num));
     }
 
@@ -150,8 +161,10 @@ public class Player {
      * @return true if allowed, false if not
      */
     public boolean isAvailable(final GroupBitfield bf, final int num) {
-        if (isCheat())
+        if (isCheat()) {
             return true;
+        }
+
         return (bf.testBit(num));
     }
 
@@ -165,15 +178,18 @@ public class Player {
      *         this pack/difficulty
      */
     public GroupBitfield getBitField(final String pack, final String diff) {
-        if (isCheat())
-            return new GroupBitfield("18446744073709551615"); // 0xffffffffffffffff
-                                                              // (8 bytes with
-                                                              // all bits set)
+        if (isCheat()) {
+            return new GroupBitfield("18446744073709551615");
+            // 0xffffffffffffffff (8 bytes with all bits set)
+        }
 
         final String id = LevelPack.getID(pack, diff);
         final GroupBitfield bf = lvlGroup.get(id);
-        if (bf == null)
+
+        if (bf == null) {
             return GroupBitfield.ONE;
+        }
+
         return bf;
     }
 

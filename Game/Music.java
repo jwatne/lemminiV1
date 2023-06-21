@@ -24,192 +24,208 @@ import java.io.FileFilter;
  *
  * @author Volker Oth
  */
-public class Music {
+public final class Music {
 
-	/** music type. */
-	private static enum Type {
-		/** no type. */
-		NONE,
-		/** midi music. */
-		MIDI,
-		/** MOD music. */
-		MOD
-	}
+    /** music type. */
+    private enum Type {
+        /** no type. */
+        NONE,
+        /** midi music. */
+        MIDI,
+        /** MOD music. */
+        MOD
+    }
 
-	/** music type. */
-	private static Type type;
-	/** currently playing?. */
-	private static boolean playing;
-	/** MOD music object. */
-	private static ModMusic modMusic;
-	/** Midi music object. */
-	private static MidiMusic midiMusic;
-	/** music gain. */
-	private static double gain = 1.0;
-	/** array of file names. */
-	private static String musicFiles[];
+    /** music type. */
+    private static Type type;
+    /** currently playing?. */
+    private static boolean playing;
+    /** MOD music object. */
+    private static ModMusic modMusic;
+    /** Midi music object. */
+    private static MidiMusic midiMusic;
+    /** music gain. */
+    private static double gain = 1.0;
+    /** array of file names. */
+    private static String[] musicFiles;
 
-	/**
-	 * Initialization.
-	 */
-	public static void init() {
-		type = Type.NONE;
-		modMusic = new ModMusic();
+    /**
+     * Private default constructor for utility class.
+     */
+    private Music() {
 
-		// read available musicfiles for random mode
-		final File dir = new File(Core.getResourcePath() + "music");
-		final File files[] = dir.listFiles(new MusicFileFilter());
+    }
 
-		if (files != null) {
-			musicFiles = new String[files.length];
+    /**
+     * Initialization.
+     */
+    public static void init() {
+        type = Type.NONE;
+        modMusic = new ModMusic();
 
-			for (int i = 0; i < files.length; i++) {
-				musicFiles[i] = files[i].getName();
-			}
-		}
-	}
+        // read available musicfiles for random mode
+        final File dir = new File(Core.getResourcePath() + "music");
+        final File[] files = dir.listFiles(new MusicFileFilter());
 
-	/**
-	 * Load music file.
-	 *
-	 * @param fName file name
-	 * @throws ResourceException
-	 * @throws LemmException
-	 */
-	public static void load(final String fName) throws ResourceException, LemmException {
-		if (fName.toLowerCase().indexOf(".mid") != -1) {
-			// MIDI
-			midiMusic = new MidiMusic(fName);
-			if (type == Type.MOD)
-				modMusic.close();
-			type = Type.MIDI;
-		} else if (fName.toLowerCase().indexOf(".mod") != -1) {
-			// MOD
-			modMusic.load(fName);
-			if (type == Type.MIDI)
-				midiMusic.close();
-			type = Type.MOD;
-		}
-		playing = false;
-	}
+        if (files != null) {
+            musicFiles = new String[files.length];
 
-	/**
-	 * Get file name of a random track.
-	 *
-	 * @return file name of a random track
-	 */
-	public static String getRandomTrack() {
-		final double r = Math.random() * musicFiles.length;
-		return musicFiles[(int) r];
-	}
+            for (int i = 0; i < files.length; i++) {
+                musicFiles[i] = files[i].getName();
+            }
+        }
+    }
 
-	/**
-	 * Play music.
-	 */
-	public static void play() {
-		switch (type) {
-			case MIDI:
-				midiMusic.play();
-				playing = true;
-				break;
-			case MOD:
-				modMusic.play();
-				playing = true;
-				break;
-			default:
-				break;
-		}
-	}
+    /**
+     * Load music file.
+     *
+     * @param fName file name
+     * @throws ResourceException
+     * @throws LemmException
+     */
+    public static void load(final String fName)
+            throws ResourceException, LemmException {
+        if (fName.toLowerCase().indexOf(".mid") != -1) {
+            // MIDI
+            midiMusic = new MidiMusic(fName);
 
-	/**
-	 * Stop music.
-	 */
-	public static void stop() {
-		switch (type) {
-			case MIDI:
-				midiMusic.stop();
-				playing = false;
-				break;
-			case MOD:
-				modMusic.stop();
-				playing = false;
-				break;
-			default:
-				break;
-		}
-	}
+            if (type == Type.MOD) {
+                modMusic.close();
+            }
 
-	/**
-	 * Close music.
-	 */
-	public static void close() {
-		switch (type) {
-			case MIDI:
-				midiMusic.close();
-				playing = false;
-				break;
-			case MOD:
-				modMusic.close();
-				playing = false;
-				break;
-			default:
-				break;
-		}
-	}
+            type = Type.MIDI;
+        } else if (fName.toLowerCase().indexOf(".mod") != -1) {
+            // MOD
+            modMusic.load(fName);
 
-	/**
-	 * Check if music is currently playing
-	 *
-	 * @return true if music is currently playing, else false
-	 */
-	public static boolean isPlaying() {
-		return playing;
-	}
+            if (type == Type.MIDI) {
+                midiMusic.close();
+            }
 
-	/**
-	 * Get current music gain (1.0=100%)
-	 *
-	 * @return current music gain (1.0=100%)
-	 */
-	public static double getGain() {
-		return gain;
-	}
+            type = Type.MOD;
+        }
 
-	/**
-	 * Set music gain
-	 *
-	 * @param gn gain (1.0=100%)
-	 */
-	public static void setGain(final double gn) {
-		if (gn > 1.0)
-			gain = 1.0;
-		else if (gn < 0)
-			gain = 0;
-		else
-			gain = gn;
+        playing = false;
+    }
 
-		switch (type) {
-			case MIDI:
-				midiMusic.setGain(gain);
-				break;
-			case MOD:
-				modMusic.setGain(gain);
-				break;
-			default:
-				break;
-		}
+    /**
+     * Get file name of a random track.
+     *
+     * @return file name of a random track
+     */
+    public static String getRandomTrack() {
+        final double r = Math.random() * musicFiles.length;
+        return musicFiles[(int) r];
+    }
 
-		Core.getProgramProps().set("musicGain", gain);
-	}
+    /**
+     * Play music.
+     */
+    public static void play() {
+        switch (type) {
+        case MIDI:
+            midiMusic.play();
+            playing = true;
+            break;
+        case MOD:
+            modMusic.play();
+            playing = true;
+            break;
+        default:
+            break;
+        }
+    }
 
-	/**
-	 * Get current music type.
-	 *
-	 * @return music type
-	 */
-	public static Type getType() {
-		return type;
-	}
+    /**
+     * Stop music.
+     */
+    public static void stop() {
+        switch (type) {
+        case MIDI:
+            midiMusic.stop();
+            playing = false;
+            break;
+        case MOD:
+            modMusic.stop();
+            playing = false;
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
+     * Close music.
+     */
+    public static void close() {
+        switch (type) {
+        case MIDI:
+            midiMusic.close();
+            playing = false;
+            break;
+        case MOD:
+            modMusic.close();
+            playing = false;
+            break;
+        default:
+            break;
+        }
+    }
+
+    /**
+     * Check if music is currently playing.
+     *
+     * @return true if music is currently playing, else false
+     */
+    public static boolean isPlaying() {
+        return playing;
+    }
+
+    /**
+     * Get current music gain (1.0=100%).
+     *
+     * @return current music gain (1.0=100%)
+     */
+    public static double getGain() {
+        return gain;
+    }
+
+    /**
+     * Set music gain.
+     *
+     * @param gn gain (1.0=100%)
+     */
+    public static void setGain(final double gn) {
+        if (gn > 1.0) {
+            gain = 1.0;
+        } else if (gn < 0) {
+            gain = 0;
+        } else {
+            gain = gn;
+        }
+
+        switch (type) {
+        case MIDI:
+            midiMusic.setGain(gain);
+            break;
+        case MOD:
+            modMusic.setGain(gain);
+            break;
+        default:
+            break;
+        }
+
+        Core.getProgramProps().set("musicGain", gain);
+    }
+
+    /**
+     * Get current music type.
+     *
+     * @return music type
+     */
+    public static Type getType() {
+        return type;
+    }
 }
 
 /**
@@ -218,19 +234,25 @@ public class Music {
  * @author Volker Oth
  */
 class MusicFileFilter implements FileFilter {
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see java.io.FileFilter#accept(java.io.File)
-	 */
-	@Override
-	public boolean accept(final File f) {
-		if (!f.isFile())
-			return false;
-		if (f.getName().toLowerCase().indexOf(".mid") != -1)
-			return true;
-		if (f.getName().toLowerCase().indexOf(".mod") != -1)
-			return true;
-		return false;
-	}
+    /*
+     * (non-Javadoc)
+     *
+     * @see java.io.FileFilter#accept(java.io.File)
+     */
+    @Override
+    public boolean accept(final File f) {
+        if (!f.isFile()) {
+            return false;
+        }
+
+        if (f.getName().toLowerCase().indexOf(".mid") != -1) {
+            return true;
+        }
+
+        if (f.getName().toLowerCase().indexOf(".mod") != -1) {
+            return true;
+        }
+
+        return false;
+    }
 }

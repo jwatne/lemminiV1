@@ -1,4 +1,4 @@
-package game;
+package game.lemmings;
 /*
  * Copyright 2009 Volker Oth
  *
@@ -16,7 +16,7 @@ package game;
  */
 
 /** animation type. */
-enum Animation {
+public enum Animation {
     /** None. */
     NONE,
     /** Loop. */

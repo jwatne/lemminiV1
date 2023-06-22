@@ -1,4 +1,4 @@
-package game;
+package game.lemmings;
 /*
  * Copyright 2009 Volker Oth
  *
@@ -14,6 +14,12 @@ package game;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import game.Direction;
+import game.GameController;
+import game.Level;
+import game.Stencil;
+import game.Type;
 
 /**
  * Class for handling Lemming Climber skill. Code moved from Lemming by John

@@ -1,4 +1,4 @@
-package game;
+package game.lemmings;
 /*
  * Copyright 2009 Volker Oth
  *
@@ -14,6 +14,8 @@ package game;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import game.Type;
 
 /**
  * Class for handling floater skill, if assigned to parent Lemming. Code moved

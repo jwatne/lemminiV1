@@ -1,4 +1,4 @@
-package game;
+package game.lemmings;
 /*
  * Copyright 2009 Volker Oth
  *
@@ -14,6 +14,12 @@ package game;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import game.Direction;
+import game.Mask;
+import game.SoundController;
+import game.Stencil;
+import game.Type;
 
 /**
  * Class for handling miner skill, if assigned to the owning Lemming.

@@ -16,6 +16,7 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import game.lemmings.Lemming;
 import gameutil.Fader;
 import gameutil.FaderState;
 import gameutil.Sprite;
@@ -591,7 +592,7 @@ public final class GameController {
     /**
      * Lemming has left the Level.
      */
-    static synchronized void increaseLeft() {
+    public static synchronized void increaseLeft() {
         numLeft += 1;
     }
 

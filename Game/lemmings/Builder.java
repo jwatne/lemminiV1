@@ -1,4 +1,4 @@
-package game;
+package game.lemmings;
 /*
  * Copyright 2009 Volker Oth
  *
@@ -14,6 +14,12 @@ package game;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import game.Direction;
+import game.GameController;
+import game.Mask;
+import game.SoundController;
+import game.Type;
 
 /**
  * Class for handling builder Lemmings. Logic moved from Lemming class by John

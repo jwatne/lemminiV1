@@ -1,4 +1,4 @@
-package game;
+package game.lemmings;
 /*
  * Copyright 2009 Volker Oth
  *
@@ -14,6 +14,11 @@ package game;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import game.GameController;
+import game.Level;
+import game.SoundController;
+import game.Type;
 
 /**
  * Class for handling faller (default) Lemmings. Code moved from Lemming class

@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
+import game.lemmings.Lemming;
 import tools.ToolBox;
 
 /*

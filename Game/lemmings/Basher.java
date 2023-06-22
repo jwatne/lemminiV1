@@ -1,4 +1,4 @@
-package game;
+package game.lemmings;
 /*
  * Copyright 2009 Volker Oth
  *
@@ -14,6 +14,14 @@ package game;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import game.Direction;
+import game.GameController;
+import game.Level;
+import game.Mask;
+import game.SoundController;
+import game.Stencil;
+import game.Type;
 
 /**
  * Class for handling Basher role, if assigned to owning Lemming. Code moved

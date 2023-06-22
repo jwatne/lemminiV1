@@ -14,6 +14,7 @@ import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.List;
 
+import game.lemmings.Lemming;
 import gameutil.Sprite;
 import tools.Props;
 import tools.ToolBox;

@@ -1,10 +1,12 @@
-package game;
+package game.lemmings;
 
 import java.awt.Component;
 import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
+import game.Core;
+import game.ResourceException;
 import tools.ToolBox;
 /*
  * Copyright 2009 Volker Oth
@@ -37,7 +39,7 @@ public class ExplodeFont {
      * @param cmp the parent component (main frame of the application).
      * @throws ResourceException
      */
-    ExplodeFont(final Component cmp) throws ResourceException {
+    public ExplodeFont(final Component cmp) throws ResourceException {
         final Image sourceImg = Core.loadImage("misc/countdown.gif", cmp);
         img = ToolBox.getAnimation(sourceImg, ANIMATION_FRAMES,
                 Transparency.BITMASK);
@@ -49,7 +51,7 @@ public class ExplodeFont {
      * @param num counter value (0..9)
      * @return image for the counter value.
      */
-    BufferedImage getImage(final int num) {
+    public BufferedImage getImage(final int num) {
         return img[num];
     }
 

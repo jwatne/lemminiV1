@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.util.LinkedList;
 import java.util.List;
 
+import game.lemmings.Lemming;
 import tools.MicrosecondTimer;
 /*
  * Copyright 2009 Volker Oth

@@ -1,4 +1,4 @@
-package game;
+package game.lemmings;
 
 import java.awt.Component;
 import java.awt.Image;
@@ -6,6 +6,18 @@ import java.awt.MediaTracker;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
+import game.Core;
+import game.Direction;
+import game.GameController;
+import game.LemmingExplosion;
+import game.Level;
+import game.Mask;
+import game.MiscGfx;
+import game.ResourceException;
+import game.SoundController;
+import game.SpriteObject;
+import game.Stencil;
+import game.Type;
 import tools.Props;
 import tools.ToolBox;
 

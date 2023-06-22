@@ -1,8 +1,10 @@
-package game;
+package game.lemmings;
 
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
+import game.Direction;
+import game.Mask;
 import tools.ToolBox;
 /*
  * Copyright 2009 Volker Oth
@@ -234,7 +236,7 @@ public class LemmingResource {
      * @param animFrames number of animation frames.
      * @param directions number of directions (1 or 2)
      */
-    LemmingResource(final BufferedImage sourceImg, final int animFrames,
+    public LemmingResource(final BufferedImage sourceImg, final int animFrames,
             final int directions) {
         img = new BufferedImage[directions][];
         mask = new Mask[directions];
@@ -259,7 +261,7 @@ public class LemmingResource {
      * @param dir Direction
      * @return mask for stencil manipulation
      */
-    Mask getMask(final Direction dir) {
+    public Mask getMask(final Direction dir) {
         if (dirs > 1) {
             return mask[dir.ordinal()];
         } else {
@@ -273,7 +275,7 @@ public class LemmingResource {
      * @param dir Direction
      * @param m   mask for stencil manipulation
      */
-    void setMask(final Direction dir, final Mask m) {
+    public void setMask(final Direction dir, final Mask m) {
         if (dirs > 1) {
             mask[dir.ordinal()] = m;
         } else {
@@ -287,7 +289,7 @@ public class LemmingResource {
      * @param dir Direction
      * @return mask for checking of indestructible pixels
      */
-    Mask getImask(final Direction dir) {
+    public Mask getImask(final Direction dir) {
         if (dirs > 1) {
             return iMask[dir.ordinal()];
         } else {
@@ -301,7 +303,7 @@ public class LemmingResource {
      * @param dir Direction
      * @param m   mask for checking of indestructible pixels
      */
-    void setImask(final Direction dir, final Mask m) {
+    public void setImask(final Direction dir, final Mask m) {
         if (dirs > 1) {
             iMask[dir.ordinal()] = m;
         } else {
@@ -316,7 +318,7 @@ public class LemmingResource {
      * @param frame Index of animation frame.
      * @return specific animation frame
      */
-    BufferedImage getImage(final Direction dir, final int frame) {
+    public BufferedImage getImage(final Direction dir, final int frame) {
         if (dirs > 1) {
             return img[dir.ordinal()][frame];
         } else {

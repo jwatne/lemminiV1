@@ -1,4 +1,4 @@
-package game;
+package game.lemmings;
 /*
  * Copyright 2009 Volker Oth
  *
@@ -14,6 +14,10 @@ package game;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import game.Mask;
+import game.Stencil;
+import game.Type;
 
 /**
  * Class for handling Stopper skill for the owning Lemming. Code moved from

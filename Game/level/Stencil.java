@@ -1,4 +1,4 @@
-package game;
+package game.level;
 
 /*
  * Copyright 2009 Volker Oth
@@ -251,7 +251,7 @@ public class Stencil {
      * @param id identifier
      * @return numerical value of the identifier as used in the stencil
      */
-    static int createObjectID(final int id) {
+    public static int createObjectID(final int id) {
         return id << ID_SHIFT_VAL;
     }
 

@@ -16,9 +16,9 @@ package game.lemmings;
  */
 
 import game.GameController;
-import game.Mask;
 import game.SoundController;
 import game.Type;
+import game.level.Mask;
 
 /**
  * Class for handling builder Lemmings. Logic moved from Lemming class by John

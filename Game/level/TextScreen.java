@@ -1,4 +1,4 @@
-package game;
+package game.level;
 
 // import static game.LemmFont.Color.*;
 
@@ -9,6 +9,13 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
+import game.Core;
+import game.GameController;
+import game.LemmFont;
+import game.LevelCode;
+import game.LevelPack;
+import game.MiscGfx;
+import game.TextDialog;
 import tools.ToolBox;
 
 /*

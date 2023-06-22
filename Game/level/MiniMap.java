@@ -1,8 +1,11 @@
-package game;
+package game.level;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+
+import game.Core;
+import game.GameController;
 
 /*
  * Copyright 2009 Volker Oth

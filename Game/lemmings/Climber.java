@@ -16,9 +16,9 @@ package game.lemmings;
  */
 
 import game.GameController;
-import game.Level;
-import game.Stencil;
 import game.Type;
+import game.level.Level;
+import game.level.Stencil;
 
 /**
  * Class for handling Lemming Climber skill. Code moved from Lemming by John

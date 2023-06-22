@@ -1,5 +1,7 @@
-package game;
+package game.level;
 
+import game.GameController;
+import game.SoundController;
 import gameutil.KeyRepeat;
 /*
  * Copyright 2009 Volker Oth

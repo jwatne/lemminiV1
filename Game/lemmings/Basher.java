@@ -16,11 +16,11 @@ package game.lemmings;
  */
 
 import game.GameController;
-import game.Level;
-import game.Mask;
 import game.SoundController;
-import game.Stencil;
 import game.Type;
+import game.level.Level;
+import game.level.Mask;
+import game.level.Stencil;
 
 /**
  * Class for handling Basher role, if assigned to owning Lemming. Code moved

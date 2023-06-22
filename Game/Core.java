@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 
 import extract.Extract;
 import extract.ExtractException;
+import game.level.Level;
 import gui.LegalDialog;
 import tools.Props;
 import tools.ToolBox;

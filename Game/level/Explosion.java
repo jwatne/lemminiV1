@@ -1,4 +1,4 @@
-package game;
+package game.level;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -6,6 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
+import game.Core;
+import game.GameController;
+import game.ResourceException;
 import tools.ToolBox;
 
 /*
@@ -73,7 +76,7 @@ public class Explosion {
      *
      * @throws ResourceException
      */
-    static void init(final Component frame) throws ResourceException {
+    public static void init(final Component frame) throws ResourceException {
         expImg = ToolBox.imageToBuffered(
                 Core.loadImage("misc/explode.gif", frame),
                 Transparency.BITMASK);

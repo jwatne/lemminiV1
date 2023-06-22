@@ -16,9 +16,9 @@ package game.lemmings;
  */
 
 import game.GameController;
-import game.Level;
 import game.SoundController;
 import game.Type;
+import game.level.Level;
 
 /**
  * Class for handling faller (default) Lemmings. Code moved from Lemming class

@@ -1,4 +1,4 @@
-package game;
+package game.level;
 
 import java.awt.Image;
 import java.awt.image.PixelGrabber;
@@ -144,7 +144,7 @@ public class SpriteObject extends Sprite {
      *
      * @param imgMask image containing the collision mask.
      */
-    void setMask(final Image imgMask) {
+    public void setMask(final Image imgMask) {
         int w = imgMask.getWidth(null);
         int h = imgMask.getHeight(null);
         mask = new int[w * h];
@@ -160,7 +160,7 @@ public class SpriteObject extends Sprite {
      *
      * @return mask as used in Stencil
      */
-    int getMaskType() {
+    public int getMaskType() {
         switch (type) {
         case NO_DIG_LEFT:
             return Stencil.MSK_NO_DIG_LEFT;

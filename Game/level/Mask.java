@@ -1,6 +1,8 @@
-package game;
+package game.level;
 
 import java.awt.image.BufferedImage;
+
+import game.GameController;
 
 /*
  * Copyright 2009 Volker Oth

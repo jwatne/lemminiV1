@@ -3,7 +3,7 @@ package game.lemmings;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
-import game.Mask;
+import game.level.Mask;
 import tools.ToolBox;
 /*
  * Copyright 2009 Volker Oth

@@ -1,4 +1,4 @@
-package game;
+package game.level;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -14,6 +14,12 @@ import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.List;
 
+import game.Core;
+import game.GameController;
+import game.LemmException;
+import game.ResourceException;
+import game.Steel;
+import game.Terrain;
 import game.lemmings.Lemming;
 import gameutil.Sprite;
 import tools.Props;
@@ -196,7 +202,7 @@ public class Level {
      * @throws ResourceException
      * @throws LemmException
      */
-    void loadLevel(final String fname, final Component frame)
+    public void loadLevel(final String fname, final Component frame)
             throws ResourceException, LemmException {
         ready = false;
         // read level properties from file
@@ -539,7 +545,7 @@ public class Level {
         final boolean drawOnVis = o
                 .getPaintMode() == LvlObject.MODE_VIS_ON_TERRAIN;
         final boolean noOverwrite = o
-                .getPaintMode() == LvlObject.MODE_NO_OVERWRITE;
+                .getPaintMode() == LvlObject.MODE_VIS_ON_TERRAIN;
         final boolean inFront = (drawOnVis || !noOverwrite);
 
         if (inFront) {

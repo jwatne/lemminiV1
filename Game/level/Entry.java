@@ -1,4 +1,4 @@
-package game;
+package game.level;
 /*
  * Copyright 2009 Volker Oth
  *
@@ -20,37 +20,67 @@ package game;
  *
  * @author Volker Oth
  */
-class Entry {
+public class Entry {
     /** identifier. */
     private int id;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(final int identifier) {
-        this.id = identifier;
-    }
 
     /** x position in pixels. */
     private int xPos;
 
-    public int getxPos() {
-        return xPos;
-    }
-
-    public void setxPos(final int xPosition) {
-        this.xPos = xPosition;
-    }
-
     /** y position in pixels. */
     private int yPos;
 
-    public int getyPos() {
+    /**
+     * Returns identifier.
+     *
+     * @return identifier.
+     */
+    public final int getId() {
+        return id;
+    }
+
+    /**
+     * Sets identifier.
+     *
+     * @param identifier identifier.
+     */
+    public final void setId(final int identifier) {
+        this.id = identifier;
+    }
+
+    /**
+     * Returns x position in pixels.
+     *
+     * @return x position in pixels.
+     */
+    public final int getxPos() {
+        return xPos;
+    }
+
+    /**
+     * Sets x position in pixels.
+     *
+     * @param xPosition x position in pixels.
+     */
+    public final void setxPos(final int xPosition) {
+        this.xPos = xPosition;
+    }
+
+    /**
+     * Returns y position in pixels.
+     *
+     * @return y position in pixels.
+     */
+    public final int getyPos() {
         return yPos;
     }
 
-    public void setyPos(final int yPosition) {
+    /**
+     * Sets y position in pixels.
+     *
+     * @param yPosition y position in pixels.
+     */
+    public final void setyPos(final int yPosition) {
         this.yPos = yPosition;
     }
 
@@ -60,7 +90,7 @@ class Entry {
      * @param x x position in pixels
      * @param y y position in pixels
      */
-    Entry(final int x, final int y) {
+    public Entry(final int x, final int y) {
         xPos = x;
         yPos = y;
     }

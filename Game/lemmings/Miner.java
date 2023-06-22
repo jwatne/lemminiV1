@@ -15,10 +15,10 @@ package game.lemmings;
  * limitations under the License.
  */
 
-import game.Mask;
 import game.SoundController;
-import game.Stencil;
 import game.Type;
+import game.level.Mask;
+import game.level.Stencil;
 
 /**
  * Class for handling miner skill, if assigned to the owning Lemming.

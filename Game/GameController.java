@@ -18,6 +18,13 @@ import javax.swing.JOptionPane;
 
 import game.lemmings.Lemming;
 import game.lemmings.SkillHandler;
+import game.level.Entry;
+import game.level.Explosion;
+import game.level.Level;
+import game.level.ReleaseRateHandler;
+import game.level.SpriteObject;
+import game.level.Stencil;
+import game.level.TextScreen;
 import gameutil.Fader;
 import gameutil.FaderState;
 import gameutil.Sprite;
@@ -312,7 +319,7 @@ public final class GameController {
      * @param relativeLevelNumber relative level number
      * @return absolute level number (0..127)
      */
-    static int absLevelNum(final int lvlPack, final int diffLevel,
+    public static int absLevelNum(final int lvlPack, final int diffLevel,
             final int relativeLevelNumber) {
         final LevelPack lpack = levelPack[lvlPack];
         // calculate absolute level number
@@ -565,7 +572,7 @@ public final class GameController {
      *
      * @return true if level was lost, false otherwise
      */
-    static synchronized boolean wasLost() {
+    public static synchronized boolean wasLost() {
         if (gameState != GameState.LEVEL && numLeft >= numToRecue) {
             return false;
         }

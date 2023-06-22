@@ -1,4 +1,4 @@
-package game;
+package game.level;
 /*
  * Copyright 2009 Volker Oth
  *
@@ -30,19 +30,19 @@ public class LvlObject {
      */
     private static final int PAINT_MODE_INDEX = 3;
     /** paint mode: only visible on a terrain pixel. */
-    static final int MODE_VIS_ON_TERRAIN = 8;
+    public static final int MODE_VIS_ON_TERRAIN = 8;
     /**
      * Paint mode: don't overwrite terrain pixel in the original background
      * image.
      */
-    static final int MODE_NO_OVERWRITE = 4;
+    public static final int MODE_NO_OVERWRITE = 4;
     /**
      * paint mode: don't overwrite terrain pixel in the current (!) background
      * image. special NO_OVERWRITE case for objects hidden behind terrain.
      */
     static final int MODE_HIDDEN = 5;
     /** paint mode: paint without any further checks. */
-    static final int MODE_FULL = 0;
+    public static final int MODE_FULL = 0;
 
     /** identifier. */
     private int id;

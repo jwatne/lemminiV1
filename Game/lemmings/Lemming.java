@@ -9,14 +9,14 @@ import java.awt.image.BufferedImage;
 import game.Core;
 import game.GameController;
 import game.LemmingExplosion;
-import game.Level;
-import game.Mask;
 import game.MiscGfx;
 import game.ResourceException;
 import game.SoundController;
-import game.SpriteObject;
-import game.Stencil;
 import game.Type;
+import game.level.Level;
+import game.level.Mask;
+import game.level.SpriteObject;
+import game.level.Stencil;
 import tools.Props;
 import tools.ToolBox;
 

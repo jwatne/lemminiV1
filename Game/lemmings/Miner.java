@@ -15,7 +15,6 @@ package game.lemmings;
  * limitations under the License.
  */
 
-import game.Direction;
 import game.Mask;
 import game.SoundController;
 import game.Stencil;

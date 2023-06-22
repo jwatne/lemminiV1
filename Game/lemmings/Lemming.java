@@ -7,7 +7,6 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import game.Core;
-import game.Direction;
 import game.GameController;
 import game.LemmingExplosion;
 import game.Level;

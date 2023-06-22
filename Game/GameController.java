@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import game.lemmings.Lemming;
+import game.lemmings.SkillHandler;
 import gameutil.Fader;
 import gameutil.FaderState;
 import gameutil.Sprite;

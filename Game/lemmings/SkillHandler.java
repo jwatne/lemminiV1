@@ -1,10 +1,19 @@
-package game;
+package game.lemmings;
 
 import java.awt.Graphics2D;
 import java.util.LinkedList;
 import java.util.List;
 
-import game.lemmings.Lemming;
+import game.GameController;
+import game.Icons;
+import game.LemmCursor;
+import game.Level;
+import game.NumFont;
+import game.ReleaseRateHandler;
+import game.ReplayAssignSkillEvent;
+import game.ReplaySelectSkillEvent;
+import game.SoundController;
+import game.Type;
 import tools.MicrosecondTimer;
 /*
  * Copyright 2009 Volker Oth

@@ -3,7 +3,6 @@ package game.lemmings;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
-import game.Direction;
 import game.Mask;
 import tools.ToolBox;
 /*

@@ -195,7 +195,7 @@ public final class Icons {
      *
      * @param type Icon Type
      */
-    static void press(final Type type) {
+    public static void press(final Type type) {
         int idx = type.ordinal();
 
         switch (type) {

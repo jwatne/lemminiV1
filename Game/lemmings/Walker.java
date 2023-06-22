@@ -15,7 +15,6 @@ package game.lemmings;
  * limitations under the License.
  */
 
-import game.Direction;
 import game.Type;
 
 /**

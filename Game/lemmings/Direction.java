@@ -1,4 +1,4 @@
-package game;
+package game.lemmings;
 
 import java.util.EnumSet;
 import java.util.HashMap;

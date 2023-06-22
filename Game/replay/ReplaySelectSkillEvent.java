@@ -1,4 +1,6 @@
-package game;
+package game.replay;
+
+import game.Type;
 
 /**
  * Storage class for SELECT_SKILL event.

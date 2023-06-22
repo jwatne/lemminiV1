@@ -1,4 +1,4 @@
-package game;
+package game.replay;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,6 +8,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import game.GameController;
+import game.LevelPack;
+import game.Type;
 
 /*
  * Copyright 2009 Volker Oth
@@ -34,28 +38,28 @@ public class ReplayStream {
     /**
      * Index position of lemming number in frame of replay data.
      */
-    private static final int LEMMING_NUMBER_INDEX = 3;
+    public static final int LEMMING_NUMBER_INDEX = 3;
     // event types
     /**
      * Assign skill event.
      */
-    static final int ASSIGN_SKILL = 0;
+    public static final int ASSIGN_SKILL = 0;
     /**
      * Screen x position change event.
      */
-    static final int MOVE_XPOS = 1;
+    public static final int MOVE_XPOS = 1;
     /**
      * Select skill event.
      */
-    static final int SELECT_SKILL = 2;
+    public static final int SELECT_SKILL = 2;
     /**
      * Set release rate event.
      */
-    static final int SET_RELEASE_RATE = 3;
+    public static final int SET_RELEASE_RATE = 3;
     /**
      * Nuke event.
      */
-    static final int NUKE = 4;
+    public static final int NUKE = 4;
 
     /**
      * List of replay events.
@@ -306,125 +310,5 @@ public class ReplayStream {
         final ReplayReleaseRateEvent event = new ReplayReleaseRateEvent(ctr,
                 releaserate);
         events.add(event);
-    }
-}
-
-/**
- * Storage class for one replay event.
- *
- * @author Volker Oth
- */
-class ReplayEvent {
-    /** frame counter. */
-    private int frameCtr;
-
-    /** event type. */
-    private int type;
-
-    /**
-     * Constructor.
-     *
-     * @param ctr frame counter
-     * @param t   type
-     */
-    ReplayEvent(final int ctr, final int t) {
-        frameCtr = ctr;
-        type = t;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public void setType(final int eventType) {
-        this.type = eventType;
-    }
-
-    public int getFrameCtr() {
-        return frameCtr;
-    }
-
-    public void setFrameCtr(final int frameCounter) {
-        this.frameCtr = frameCounter;
-    }
-
-    @Override
-    public String toString() {
-        return "" + frameCtr + ", " + type;
-    }
-}
-
-/**
- * Storage class for MOVE_XPOS event.
- *
- * @author Volker Oth
- */
-class ReplayMoveXPosEvent extends ReplayEvent {
-    /** screen x position. */
-    private int xPos;
-
-    /**
-     * Screen X position changed event.
-     *
-     * @param ctr Frame counter
-     * @param x   release x position
-     */
-    ReplayMoveXPosEvent(final int ctr, final int x) {
-        super(ctr, ReplayStream.MOVE_XPOS);
-        xPos = x;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + ", " + xPos;
-    }
-
-    public int getxPos() {
-        return xPos;
-    }
-
-    public void setxPos(final int screenXPosition) {
-        this.xPos = screenXPosition;
-    }
-}
-
-/**
- * Storage class for SET_RELEASE_RATE event.
- *
- * @author Volker Oth
- */
-class ReplayReleaseRateEvent extends ReplayEvent {
-    /**
-     * Release rate.
-     */
-    private int releaseRate;
-
-    /**
-     * Release Rate changed event.
-     *
-     * @param ctr  Frame counter
-     * @param rate release rate value
-     */
-    ReplayReleaseRateEvent(final int ctr, final int rate) {
-        super(ctr, ReplayStream.SET_RELEASE_RATE);
-        releaseRate = rate;
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see Game.ReplayEvent#toString()
-     */
-    @Override
-    public String toString() {
-        return super.toString() + ", " + releaseRate;
-    }
-
-    public int getReleaseRate() {
-        return releaseRate;
-    }
-
-    public void setReleaseRate(final int rate) {
-        this.releaseRate = rate;
     }
 }

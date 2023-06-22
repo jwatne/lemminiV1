@@ -8,12 +8,12 @@ import game.GameController;
 import game.Icons;
 import game.LemmCursor;
 import game.NumFont;
-import game.ReplayAssignSkillEvent;
-import game.ReplaySelectSkillEvent;
 import game.SoundController;
 import game.Type;
 import game.level.Level;
 import game.level.ReleaseRateHandler;
+import game.replay.ReplayAssignSkillEvent;
+import game.replay.ReplaySelectSkillEvent;
 import tools.MicrosecondTimer;
 /*
  * Copyright 2009 Volker Oth

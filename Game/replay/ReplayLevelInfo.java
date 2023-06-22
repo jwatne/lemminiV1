@@ -1,4 +1,4 @@
-package game;
+package game.replay;
 
 /*
  * Copyright 2009 Volker Oth

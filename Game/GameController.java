@@ -35,6 +35,7 @@ import game.replay.ReplayStream;
 import gameutil.Fader;
 import gameutil.FaderState;
 import gameutil.Sprite;
+import lemmini.Constants;
 import tools.MicrosecondTimer;
 import tools.ToolBox;
 /*
@@ -59,14 +60,7 @@ import tools.ToolBox;
  * @author Volker Oth
  */
 public final class GameController {
-    /**
-     * Standard value of 10.
-     */
-    private static final int DECIMAL_10 = 10;
-    /**
-     * Self explanatory....
-     */
-    private static final int SECONDS_PER_MINUTE = 60;
+
     /**
      * Hexidecimal value 0x20.
      */
@@ -627,7 +621,7 @@ public final class GameController {
      */
     public static synchronized String getTimeString() {
         final String t1 = Integer.toString(time / 60);
-        String t2 = Integer.toString(time % SECONDS_PER_MINUTE);
+        String t2 = Integer.toString(time % Constants.SECONDS_PER_MINUTE);
 
         if (t2.length() < 2) {
             t2 = "0" + t2;
@@ -755,7 +749,7 @@ public final class GameController {
 
                 SoundController.playTrapDoorOpenSound();
             } else if (entryOpenCtr == MAX_ENTRY_OPEN_CTR
-                    + DECIMAL_10 * MAX_ANIM_CTR) {
+                    + Constants.DECIMAL_10 * MAX_ANIM_CTR) {
                 entryOpened = true;
                 releaseCtr = ReleaseRateHandler.getReleaseBase();
                 // first lemming to enter at once

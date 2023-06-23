@@ -6,6 +6,8 @@ import java.awt.image.IndexColorModel;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import lemmini.Constants;
+
 /**
  * GifEncoder - writes out an image as a GIF.
  *
@@ -62,14 +64,6 @@ public class GifEncoder {
      */
     private static final int SIXTY_FIVE_K = 65536;
     /**
-     * 8-bit shift.
-     */
-    private static final int SHIFT_8 = 8;
-    /**
-     * 8-bit mask = 0xff.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
-    /**
      * Byte value indicating GIF is interlaced.
      */
     private static final int INTERLACED = 0x40;
@@ -81,10 +75,6 @@ public class GifEncoder {
      * 2nd byte value to write for transparent indicator.
      */
     private static final int TRANSPARENT_BYTE_2 = 0xf9;
-    /**
-     * 4-bit shift.
-     */
-    private static final int SHIFT_4 = 4;
     /**
      * Value indicating there is a color map.
      */
@@ -302,7 +292,8 @@ public class GifEncoder {
         // Indicate that there is a global colour map
         byteToOutput = (byte) COLOR_MAP_FLAG; // Yes, there is a color map
         // OR in the resolution
-        byteToOutput |= (byte) ((EIGHT_BITS_PER_PIXEL - 1) << SHIFT_4);
+        byteToOutput |= (byte) ((EIGHT_BITS_PER_PIXEL
+                - 1) << Constants.SHIFT_4);
         // Not sorted
         // OR in the Bits per Pixel
         byteToOutput |= (byte) ((bitsPerPixel - 1));
@@ -379,15 +370,16 @@ public class GifEncoder {
         if (pixelIndex == numPixels) {
             return EOF;
         } else {
-            return pixels[pixelIndex++] & EIGHT_BIT_MASK;
+            return pixels[pixelIndex++] & Constants.EIGHT_BIT_MASK;
         }
     }
 
     // Write out a word to the GIF file
     final void putWord(final int w, final OutputStream outs)
             throws IOException {
-        putByte((byte) (w & EIGHT_BIT_MASK), outs);
-        putByte((byte) ((w >> SHIFT_8) & EIGHT_BIT_MASK), outs);
+        putByte((byte) (w & Constants.EIGHT_BIT_MASK), outs);
+        putByte((byte) ((w >> Constants.SHIFT_8) & Constants.EIGHT_BIT_MASK),
+                outs);
     }
 
     // Write out a byte to the GIF file
@@ -587,9 +579,9 @@ public class GifEncoder {
 
         curBits += numBits;
 
-        while (curBits >= SHIFT_8) {
-            charOut((byte) (curAccum & EIGHT_BIT_MASK), outs);
-            curAccum >>= SHIFT_8;
+        while (curBits >= Constants.SHIFT_8) {
+            charOut((byte) (curAccum & Constants.EIGHT_BIT_MASK), outs);
+            curAccum >>= Constants.SHIFT_8;
             curBits -= BITS_PER_CHARACTER;
         }
 
@@ -614,8 +606,8 @@ public class GifEncoder {
         if (code == eofCode) {
             // At EOF, write the rest of the buffer.
             while (curBits > 0) {
-                charOut((byte) (curAccum & EIGHT_BIT_MASK), outs);
-                curAccum >>= SHIFT_8;
+                charOut((byte) (curAccum & Constants.EIGHT_BIT_MASK), outs);
+                curAccum >>= Constants.SHIFT_8;
                 curBits -= BITS_PER_CHARACTER;
             }
 

@@ -16,6 +16,7 @@ package game.lemmings;
  */
 
 import game.Type;
+import lemmini.Constants;
 
 /**
  * Class for handling floater skill, if assigned to parent Lemming. Code moved
@@ -32,18 +33,6 @@ public class Floater {
      * 4 constant.
      */
     private static final int FOUR = 4;
-    /**
-     * 3 constant.
-     */
-    private static final int THREE = 3;
-    /**
-     * 5 constant.
-     */
-    private static final int FIVE = 5;
-    /**
-     * 6 constant.
-     */
-    private static final int SIX = 6;
     /**
      * The lemming owning the instance of this class.
      */
@@ -114,13 +103,13 @@ public class Floater {
                 lemming.setY(
                         lemming.getY() + Faller.FALLER_STEP - FLOATER_STEP);
                 break;
-            case THREE:
+            case Constants.THREE:
                 lemming.setY(lemming.getY() - (FLOATER_STEP - 1)); // decelerate
                                                                    // a little
                 break;
             case FOUR:
-            case FIVE:
-            case SIX:
+            case Constants.FIVE:
+            case Constants.SIX:
             case SEVEN:
                 lemming.setY(lemming.getY() - FLOATER_STEP); // decelerate some
                                                              // more

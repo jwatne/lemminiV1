@@ -12,6 +12,7 @@ import javax.swing.JSlider;
 
 import game.Music;
 import game.SoundController;
+import lemmini.Constants;
 
 /*
  * Copyright 2009 Volker Oth
@@ -141,11 +142,6 @@ public class GainDialog extends JDialog {
      */
     private static final int INITIAL_WIDTH = 300;
 
-    /**
-     * Multiplier to convert decimal values to percentages.
-     */
-    private static final int ONE_HUNDRED_PERCENT = 100;
-
     private static final long serialVersionUID = 1L;
 
     /**
@@ -195,9 +191,10 @@ public class GainDialog extends JDialog {
         final Point p = frame.getLocation();
         this.setLocation(p.x + frame.getWidth() / 2 - getWidth() / 2,
                 p.y + frame.getHeight() / 2 - getHeight() / 2);
-        jSliderSound.setValue((int) (ONE_HUNDRED_PERCENT
+        jSliderSound.setValue((int) (Constants.ONE_HUNDRED_PERCENT
                 * SoundController.getSound().getGain()));
-        jSliderMusic.setValue((int) (ONE_HUNDRED_PERCENT * Music.getGain()));
+        jSliderMusic.setValue(
+                (int) (Constants.ONE_HUNDRED_PERCENT * Music.getGain()));
     }
 
     /**
@@ -246,11 +243,11 @@ public class GainDialog extends JDialog {
             jSliderMusic = new JSlider();
             jSliderMusic.setBounds(new Rectangle(VOLUME_LABELS_X,
                     MUSIC_SLIDER_Y, MUSIC_SLIDER_WIDTH, CONTROL_HEIGHT));
-            jSliderMusic.setMaximum(ONE_HUNDRED_PERCENT);
+            jSliderMusic.setMaximum(Constants.ONE_HUNDRED_PERCENT);
             jSliderMusic.setMinimum(0);
             jSliderMusic.setMajorTickSpacing(MAJOR_TICK_SPACING);
             jSliderMusic.setPaintTicks(true);
-            jSliderMusic.setValue(ONE_HUNDRED_PERCENT);
+            jSliderMusic.setValue(Constants.ONE_HUNDRED_PERCENT);
         }
         return jSliderMusic;
     }
@@ -265,10 +262,10 @@ public class GainDialog extends JDialog {
             jSliderSound = new JSlider();
             jSliderSound.setBounds(new Rectangle(VOLUME_LABELS_X,
                     SOUND_SLIDER_Y, MUSIC_SLIDER_WIDTH, CONTROL_HEIGHT));
-            jSliderSound.setMaximum(ONE_HUNDRED_PERCENT);
+            jSliderSound.setMaximum(Constants.ONE_HUNDRED_PERCENT);
             jSliderSound.setMinimum(0);
             jSliderSound.setPaintTicks(true);
-            jSliderSound.setValue(ONE_HUNDRED_PERCENT);
+            jSliderSound.setValue(Constants.ONE_HUNDRED_PERCENT);
             jSliderSound.setMajorTickSpacing(MAJOR_TICK_SPACING);
         }
 

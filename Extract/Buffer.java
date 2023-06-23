@@ -15,6 +15,8 @@ package extract;
  * limitations under the License.
  */
 
+import lemmini.Constants;
+
 /**
  * Buffer class that manages reading/writing from/to a byte buffer.
  *
@@ -26,17 +28,9 @@ class Buffer {
      */
     private static final int THREE_BYTES = 24;
     /**
-     * Bits in two bytes.
-     */
-    private static final int TWO_BYTES = 16;
-    /**
      * Bits in one byte.
      */
     private static final int ONE_BYTE = 8;
-    /**
-     * Hexidecimal value 0xff.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
     /** array of byte which defines the data buffer.. */
     private final byte[] buffer;
     /** byte index in buffer.. */
@@ -105,7 +99,7 @@ class Buffer {
      * @throws ArrayIndexOutOfBoundsException
      */
     int getByte() throws ArrayIndexOutOfBoundsException {
-        return buffer[index++] & EIGHT_BIT_MASK;
+        return buffer[index++] & Constants.EIGHT_BIT_MASK;
     }
 
     /**
@@ -147,7 +141,8 @@ class Buffer {
      * @throws ArrayIndexOutOfBoundsException
      */
     int getDWord() throws ArrayIndexOutOfBoundsException {
-        return getByte() | (getByte() << ONE_BYTE) | (getByte() << TWO_BYTES)
+        return getByte() | (getByte() << ONE_BYTE)
+                | (getByte() << Constants.TWO_BYTES)
                 | (getByte() << THREE_BYTES);
     }
 
@@ -161,7 +156,7 @@ class Buffer {
     void setDWord(final int val) throws ArrayIndexOutOfBoundsException {
         setByte((byte) val);
         setByte((byte) (val >> ONE_BYTE));
-        setByte((byte) (val >> TWO_BYTES));
+        setByte((byte) (val >> Constants.TWO_BYTES));
         setByte((byte) (val >> THREE_BYTES));
     }
 }

@@ -14,6 +14,7 @@ import game.level.Level;
 import game.level.ReleaseRateHandler;
 import game.replay.ReplayAssignSkillEvent;
 import game.replay.ReplaySelectSkillEvent;
+import lemmini.Constants;
 import tools.MicrosecondTimer;
 /*
  * Copyright 2009 Volker Oth
@@ -68,10 +69,6 @@ public final class SkillHandler {
      * Index for the floaters selection button.
      */
     private static final int FLOATERS_INDEX = 3;
-    /**
-     * Standard value of 10.
-     */
-    private static final int DECIMAL_10 = 10;
     /**
      * Nuke icon: maximum time between two mouse clicks for double click
      * detection (in microseconds).
@@ -214,7 +211,7 @@ public final class SkillHandler {
         // draw counters
         int val = 0;
 
-        for (int i = 0; i < DECIMAL_10; i++) {
+        for (int i = 0; i < Constants.DECIMAL_10; i++) {
             switch (i) {
             case 0:
                 val = GameController.getLevel().getReleaseRate();

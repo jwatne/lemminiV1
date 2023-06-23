@@ -15,6 +15,8 @@ package extract;
  * limitations under the License.
  */
 
+import lemmini.Constants;
+
 /**
  * Storage class for terrain tiles.
  *
@@ -42,41 +44,10 @@ class Terrain {
      */
     private static final int BIT_9_MASK = 256;
     /**
-     * 7-bit shift.
-     */
-    private static final int SHIFT_7 = 7;
-    /**
-     * Mask for 8th bit = 0x80.
-     */
-    private static final int BIT_8_MASK = 0x80;
-    /**
      * 2nd index of yPos information in buffer.
      */
     private static final int YPOS_INDEX_2 = 3;
-    /**
-     * Offset to subtract from buffer values to obtain x position.
-     */
-    private static final int X_OFFSET = 16;
-    /**
-     * 8-bit mask.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
-    /**
-     * 8-bit shift.
-     */
-    private static final int SHIFT_8 = 8;
-    /**
-     * 4-bit mask = 0x0f.
-     */
-    private static final int FOUR_BIT_MASK = 0x0f;
-    /**
-     * 4-bit shift.
-     */
-    private static final int SHIFT_4 = 4;
-    /**
-     * Mask for bits 5-8 = 0xf0.
-     */
-    private static final int BITS_5_TO_8_MASK = 0xf0;
+
     /** identifier. */
     private int id;
 
@@ -175,15 +146,15 @@ class Terrain {
         // 2 (remove terrain instead of add it). you can add them together.
         // 0 indicates normal.
         // eg: 0xC011 means draw at xpos=1, do not overwrite, upside-down.
-        modifier = (b[0] & BITS_5_TO_8_MASK) >> SHIFT_4;
-        xPos = ((b[0] & FOUR_BIT_MASK) << SHIFT_8) + (b[1] & EIGHT_BIT_MASK)
-                - X_OFFSET;
+        modifier = (b[0] & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4;
+        xPos = ((b[0] & Constants.FOUR_BIT_MASK) << Constants.SHIFT_8)
+                + (b[1] & Constants.EIGHT_BIT_MASK) - Constants.X_OFFSET;
         xPos *= scale;
         // y pos : 9-bit value. min 0xEF0, max 0x518. 0xEF0 = -38, 0xEF8 = -37,
         // 0x020 = 0, 0x028 = 1, 0x030 = 2, 0x038 = 3, ... , 0x518 = 159
         // note: the ypos value bleeds into the next value since it is 9bits.
-        yPos = (((b[2] & EIGHT_BIT_MASK) << 1)
-                + ((b[YPOS_INDEX_2] & BIT_8_MASK) >> SHIFT_7));
+        yPos = (((b[2] & Constants.EIGHT_BIT_MASK) << 1) + ((b[YPOS_INDEX_2]
+                & Constants.BIT_8_MASK) >> Constants.SHIFT_7));
 
         if ((yPos & BIT_9_MASK) != 0) {
             yPos -= YPOS_9_BIT_CORRECTION;

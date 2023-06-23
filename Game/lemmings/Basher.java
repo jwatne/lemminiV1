@@ -21,6 +21,7 @@ import game.Type;
 import game.level.Level;
 import game.level.Mask;
 import game.level.Stencil;
+import lemmini.Constants;
 
 /**
  * Class for handling Basher role, if assigned to owning Lemming. Code moved
@@ -161,7 +162,7 @@ public class Basher {
                 case 2 * Lemming.TIME_SCALE:
                 case Faller.FALLER_STEP * Lemming.TIME_SCALE:
                 case Lemming.STEP_PIXELS * Lemming.TIME_SCALE:
-                case Lemming.FIVE * Lemming.TIME_SCALE:
+                case Constants.FIVE * Lemming.TIME_SCALE:
                     // bash mask should have the same height as the lemming
                     m = lemRes.getMask(dir);
                     sx = lemming.screenX();
@@ -179,7 +180,7 @@ public class Basher {
                         newType = Type.WALKER;
                     }
 
-                    if (idx == Lemming.FIVE * Lemming.TIME_SCALE) {
+                    if (idx == Constants.FIVE * Lemming.TIME_SCALE) {
                         // check for conversion to walker because there are no
                         // bricks left
                         if (!canBash()) {

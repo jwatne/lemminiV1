@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
+import lemmini.Constants;
 import tools.ToolBox;
 
 /*
@@ -35,25 +36,9 @@ public final class LemmFont {
      */
     private static final int MAX_GREEN = 0xff00;
     /**
-     * 7-bit shift.
-     */
-    private static final int SHIFT_7 = 7;
-    /**
-     * 8-bit shift.
-     */
-    private static final int SHIFT_8 = 8;
-    /**
      * Max RGB color channel value.
      */
     private static final int MAX_COLOR = 0xff;
-    /**
-     * 16-bit shift.
-     */
-    private static final int SHIFT_16 = 16;
-    /**
-     * Maximum alpha ARGB value.
-     */
-    private static final int MAX_ALPHA = 0xff000000;
     /**
      * Number of color indexes in img.
      */
@@ -128,32 +113,36 @@ public final class LemmFont {
         for (int xp = 0; xp < sourceImg.getWidth(null); xp++) {
             for (int yp = 0; yp < sourceImg.getHeight(null); yp++) {
                 int col = sourceImg.getRGB(xp, yp); // A R G B
-                final int a = col & MAX_ALPHA; // transparent part
-                final int r = (col >> SHIFT_16) & MAX_COLOR;
-                final int g = (col >> SHIFT_8) & MAX_COLOR;
+                final int a = col & Constants.MAX_ALPHA; // transparent part
+                final int r = (col >> Constants.SHIFT_16) & MAX_COLOR;
+                final int g = (col >> Constants.SHIFT_8) & MAX_COLOR;
                 final int b = col & MAX_COLOR;
                 // patch image to red version by swapping red and green
                 // components
-                col = a | (g << SHIFT_16) | (r << SHIFT_8) | b;
+                col = a | (g << Constants.SHIFT_16) | (r << Constants.SHIFT_8)
+                        | b;
                 redImg.setRGB(xp, yp, col);
                 // patch image to blue version by swapping blue and green
                 // components
-                col = a | (r << SHIFT_16) | (b << SHIFT_8) | g;
+                col = a | (r << Constants.SHIFT_16) | (b << Constants.SHIFT_8)
+                        | g;
                 blueImg.setRGB(xp, yp, col);
                 // patch image to turquoise version by setting blue component to
                 // value of green
                 // component
-                col = a | (r << SHIFT_16) | (g << SHIFT_8) | g;
+                col = a | (r << Constants.SHIFT_16) | (g << Constants.SHIFT_8)
+                        | g;
                 turquoiseImg.setRGB(xp, yp, col);
                 // patch image to yellow version by setting red component to
                 // value of green
                 // component
-                col = a | (g << SHIFT_16) | (g << SHIFT_8) | b;
+                col = a | (g << Constants.SHIFT_16) | (g << Constants.SHIFT_8)
+                        | b;
                 brownImg.setRGB(xp, yp, col);
                 // patch image to violet version by exchanging red and blue with
                 // green
-                col = a | (g << SHIFT_16) | (((r + b) << SHIFT_7) & MAX_GREEN)
-                        | g;
+                col = a | (g << Constants.SHIFT_16)
+                        | (((r + b) << Constants.SHIFT_7) & MAX_GREEN) | g;
                 violetImg.setRGB(xp, yp, col);
             }
         }

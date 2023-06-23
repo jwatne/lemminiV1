@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
+import lemmini.Constants;
 import tools.ToolBox;
 
 /*
@@ -33,10 +34,6 @@ import tools.ToolBox;
  */
 public final class Fader {
     /**
-     * Number of bits in 2 bytes.
-     */
-    private static final int TWO_BYTES = 16;
-    /**
      * Maximum hex value for RGBA channel.
      */
     private static final int MAX_CHANNEL_VALUE = 0xff;
@@ -57,7 +54,7 @@ public final class Fader {
     /** height of square to use for fading. */
     private static final int HEIGHT = 64;
     /** maximum alpha (opaque). */
-    private static final int MAX_ALPHA = 0xff;
+    private static final int MAX_ALPHA_VALUE = 0xff;
 
     /** current alpha value. */
     private static int fadeValue;
@@ -134,8 +131,9 @@ public final class Fader {
             alphaGfx = alphaImg.createGraphics();
         }
         // fill with alpha blended color
-        fillColor = new Color((color >> TWO_BYTES) & MAX_CHANNEL_VALUE,
-                (color >> TWO_BYTES) & MAX_CHANNEL_VALUE,
+        fillColor = new Color(
+                (color >> Constants.TWO_BYTES) & MAX_CHANNEL_VALUE,
+                (color >> Constants.TWO_BYTES) & MAX_CHANNEL_VALUE,
                 color & MAX_CHANNEL_VALUE, alpha);
         alphaGfx.setBackground(fillColor);
         alphaGfx.clearRect(0, 0, WIDTH, HEIGHT);
@@ -164,7 +162,7 @@ public final class Fader {
 
         switch (fadeState) {
         case IN:
-            fadeValue = MAX_ALPHA; // opaque
+            fadeValue = MAX_ALPHA_VALUE; // opaque
             setAlpha(fadeValue);
             break;
         case OUT:
@@ -213,10 +211,10 @@ public final class Fader {
             // System.out.println(fadeValue);
             break;
         case OUT:
-            if (fadeValue <= MAX_ALPHA - fadeStep) {
+            if (fadeValue <= MAX_ALPHA_VALUE - fadeStep) {
                 fadeValue += fadeStep;
             } else {
-                fadeValue = MAX_ALPHA;
+                fadeValue = MAX_ALPHA_VALUE;
                 fadeState = FaderState.OFF;
             }
             Fader.setAlpha(fadeValue);

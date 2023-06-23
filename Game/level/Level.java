@@ -22,6 +22,7 @@ import game.Steel;
 import game.Terrain;
 import game.lemmings.Lemming;
 import gameutil.Sprite;
+import lemmini.Constants;
 import tools.Props;
 import tools.ToolBox;
 
@@ -56,17 +57,9 @@ public class Level {
      */
     private static final int HEX_0X60 = 0x60;
     /**
-     * 8-bit mask = 0xff.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
-    /**
-     * 8-bit shift.
-     */
-    private static final int SHIFT_8 = 8;
-    /**
      * Number of RGB color channels (R, G, and B).
      */
-    private static final int NUM_RGB_COLOR_CHANNELS = 3;
+    private static final int NUM_RGB_CHANNELS = 3;
     /**
      * Entry animation type.
      */
@@ -75,10 +68,6 @@ public class Level {
      * Maximum number of Sprite objects.
      */
     private static final int MAX_NUM_SPRITE_OBJECTS = 64;
-    /**
-     * Maximum alpha value ARGB color.
-     */
-    private static final int MAX_ALPHA = 0xff000000;
     /**
      * Number of int elements in steel_x array.
      */
@@ -91,10 +80,6 @@ public class Level {
      * Number of int elements in object_x array.
      */
     private static final int OBJECT_X_LENGTH = 5;
-    /**
-     * Seconds per minute.
-     */
-    private static final int SECONDS_PER_MINUTE = 60;
     /** maximum width of level. */
     public static final int WIDTH = 1664 * 2;
     /** maximum height of level. */
@@ -227,7 +212,7 @@ public class Level {
 
         if (timeLimitSeconds == -1) {
             final int timeLimit = p.get("timeLimit", -1);
-            timeLimitSeconds = timeLimit * SECONDS_PER_MINUTE;
+            timeLimitSeconds = timeLimit * Constants.SECONDS_PER_MINUTE;
         }
 
         // out("timeLimit = " + timeLimit);
@@ -485,7 +470,7 @@ public class Level {
                 final int col = source[yLine + x];
 
                 // ignore transparent pixels
-                if ((col & MAX_ALPHA) == 0) {
+                if ((col & Constants.MAX_ALPHA) == 0) {
                     continue;
                 }
 
@@ -579,7 +564,7 @@ public class Level {
                     // store object type in mask and idx in higher byte
                     if (spr.getType() != SpriteObject.Type.ENTRY
                             && spr.getType() != SpriteObject.Type.PASSIVE) {
-                        if ((spr.getMask(x, y) & MAX_ALPHA) != 0) {
+                        if ((spr.getMask(x, y) & Constants.MAX_ALPHA) != 0) {
                             // not transparent
                             // avoid two objects on the same stencil
                             // position
@@ -672,7 +657,7 @@ public class Level {
             // sprite screenBuffer pixel
             final int imgCol = imgSpr.getRGB(x, y);
 
-            if ((imgCol & MAX_ALPHA) == 0) {
+            if ((imgCol & Constants.MAX_ALPHA) == 0) {
                 continue;
             }
 
@@ -789,15 +774,16 @@ public class Level {
         // this.getClass().getClassLoader();
         final MediaTracker tracker = new MediaTracker(cmp);
         // first some global settings
-        bgCol = props.get("bgColor", 0x000000) | MAX_ALPHA;
+        bgCol = props.get("bgColor", 0x000000) | Constants.MAX_ALPHA;
         bgColor = new Color(bgCol);
-        debrisCol = props.get("debrisColor", Color.WHITE.getRGB()) | MAX_ALPHA;
+        debrisCol = props.get("debrisColor", Color.WHITE.getRGB())
+                | Constants.MAX_ALPHA;
         // replace pink color with debris color
         Lemming.patchColors(TEMPLATE_COLOR, debrisCol);
         particleCol = props.get("particleColor", DEFAULT_PARTICLE_COLORS);
 
         for (int i = 0; i < particleCol.length; i++) {
-            particleCol[i] |= MAX_ALPHA;
+            particleCol[i] |= Constants.MAX_ALPHA;
         }
 
         // go through all the entries (shouldn't be more than 64)
@@ -964,7 +950,8 @@ public class Level {
                 int c = img.getRGB(x, y);
 
                 if (c == backgroundColor) {
-                    c = MAX_ALPHA; // make backgroud black instead of dark
+                    c = Constants.MAX_ALPHA; // make backgroud black instead of
+                                             // dark
                 } else {
                     c = tintNonBackgroundColor(c);
                 }
@@ -978,22 +965,23 @@ public class Level {
         int c = initialColor;
         int sum = 0;
 
-        for (int i = 0; i < NUM_RGB_COLOR_CHANNELS; i++, c >>= SHIFT_8) {
-            sum += (c & EIGHT_BIT_MASK);
+        for (int i = 0; i < NUM_RGB_CHANNELS; i++, c >>= Constants.SHIFT_8) {
+            sum += (c & Constants.EIGHT_BIT_MASK);
         }
 
-        sum /= NUM_RGB_COLOR_CHANNELS; // mean value
+        sum /= NUM_RGB_CHANNELS; // mean value
 
         if (sum != 0) {
             sum += HEX_0X60;
         }
 
         // sum *= 3; // make lighter
-        if (sum > EIGHT_BIT_MASK) {
-            sum = EIGHT_BIT_MASK;
+        if (sum > Constants.EIGHT_BIT_MASK) {
+            sum = Constants.EIGHT_BIT_MASK;
         }
 
-        c = MAX_ALPHA + ((sum << SHIFT_8) & MASK_BITS_9_TO_16);
+        c = Constants.MAX_ALPHA
+                + ((sum << Constants.SHIFT_8) & MASK_BITS_9_TO_16);
         return c;
     }
 

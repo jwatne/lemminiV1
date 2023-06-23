@@ -18,6 +18,7 @@ import javax.sound.sampled.Mixer;
 import game.Core;
 import game.ResourceException;
 import game.SoundController;
+import lemmini.Constants;
 
 /*
  * Copyright 2009 Volker Oth
@@ -50,17 +51,9 @@ public class Sound {
      */
     private static final double TEN_POINT_0 = 10.0;
     /**
-     * Decimal value 0.5.
-     */
-    private static final double HALF = 0.5;
-    /**
      * Multiplier used to derive pitched value.
      */
     private static final double PITCH_MULTIPLIER = 0.0204;
-    /**
-     * Numeric value 3.
-     */
-    private static final int THREE = 3;
     /**
      * Numeric value 8.
      */
@@ -69,10 +62,6 @@ public class Sound {
      * Hexidecimal value 0x80.
      */
     private static final int HEX_80 = 0x80;
-    /**
-     * 8-bit mask = Hexidecimal value 0xff.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
     /**
      * Value of 0.1.
      */
@@ -422,31 +411,34 @@ public class Sound {
 
             if (from8bit) {
                 if (ofs < ONE_TENTH || pos == sampleNumSrc - 1) {
-                    val = buffer[pos] & EIGHT_BIT_MASK;
+                    val = buffer[pos] & Constants.EIGHT_BIT_MASK;
                 } else {
                     // interpolate between sample points
-                    val = (int) ((buffer[pos] & EIGHT_BIT_MASK) * (1.0 - ofs)
-                            + (buffer[pos + 1] & EIGHT_BIT_MASK) * ofs);
+                    val = (int) ((buffer[pos] & Constants.EIGHT_BIT_MASK)
+                            * (1.0 - ofs)
+                            + (buffer[pos + 1] & Constants.EIGHT_BIT_MASK)
+                                    * ofs);
                 }
                 // byte order is little endian
                 val = (val - HEX_80) << EIGHT;
             } else {
                 if (convertEndian) {
-                    val = (buffer[2 * pos + 1] & EIGHT_BIT_MASK)
+                    val = (buffer[2 * pos + 1] & Constants.EIGHT_BIT_MASK)
                             | (buffer[2 * pos] << EIGHT);
                 } else {
-                    val = (buffer[2 * pos] & EIGHT_BIT_MASK)
+                    val = (buffer[2 * pos] & Constants.EIGHT_BIT_MASK)
                             | (buffer[2 * pos + 1] << EIGHT);
                 }
 
                 if (ofs >= ONE_TENTH && pos < sampleNumSrc - 1) {
                     // interpolate between sample points
                     if (convertEndian) {
-                        val2 = (buffer[2 * pos + THREE] & EIGHT_BIT_MASK)
+                        val2 = (buffer[2 * pos + Constants.THREE]
+                                & Constants.EIGHT_BIT_MASK)
                                 | (buffer[2 * pos + 2] << EIGHT);
                     } else {
-                        val2 = (buffer[2 * pos + 2] & EIGHT_BIT_MASK)
-                                | (buffer[2 * pos + THREE] << EIGHT);
+                        val2 = (buffer[2 * pos + 2] & Constants.EIGHT_BIT_MASK)
+                                | (buffer[2 * pos + Constants.THREE] << EIGHT);
                     }
 
                     val = (int) (val * (1.0 - ofs) + val2 * ofs);
@@ -496,13 +488,13 @@ public class Sound {
         // create scaled buffer
 
         for (int i = 0; i < len; i++) {
-            int pos = (int) (i * fact + HALF) * 2;
+            int pos = (int) (i * fact + Constants.HALF) * 2;
 
             if (pos >= soundBuffer[idx].length - 1) {
                 pos = soundBuffer[idx].length - 2;
             }
 
-            double val = (soundBuffer[idx][pos] & EIGHT_BIT_MASK)
+            double val = (soundBuffer[idx][pos] & Constants.EIGHT_BIT_MASK)
                     | (soundBuffer[idx][pos + 1] << EIGHT);
 
             // fade in

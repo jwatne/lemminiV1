@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.Adler32;
 
+import lemmini.Constants;
+
 /*
  * Copyright 2009 Volker Oth
  *
@@ -35,10 +37,6 @@ public final class Diff {
      */
     private static final int THREE_BYTE_SHIFT = 24;
     /**
-     * Bits to shift by two bytes.
-     */
-    private static final int TWO_BYTE_SHIFT = 16;
-    /**
      * Bits to shift by one byte.
      */
     private static final int ONE_BYTE_SHIFT = 8;
@@ -50,10 +48,6 @@ public final class Diff {
      * Hexadecimal 0x7f.
      */
     private static final int HEX7F = 0x7f;
-    /**
-     * Hexadecimal 0x80.
-     */
-    private static final int HEX80 = 0x80;
     /**
      * Re-synchronization window length.
      */
@@ -453,7 +447,7 @@ public final class Diff {
         do {
             v = b.getByte();
 
-            if ((v & HEX80) == 0) {
+            if ((v & Constants.HEX80) == 0) {
                 // no continue bit set
                 val += (v << shift);
                 break;
@@ -480,7 +474,7 @@ public final class Diff {
         int val = value;
 
         while (val > HEX7F) {
-            l.add((byte) (val & HEX7F | HEX80));
+            l.add((byte) (val & HEX7F | Constants.HEX80));
             val >>>= DECIMAL7;
         }
 
@@ -664,7 +658,7 @@ public final class Diff {
     private static void setDWord(final List<Byte> l, final int val) {
         l.add((byte) val);
         l.add((byte) (val >> ONE_BYTE_SHIFT));
-        l.add((byte) (val >> TWO_BYTE_SHIFT));
+        l.add((byte) (val >> Constants.SHIFT_16));
         l.add((byte) (val >> THREE_BYTE_SHIFT));
     }
 

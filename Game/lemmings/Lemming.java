@@ -17,6 +17,7 @@ import game.level.Level;
 import game.level.Mask;
 import game.level.SpriteObject;
 import game.level.Stencil;
+import lemmini.Constants;
 import tools.Props;
 import tools.ToolBox;
 
@@ -43,25 +44,13 @@ import tools.ToolBox;
  */
 public class Lemming {
     /**
-     * 3 constant.
-     */
-    private static final int THREE = 3;
-    /**
      * 20 constant.
      */
     public static final int TWENTY = 20;
     /**
-     * 5 constant.
-     */
-    public static final int FIVE = 5;
-    /**
      * Number of pixels to add/subtract when stepping.
      */
     public static final int STEP_PIXELS = 4;
-    /**
-     * 6 constant.
-     */
-    private static final int SIX = 6;
     /**
      * -6 constant.
      */
@@ -680,7 +669,7 @@ public class Lemming {
         free = 0;
         final int xOld = x;
 
-        for (int i = NEGATIVE_SIX; i < SIX; i++) {
+        for (int i = NEGATIVE_SIX; i < Constants.SIX; i++) {
             // should be 14 pixels, here it's more like 12
             x = xOld + i;
 
@@ -1014,7 +1003,8 @@ public class Lemming {
 
         if (x > 0 && x < Level.WIDTH && sy > 0 && sy < Level.HEIGHT) {
             m.eraseMask(x - m.getWidth() / 2,
-                    midY() - m.getHeight() / 2 + THREE, 0, Stencil.MSK_STEEL);
+                    midY() - m.getHeight() / 2 + Constants.THREE, 0,
+                    Stencil.MSK_STEEL);
         }
     }
 
@@ -1284,7 +1274,7 @@ public class Lemming {
             int[] val = p.get("lemm_" + i, def);
             int type;
 
-            if (val.length == THREE) {
+            if (val.length == Constants.THREE) {
                 // frames, directions, animation type
                 type = i;
 
@@ -1309,7 +1299,7 @@ public class Lemming {
             // read mask
             val = p.get("mask_" + i, def);
 
-            if (val.length == THREE) {
+            if (val.length == Constants.THREE) {
                 // mask_Y: frames, directions, step
                 type = i;
                 final Image sourceImg = Core.loadImage(tracker,
@@ -1353,7 +1343,7 @@ public class Lemming {
             // read foot position and size
             val = p.get("pos_" + i, def);
 
-            if (val.length == THREE) {
+            if (val.length == Constants.THREE) {
                 lemmings[type].setFootX(val[0]);
                 lemmings[type].setFootY(val[1]);
                 lemmings[type].setSize(val[2]);
@@ -1433,7 +1423,7 @@ public class Lemming {
                 nuke = true;
 
                 if (exploder.getExplodeNumCtr() == 0) {
-                    exploder.setExplodeNumCtr(FIVE);
+                    exploder.setExplodeNumCtr(Constants.FIVE);
                     exploder.setExplodeCtr(0);
                     return true;
                 } else {
@@ -1471,7 +1461,7 @@ public class Lemming {
             //$FALL-THROUGH$
         case BOMBER:
             if (exploder.getExplodeNumCtr() == 0) {
-                exploder.setExplodeNumCtr(FIVE);
+                exploder.setExplodeNumCtr(Constants.FIVE);
                 exploder.setExplodeCtr(0);
                 return true;
             } else {

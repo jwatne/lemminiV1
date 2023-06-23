@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import lemmini.Constants;
+
 /*
  * Copyright 2009 Volker Oth
  *
@@ -40,10 +42,6 @@ public final class ExtractLevel {
      * # of tiles.
      */
     private static final int NUM_TILES = 400;
-    /**
-     * 8-bit mask = 0xff.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
     /**
      * Number of objects.
      */
@@ -360,7 +358,7 @@ public final class ExtractLevel {
 
             for (int j = 0; j < BUFFER_SIZE; j++) {
                 by[j] = b.getByte();
-                sum += by[j] & EIGHT_BIT_MASK;
+                sum += by[j] & Constants.EIGHT_BIT_MASK;
             }
 
             if (sum != 0) {
@@ -385,14 +383,14 @@ public final class ExtractLevel {
         int idx = 0;
 
         for (int i = 0; i < NUM_TILES; i++) {
-            int mask = EIGHT_BIT_MASK;
+            int mask = Constants.EIGHT_BIT_MASK;
 
             for (int j = 0; j < BYTES_PER_TILE; j++) {
                 by[j] = b.getByte();
                 mask &= by[j];
             }
 
-            if (mask != EIGHT_BIT_MASK) {
+            if (mask != Constants.EIGHT_BIT_MASK) {
                 final Terrain ter = new Terrain(by, SCALE);
                 terrain.add(ter);
                 fo.write("terrain_" + idx + " = " + ter.getId() + ", "
@@ -415,7 +413,7 @@ public final class ExtractLevel {
 
             for (int j = 0; j < BYTES_PER_TILE; j++) {
                 by[j] = b.getByte();
-                sum += by[j] & EIGHT_BIT_MASK;
+                sum += by[j] & Constants.EIGHT_BIT_MASK;
             }
 
             if (sum != 0) {
@@ -436,7 +434,7 @@ public final class ExtractLevel {
 
         for (int j = 0; j < LEVEL_NAME_SIZE; j++) {
             // replace wrong apostrophes
-            char c = (char) (b.getByte() & EIGHT_BIT_MASK);
+            char c = (char) (b.getByte() & Constants.EIGHT_BIT_MASK);
 
             if (c == '�' || c == '`') {
                 c = '\'';

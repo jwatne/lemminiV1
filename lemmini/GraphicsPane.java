@@ -73,10 +73,6 @@ public class GraphicsPane extends JPanel
      */
     private static final int MAX_NUM_LEMMINGS_STRING_LENGTH = 14;
     /**
-     * Multiplier to convert decimals to percentages.
-     */
-    private static final int ONE_HUNDRED_PERCENT = 100;
-    /**
      * 8 pixels.
      */
     private static final int EIGHT_PIXELS = 8;
@@ -381,9 +377,9 @@ public class GraphicsPane extends JPanel
                 }
 
                 sb.append("  IN ");
-                s = Integer.toString(
-                        GameController.getNumLeft() * ONE_HUNDRED_PERCENT
-                                / GameController.getNumLemmingsMax());
+                s = Integer.toString(GameController.getNumLeft()
+                        * Constants.ONE_HUNDRED_PERCENT
+                        / GameController.getNumLemmingsMax());
 
                 if (s.length() == 1) {
                     sb.append("0");

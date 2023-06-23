@@ -15,6 +15,8 @@ package extract;
  * limitations under the License.
  */
 
+import lemmini.Constants;
+
 /**
  * Storage class for level objects.
  *
@@ -57,18 +59,6 @@ class LvlObject {
      * Index of 2nd y position element in buffer.
      */
     private static final int Y_POS_INDEX_2 = 3;
-    /**
-     * Offset subtracted to obtain x position.
-     */
-    private static final int X_OFFSET = 16;
-    /**
-     * 8-bit shift.
-     */
-    private static final int SHIFT_8 = 8;
-    /**
-     * 8-bit mask = 0xff.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
     /** paint mode: only visible on a terrain pixel. */
     private static final int MODE_VIS_ON_TERRAIN = 8;
     /**
@@ -195,21 +185,21 @@ class LvlObject {
         // -8
         // 0x0010 = 0, 0x0018 = 8, ... , 0x0638 = 1576 note: should be multiples
         // of 8
-        xPos = (short) (((b[0] & EIGHT_BIT_MASK) << SHIFT_8)
-                + (b[1] & EIGHT_BIT_MASK)) - X_OFFSET;
+        xPos = (short) (((b[0] & Constants.EIGHT_BIT_MASK) << Constants.SHIFT_8)
+                + (b[1] & Constants.EIGHT_BIT_MASK)) - Constants.X_OFFSET;
         xPos *= scale;
         // y pos : min 0xFFD7, max 0x009F. 0xFFD7 = -41, 0xFFF8 = -8, 0xFFFF =
         // -1
         // 0x0000 = 0, ... , 0x009F = 159. note: can be any value in the
         // specified range
-        yPos = (short) (((b[2] & EIGHT_BIT_MASK) << SHIFT_8)
-                + (b[Y_POS_INDEX_2] & EIGHT_BIT_MASK));
+        yPos = (short) (((b[2] & Constants.EIGHT_BIT_MASK) << Constants.SHIFT_8)
+                + (b[Y_POS_INDEX_2] & Constants.EIGHT_BIT_MASK));
         yPos *= scale;
         // obj id : min 0x0000, max 0x000F. the object id is different in each
         // graphics set, however 0x0000 is always an exit and 0x0001 is always a
         // start.
-        id = ((b[ID_INDEX_1] & EIGHT_BIT_MASK) << SHIFT_8)
-                + (b[ID_INDEX_2] & EIGHT_BIT_MASK);
+        id = ((b[ID_INDEX_1] & Constants.EIGHT_BIT_MASK) << Constants.SHIFT_8)
+                + (b[ID_INDEX_2] & Constants.EIGHT_BIT_MASK);
         // modifier : first byte can be 80 (do not overwrite existing terrain)
         // or 40
         // (must have terrain underneath to be visible). 00 specifies always
@@ -218,7 +208,7 @@ class LvlObject {
         // second byte can be 8F (display graphic upside-down) or 0F (display
         // graphic
         // normally)
-        switch (b[PAINT_MODE_INDEX] & EIGHT_BIT_MASK) {
+        switch (b[PAINT_MODE_INDEX] & Constants.EIGHT_BIT_MASK) {
         case NO_OVERWRITE_VALUE:
             paintMode = MODE_NO_OVERWRITE;
             break;
@@ -233,6 +223,7 @@ class LvlObject {
             break;
         }
 
-        upsideDown = ((b[UPSIDE_DOWN_INDEX] & EIGHT_BIT_MASK) == UPSIDE_DOWN);
+        upsideDown = ((b[UPSIDE_DOWN_INDEX]
+                & Constants.EIGHT_BIT_MASK) == UPSIDE_DOWN);
     }
 }

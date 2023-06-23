@@ -1,5 +1,7 @@
 package game;
 
+import lemmini.Constants;
+
 /*
  * Copyright 2009 Volker Oth
  *
@@ -31,29 +33,9 @@ public final class LevelCode {
     // %6
 
     /**
-     * Array index 6.
-     */
-    private static final int INDEX_6 = 6;
-    /**
      * Array index 9.
      */
     private static final int INDEX_9 = 9;
-    /**
-     * 4-bit shift.
-     */
-    private static final int SHIFT_4 = 4;
-    /**
-     * Mask for bits 5 to 8 = 0xf0.
-     */
-    private static final int BITS_5_TO_8_MASK = 0xf0;
-    /**
-     * 4-bit mask value = 0xf = 0x0f.
-     */
-    private static final int FOUR_BIT_MASK = 0x0f;
-    /**
-     * Array index 7.
-     */
-    private static final int INDEX_7 = 7;
     /**
      * Array index 8.
      */
@@ -70,10 +52,6 @@ public final class LevelCode {
      * 32-bit mask.
      */
     private static final int MASK_32BIT = 0xff;
-    /**
-     * 100% as a percentage int.
-     */
-    private static final int ONE_HUNDRED_PERCENT = 100;
     /* magic: S */
     /** Magic mask. */
     private static final int[] MMASK = {1, 2, 4, 24, 32, 64, 0};
@@ -144,12 +122,13 @@ public final class LevelCode {
         }
 
         // create bytes 8th and 9th byte (level)
-        bo[INDEX_7] = (byte) (bi[INDEX_7] + (level & FOUR_BIT_MASK));
+        bo[Constants.INDEX_7] = (byte) (bi[Constants.INDEX_7]
+                + (level & Constants.FOUR_BIT_MASK));
         bo[INDEX_8] = (byte) (bi[INDEX_8]
-                + ((level & BITS_5_TO_8_MASK) >> SHIFT_4));
-        sum += (bo[INDEX_7] + bo[INDEX_8]) & MASK_32BIT;
+                + ((level & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4));
+        sum += (bo[Constants.INDEX_7] + bo[INDEX_8]) & MASK_32BIT;
         // create 10th byte (checksum)
-        bo[INDEX_9] = (byte) (bi[INDEX_9] + (sum & FOUR_BIT_MASK));
+        bo[INDEX_9] = (byte) (bi[INDEX_9] + (sum & Constants.FOUR_BIT_MASK));
         return new String(bo);
     }
 
@@ -171,12 +150,15 @@ public final class LevelCode {
             return -1;
         }
 
-        int level = ((bi[INDEX_7] - bs[INDEX_7]) & FOUR_BIT_MASK)
-                + (((bi[INDEX_8] - bs[INDEX_8]) & FOUR_BIT_MASK) << SHIFT_4);
+        int level = ((bi[Constants.INDEX_7] - bs[Constants.INDEX_7])
+                & Constants.FOUR_BIT_MASK)
+                + (((bi[INDEX_8] - bs[INDEX_8])
+                        & Constants.FOUR_BIT_MASK) << Constants.SHIFT_4);
 
         // unrotate
         for (int j = 0; j < SEVEN_BYTES; j++) {
-            bo[(j + INDEX_6 + (level % INDEX_8)) % SEVEN_BYTES] = bi[j];
+            bo[(j + Constants.INDEX_6 + (level % INDEX_8))
+                    % SEVEN_BYTES] = bi[j];
         }
 
         // decode
@@ -191,7 +173,8 @@ public final class LevelCode {
             percent += ((nibble << PSHIFTR[i]) >> PSHIFTL[i]) & PMASK[i];
         }
 
-        if (level != reconstructedLevel || percent > ONE_HUNDRED_PERCENT) {
+        if (level != reconstructedLevel
+                || percent > Constants.ONE_HUNDRED_PERCENT) {
             return -1;
         }
 

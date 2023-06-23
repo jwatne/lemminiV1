@@ -10,6 +10,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 
+import lemmini.Constants;
 import micromod.Micromod;
 
 /*
@@ -35,6 +36,12 @@ import micromod.Micromod;
  */
 public class ModMusic implements Runnable {
     /**
+     * Local copy of {@link Constants#SHIFT_8} used to avoid line-too-long
+     * Checkstyle errors.
+     */
+    private static final int SHIFT8 = Constants.SHIFT_8;
+
+    /**
      * Thread sleep time = 40 ms.
      */
     private static final int SLEEP_40MS = 40;
@@ -43,16 +50,6 @@ public class ModMusic implements Runnable {
      * 3 added to base index within array.
      */
     private static final int OFFSET_3 = 3;
-
-    /**
-     * 8-bit shift.
-     */
-    private static final int SHIFT_8 = 8;
-
-    /**
-     * 8-bit mask = 0xff.
-     */
-    private static final int EIGHT_BIT_MASK = 0xFF;
 
     /** sample frequency. */
     private static final int SAMPLE_RATE = 44100;
@@ -153,14 +150,15 @@ public class ModMusic implements Runnable {
 
                     micromod.mix(lbuf, rbuf, 0, count);
 
-                    for (int ix = 0; ix < count; ix++) {
-                        final int ox = ix << 2;
-                        obuf[ox] = (byte) (lbuf[ix] & EIGHT_BIT_MASK);
-                        obuf[ox + 1] = (byte) (lbuf[ix] >> SHIFT_8);
-                        obuf[ox + 2] = (byte) (rbuf[ix] & EIGHT_BIT_MASK);
-                        obuf[ox + OFFSET_3] = (byte) (rbuf[ix] >> SHIFT_8);
-                        rbuf[ix] = 0;
-                        lbuf[ix] = 0;
+                    for (int i = 0; i < count; i++) {
+                        final int ox = i << 2;
+                        obuf[ox] = (byte) (lbuf[i] & Constants.EIGHT_BIT_MASK);
+                        obuf[ox + 1] = (byte) (lbuf[i] >> SHIFT8);
+                        obuf[ox + 2] = (byte) (rbuf[i]
+                                & Constants.EIGHT_BIT_MASK);
+                        obuf[ox + OFFSET_3] = (byte) (rbuf[i] >> SHIFT8);
+                        rbuf[i] = 0;
+                        lbuf[i] = 0;
                     }
 
                     line.write(obuf, 0, count << 2);

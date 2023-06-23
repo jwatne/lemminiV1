@@ -1,7 +1,5 @@
 package game.level;
 
-// import static game.LemmFont.Color.*;
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Transparency;
@@ -16,6 +14,7 @@ import game.LevelCode;
 import game.LevelPack;
 import game.MiscGfx;
 import game.TextDialog;
+import lemmini.Constants;
 import tools.ToolBox;
 
 /*
@@ -42,10 +41,6 @@ import tools.ToolBox;
  */
 public final class TextScreen {
 
-    /**
-     * One half.
-     */
-    private static final double HALF = 0.5;
     /**
      * Y position = -120.
      */
@@ -90,14 +85,6 @@ public final class TextScreen {
      * Line -7 relative to line 0.
      */
     private static final int L_7 = -7;
-    /**
-     * Number of seconds per minute.
-     */
-    private static final int SECONDS_PER_MINUTE = 60;
-    /**
-     * 100% = multiplier to convert decimal value to percentage.
-     */
-    private static final int ONE_HUNDRED_PERCENT = 100;
     /**
      * 9 characters to the left.
      */
@@ -283,13 +270,15 @@ public final class TextScreen {
         textScreen.print("Number of Lemmings " + level.getNumLemmings(), X_9, 0,
                 LemmFont.Color.BLUE);
         textScreen.print(
-                "" + (level.getNumToRescue() * ONE_HUNDRED_PERCENT
+                "" + (level.getNumToRescue() * Constants.ONE_HUNDRED_PERCENT
                         / level.getNumLemmings()) + "% to be saved",
                 X_9, 1, LemmFont.Color.GREEN);
         textScreen.print("Release Rate " + level.getReleaseRate(), X_9, 2,
                 LemmFont.Color.BROWN);
-        final int minutes = level.getTimeLimitSeconds() / SECONDS_PER_MINUTE;
-        final int seconds = level.getTimeLimitSeconds() % SECONDS_PER_MINUTE;
+        final int minutes = level.getTimeLimitSeconds()
+                / Constants.SECONDS_PER_MINUTE;
+        final int seconds = level.getTimeLimitSeconds()
+                % Constants.SECONDS_PER_MINUTE;
 
         if (seconds == 0) {
             textScreen.print("Time         " + minutes + " Minutes", X_9, L3,
@@ -363,7 +352,7 @@ public final class TextScreen {
             textScreen.addTextButton(L_2, L5, BUTTON_RESTART, "Retry", "Retry",
                     LemmFont.Color.BLUE, LemmFont.Color.BROWN);
         } else {
-            if (rescued == ONE_HUNDRED_PERCENT) {
+            if (rescued == Constants.ONE_HUNDRED_PERCENT) {
                 textScreen.printCentered("Superb! You rescued every lemming on",
                         L_2, LemmFont.Color.RED);
                 textScreen.printCentered("that level. Can you do it again....?",
@@ -530,7 +519,7 @@ public final class TextScreen {
             op.filter(imgSrc, imgTrg);
             textScreen.drawImage(imgTrg,
                     Y_120 - (int) (imgSrc.getHeight() / 2 * Math.abs(rotFact)
-                            + HALF));
+                            + Constants.HALF));
         } else {
             // display original image
             flipCtr = 0;

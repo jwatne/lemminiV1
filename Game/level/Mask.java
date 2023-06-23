@@ -3,6 +3,7 @@ package game.level;
 import java.awt.image.BufferedImage;
 
 import game.GameController;
+import lemmini.Constants;
 
 /*
  * Copyright 2009 Volker Oth
@@ -36,10 +37,6 @@ public class Mask {
      * Number by which to divide total number of pixels to get maxMaskPixels.
      */
     private static final int MAX_MASK_PIXELS_DIVIDER = 3;
-    /**
-     * Maximum alpha ARGB value.
-     */
-    private static final int MAX_ALPHA = 0xff000000;
     /**
      * number of pixels in mask that may be indestructible before action is
      * stopped.
@@ -78,7 +75,7 @@ public class Mask {
                 for (int x = 0; x < width; x++) {
                     final int rgba = img.getRGB(x, y);
 
-                    if (((rgba & MAX_ALPHA) != 0)) {
+                    if (((rgba & Constants.MAX_ALPHA) != 0)) {
                         mask[i][pos + x] = (byte) 1;
                         maxMaskPixels[i]++;
                     } else {
@@ -172,8 +169,8 @@ public class Mask {
 
                         if (drawSmallX && drawSmallY) {
                             bgImageSmall.setRGB(x / scaleX, y / scaleY,
-                                    MAX_ALPHA/* bgCol */); // erase pixel in
-                                                           // bgIMageSmall
+                                    Constants.MAX_ALPHA);
+                            // erase pixel in bgIMageSmall
                         }
                     } else {
                         ctrIndestructable++;

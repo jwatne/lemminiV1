@@ -15,20 +15,14 @@ package extract;
  * limitations under the License.
  */
 
+import lemmini.Constants;
+
 /**
  * Abstraction layer for binary level in byte buffer.
  *
  * @author Volker Oth
  */
 class LevelBuffer {
-    /**
-     * 8-bit shift.
-     */
-    private static final int SHIFT_8 = 8;
-    /**
-     * 8-bit mask = 0xff.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
     /** data buffer. */
     private final byte[] buffer;
     /** byte offset. */
@@ -51,7 +45,8 @@ class LevelBuffer {
      * @throws ArrayIndexOutOfBoundsException
      */
     int getWord() throws ArrayIndexOutOfBoundsException {
-        return ((buffer[ofs++] & EIGHT_BIT_MASK) << SHIFT_8) + buffer[ofs++];
+        return ((buffer[ofs++] & Constants.EIGHT_BIT_MASK) << Constants.SHIFT_8)
+                + buffer[ofs++];
     }
 
     /**

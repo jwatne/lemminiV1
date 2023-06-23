@@ -15,6 +15,8 @@ package extract;
  * limitations under the License.
  */
 
+import lemmini.Constants;
+
 /**
  *
  * Storage class for steel areas.
@@ -23,41 +25,13 @@ package extract;
  */
 class Steel {
     /**
-     * 4-bit mask.
-     */
-    private static final int FOUR_BIT_MASK = 0xf;
-    /**
-     * 4-bit shift.
-     */
-    private static final int SHIFT_4 = 4;
-    /**
-     * Mask for bits 5-8 = 0xf0.
-     */
-    private static final int BITS_5_TO_8_MASK = 0xf0;
-    /**
      * 7-bit mask = 0x7f.
      */
     private static final int SEVEN_BIT_MASK = 0x7f;
     /**
-     * Amount to subtract from buffer values to obtain xPos in pixels.
-     */
-    private static final int X_OFFSET = 16;
-    /**
      * Pixels per nibble = 4.
      */
     private static final int PIXELS_PER_NIBBLE = 4;
-    /**
-     * 7-bit shift.
-     */
-    private static final int SHIFT_7 = 7;
-    /**
-     * 8th bit mask = 0x80.
-     */
-    private static final int BIT_8_MASK = 0x80;
-    /**
-     * 8-bit mask = 0xff.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
     /** x position in pixels. */
     private int xPos;
 
@@ -150,9 +124,9 @@ class Steel {
      */
     Steel(final byte[] b, final int scale) { // note: last byte is always 0
         // xpos: 9-bit value: 0x000..0x178). 0x000 = -16, 0x178 = 1580
-        xPos = (((b[0] & EIGHT_BIT_MASK) << 1)
-                + ((b[1] & BIT_8_MASK) >> SHIFT_7)) * PIXELS_PER_NIBBLE
-                - X_OFFSET;
+        xPos = (((b[0] & Constants.EIGHT_BIT_MASK) << 1)
+                + ((b[1] & Constants.BIT_8_MASK) >> Constants.SHIFT_7))
+                * PIXELS_PER_NIBBLE - Constants.X_OFFSET;
         xPos *= scale;
         // ypos: 0x00..0x27. 0x00 = 0, 0x27 = 156 - each hex value represents 4
         // pixels
@@ -163,10 +137,11 @@ class Steel {
         // pixels)
         // second nibble is the y-size. 0x00 = (4,4), 0x11 = (8,8), 0x7F =
         // (32,64)
-        width = ((b[2] & BITS_5_TO_8_MASK) >> SHIFT_4) * PIXELS_PER_NIBBLE
-                + PIXELS_PER_NIBBLE;
+        width = ((b[2] & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4)
+                * PIXELS_PER_NIBBLE + PIXELS_PER_NIBBLE;
         width *= scale;
-        height = (b[2] & FOUR_BIT_MASK) * PIXELS_PER_NIBBLE + PIXELS_PER_NIBBLE;
+        height = (b[2] & Constants.FOUR_BIT_MASK) * PIXELS_PER_NIBBLE
+                + PIXELS_PER_NIBBLE;
         height *= scale;
     }
 }

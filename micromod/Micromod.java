@@ -15,6 +15,8 @@ package micromod;
  * limitations under the License.
  */
 
+import lemmini.Constants;
+
 /**
  * Micromod/e fast module player (rev b).
  */
@@ -44,10 +46,6 @@ public class Micromod {
      */
     private static final int MIN_P_FOR_MIX_UPDATE = 27;
     /**
-     * 7-bit shift.
-     */
-    private static final int SHIFT_7_BITS = 7;
-    /**
      * Mask for 6th bit = 0x20.
      */
     private static final int BIT_SIX_MASK = 0x20;
@@ -67,14 +65,6 @@ public class Micromod {
      * Maximum number of rows.
      */
     private static final int NUM_ROWS = 64;
-    /**
-     * 4-bit shift.
-     */
-    private static final int SHIFT_4_BITS = 4;
-    /**
-     * Mask for bits 5-8 = 0xF0.
-     */
-    private static final int BITS_5_TO_8_MASK = 0xF0;
     /**
      * Number fcount values - used for mod calc.
      */
@@ -135,10 +125,6 @@ public class Micromod {
      * Max value = 7.
      */
     private static final int MAX7 = 7;
-    /**
-     * 4-bit mask = 0x0F.
-     */
-    private static final int FOUR_BIT_MASK = 0xF;
     /**
      * Amount to add for fine value.
      */
@@ -204,17 +190,9 @@ public class Micromod {
      */
     private static final int M_DOT_K_DOT = 0x4b2e;
     /**
-     * 8-bit mask.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
-    /**
      * Second index of number of Amiga channels in buffer.
      */
     private static final int AMIGA_NUM_CHANNEL_INDEX_2 = 1083;
-    /**
-     * 8-bit shift.
-     */
-    private static final int SHIFT_8_BITS = 8;
     /**
      * First index of number of Amiga channels in buffer.
      */
@@ -455,8 +433,9 @@ public class Micromod {
             }
         }
 
-        switch ((modDataBuffer[AMIGA_NUM_CHANNEL_INDEX_1] << SHIFT_8_BITS)
-                | modDataBuffer[AMIGA_NUM_CHANNEL_INDEX_2] & EIGHT_BIT_MASK) {
+        switch ((modDataBuffer[AMIGA_NUM_CHANNEL_INDEX_1] << Constants.SHIFT_8)
+                | modDataBuffer[AMIGA_NUM_CHANNEL_INDEX_2]
+                        & Constants.EIGHT_BIT_MASK) {
         case M_DOT_K_DOT: // M.K.
         case M_BANG_K_BANG: // M!K!
         case FLT4: // FLT4
@@ -486,7 +465,7 @@ public class Micromod {
             int slen = ushortbe(modDataBuffer,
                     inst * INST_MULTIPLIER + SLEN_OFFSET) << 1;
             int fine = modDataBuffer[inst * INST_MULTIPLIER + FINE_OFFSET]
-                    & FOUR_BIT_MASK;
+                    & Constants.FOUR_BIT_MASK;
 
             if (fine > MAX7) {
                 fine -= REDUCTION16;
@@ -572,7 +551,7 @@ public class Micromod {
                 final int coffset = chan * CH_STRUCT_LEN;
                 final int ampl = channels[coffset + CH_AMPL];
                 final int pann = channels[coffset + CH_PANNING] << FP_SHIFT
-                        - SHIFT_8_BITS;
+                        - Constants.SHIFT_8;
                 final int lamp = ampl * (FP_ONE - pann) >> FP_SHIFT;
                 final int ramp = ampl * pann >> FP_SHIFT;
                 final int inst = channels[coffset + CH_INSTRUMENT];
@@ -592,7 +571,7 @@ public class Micromod {
                             spos -= llen;
                         }
                         final int sample = mod[sidx
-                                + (spos >> FP_SHIFT)] << SHIFT_8_BITS;
+                                + (spos >> FP_SHIFT)] << Constants.SHIFT_8;
                         l[offset + x] += sample * lamp >> FP_SHIFT;
                         r[offset + x] += sample * ramp >> FP_SHIFT;
                         spos += step;
@@ -674,10 +653,11 @@ public class Micromod {
                     break;
                 case 1:
                     channels[coffset + CH_ARPEGGIO] = (eparam
-                            & BITS_5_TO_8_MASK) >> SHIFT_4_BITS;
+                            & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4;
                     break;
                 case 2:
-                    channels[coffset + CH_ARPEGGIO] = eparam & FOUR_BIT_MASK;
+                    channels[coffset + CH_ARPEGGIO] = eparam
+                            & Constants.FOUR_BIT_MASK;
                     break;
                 default:
                     break;
@@ -711,9 +691,9 @@ public class Micromod {
                 volslide(coffset, eparam);
                 break;
             case FX_EXTENDED:
-                switch (eparam & BITS_5_TO_8_MASK) {
+                switch (eparam & Constants.BITS_5_TO_8_MASK) {
                 case EX_RETRIG:
-                    int rtparam = eparam & FOUR_BIT_MASK;
+                    int rtparam = eparam & Constants.FOUR_BIT_MASK;
                     if (rtparam == 0) {
                         rtparam = 1;
                     }
@@ -722,12 +702,12 @@ public class Micromod {
                     }
                     break;
                 case EX_NOTE_CUT:
-                    if ((eparam & FOUR_BIT_MASK) == fcount) {
+                    if ((eparam & Constants.FOUR_BIT_MASK) == fcount) {
                         channels[coffset + CH_VOLUME] = 0;
                     }
                     break;
                 case EX_NOTE_DELAY:
-                    if ((eparam & FOUR_BIT_MASK) == fcount) {
+                    if ((eparam & Constants.FOUR_BIT_MASK) == fcount) {
                         trigger(coffset);
                     }
                     break;
@@ -766,21 +746,22 @@ public class Micromod {
         for (int chan = 0; chan < numchan; chan++) {
             final int coffset = chan * CH_STRUCT_LEN;
             final int noffset = roffset + (chan * FOUR_CHANNELS);
-            channels[coffset
-                    + CH_NOTE_PERIOD] = (mod[noffset + 1] & EIGHT_BIT_MASK)
-                            | ((mod[noffset] & FOUR_BIT_MASK) << SHIFT_8_BITS);
+            channels[coffset + CH_NOTE_PERIOD] = (mod[noffset + 1]
+                    & Constants.EIGHT_BIT_MASK)
+                    | ((mod[noffset]
+                            & Constants.FOUR_BIT_MASK) << Constants.SHIFT_8);
             channels[coffset + CH_NOTE_INSTRU] = ((mod[noffset + 2]
-                    & BITS_5_TO_8_MASK) >> SHIFT_4_BITS)
+                    & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4)
                     | (mod[noffset] & BIT_5_MASK);
             channels[coffset + CH_NOTE_EFFECT] = mod[noffset + 2]
-                    & FOUR_BIT_MASK;
+                    & Constants.FOUR_BIT_MASK;
             channels[coffset + CH_NOTE_EPARAM] = mod[noffset + EPARAM_OFFSET]
-                    & EIGHT_BIT_MASK;
+                    & Constants.EIGHT_BIT_MASK;
             final int effect = channels[coffset + CH_NOTE_EFFECT];
             final int eparam = channels[coffset + CH_NOTE_EPARAM];
 
-            if (!(effect == FX_EXTENDED
-                    && ((eparam & BITS_5_TO_8_MASK) == EX_NOTE_DELAY))) {
+            if (!(effect == FX_EXTENDED && ((eparam
+                    & Constants.BITS_5_TO_8_MASK) == EX_NOTE_DELAY))) {
                 trigger(coffset);
             }
 
@@ -805,7 +786,8 @@ public class Micromod {
                 handleFXSetpanning(coffset, eparam);
                 break;
             case FX_SET_SPOS:
-                channels[coffset + CH_SPOS] = eparam << FP_SHIFT + SHIFT_8_BITS;
+                channels[coffset + CH_SPOS] = eparam << FP_SHIFT
+                        + Constants.SHIFT_8;
                 break;
             case FX_PAT_JUMP:
                 handleFXPatJump(eparam);
@@ -854,16 +836,16 @@ public class Micromod {
 
     private void handleFXExtended(final int chan, final int coffset,
             final int eparam) {
-        switch (eparam & BITS_5_TO_8_MASK) {
+        switch (eparam & Constants.BITS_5_TO_8_MASK) {
         case EX_FINE_PORT_UP:
-            channels[coffset + CH_PERIOD] -= (eparam & FOUR_BIT_MASK);
+            channels[coffset + CH_PERIOD] -= (eparam & Constants.FOUR_BIT_MASK);
             break;
         case EX_FINE_PORT_DN:
-            channels[coffset + CH_PERIOD] += (eparam & FOUR_BIT_MASK);
+            channels[coffset + CH_PERIOD] += (eparam & Constants.FOUR_BIT_MASK);
             break;
 
         case EX_SET_FINETUNE:
-            int ftval = eparam & FOUR_BIT_MASK;
+            int ftval = eparam & Constants.FOUR_BIT_MASK;
 
             if (ftval > MAX7) {
                 ftval -= REDUCTION16;
@@ -872,7 +854,7 @@ public class Micromod {
             channels[coffset + CH_FINETUNE] = ftval;
             break;
         case EX_PAT_LOOP:
-            final int plparam = eparam & FOUR_BIT_MASK;
+            final int plparam = eparam & Constants.FOUR_BIT_MASK;
 
             if (plparam == 0) {
                 channels[coffset + CH_PAT_LOOP_ROW] = row;
@@ -898,7 +880,7 @@ public class Micromod {
 
         case EX_FINE_VOL_UP:
             int fvolup = channels[coffset + CH_VOLUME]
-                    + (eparam & FOUR_BIT_MASK);
+                    + (eparam & Constants.FOUR_BIT_MASK);
 
             if (fvolup > MAX_VOLUME) {
                 fvolup = MAX_VOLUME;
@@ -908,7 +890,7 @@ public class Micromod {
             break;
         case EX_FINE_VOL_DN:
             int fvoldn = channels[coffset + CH_VOLUME]
-                    - (eparam & FOUR_BIT_MASK);
+                    - (eparam & Constants.FOUR_BIT_MASK);
 
             if (fvoldn > MAX_VOLUME) {
                 fvoldn = 0;
@@ -917,19 +899,19 @@ public class Micromod {
             channels[coffset + CH_VOLUME] = fvoldn;
             break;
         case EX_NOTE_CUT:
-            if ((eparam & FOUR_BIT_MASK) == fcount) {
+            if ((eparam & Constants.FOUR_BIT_MASK) == fcount) {
                 channels[coffset + CH_VOLUME] = 0;
             }
 
             break;
         case EX_NOTE_DELAY:
-            if ((eparam & FOUR_BIT_MASK) == fcount) {
+            if ((eparam & Constants.FOUR_BIT_MASK) == fcount) {
                 trigger(coffset);
             }
 
             break;
         case EX_PAT_DELAY:
-            tick = tempo + tempo * (eparam & FOUR_BIT_MASK);
+            tick = tempo + tempo * (eparam & Constants.FOUR_BIT_MASK);
             break;
         default:
             break;
@@ -939,8 +921,8 @@ public class Micromod {
     private void handleFXPatBreak(final int eparam) {
         if (loopcount <= 0) {
             npat = pat + 1;
-            nrow = ((eparam & BITS_5_TO_8_MASK) >> SHIFT_4_BITS) * TEN
-                    + (eparam & FOUR_BIT_MASK);
+            nrow = ((eparam & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4)
+                    * TEN + (eparam & Constants.FOUR_BIT_MASK);
         }
     }
 
@@ -1036,8 +1018,8 @@ public class Micromod {
 
     private void volslide(final int coffset, final int eparam) {
         int vol = channels[coffset + CH_VOLUME];
-        vol += (eparam & BITS_5_TO_8_MASK) >> SHIFT_4_BITS;
-        vol -= eparam & FOUR_BIT_MASK;
+        vol += (eparam & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4;
+        vol -= eparam & Constants.FOUR_BIT_MASK;
         if (vol > MAX_VOLUME) {
             vol = MAX_VOLUME;
         }
@@ -1067,8 +1049,9 @@ public class Micromod {
 
     private void vibrato(final int coffset) {
         final int vparam = channels[coffset + CH_VIBR_PARAM];
-        final int vspeed = (vparam & BITS_5_TO_8_MASK) >> SHIFT_4_BITS;
-        final int vdepth = vparam & FOUR_BIT_MASK;
+        final int vspeed = (vparam
+                & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4;
+        final int vdepth = vparam & Constants.FOUR_BIT_MASK;
         final int vibpos = vspeed * channels[coffset + CH_VIBR_COUNT];
         int tval = sintable[vibpos & FIVE_BIT_MASK];
 
@@ -1076,13 +1059,14 @@ public class Micromod {
             tval = -tval;
         }
 
-        channels[coffset + CH_VIBR_PERIOD] = tval * vdepth >> SHIFT_7_BITS;
+        channels[coffset + CH_VIBR_PERIOD] = tval * vdepth >> Constants.SHIFT_7;
     }
 
     private void tremolo(final int coffset) {
         final int tparam = channels[coffset + CH_TREM_PARAM];
-        final int tspeed = (tparam & BITS_5_TO_8_MASK) >> SHIFT_4_BITS;
-        final int tdepth = tparam & FOUR_BIT_MASK;
+        final int tspeed = (tparam
+                & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4;
+        final int tdepth = tparam & Constants.FOUR_BIT_MASK;
         final int trempos = tspeed * channels[coffset + CH_VIBR_COUNT];
         int tval = sintable[trempos & FIVE_BIT_MASK];
 
@@ -1090,7 +1074,7 @@ public class Micromod {
             tval = -tval;
         }
 
-        channels[coffset + CH_TREM_VOLUME] = tval * tdepth >> SHIFT_7_BITS;
+        channels[coffset + CH_TREM_VOLUME] = tval * tdepth >> Constants.SHIFT_7;
     }
 
     private void mixupdate() {
@@ -1107,7 +1091,7 @@ public class Micromod {
                 a = MAX_VOLUME;
             }
 
-            channels[coffset + CH_AMPL] = a << FP_SHIFT - SHIFT_8_BITS;
+            channels[coffset + CH_AMPL] = a << FP_SHIFT - Constants.SHIFT_8;
             int p = channels[coffset + CH_PERIOD]
                     + channels[coffset + CH_VIBR_PERIOD];
 
@@ -1129,7 +1113,7 @@ public class Micromod {
     }
 
     private int ushortbe(final byte[] buf, final int offset) {
-        return ((buf[offset] & EIGHT_BIT_MASK) << SHIFT_8_BITS)
-                | (buf[offset + 1] & EIGHT_BIT_MASK);
+        return ((buf[offset] & Constants.EIGHT_BIT_MASK) << Constants.SHIFT_8)
+                | (buf[offset + 1] & Constants.EIGHT_BIT_MASK);
     }
 }

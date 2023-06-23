@@ -6,6 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import lemmini.Constants;
 import tools.ToolBox;
 
 /*
@@ -30,24 +31,6 @@ import tools.ToolBox;
  * @author Volker Oth
  */
 public final class MiscGfx {
-
-    /**
-     * 8-bit shift.
-     */
-    private static final int SHIFT_8 = 8;
-    /**
-     * 8-bit mask.
-     */
-    private static final int EIGHT_BIT_MASK = 0xff;
-    /**
-     * 16-bit shift.
-     */
-    private static final int SHIFT_16 = 16;
-    /**
-     * Maximum alpha ARGB value.
-     */
-    private static final int MAX_ALPHA = 0xff000000;
-
     /** Index of images. */
     public enum Index {
         /** border for the mini map. */
@@ -106,14 +89,16 @@ public final class MiscGfx {
         for (int xp = 0; xp < img.getWidth(null); xp++) {
             for (int yp = 0; yp < img.getHeight(null); yp++) {
                 int col = img.getRGB(xp, yp); // A R G B
-                final int a = col & MAX_ALPHA; // transparent part
-                int r = (col >> SHIFT_16) & EIGHT_BIT_MASK;
-                final int g = (col >> SHIFT_8) & EIGHT_BIT_MASK;
-                int b = col & EIGHT_BIT_MASK;
+                final int a = col & Constants.MAX_ALPHA; // transparent part
+                int r = (col >> Constants.SHIFT_16) & Constants.EIGHT_BIT_MASK;
+                final int g = (col >> Constants.SHIFT_8)
+                        & Constants.EIGHT_BIT_MASK;
+                int b = col & Constants.EIGHT_BIT_MASK;
                 // patch image to brown version by manipulating red component
-                r = (r * 2) & EIGHT_BIT_MASK;
+                r = (r * 2) & Constants.EIGHT_BIT_MASK;
                 b = b / 2;
-                col = a | (g << SHIFT_16) | (r << SHIFT_8) | b;
+                col = a | (g << Constants.SHIFT_16) | (r << Constants.SHIFT_8)
+                        | b;
                 brownImg.setRGB(xp, yp, col);
             }
         }

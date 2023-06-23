@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import lemmini.Constants;
+
 /*
  * Copyright 2009 Volker Oth
  *
@@ -31,11 +33,6 @@ import java.util.List;
  * @author Volker Oth
  */
 public class ExtractSPR {
-    /**
-     * Hexadecimal value 0x80.
-     */
-    private static final int HEX80 = 0x80;
-
     /**
      * Large sprite line offset.
      */
@@ -65,11 +62,6 @@ public class ExtractSPR {
     private static final int SPR_HEADER_3_VALUE = 0x45;
 
     /**
-     * 8-bit mask.
-     */
-    private static final int EIGHT_BIT_MASK = 0xFF;
-
-    /**
      * Palette header index 3 value.
      */
     private static final int PALETTE_HEADER_3_VALUE = 0x50;
@@ -90,14 +82,6 @@ public class ExtractSPR {
      * Array index = 5.
      */
     private static final int INDEX_5 = 5;
-    /**
-     * Array index = 6.
-     */
-    private static final int INDEX_6 = 6;
-    /**
-     * Array index = 7.
-     */
-    private static final int INDEX_7 = 7;
 
     /**
      * Palette header index 0 value.
@@ -163,8 +147,8 @@ public class ExtractSPR {
         byte[] r = new byte[paletteSize];
         byte[] g = new byte[paletteSize];
         byte[] b = new byte[paletteSize];
-        int ofs = INDEX_6; // skip two bytes which contain number of palettes
-                           // (?)
+        int ofs = Constants.INDEX_6; // skip two bytes which contain number o
+                                     // palette (?)
 
         for (int idx = 0; idx < paletteSize; idx++) {
             r[idx] = buffer[ofs++];
@@ -235,7 +219,7 @@ public class ExtractSPR {
      * @return Unsigned value of byte
      */
     private static int unsigned(final byte b) {
-        return b & EIGHT_BIT_MASK;
+        return b & Constants.EIGHT_BIT_MASK;
     }
 
     /**
@@ -292,8 +276,8 @@ public class ExtractSPR {
         // get number of frames
         final int frames = unsigned(buffer[INDEX_4])
                 + unsigned(buffer[INDEX_5]) * HIGH_BYTE_MULTIPLIER;
-        int ofs = unsigned(buffer[INDEX_6])
-                + unsigned(buffer[INDEX_7]) * HIGH_BYTE_MULTIPLIER;
+        int ofs = unsigned(buffer[Constants.INDEX_6])
+                + unsigned(buffer[Constants.INDEX_7]) * HIGH_BYTE_MULTIPLIER;
 
         images = new GIFImage[frames];
         byte b;
@@ -348,14 +332,15 @@ public class ExtractSPR {
                     b = buffer[ofs++];
                 }
 
-                if (!((b & HEX80) == HEX80)) {
+                if (!((b & Constants.HEX80) == Constants.HEX80)) {
                     // additional line offset
                     lineOfs += (b & LARGE_SPRITE_LINE_OFFSET);
                     b = buffer[ofs++]; // start character
                 }
 
                 // get line length
-                final int len = (b & EIGHT_BIT_MASK) - HEX80;
+                final int len = (b & Constants.EIGHT_BIT_MASK)
+                        - Constants.HEX80;
 
                 if (len < 0 || len > LARGE_SPRITE_LINE_OFFSET || len > maxLen) {
                     throw new ExtractException(
@@ -376,7 +361,7 @@ public class ExtractSPR {
                             // compresse palette
                             final byte pixVal = (byte) (lookupBuf[buffer[ofs++]
                                     & LARGE_SPRITE_LINE_OFFSET]
-                                    & EIGHT_BIT_MASK);
+                                    & Constants.EIGHT_BIT_MASK);
                             pixels[y + xOfs + lineOfs + pixel
                                     + pxOffset] = pixVal;
                         }
@@ -389,7 +374,7 @@ public class ExtractSPR {
 
                     b = buffer[ofs++]; // end character must be HEX80
 
-                    if ((b & EIGHT_BIT_MASK) != HEX80) {
+                    if ((b & Constants.EIGHT_BIT_MASK) != Constants.HEX80) {
                         // if this is not the end character, the line is
                         // continued after an offset
                         pxOffset += (lineOfs + len);

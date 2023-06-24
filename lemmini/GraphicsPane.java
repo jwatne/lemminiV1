@@ -29,6 +29,7 @@ import game.level.MiniMap;
 import game.level.ReleaseRateHandler;
 import game.level.Stencil;
 import game.level.TextScreen;
+import game.replay.ReplayController;
 import gameutil.Fader;
 import gameutil.FaderState;
 import tools.MicrosecondTimer;
@@ -417,7 +418,7 @@ public class GraphicsPane extends JPanel
             }
 
             // replay icon
-            final BufferedImage replayImage = GameController.getReplayImage();
+            final BufferedImage replayImage = ReplayController.getReplayImage();
 
             if (replayImage != null) {
                 offGfx.drawImage(replayImage,
@@ -730,7 +731,7 @@ public class GraphicsPane extends JPanel
                             replayPath += ".rpl";
                         }
 
-                        if (GameController.saveReplay(replayPath)) {
+                        if (ReplayController.saveReplay(replayPath)) {
                             return;
                         }
 

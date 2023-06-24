@@ -13,6 +13,7 @@ import game.Type;
 import game.level.Level;
 import game.level.ReleaseRateHandler;
 import game.replay.ReplayAssignSkillEvent;
+import game.replay.ReplayController;
 import game.replay.ReplaySelectSkillEvent;
 import lemmini.Constants;
 import tools.MicrosecondTimer;
@@ -447,56 +448,56 @@ public final class SkillHandler {
                 lemmSkill = Type.FLOATER;
             }
 
-            GameController.stopReplayMode();
+            ReplayController.stopReplayMode();
             break;
         case CLIMB:
             if (GameController.isCheat() || numClimbers > 0) {
                 lemmSkill = Type.CLIMBER;
             }
 
-            GameController.stopReplayMode();
+            ReplayController.stopReplayMode();
             break;
         case BOMB:
             if (GameController.isCheat() || numBombers > 0) {
                 lemmSkill = Type.BOMBER;
             }
 
-            GameController.stopReplayMode();
+            ReplayController.stopReplayMode();
             break;
         case DIG:
             if (GameController.isCheat() || numDiggers > 0) {
                 lemmSkill = Type.DIGGER;
             }
 
-            GameController.stopReplayMode();
+            ReplayController.stopReplayMode();
             break;
         case BASH:
             if (GameController.isCheat() || numBashers > 0) {
                 lemmSkill = Type.BASHER;
             }
 
-            GameController.stopReplayMode();
+            ReplayController.stopReplayMode();
             break;
         case BUILD:
             if (GameController.isCheat() || numBuilders > 0) {
                 lemmSkill = Type.BUILDER;
             }
 
-            GameController.stopReplayMode();
+            ReplayController.stopReplayMode();
             break;
         case MINE:
             if (GameController.isCheat() || numMiners > 0) {
                 lemmSkill = Type.MINER;
             }
 
-            GameController.stopReplayMode();
+            ReplayController.stopReplayMode();
             break;
         case BLOCK:
             if (GameController.isCheat() || numBlockers > 0) {
                 lemmSkill = Type.STOPPER;
             }
 
-            GameController.stopReplayMode();
+            ReplayController.stopReplayMode();
             break;
         case NUKE:
             ok = true;
@@ -513,13 +514,13 @@ public final class SkillHandler {
         case PLUS:
             ok = true; // supress sound
             ReleaseRateHandler.getPlus().pressed(GameController.KEYREPEAT_ICON);
-            GameController.stopReplayMode();
+            ReplayController.stopReplayMode();
             break;
         case MINUS:
             ok = true; // supress sound
             ReleaseRateHandler.getMinus()
                     .pressed(GameController.KEYREPEAT_ICON);
-            GameController.stopReplayMode();
+            ReplayController.stopReplayMode();
             break;
         default:
             break;
@@ -532,7 +533,7 @@ public final class SkillHandler {
      * Handle pressing of nuke icon button.
      */
     private static void handleNukeIconButton() {
-        GameController.stopReplayMode();
+        ReplayController.stopReplayMode();
 
         if (timerNuke.delta() < MICROSEC_NUKE_DOUBLE_CLICK) {
             if (!GameController.isNuke()) {

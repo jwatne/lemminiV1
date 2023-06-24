@@ -25,13 +25,7 @@ import game.level.ReleaseRateHandler;
 import game.level.SpriteObject;
 import game.level.Stencil;
 import game.level.TextScreen;
-import game.replay.ReplayAssignSkillEvent;
-import game.replay.ReplayEvent;
-import game.replay.ReplayLevelInfo;
-import game.replay.ReplayMoveXPosEvent;
-import game.replay.ReplayReleaseRateEvent;
-import game.replay.ReplaySelectSkillEvent;
-import game.replay.ReplayStream;
+import game.replay.ReplayController;
 import gameutil.Fader;
 import gameutil.FaderState;
 import gameutil.Sprite;
@@ -61,14 +55,6 @@ import tools.ToolBox;
  */
 public final class GameController {
 
-    /**
-     * Hexidecimal value 0x20.
-     */
-    private static final int REPLAY_IMAGE_CUTOFF = 0x20;
-    /**
-     * Replay frame mask value = Hexidecimal value 0x3f.
-     */
-    private static final int REPLAY_FRAME_MASK = 0x3f;
     /**
      * Scale factor.
      */
@@ -198,10 +184,6 @@ public final class GameController {
     private static Lemming lemmSkillRequest;
     /** horizontal scrolling offset for level. */
     private static int xPos;
-    /** replay stream used for handling replays. */
-    private static ReplayStream replay;
-    /** frame counter used for handling replays. */
-    private static int replayFrame;
     /** old value of release rate. */
     private static int releaseRateOld;
     /** old value of nuke flag. */
@@ -210,10 +192,6 @@ public final class GameController {
     private static int xPosOld;
     /** old value of selected skill. */
     private static Type lemmSkillOld;
-    /** flag: replay mode is active. */
-    private static boolean replayMode;
-    /** flag: replay mode should be stopped. */
-    private static boolean stopReplayMode;
     /** listener to inform GUI of player's progress. */
     private static UpdateListener levelMenuUpdateListener;
     /** number of Lemmings which left the level. */
@@ -284,10 +262,7 @@ public final class GameController {
         curDiffLevel = 0;
         curLevelPack = 1; // since 0 is dummy
         curLevelNumber = 0;
-        replayFrame = 0;
-        replay = new ReplayStream();
-        replayMode = false;
-        stopReplayMode = false;
+        ReplayController.init();
         wasCheated = isCheat();
     }
 
@@ -399,7 +374,7 @@ public final class GameController {
         Music.stop();
         setFastForward(false);
         setSuperLemming(false);
-        replayMode = false;
+        ReplayController.setReplayMode(false);
 
         if (!wasLost() && (curLevelPack != 0)) {
             levelMenuUpdateListener.update();
@@ -426,15 +401,7 @@ public final class GameController {
     private static synchronized void restartLevel(final boolean doReplay,
             final Component frame) {
         initLevel(frame);
-
-        if (doReplay) {
-            replayMode = true;
-            replay.save(Core.getResourcePath() + "/replay.rpl");
-            replay.rewind();
-        } else {
-            replayMode = false;
-            replay.clear();
-        }
+        ReplayController.doReplayIfReplayMode(doReplay);
     }
 
     /**
@@ -475,8 +442,8 @@ public final class GameController {
         mapPreview = getLevel().createMiniMap(mapPreview, bgImage, SCALE_FACTOR,
                 SCALE_FACTOR, false);
         setSuperLemming(getLevel().isSuperLemming());
-        replayFrame = 0;
-        stopReplayMode = false;
+        ReplayController.setReplayFrame(0);
+        ReplayController.setStopReplayMode(false);
         releaseRateOld = releaseRate;
         lemmSkillOld = SkillHandler.getLemmSkill();
         nukeOld = false;
@@ -547,24 +514,10 @@ public final class GameController {
         // loading the level will patch pink lemmings pixels to correct color
         getLevel().loadLevel(lvlPath, frame);
 
-        // if with and height would be stored inside the level, the bgImage etc.
-        // would
-        // have to
-        // be recreated here
-        // bgImage = gc.createCompatibleImage(Level.width, Level.height,
-        // Transparency.BITMASK);
-        // bgGfx = bgImage.createGraphics();
-
+        // if width and height would be stored inside the level, the bgImage
+        // etc. would have to be recreated here
         initLevel(frame);
-
-        if (doReplay) {
-            replayMode = true;
-            replay.rewind();
-        } else {
-            replayMode = false;
-            replay.clear();
-        }
-
+        ReplayController.rewindIfReplayMode(doReplay);
         return getLevel();
     }
 
@@ -582,36 +535,10 @@ public final class GameController {
     }
 
     /**
-     * Get current replay image.
-     *
-     * @return current replay image
-     */
-    public static synchronized BufferedImage getReplayImage() {
-        if (!replayMode) {
-            return null;
-        }
-
-        if ((replayFrame & REPLAY_FRAME_MASK) > REPLAY_IMAGE_CUTOFF) {
-            return MiscGfx.getImage(MiscGfx.Index.REPLAY_1);
-        } else {
-            return MiscGfx.getImage(MiscGfx.Index.REPLAY_2);
-        }
-    }
-
-    /**
      * Lemming has left the Level.
      */
     public static synchronized void increaseLeft() {
         numLeft += 1;
-    }
-
-    /**
-     * Stop replay.
-     */
-    public static void stopReplayMode() {
-        if (replayMode) {
-            stopReplayMode = true;
-        }
     }
 
     /**
@@ -639,6 +566,7 @@ public final class GameController {
         }
 
         updateCtr++;
+        final boolean replayMode = ReplayController.isReplayMode();
 
         if (!replayMode) {
             assignSkill(false); // first try to assign skill
@@ -651,12 +579,12 @@ public final class GameController {
             return;
         }
 
-        testForEndOfReplayMode();
+        ReplayController.testForEndOfReplayMode();
 
         if (!replayMode) {
             handleNonReplayModeUpdate();
         } else {
-            handleReplayModeUpdate();
+            ReplayController.handleReplayModeUpdate(lemmings);
         }
 
         // replay: xpos changed
@@ -666,6 +594,7 @@ public final class GameController {
         releaseLemmings(nukeTemp);
         nuke(nukeTemp);
         openTrapDoors();
+
         // end of game conditions
         if ((nukeTemp || numLemmingsOut == getNumLemmingsMax())
                 && explosions.size() == 0 && lemmings.size() == 0) {
@@ -680,7 +609,7 @@ public final class GameController {
             assignSkill(true); // 2nd try to assign skill
         }
 
-        replayFrame++;
+        ReplayController.incrementReplayFrame();
     }
 
     /**
@@ -824,43 +753,6 @@ public final class GameController {
     }
 
     /**
-     * Handle replay mode-specific portions of frame update.
-     */
-    private static void handleReplayModeUpdate() {
-        // replay mode
-        ReplayEvent r;
-
-        while ((r = replay.getNext(replayFrame)) != null) {
-            switch (r.getType()) {
-            case ReplayStream.ASSIGN_SKILL:
-                SkillHandler.assignSkillAndDecrementAvailable(
-                        (ReplayAssignSkillEvent) r, lemmings);
-                SoundController.playSettingNewSKillSound();
-                break;
-            case ReplayStream.SET_RELEASE_RATE:
-                final ReplayReleaseRateEvent rr = (ReplayReleaseRateEvent) r;
-                ReleaseRateHandler.setReleaseRate(rr.getReleaseRate());
-                ReleaseRateHandler.calcReleaseBase();
-                SoundController
-                        .playPitched(ReleaseRateHandler.getReleaseRate());
-                break;
-            case ReplayStream.NUKE:
-                nuke = true;
-                break;
-            case ReplayStream.MOVE_XPOS:
-                final ReplayMoveXPosEvent rx = (ReplayMoveXPosEvent) r;
-                setxPos(rx.getxPos());
-                break;
-            case ReplayStream.SELECT_SKILL:
-                SkillHandler.selectSkill((ReplaySelectSkillEvent) r);
-                break;
-            default:
-                break;
-            }
-        }
-    }
-
-    /**
      * Handles non-replay mode-specific portions of frame update.
      */
     private static void handleNonReplayModeUpdate() {
@@ -869,43 +761,32 @@ public final class GameController {
             final int releaseRate = ReleaseRateHandler.getReleaseRate();
 
             if (releaseRate != releaseRateOld) {
-                replay.addReleaseRateEvent(replayFrame, releaseRate);
-                releaseRateOld = releaseRate;
+                releaseRateOld = ReplayController
+                        .addReleaseRateEvent(releaseRate);
             }
 
             // replay: nuked?
             if (nuke != nukeOld) {
-                replay.addNukeEvent(replayFrame);
-                nukeOld = nuke;
+                nukeOld = ReplayController.addNukeEvent(nuke);
             }
 
             // replay: xPos changed?
-            if (getxPos() != xPosOld) {
-                replay.addXPosEvent(replayFrame, getxPos());
-                xPosOld = getxPos();
+            int updatedXPos = getxPos();
+
+            if (updatedXPos != xPosOld) {
+                ReplayController.addXPosEvent(updatedXPos);
+                xPosOld = updatedXPos;
             }
 
             final Type lemmSkill = SkillHandler.getLemmSkill();
 
             // skill changed
             if (lemmSkill != lemmSkillOld) {
-                replay.addSelectSkillEvent(replayFrame, lemmSkill);
+                ReplayController.addSelectSkillEvent(lemmSkill);
                 lemmSkillOld = lemmSkill;
             }
         } else {
-            replay.clear();
-        }
-    }
-
-    /**
-     * Checks wheter in replay mode and should stop replay mode. If so, stops
-     * replay mode and clears both flag attributes.
-     */
-    private static void testForEndOfReplayMode() {
-        if (replayMode && stopReplayMode) {
-            replay.clearFrom(replayFrame);
-            replayMode = false;
-            stopReplayMode = false;
+            ReplayController.clear();
         }
     }
 
@@ -919,7 +800,7 @@ public final class GameController {
             lemmSkillRequest = lemm;
         }
 
-        stopReplayMode();
+        ReplayController.stopReplayMode();
     }
 
     /**
@@ -940,7 +821,7 @@ public final class GameController {
             lemmSkillRequest = null;
         }
 
-        stopReplayMode();
+        ReplayController.stopReplayMode();
         final boolean canSet = canSetSkill(lemm);
 
         if (canSet) {
@@ -956,12 +837,10 @@ public final class GameController {
             if (!wasCheated) {
                 synchronized (lemmings) {
                     for (int i = 0; i < lemmings.size(); i++) {
-                        if (lemmings.get(i) == lemm) { // if 2nd try
-                                                       // (delete==true) assign
-                                                       // to next frame
-                            replay.addAssignSkillEvent(
-                                    replayFrame + ((delete) ? 1 : 0), lemmSkill,
-                                    i);
+                        if (lemmings.get(i) == lemm) {
+                            // if 2nd try (delete==true) assign to next frame
+                            ReplayController.addAssignSkillEvent(delete,
+                                    lemmSkill, i);
                         }
                     }
                 }
@@ -1227,26 +1106,6 @@ public final class GameController {
      */
     public static void setTransition(final TransitionState ts) {
         transitionState = ts;
-    }
-
-    /**
-     * Load a replay.
-     *
-     * @param fn file name
-     * @return replay level info object
-     */
-    public static ReplayLevelInfo loadReplay(final String fn) {
-        return replay.load(fn);
-    }
-
-    /**
-     * Save a replay.
-     *
-     * @param fn file name
-     * @return true if saved successfully, false otherwise
-     */
-    public static boolean saveReplay(final String fn) {
-        return replay.save(fn);
     }
 
     /**

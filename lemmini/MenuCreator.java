@@ -25,6 +25,7 @@ import game.LevelPack;
 import game.Music;
 import game.Player;
 import game.SoundController;
+import game.replay.ReplayController;
 import game.replay.ReplayLevelInfo;
 import gameutil.Sound;
 import gui.GainDialog;
@@ -704,7 +705,7 @@ public class MenuCreator {
                     try {
                         if (ToolBox.getExtension(replayPath)
                                 .equalsIgnoreCase("rpl")) {
-                            final ReplayLevelInfo rli = GameController
+                            final ReplayLevelInfo rli = ReplayController
                                     .loadReplay(replayPath);
 
                             if (rli != null) {

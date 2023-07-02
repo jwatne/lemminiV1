@@ -7,6 +7,7 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import game.Core;
+import game.ExplosionHandler;
 import game.GameController;
 import game.LemmingExplosion;
 import game.MiscGfx;
@@ -993,7 +994,7 @@ public class Lemming {
     public void explode() {
         SoundController.getSound().play(SoundController.SND_EXPLODE);
         // create particle explosion
-        GameController.addExplosion(midX(), midY());
+        ExplosionHandler.addExplosion(midX(), midY());
         hasDied = true;
         changeType(type, Type.BOMBER);
         // consider height difference between lemming and mask

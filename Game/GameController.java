@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -144,8 +143,6 @@ public final class GameController {
     private static int nextLevelPack;
     /** index of next level. */
     private static int nextLevelNumber;
-    /** list of all active explosions. */
-    private static LinkedList<Explosion> explosions;
     /** array of available level packs. */
     private static LevelPack[] levelPack;
     /** small preview version of level used in briefing screen. */
@@ -217,7 +214,7 @@ public final class GameController {
         Explosion.init(frame);
         Lemming.loadLemmings(frame);
         LemmingHandler.init();
-        explosions = new LinkedList<Explosion>();
+        ExplosionHandler.init();
         LemmFont.init(frame);
         NumFont.init(frame);
         LemmCursor.init(frame);
@@ -402,7 +399,7 @@ public final class GameController {
         bgGfx.setBackground(blankColor);
         bgGfx.clearRect(0, 0, bgImage.getWidth(), bgImage.getHeight());
         stencil = getLevel().paintLevel(bgImage, frame, stencil);
-        explosions.clear();
+        ExplosionHandler.initLevel();
         Icons.reset();
         TrapDoor.reset(getLevel().getEntryNum());
         entryOpened = false;
@@ -579,12 +576,13 @@ public final class GameController {
         // end of game conditions
         if ((nukeTemp
                 || LemmingHandler.getNumLemmingsOut() == getNumLemmingsMax())
-                && explosions.size() == 0 && lemmings.size() == 0) {
+                && ExplosionHandler.getExplosions().size() == 0
+                && lemmings.size() == 0) {
             endLevel();
         }
 
         LemmingHandler.animateLemmings();
-        handleExplosions();
+        ExplosionHandler.handleExplosions();
         animateLevelObjects();
 
         if (!replayMode) {
@@ -604,25 +602,6 @@ public final class GameController {
             for (int n = 0; n < getLevel().getSprObjectNum(); n++) {
                 final SpriteObject spr = getLevel().getSprObject(n);
                 spr.getImageAnim(); // just to animate
-            }
-        }
-    }
-
-    /**
-     * Loop through ad animate any explosions.
-     */
-    private static void handleExplosions() {
-        synchronized (explosions) {
-            final Iterator<Explosion> it = explosions.iterator();
-
-            while (it.hasNext()) {
-                final Explosion e = it.next();
-
-                if (e.isFinished()) {
-                    it.remove();
-                } else {
-                    e.update();
-                }
             }
         }
     }
@@ -784,36 +763,6 @@ public final class GameController {
         }
 
         gameState = GameState.LEVEL;
-    }
-
-    /**
-     * Draw the explosions.
-     *
-     * @param g      graphics object
-     * @param width  width of screen in pixels
-     * @param height height of screen in pixels
-     * @param xOfs   horizontal level offset in pixels
-     */
-    public static void drawExplosions(final Graphics2D g, final int width,
-            final int height, final int xOfs) {
-        synchronized (explosions) {
-            for (final Explosion e : explosions) {
-                e.draw(g, width, height, xOfs);
-            }
-        }
-    }
-
-    /**
-     * Add a new explosion.
-     *
-     * @param x x coordinate in pixels.
-     * @param y y coordinate in pixels.
-     */
-    public static void addExplosion(final int x, final int y) {
-        // create particle explosion
-        synchronized (GameController.explosions) {
-            GameController.explosions.add(new Explosion(x, y));
-        }
     }
 
     /**

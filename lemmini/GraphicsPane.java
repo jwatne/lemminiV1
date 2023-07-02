@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import game.Core;
+import game.ExplosionHandler;
 import game.GameController;
 import game.Icons;
 import game.LemmCursor;
@@ -346,7 +347,7 @@ public class GraphicsPane extends JPanel
                     .lemmUnderCursor(LemmCursor.getType());
             offGfx.setClip(0, 0, w, h);
             // draw explosions
-            GameController.drawExplosions(offGfx, offImage[0].getWidth(),
+            ExplosionHandler.drawExplosions(offGfx, offImage[0].getWidth(),
                     Level.HEIGHT, xOfsTemp);
             offGfx.setClip(0, 0, w, this.getHeight());
 

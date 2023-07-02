@@ -18,7 +18,6 @@ import javax.swing.JOptionPane;
 
 import game.lemmings.Lemming;
 import game.lemmings.SkillHandler;
-import game.level.Entry;
 import game.level.Explosion;
 import game.level.Level;
 import game.level.ReleaseRateHandler;
@@ -63,10 +62,6 @@ public final class GameController {
      * The maximum number of levels for a difficulty level.
      */
     private static final int MAX_LEVELS = 30;
-    /**
-     * Initial capacity of ArrayList for lemmsUnderCursor.
-     */
-    private static final int INITIAL_CAPACITY = 10;
     /**
      * Maximum hexidecimal value for an RGBA color component.
      */
@@ -133,8 +128,6 @@ public final class GameController {
     private static int entryOpenCtr;
     /** frame counter for handling time. */
     private static double secondCtr;
-    /** frame counter used to handle release of new Lemmings. */
-    private static int releaseCtr;
     /** frame counter used to update animated sprite objects. */
     private static int animCtr;
     /** level object. */
@@ -151,12 +144,8 @@ public final class GameController {
     private static int nextLevelPack;
     /** index of next level. */
     private static int nextLevelNumber;
-    /** list of all active Lemmings in the Level. */
-    private static LinkedList<Lemming> lemmings;
     /** list of all active explosions. */
     private static LinkedList<Explosion> explosions;
-    /** list of all Lemmings under the mouse cursor. */
-    private static List<Lemming> lemmsUnderCursor;
     /** array of available level packs. */
     private static LevelPack[] levelPack;
     /** small preview version of level used in briefing screen. */
@@ -180,8 +169,6 @@ public final class GameController {
         GameController.nuke = nukeActivated;
     }
 
-    /** Lemming for which skill change is requested. */
-    private static Lemming lemmSkillRequest;
     /** horizontal scrolling offset for level. */
     private static int xPos;
     /** old value of release rate. */
@@ -199,8 +186,6 @@ public final class GameController {
 
     /** number of Lemmings available. */
     private static int numLemmingsMax;
-    /** number of Lemmings who entered the level. */
-    private static int numLemmingsOut;
     /** number of Lemmings which have to be rescued to finish the level. */
     private static int numToRecue;
     /** time left in seconds. */
@@ -231,10 +216,8 @@ public final class GameController {
         Icons.init(frame);
         Explosion.init(frame);
         Lemming.loadLemmings(frame);
-        lemmings = new LinkedList<Lemming>();
+        LemmingHandler.init();
         explosions = new LinkedList<Explosion>();
-        lemmsUnderCursor = new ArrayList<Lemming>(INITIAL_CAPACITY);
-        lemmSkillRequest = null;
         LemmFont.init(frame);
         NumFont.init(frame);
         LemmCursor.init(frame);
@@ -414,26 +397,23 @@ public final class GameController {
         setFastForward(false);
         setPaused(false);
         nuke = false;
-        lemmSkillRequest = null;
+        LemmingHandler.initLevelsLemmings();
         TextScreen.setMode(TextScreen.Mode.INIT);
         bgGfx.setBackground(blankColor);
         bgGfx.clearRect(0, 0, bgImage.getWidth(), bgImage.getHeight());
         stencil = getLevel().paintLevel(bgImage, frame, stencil);
-        lemmings.clear();
         explosions.clear();
         Icons.reset();
         TrapDoor.reset(getLevel().getEntryNum());
         entryOpened = false;
         entryOpenCtr = 0;
         secondCtr = 0;
-        releaseCtr = 0;
         SkillHandler.setLemmSkill(Type.UNDEFINED);
         ReleaseRateHandler.initLevel();
         numLeft = 0;
         final int releaseRate = getLevel().getReleaseRate();
         ReleaseRateHandler.setReleaseRate(releaseRate);
         numLemmingsMax = getLevel().getNumLemmings();
-        numLemmingsOut = 0;
         numToRecue = getLevel().getNumToRescue();
         time = getLevel().getTimeLimitSeconds();
         SkillHandler.initLevel(getLevel());
@@ -569,7 +549,7 @@ public final class GameController {
         final boolean replayMode = ReplayController.isReplayMode();
 
         if (!replayMode) {
-            assignSkill(false); // first try to assign skill
+            LemmingHandler.assignSkill(false); // first try to assign skill
         }
 
         // check +/- buttons also if paused
@@ -580,6 +560,7 @@ public final class GameController {
         }
 
         ReplayController.testForEndOfReplayMode();
+        final LinkedList<Lemming> lemmings = LemmingHandler.getLemmings();
 
         if (!replayMode) {
             handleNonReplayModeUpdate();
@@ -591,22 +572,23 @@ public final class GameController {
         // store locally to avoid it's overwritten amidst function
         final boolean nukeTemp = nuke;
         checkForTimeExpired();
-        releaseLemmings(nukeTemp);
-        nuke(nukeTemp);
+        LemmingHandler.releaseLemmings(nukeTemp, entryOpened);
+        LemmingHandler.nuke(nukeTemp, updateCtr);
         openTrapDoors();
 
         // end of game conditions
-        if ((nukeTemp || numLemmingsOut == getNumLemmingsMax())
+        if ((nukeTemp
+                || LemmingHandler.getNumLemmingsOut() == getNumLemmingsMax())
                 && explosions.size() == 0 && lemmings.size() == 0) {
             endLevel();
         }
 
-        animateLemmings();
+        LemmingHandler.animateLemmings();
         handleExplosions();
         animateLevelObjects();
 
         if (!replayMode) {
-            assignSkill(true); // 2nd try to assign skill
+            LemmingHandler.assignSkill(true); // 2nd try to assign skill
         }
 
         ReplayController.incrementReplayFrame();
@@ -646,26 +628,6 @@ public final class GameController {
     }
 
     /**
-     * Animate or remove lemmings from frame.
-     */
-    private static void animateLemmings() {
-        synchronized (lemmings) {
-            final Iterator<Lemming> it = lemmings.iterator();
-
-            while (it.hasNext()) {
-                final Lemming l = it.next();
-
-                if (l.hasDied() || l.hasLeft()) {
-                    it.remove();
-                    continue;
-                }
-
-                l.animate();
-            }
-        }
-    }
-
-    /**
      * Open trap doors if appropriate.
      */
     private static void openTrapDoors() {
@@ -680,56 +642,10 @@ public final class GameController {
             } else if (entryOpenCtr == MAX_ENTRY_OPEN_CTR
                     + Constants.DECIMAL_10 * MAX_ANIM_CTR) {
                 entryOpened = true;
-                releaseCtr = ReleaseRateHandler.getReleaseBase();
+                LemmingHandler
+                        .setReleaseCtr(ReleaseRateHandler.getReleaseBase());
                 // first lemming to enter at once
                 SoundController.playMusicIfMusicOn();
-            }
-        }
-    }
-
-    /**
-     * Handle nuking if appropriate.
-     *
-     * @param nukeTemp Stored initial value of {@link #nuke}.
-     */
-    private static void nuke(final boolean nukeTemp) {
-        if (nukeTemp && ((updateCtr & 1) == 1)) {
-            synchronized (lemmings) {
-                for (final Lemming l : lemmings) {
-                    if (!l.nuke() && !l.hasDied() && !l.hasLeft()) {
-                        l.setSkill(Type.NUKE);
-                        // System.out.println("nuked!");
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Releases lemmings if appropriate to current game conditions.
-     *
-     * @param nukeTemp Stored initial value of {@link #nuke}.
-     */
-    private static void releaseLemmings(final boolean nukeTemp) {
-        if (entryOpened && !nukeTemp && !isPaused()
-                && numLemmingsOut < getNumLemmingsMax()
-                && ++releaseCtr >= ReleaseRateHandler.getReleaseBase()) {
-            releaseCtr = 0;
-
-            try {
-                if (getLevel().getEntryNum() != 0) {
-                    final Entry e = getLevel().getEntry(TrapDoor.getNext());
-                    final Lemming l = new Lemming(e.getxPos() + 2,
-                            e.getyPos() + 20);
-
-                    synchronized (lemmings) {
-                        lemmings.add(l);
-                    }
-
-                    numLemmingsOut++;
-                }
-            } catch (final ArrayIndexOutOfBoundsException ex) {
             }
         }
     }
@@ -788,85 +704,6 @@ public final class GameController {
         } else {
             ReplayController.clear();
         }
-    }
-
-    /**
-     * Request a skill change for a Lemming (currently selected skill).
-     *
-     * @param lemm Lemming
-     */
-    public static synchronized void requestSkill(final Lemming lemm) {
-        if (SkillHandler.getLemmSkill() != Type.UNDEFINED) {
-            lemmSkillRequest = lemm;
-        }
-
-        ReplayController.stopReplayMode();
-    }
-
-    /**
-     * Assign the selected skill to the selected Lemming.
-     *
-     * @param delete flag: reset the current skill request
-     */
-    private static synchronized void assignSkill(final boolean delete) {
-        final Type lemmSkill = SkillHandler.getLemmSkill();
-
-        if (lemmSkillRequest == null || Type.UNDEFINED == lemmSkill) {
-            return;
-        }
-
-        final Lemming lemm = lemmSkillRequest;
-
-        if (delete) {
-            lemmSkillRequest = null;
-        }
-
-        ReplayController.stopReplayMode();
-        final boolean canSet = canSetSkill(lemm);
-
-        if (canSet) {
-            lemmSkillRequest = null; // erase request
-            SoundController.playMouseClickedSound();
-
-            if (isPaused()) {
-                setPaused(false);
-                Icons.press(Icons.Type.PAUSE);
-            }
-
-            // add to replay stream
-            if (!wasCheated) {
-                synchronized (lemmings) {
-                    for (int i = 0; i < lemmings.size(); i++) {
-                        if (lemmings.get(i) == lemm) {
-                            // if 2nd try (delete==true) assign to next frame
-                            ReplayController.addAssignSkillEvent(delete,
-                                    lemmSkill, i);
-                        }
-                    }
-                }
-            }
-        } else if (delete) {
-            SoundController.playTingSound();
-        }
-    }
-
-    /**
-     * Indicates whether the lemming's skill can be set to the selected one.
-     *
-     * @param lemm the lemming whose skill is to be set, if possible.
-     * @return <code>true</code> if the lemming's skill can be set to the
-     *         selected one.
-     */
-    private static boolean canSetSkill(final Lemming lemm) {
-        boolean canSet = false;
-
-        if (isCheat()) {
-            canSet = lemm.setSkill(SkillHandler.getLemmSkill());
-        } else {
-            canSet = SkillHandler.canSetSkillOfLemmingIfNotCheatMode(lemm);
-        }
-
-        return canSet;
     }
 
     /**
@@ -1127,6 +964,15 @@ public final class GameController {
     }
 
     /**
+     * Indicates whether cheat mode was activated.
+     *
+     * @return true: cheat mode was activated, false otherwise
+     */
+    public static boolean isWasCheated() {
+        return wasCheated;
+    }
+
+    /**
      * Set cheated detection.
      *
      * @param c true: cheat mode was activated, false otherwise
@@ -1233,24 +1079,6 @@ public final class GameController {
      */
     public static void releaseIcon(final Icons.Type t) {
         Icons.release(t);
-    }
-
-    /**
-     * Get list of all Lemmings under the mouse cursor.
-     *
-     * @return list of all Lemmings under the mouse cursor
-     */
-    public static List<Lemming> getLemmsUnderCursor() {
-        return lemmsUnderCursor;
-    }
-
-    /**
-     * Get list of all Lemmings in this level.
-     *
-     * @return list of all Lemmings in this level
-     */
-    public static LinkedList<Lemming> getLemmings() {
-        return lemmings;
     }
 
     /**

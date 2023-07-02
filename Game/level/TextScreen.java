@@ -225,7 +225,7 @@ public final class TextScreen {
                     textScreen.printCentered(
                             "A game engine for Lemmings(tm) in Java", 0,
                             LemmFont.Color.RED);
-                    textScreen.printCentered("Release 1.00 06/2023", 1,
+                    textScreen.printCentered("Release 1.01 07/2023", 1,
                             LemmFont.Color.BLUE);
                     textScreen.printCentered("Coded by Volker Oth 2005-2017", 2,
                             LemmFont.Color.VIOLET);

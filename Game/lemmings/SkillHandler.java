@@ -7,6 +7,7 @@ import java.util.List;
 import game.GameController;
 import game.Icons;
 import game.LemmCursor;
+import game.LemmingHandler;
 import game.NumFont;
 import game.SoundController;
 import game.Type;
@@ -339,7 +340,7 @@ public final class SkillHandler {
     public static synchronized Lemming lemmUnderCursor(
             final LemmCursor.Type type) {
         // search for level without the skill
-        final List<Lemming> lemmsUnderCursor = GameController
+        final List<Lemming> lemmsUnderCursor = LemmingHandler
                 .getLemmsUnderCursor();
 
         for (int i = 0; i < lemmsUnderCursor.size(); i++) {

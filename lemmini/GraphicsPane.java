@@ -19,6 +19,7 @@ import game.GameController;
 import game.Icons;
 import game.LemmCursor;
 import game.LemmFont;
+import game.LemmingHandler;
 import game.MiscGfx;
 import game.GameState;
 import game.TransitionState;
@@ -370,7 +371,7 @@ public class GraphicsPane extends JPanel
                 final StringBuffer sb = new StringBuffer();
                 sb.append("OUT ");
                 String s = Integer
-                        .toString(GameController.getLemmings().size());
+                        .toString(LemmingHandler.getLemmings().size());
                 sb.append(s);
 
                 if (s.length() == 1) {
@@ -395,7 +396,7 @@ public class GraphicsPane extends JPanel
                     n = lemmUnderCursor.getName();
                     // display also the total number of lemmings under
                     // the cursor
-                    final int num = GameController.getLemmsUnderCursor().size();
+                    final int num = LemmingHandler.getLemmsUnderCursor().size();
 
                     if (num > 1) {
                         n = n + " " + Integer.toString(num);
@@ -453,10 +454,10 @@ public class GraphicsPane extends JPanel
     private void drawLemmings(final Graphics2D offGfx, final int xOfsTemp,
             final int w, final int h) {
         offGfx.setClip(0, 0, w, h);
-        GameController.getLemmsUnderCursor().clear();
-        final List<Lemming> lemmings = GameController.getLemmings();
+        LemmingHandler.getLemmsUnderCursor().clear();
+        final List<Lemming> lemmings = LemmingHandler.getLemmings();
 
-        synchronized (GameController.getLemmings()) {
+        synchronized (LemmingHandler.getLemmings()) {
             for (final Lemming l : lemmings) {
                 final int lx = l.screenX();
                 final int ly = l.screenY();
@@ -466,7 +467,7 @@ public class GraphicsPane extends JPanel
                     offGfx.drawImage(l.getImage(), lx - xOfsTemp, ly, null);
 
                     if (LemmCursor.doesCollide(l, xOfsTemp)) {
-                        GameController.getLemmsUnderCursor().add(l);
+                        LemmingHandler.getLemmsUnderCursor().add(l);
                     }
 
                     final BufferedImage cd = l.getCountdown();
@@ -767,7 +768,7 @@ public class GraphicsPane extends JPanel
                             .lemmUnderCursor(LemmCursor.getType());
 
                     if (l != null) {
-                        GameController.requestSkill(l);
+                        LemmingHandler.requestSkill(l);
                     }
                 }
 

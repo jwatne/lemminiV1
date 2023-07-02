@@ -30,6 +30,7 @@ import game.GroupBitfield;
 import game.Icons;
 import game.LemmCursor;
 import game.LemmException;
+import game.LemmingHandler;
 import game.LevelPack;
 import game.ResourceException;
 import game.GameState;
@@ -439,8 +440,8 @@ public class Lemmini extends JFrame implements KeyListener {
         if (GameController.isCheat()) {
             final Lemming l = new Lemming(gp.getCursorX(), gp.getCursorY());
 
-            synchronized (GameController.getLemmings()) {
-                GameController.getLemmings().add(l);
+            synchronized (LemmingHandler.getLemmings()) {
+                LemmingHandler.getLemmings().add(l);
             }
         }
     }

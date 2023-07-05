@@ -27,6 +27,7 @@ import game.Player;
 import game.SoundController;
 import game.replay.ReplayController;
 import game.replay.ReplayLevelInfo;
+import gameutil.FaderHandler;
 import gameutil.Sound;
 import gui.GainDialog;
 import gui.LevelCodeDialog;
@@ -100,10 +101,10 @@ public class MenuCreator {
         @Override
         public void actionPerformed(final java.awt.event.ActionEvent e) {
             if (!GameController.getLevel().isReady()) {
-                GameController.requestChangeLevel(
-                        GameController.getCurLevelPackIdx(),
-                        GameController.getCurDiffLevel(),
-                        GameController.getCurLevelNumber(), false);
+                FaderHandler.requestChangeLevel(
+                        FaderHandler.getCurLevelPackIdx(),
+                        FaderHandler.getCurDiffLevel(),
+                        FaderHandler.getCurLevelNumber(), false);
             } else {
                 GameController.requestRestartLevel(false);
             }
@@ -115,7 +116,7 @@ public class MenuCreator {
         @Override
         public void actionPerformed(final java.awt.event.ActionEvent e) {
             final LvlMenuItem item = (LvlMenuItem) e.getSource();
-            GameController.requestChangeLevel(item.getLevelPack(),
+            FaderHandler.requestChangeLevel(item.getLevelPack(),
                     item.getDiffLevel(), item.getLevel(), false);
         }
     }
@@ -661,8 +662,7 @@ public class MenuCreator {
 
                     // real level code -> get absolute level
                     levelCode = levelCode.toUpperCase();
-                    final LevelPack lpack = GameController
-                            .getLevelPack(lvlPack);
+                    final LevelPack lpack = FaderHandler.getLevelPack(lvlPack);
                     final int lvlAbs = LevelCode.getLevel(lpack.getCodeSeed(),
                             levelCode, lpack.getCodeOffset());
 
@@ -675,7 +675,7 @@ public class MenuCreator {
                         final int lvlRel = l[1];
                         Core.getPlayer().setAvailable(lpack.getName(),
                                 lpack.getDiffLevels()[diffLvl], lvlRel);
-                        GameController.requestChangeLevel(lvlPack, diffLvl,
+                        FaderHandler.requestChangeLevel(lvlPack, diffLvl,
                                 lvlRel, false);
                         updateLevelMenus();
                         return;
@@ -711,16 +711,16 @@ public class MenuCreator {
                             if (rli != null) {
                                 int lpn = -1;
 
-                                for (int i = 0; i < GameController
+                                for (int i = 0; i < FaderHandler
                                         .getLevelPackNum(); i++) {
-                                    if (GameController.getLevelPack(i).getName()
+                                    if (FaderHandler.getLevelPack(i).getName()
                                             .equals(rli.getLevelPack())) {
                                         lpn = i;
                                     }
                                 }
 
                                 if (lpn > -1) {
-                                    GameController.requestChangeLevel(lpn,
+                                    FaderHandler.requestChangeLevel(lpn,
                                             rli.getDiffLevel(),
                                             rli.getLvlNumber(), true);
                                     return; // success
@@ -766,12 +766,11 @@ public class MenuCreator {
 
                             if (id.equalsIgnoreCase("# LVL")) {
                                 // this is a hack - maybe find a better way
-                                GameController.getLevelPack(0).getInfo(0, 0)
+                                FaderHandler.getLevelPack(0).getInfo(0, 0)
                                         .setFileName(p);
-                                GameController.getLevelPack(0).getInfo(0, 0)
+                                FaderHandler.getLevelPack(0).getInfo(0, 0)
                                         .setMusic(Music.getRandomTrack());
-                                GameController.requestChangeLevel(0, 0, 0,
-                                        false);
+                                FaderHandler.requestChangeLevel(0, 0, 0, false);
                                 lvlPath = p;
                                 return;
                             }
@@ -808,11 +807,9 @@ public class MenuCreator {
 
         jMenuSelect = new JMenu("Select Level");
 
-        for (int lp = 1; lp < GameController.getLevelPackNum(); lp++) { // skip
-                                                                        // dummy
-                                                                        // level
-                                                                        // pack
-            final LevelPack lPack = GameController.getLevelPack(lp);
+        for (int lp = 1; lp < FaderHandler.getLevelPackNum(); lp++) {
+            // skip dummy level pack
+            final LevelPack lPack = FaderHandler.getLevelPack(lp);
             final JMenu jMenuPack = new JMenu(lPack.getName());
             final String[] difficulties = lPack.getDiffLevels();
 
@@ -856,11 +853,9 @@ public class MenuCreator {
      */
     void updateLevelMenus() {
         // update level menus
-        for (int lp = 1; lp < GameController.getLevelPackNum(); lp++) { // skip
-                                                                        // dummy
-                                                                        // level
-                                                                        // pack
-            final LevelPack lPack = GameController.getLevelPack(lp);
+        for (int lp = 1; lp < FaderHandler.getLevelPackNum(); lp++) {
+            // skip dummy level pack
+            final LevelPack lPack = FaderHandler.getLevelPack(lp);
             final String[] difficulties = lPack.getDiffLevels();
 
             for (int i = 0; i < difficulties.length; i++) {

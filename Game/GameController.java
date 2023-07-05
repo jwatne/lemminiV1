@@ -1,8 +1,6 @@
 package game;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
@@ -12,9 +10,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-
 import game.lemmings.Lemming;
 import game.lemmings.SkillHandler;
 import game.level.Explosion;
@@ -22,9 +17,9 @@ import game.level.Level;
 import game.level.ReleaseRateHandler;
 import game.level.SpriteObject;
 import game.level.Stencil;
-import game.level.TextScreen;
 import game.replay.ReplayController;
 import gameutil.Fader;
+import gameutil.FaderHandler;
 import gameutil.FaderState;
 import gameutil.Sprite;
 import lemmini.Constants;
@@ -54,17 +49,9 @@ import tools.ToolBox;
 public final class GameController {
 
     /**
-     * Scale factor.
-     */
-    private static final int SCALE_FACTOR = 4;
-    /**
      * The maximum number of levels for a difficulty level.
      */
     private static final int MAX_LEVELS = 30;
-    /**
-     * Maximum hexidecimal value for an RGBA color component.
-     */
-    private static final int MAX_COLOR_COMPONENT_VALUE = 0xff;
 
     /** key repeat bitmask for icons. */
     public static final int KEYREPEAT_ICON = 1;
@@ -94,27 +81,22 @@ public final class GameController {
 
     /** the background stencil. */
     private static Stencil stencil;
+
     /** the background image. */
     private static BufferedImage bgImage;
     /** flag: use advanced mouse selection methods. */
     private static boolean advancedSelect;
     /** flag: use classical mouse cursor behavior. */
     private static boolean classicalCursor;
-    /** graphics object for the background image. */
-    private static Graphics2D bgGfx;
-    /** color used to erase the background (black). */
-    private static Color blankColor = new Color(MAX_COLOR_COMPONENT_VALUE, 0, 0,
-            0);
     /** flag: fast forward mode is active. */
     private static boolean fastForward;
     /** flag: Superlemming mode is active. */
     private static boolean superLemming;
     /** game state. */
     private static GameState gameState;
-    /** transition (fading) state. */
-    private static TransitionState transitionState;
-    /** flag: entry is openend. */
+    /** flag: entry is opened. */
     private static boolean entryOpened;
+
     /** flag: nuke was activated. */
     private static boolean nuke;
     /** flag: game is paused. */
@@ -125,26 +107,13 @@ public final class GameController {
     private static boolean wasCheated = false;
     /** frame counter for handling opening of entries. */
     private static int entryOpenCtr;
+
     /** frame counter for handling time. */
     private static double secondCtr;
     /** frame counter used to update animated sprite objects. */
     private static int animCtr;
     /** level object. */
     private static Level level;
-    /** index of current difficulty level. */
-    private static int curDiffLevel;
-    /** index of current level pack. */
-    private static int curLevelPack;
-    /** index of current level. */
-    private static int curLevelNumber;
-    /** index of next difficulty level. */
-    private static int nextDiffLevel;
-    /** index of next level pack. */
-    private static int nextLevelPack;
-    /** index of next level. */
-    private static int nextLevelNumber;
-    /** array of available level packs. */
-    private static LevelPack[] levelPack;
     /** small preview version of level used in briefing screen. */
     private static BufferedImage mapPreview;
 
@@ -172,8 +141,10 @@ public final class GameController {
     private static int releaseRateOld;
     /** old value of nuke flag. */
     private static boolean nukeOld;
+
     /** old value of horizontal scrolling position. */
     private static int xPosOld;
+
     /** old value of selected skill. */
     private static Type lemmSkillOld;
     /** listener to inform GUI of player's progress. */
@@ -183,8 +154,9 @@ public final class GameController {
 
     /** number of Lemmings available. */
     private static int numLemmingsMax;
+
     /** number of Lemmings which have to be rescued to finish the level. */
-    private static int numToRecue;
+    private static int numToRescue;
     /** time left in seconds. */
     private static int time;
     /** free running update counter. */
@@ -198,6 +170,115 @@ public final class GameController {
     }
 
     /**
+     * Sets old value of horizontal scrolling position.
+     *
+     * @param oldPosition old value of horizontal scrolling position.
+     */
+    public static void setxPosOld(final int oldPosition) {
+        GameController.xPosOld = oldPosition;
+    }
+
+    /**
+     * Sets old value of nuke flag.
+     *
+     * @param oldValue old value of nuke flag.
+     */
+    public static void setNukeOld(final boolean oldValue) {
+        GameController.nukeOld = oldValue;
+    }
+
+    /**
+     * Returns old value of selected skill.
+     *
+     * @return old value of selected skill.
+     */
+    public static Type getLemmSkillOld() {
+        return lemmSkillOld;
+    }
+
+    /**
+     * Sets old value of selected skill.
+     *
+     * @param oldSkill old value of selected skill.
+     */
+    public static void setLemmSkillOld(final Type oldSkill) {
+        GameController.lemmSkillOld = oldSkill;
+    }
+
+    /**
+     * Returns old value of release rate.
+     *
+     * @return old value of release rate.
+     */
+    public static int getReleaseRateOld() {
+        return releaseRateOld;
+    }
+
+    /**
+     * Sets old value of release rate.
+     *
+     * @param oldRate old value of release rate.
+     */
+    public static void setReleaseRateOld(final int oldRate) {
+        GameController.releaseRateOld = oldRate;
+    }
+
+    /**
+     * Returns value of frame counter for handling time.
+     *
+     * @return value of frame counter for handling time.
+     */
+    public static double getSecondCtr() {
+        return secondCtr;
+    }
+
+    /**
+     * Sets value of frame counter for handling time.
+     *
+     * @param counterValue value of frame counter for handling time.
+     */
+    public static void setSecondCtr(final double counterValue) {
+        GameController.secondCtr = counterValue;
+    }
+
+    /**
+     * Returns frame counter for handling opening of entries.
+     *
+     * @return frame counter for handling opening of entries.
+     */
+    public static int getEntryOpenCtr() {
+        return entryOpenCtr;
+    }
+
+    /**
+     * Sets value of frame counter for handling opening of entries.
+     *
+     * @param counterValue value of frame counter for handling opening of
+     *                     entries.
+     */
+    public static void setEntryOpenCtr(final int counterValue) {
+        GameController.entryOpenCtr = counterValue;
+    }
+
+    /**
+     * Indicates whether entry is opened.
+     *
+     * @return <code>true</code> if entry is opened.
+     */
+    public static boolean isEntryOpened() {
+        return entryOpened;
+    }
+
+    /**
+     * Sets whether entry is opened.
+     *
+     * @param opened <code>true</code> if entry is opened.
+     */
+    public static void setEntryOpened(final boolean opened) {
+        GameController.entryOpened = opened;
+    }
+
+    /**
      * Initialization.
      *
      * @param frame the parent component (main frame of the application).
@@ -207,7 +288,6 @@ public final class GameController {
     public static void init(final Component frame) throws ResourceException {
         bgImage = ToolBox.createImage(Level.WIDTH, Level.HEIGHT,
                 Transparency.BITMASK);
-        bgGfx = bgImage.createGraphics();
         gameState = GameState.INIT;
         SoundController.initSound();
         Icons.init(frame);
@@ -230,18 +310,7 @@ public final class GameController {
         // now get the names of the directories
         final List<String> dirs = getNamesOfDirectories(files);
         Collections.sort(dirs);
-        levelPack = new LevelPack[dirs.size() + 1];
-        levelPack[0] = new LevelPack(); // dummy
-
-        for (int i = 0; i < dirs.size(); i++) { // read levels
-            final String lvlName = dirs.get(i);
-            levelPack[i + 1] = new LevelPack(Core.findResource("levels/"
-                    + ToolBox.addSeparator(lvlName) + "levelpack.ini"));
-        }
-
-        curDiffLevel = 0;
-        curLevelPack = 1; // since 0 is dummy
-        curLevelNumber = 0;
+        FaderHandler.init(bgImage, dirs);
         ReplayController.init();
         wasCheated = isCheat();
     }
@@ -277,6 +346,7 @@ public final class GameController {
      */
     public static int absLevelNum(final int lvlPack, final int diffLevel,
             final int relativeLevelNumber) {
+        final LevelPack[] levelPack = FaderHandler.getLevelPack();
         final LevelPack lpack = levelPack[lvlPack];
         // calculate absolute level number
         int absLvl = relativeLevelNumber;
@@ -297,6 +367,7 @@ public final class GameController {
      */
     public static int[] relLevelNum(final int lvlPack, final int lvlAbs) {
         final int[] retval = new int[2];
+        final LevelPack[] levelPack = FaderHandler.getLevelPack();
         final LevelPack lpack = levelPack[lvlPack];
         final int diffLevels = lpack.getDiffLevels().length;
         int lvl = 0;
@@ -327,10 +398,13 @@ public final class GameController {
      * @return true: ok, false: no more level in this difficulty level
      */
     public static synchronized boolean nextLevel() {
-        final int num = curLevelNumber + 1;
+        final int num = FaderHandler.getCurLevelNumber() + 1;
+        final LevelPack[] levelPack = FaderHandler.getLevelPack();
+        final int curLevelPack = FaderHandler.getCurLevelPackIdx();
+        final int curDiffLevel = FaderHandler.getCurDiffLevel();
 
         if (num < levelPack[curLevelPack].getLevels(curDiffLevel).length) {
-            curLevelNumber = num;
+            FaderHandler.setCurLevelNumber(num);
             return true;
         } else {
             return false; // congrats - difficulty level done
@@ -341,7 +415,7 @@ public final class GameController {
      * Fade out at end of level.
      */
     public static synchronized void endLevel() {
-        transitionState = TransitionState.END_LEVEL;
+        FaderHandler.setTransitionState(TransitionState.END_LEVEL);
         gameState = GameState.LEVEL_END;
         Fader.setState(FaderState.OUT);
     }
@@ -350,11 +424,12 @@ public final class GameController {
      * Level successfully finished, enter debriefing and tell GUI to enable next
      * level.
      */
-    static synchronized void finishLevel() {
+    public static synchronized void finishLevel() {
         Music.stop();
         setFastForward(false);
         setSuperLemming(false);
         ReplayController.setReplayMode(false);
+        final int curLevelPack = FaderHandler.getCurLevelPackIdx();
 
         if (!wasLost() && (curLevelPack != 0)) {
             levelMenuUpdateListener.update();
@@ -373,62 +448,6 @@ public final class GameController {
     }
 
     /**
-     * Restart level.
-     *
-     * @param doReplay true: replay, false: play
-     * @param frame    the parent component (main frame of the application).
-     */
-    private static synchronized void restartLevel(final boolean doReplay,
-            final Component frame) {
-        initLevel(frame);
-        ReplayController.doReplayIfReplayMode(doReplay);
-    }
-
-    /**
-     * Initialize a level after it was loaded.
-     *
-     * @param frame the parent component (main frame of the application).
-     */
-    private static void initLevel(final Component frame) {
-        Music.stop();
-        setFastForward(false);
-        setPaused(false);
-        nuke = false;
-        LemmingHandler.initLevelsLemmings();
-        TextScreen.setMode(TextScreen.Mode.INIT);
-        bgGfx.setBackground(blankColor);
-        bgGfx.clearRect(0, 0, bgImage.getWidth(), bgImage.getHeight());
-        stencil = getLevel().paintLevel(bgImage, frame, stencil);
-        ExplosionHandler.initLevel();
-        Icons.reset();
-        TrapDoor.reset(getLevel().getEntryNum());
-        entryOpened = false;
-        entryOpenCtr = 0;
-        secondCtr = 0;
-        SkillHandler.setLemmSkill(Type.UNDEFINED);
-        ReleaseRateHandler.initLevel();
-        numLeft = 0;
-        final int releaseRate = getLevel().getReleaseRate();
-        ReleaseRateHandler.setReleaseRate(releaseRate);
-        numLemmingsMax = getLevel().getNumLemmings();
-        numToRecue = getLevel().getNumToRescue();
-        time = getLevel().getTimeLimitSeconds();
-        SkillHandler.initLevel(getLevel());
-        setxPos(getLevel().getXpos());
-        ReleaseRateHandler.calcReleaseBase();
-        mapPreview = getLevel().createMiniMap(mapPreview, bgImage, SCALE_FACTOR,
-                SCALE_FACTOR, false);
-        setSuperLemming(getLevel().isSuperLemming());
-        ReplayController.setReplayFrame(0);
-        ReplayController.setStopReplayMode(false);
-        releaseRateOld = releaseRate;
-        lemmSkillOld = SkillHandler.getLemmSkill();
-        nukeOld = false;
-        xPosOld = getLevel().getXpos();
-        gameState = GameState.BRIEFING;
-    }
-
-    /**
      * Request the restart of this level.
      *
      * @param doReplay
@@ -436,66 +455,12 @@ public final class GameController {
     public static synchronized void requestRestartLevel(
             final boolean doReplay) {
         if (doReplay) {
-            transitionState = TransitionState.REPLAY_LEVEL;
+            FaderHandler.setTransitionState(TransitionState.REPLAY_LEVEL);
         } else {
-            transitionState = TransitionState.RESTART_LEVEL;
+            FaderHandler.setTransitionState(TransitionState.RESTART_LEVEL);
         }
 
         Fader.setState(FaderState.OUT);
-    }
-
-    /**
-     * Request a new level.
-     *
-     * @param lPack    index of level pack
-     * @param dLevel   index of difficulty level
-     * @param lNum     level number
-     * @param doReplay true: replay, false: play
-     */
-    public static synchronized void requestChangeLevel(final int lPack,
-            final int dLevel, final int lNum, final boolean doReplay) {
-        nextLevelPack = lPack;
-        nextDiffLevel = dLevel;
-        nextLevelNumber = lNum;
-
-        if (doReplay) {
-            transitionState = TransitionState.LOAD_REPLAY;
-        } else {
-            transitionState = TransitionState.LOAD_LEVEL;
-        }
-
-        Fader.setState(FaderState.OUT);
-    }
-
-    /**
-     * Start a new level.
-     *
-     * @param lPack    index of level pack
-     * @param dLevel   index of difficulty level
-     * @param lNum     level number
-     * @param doReplay true: replay, false: play
-     * @param frame    the parent component (main frame of the application).
-     * @return the new level.
-     */
-    private static synchronized Level changeLevel(final int lPack,
-            final int dLevel, final int lNum, final boolean doReplay,
-            final Component frame) throws ResourceException, LemmException {
-        // gameState = GAME_ST_INIT;
-        curLevelPack = lPack;
-        curDiffLevel = dLevel;
-        curLevelNumber = lNum;
-        final String lvlPath = levelPack[curLevelPack]
-                .getInfo(curDiffLevel, curLevelNumber).getFileName();
-        // lemmings need to be reloaded to contain pink color
-        Lemming.loadLemmings(frame);
-        // loading the level will patch pink lemmings pixels to correct color
-        getLevel().loadLevel(lvlPath, frame);
-
-        // if width and height would be stored inside the level, the bgImage
-        // etc. would have to be recreated here
-        initLevel(frame);
-        ReplayController.rewindIfReplayMode(doReplay);
-        return getLevel();
     }
 
     /**
@@ -504,7 +469,7 @@ public final class GameController {
      * @return true if level was lost, false otherwise
      */
     public static synchronized boolean wasLost() {
-        if (gameState != GameState.LEVEL && numLeft >= numToRecue) {
+        if (gameState != GameState.LEVEL && numLeft >= numToRescue) {
             return false;
         }
 
@@ -686,86 +651,6 @@ public final class GameController {
     }
 
     /**
-     * Fade in/out.
-     *
-     * @param g     graphics object
-     * @param frame the parent JFrame (main frame of the application).
-     */
-    public static void fade(final Graphics g, final JFrame frame) {
-        if (Fader.getState() == FaderState.OFF
-                && transitionState != TransitionState.NONE) {
-            switch (transitionState) {
-            case END_LEVEL:
-                finishLevel();
-                break;
-            case TO_BRIEFING:
-                gameState = GameState.BRIEFING;
-                break;
-            case TO_DEBRIEFING:
-                gameState = GameState.DEBRIEFING;
-                break;
-            case TO_INTRO:
-                gameState = GameState.INTRO;
-                break;
-            case TO_LEVEL:
-                fadeToLevel();
-                break;
-            case RESTART_LEVEL:
-            case REPLAY_LEVEL:
-                restartLevel(transitionState == TransitionState.REPLAY_LEVEL,
-                        frame);
-                break;
-            case LOAD_LEVEL:
-            case LOAD_REPLAY:
-                try {
-                    changeLevel(nextLevelPack, nextDiffLevel, nextLevelNumber,
-                            transitionState == TransitionState.LOAD_REPLAY,
-                            frame);
-                    frame.setTitle("Lemmini - " + getLevel().getLevelName());
-                } catch (final ResourceException ex) {
-                    Core.resourceError(ex.getMessage());
-                } catch (final LemmException ex) {
-                    JOptionPane.showMessageDialog(null, ex.getMessage(),
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    System.exit(1);
-                }
-
-                break;
-            default:
-                break;
-            }
-
-            Fader.setState(FaderState.IN);
-            transitionState = TransitionState.NONE;
-        }
-
-        Fader.fade(g);
-    }
-
-    /**
-     * Fade to level.
-     */
-    private static void fadeToLevel() {
-        SoundController.playStartOfLevelSound();
-
-        try {
-            Music.load("music/"
-                    + GameController.levelPack[GameController.curLevelPack]
-                            .getInfo(GameController.curDiffLevel,
-                                    GameController.curLevelNumber)
-                            .getMusic());
-        } catch (final ResourceException ex) {
-            Core.resourceError(ex.getMessage());
-        } catch (final LemmException ex) {
-            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            System.exit(1);
-        }
-
-        gameState = GameState.LEVEL;
-    }
-
-    /**
      * Draw icon bar.
      *
      * @param g graphics object
@@ -774,61 +659,6 @@ public final class GameController {
      */
     public static void drawIcons(final Graphics2D g, final int x, final int y) {
         g.drawImage(Icons.getImg(), x, y, null);
-    }
-
-    /**
-     * Get index of current level pack.
-     *
-     * @return index of current level pack
-     */
-    public static int getCurLevelPackIdx() {
-        return curLevelPack;
-    }
-
-    /**
-     * Get current level pack.
-     *
-     * @return current level pack
-     */
-    public static LevelPack getCurLevelPack() {
-        return levelPack[curLevelPack];
-    }
-
-    /**
-     * get number of level packs.
-     *
-     * @return number of level packs
-     */
-    public static int getLevelPackNum() {
-        return levelPack.length;
-    }
-
-    /**
-     * Get level pack via index.
-     *
-     * @param i index of level pack
-     * @return LevelPack
-     */
-    public static LevelPack getLevelPack(final int i) {
-        return levelPack[i];
-    }
-
-    /**
-     * Get index of current difficulty level.
-     *
-     * @return index of current difficulty level
-     */
-    public static int getCurDiffLevel() {
-        return curDiffLevel;
-    }
-
-    /**
-     * Get number of current level.
-     *
-     * @return number of current leve
-     */
-    public static int getCurLevelNumber() {
-        return curLevelNumber;
     }
 
     /**
@@ -883,15 +713,6 @@ public final class GameController {
      */
     public static boolean isCheat() {
         return cheat;
-    }
-
-    /**
-     * Set transition state.
-     *
-     * @param ts TransitionState
-     */
-    public static void setTransition(final TransitionState ts) {
-        transitionState = ts;
     }
 
     /**
@@ -1003,6 +824,15 @@ public final class GameController {
     }
 
     /**
+     * Sets number of Lemmings available.
+     *
+     * @param lemmingsAvailable number of Lemmings available.
+     */
+    public static void setNumLemmingsMax(final int lemmingsAvailable) {
+        GameController.numLemmingsMax = lemmingsAvailable;
+    }
+
+    /**
      * Get icon type from x position.
      *
      * @param x x position in pixels
@@ -1098,6 +928,15 @@ public final class GameController {
     }
 
     /**
+     * Sets the background stencil.
+     *
+     * @param backgroundStencil the background stencil.
+     */
+    public static void setStencil(final Stencil backgroundStencil) {
+        GameController.stencil = backgroundStencil;
+    }
+
+    /**
      * Get small preview image of level.
      *
      * @return small preview image of level
@@ -1107,12 +946,30 @@ public final class GameController {
     }
 
     /**
+     * Sets small preview version of level used in briefing screen.
+     *
+     * @param preview small preview version of level used in briefing screen.
+     */
+    public static void setMapPreview(final BufferedImage preview) {
+        GameController.mapPreview = preview;
+    }
+
+    /**
      * Get number of Lemmings to rescue.
      *
      * @return number of Lemmings to rescue
      */
-    public static int getNumToRecue() {
-        return numToRecue;
+    public static int getNumToRescue() {
+        return numToRescue;
+    }
+
+    /**
+     * Sets number of Lemmings to rescue.
+     *
+     * @param numberToRescue number of Lemmings to rescue.
+     */
+    public static void setNumToRescue(final int numberToRescue) {
+        GameController.numToRescue = numberToRescue;
     }
 
     /**
@@ -1122,5 +979,14 @@ public final class GameController {
      */
     public static int getTime() {
         return time;
+    }
+
+    /**
+     * Sets time left in seconds.
+     *
+     * @param timeLeft time left in seconds.
+     */
+    public static void setTime(final int timeLeft) {
+        GameController.time = timeLeft;
     }
 }

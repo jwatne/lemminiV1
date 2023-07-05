@@ -40,6 +40,7 @@ import game.lemmings.SkillHandler;
 import game.level.Level;
 import game.level.ReleaseRateHandler;
 import gameutil.Fader;
+import gameutil.FaderHandler;
 import gameutil.FaderState;
 import tools.Props;
 import tools.ToolBox;
@@ -174,7 +175,7 @@ public class Lemmini extends JFrame implements KeyListener {
         this.setVisible(true);
         gp.init();
         GameController.setGameState(GameState.INTRO);
-        GameController.setTransition(TransitionState.NONE);
+        FaderHandler.setTransitionState(TransitionState.NONE);
         Fader.setBounds(Core.getDrawWidth(), Core.getDrawHeight());
         Fader.setState(FaderState.IN);
         final Thread t = new Thread(gp);
@@ -490,10 +491,9 @@ public class Lemmini extends JFrame implements KeyListener {
     private void doPatchLevelIfCheatEnabled() {
         if (GameController.isCheat()) {
             patchLevel(
-                    GameController
-                            .getLevelPack(GameController.getCurLevelPackIdx())
-                            .getInfo(GameController.getCurDiffLevel(),
-                                    GameController.getCurLevelNumber())
+                    FaderHandler.getLevelPack(FaderHandler.getCurLevelPackIdx())
+                            .getInfo(FaderHandler.getCurDiffLevel(),
+                                    FaderHandler.getCurLevelNumber())
                             .getFileName());
         }
     }
@@ -538,11 +538,10 @@ public class Lemmini extends JFrame implements KeyListener {
      */
     private void printCurrentLevelOnConsole() {
         if (GameController.isCheat()) {
-            System.out
-                    .println(GameController
-                            .getLevelPack(GameController.getCurLevelPackIdx())
-                            .getInfo(GameController.getCurDiffLevel(),
-                                    GameController.getCurLevelNumber())
+            System.out.println(
+                    FaderHandler.getLevelPack(FaderHandler.getCurLevelPackIdx())
+                            .getInfo(FaderHandler.getCurDiffLevel(),
+                                    FaderHandler.getCurLevelNumber())
                             .getFileName());
         }
     }

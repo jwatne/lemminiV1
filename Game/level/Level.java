@@ -21,6 +21,7 @@ import game.ResourceException;
 import game.Steel;
 import game.Terrain;
 import game.lemmings.Lemming;
+import gameutil.FaderHandler;
 import gameutil.Sprite;
 import lemmini.Constants;
 import tools.Props;
@@ -200,7 +201,7 @@ public class Level {
         lvlName = p.get("name", "");
         // out(fname + " - " + lvlName);
         maxFallDistance = p.get("maxFallDistance",
-                GameController.getCurLevelPack().getMaxFallDistance());
+                FaderHandler.getCurLevelPack().getMaxFallDistance());
         // read configuration in big endian word
         releaseRate = p.get("releaseRate", -1);
         // out("releaseRate = " + releaseRate);

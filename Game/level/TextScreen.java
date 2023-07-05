@@ -14,6 +14,7 @@ import game.LevelCode;
 import game.LevelPack;
 import game.MiscGfx;
 import game.TextDialog;
+import gameutil.FaderHandler;
 import lemmini.Constants;
 import tools.ToolBox;
 
@@ -259,13 +260,13 @@ public final class TextScreen {
         final Level level = GameController.getLevel();
         // LevelInfo li;
         textScreen.restore();
-        final String rating = GameController.getCurLevelPack()
-                .getDiffLevels()[GameController.getCurDiffLevel()];
+        final String rating = FaderHandler.getCurLevelPack()
+                .getDiffLevels()[FaderHandler.getCurDiffLevel()];
         textScreen.drawImage(GameController.getMapPreview(), MAP_PREVIEW_Y);
         textScreen
                 .printCentered(
-                        "Level " + (GameController.getCurLevelNumber() + 1)
-                                + " " + level.getLevelName(),
+                        "Level " + (FaderHandler.getCurLevelNumber() + 1) + " "
+                                + level.getLevelName(),
                         L_2, LemmFont.Color.RED);
         textScreen.print("Number of Lemmings " + level.getNumLemmings(), X_9, 0,
                 LemmFont.Color.BLUE);
@@ -300,7 +301,7 @@ public final class TextScreen {
     static void initDebriefing() {
         textScreen.init();
         textScreen.fillBackground(MiscGfx.getImage(MiscGfx.Index.TILE_GREEN));
-        final int toRescue = GameController.getNumToRecue() * 100
+        final int toRescue = GameController.getNumToRescue() * 100
                 / GameController.getNumLemmingsMax(); // % to rescue
                                                       // of
         // total number
@@ -309,8 +310,8 @@ public final class TextScreen {
                                                       // total
         // number
         final int rescuedOfToRescue = GameController.getNumLeft() * 100
-                / GameController.getNumToRecue(); // % rescued
-                                                  // of no.
+                / GameController.getNumToRescue(); // % rescued
+                                                   // of no.
         // to rescue
         textScreen.restore();
         if (GameController.getTime() == 0) {
@@ -377,17 +378,16 @@ public final class TextScreen {
                         LemmFont.Color.RED);
             }
 
-            final LevelPack lp = GameController.getCurLevelPack();
-            final int ln = GameController.getCurLevelNumber();
+            final LevelPack lp = FaderHandler.getCurLevelPack();
+            final int ln = FaderHandler.getCurLevelNumber();
 
-            if (lp.getLevels(GameController.getCurDiffLevel()).length > ln
-                    + 1) {
+            if (lp.getLevels(FaderHandler.getCurDiffLevel()).length > ln + 1) {
                 textScreen.printCentered(
                         "Your access code for level " + (ln + 2), 1,
                         LemmFont.Color.BROWN);
                 final int absLevel = GameController.absLevelNum(
-                        GameController.getCurLevelPackIdx(),
-                        GameController.getCurDiffLevel(), ln + 1);
+                        FaderHandler.getCurLevelPackIdx(),
+                        FaderHandler.getCurDiffLevel(), ln + 1);
                 final String code = LevelCode.create(lp.getCodeSeed(), absLevel,
                         rescued, 0, lp.getCodeOffset());
                 textScreen.printCentered("is " + code, 2, LemmFont.Color.BROWN);
@@ -397,7 +397,7 @@ public final class TextScreen {
                 textScreen.printCentered("Congratulations!", 1,
                         LemmFont.Color.BROWN);
                 textScreen.printCentered("You finished all the "
-                        + lp.getDiffLevels()[GameController.getCurDiffLevel()]
+                        + lp.getDiffLevels()[FaderHandler.getCurDiffLevel()]
                         + " levels!", 2, LemmFont.Color.GREEN);
             }
         }
@@ -406,7 +406,7 @@ public final class TextScreen {
         textScreen.addTextButton(X_12, L4, BUTTON_REPLAY, "Replay", "Replay",
                 LemmFont.Color.BLUE, LemmFont.Color.BROWN);
 
-        if (GameController.getCurLevelPackIdx() != 0) {
+        if (FaderHandler.getCurLevelPackIdx() != 0) {
             textScreen.addTextButton(L_4, L4, BUTTON_SAVEREPLAY, "Save Replay",
                     "Save Replay", LemmFont.Color.BLUE, LemmFont.Color.BROWN);
         }

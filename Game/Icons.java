@@ -262,7 +262,7 @@ public final class Icons {
     /**
      * Reset Icon bar.
      */
-    static void reset() {
+    public static void reset() {
         for (int i = 0; i <= LAST_DRAWN; i++) {
             icons[i].setFrameIdx(0);
             iconGfx.drawImage(icons[i].getImage(), WIDTH * i, 0, null);

@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import game.GameController;
 import game.LevelPack;
 import game.Type;
+import gameutil.FaderHandler;
 
 /*
  * Copyright 2009 Volker Oth
@@ -234,9 +234,9 @@ public class ReplayStream {
     public boolean save(final String fname) {
         try (FileWriter f = new FileWriter(new File(fname))) {
             f.write("#REPLAY\n");
-            final LevelPack lp = GameController.getCurLevelPack();
-            f.write("#" + lp.getName() + ", " + GameController.getCurDiffLevel()
-                    + ", " + GameController.getCurLevelNumber() + "\n");
+            final LevelPack lp = FaderHandler.getCurLevelPack();
+            f.write("#" + lp.getName() + ", " + FaderHandler.getCurDiffLevel()
+                    + ", " + FaderHandler.getCurLevelNumber() + "\n");
 
             for (int i = 0; i < events.size(); i++) {
                 final ReplayEvent r = events.get(i);

@@ -33,6 +33,7 @@ import game.level.Stencil;
 import game.level.TextScreen;
 import game.replay.ReplayController;
 import gameutil.Fader;
+import gameutil.FaderHandler;
 import gameutil.FaderState;
 import tools.MicrosecondTimer;
 import tools.ToolBox;
@@ -295,7 +296,7 @@ public class GraphicsPane extends JPanel
             }
 
             // fader
-            GameController.fade(offGfx, frame);
+            FaderHandler.fade(offGfx, frame);
             // and all onto screen
             activeBuffer = drawBuffer;
 
@@ -695,7 +696,7 @@ public class GraphicsPane extends JPanel
         switch (GameController.getGameState()) {
         case BRIEFING:
             MiniMap.init(SMALL_X, SMALL_Y, X_SCALE, Y_SCALE, true);
-            GameController.setTransition(TransitionState.TO_LEVEL);
+            FaderHandler.setTransitionState(TransitionState.TO_LEVEL);
             Fader.setState(FaderState.OUT);
             mouseevent.consume();
             break;
@@ -705,16 +706,16 @@ public class GraphicsPane extends JPanel
             switch (button) {
             case TextScreen.BUTTON_CONTINUE:
                 GameController.nextLevel(); // continue to next level
-                GameController.requestChangeLevel(
-                        GameController.getCurLevelPackIdx(),
-                        GameController.getCurDiffLevel(),
-                        GameController.getCurLevelNumber(), false);
+                FaderHandler.requestChangeLevel(
+                        FaderHandler.getCurLevelPackIdx(),
+                        FaderHandler.getCurDiffLevel(),
+                        FaderHandler.getCurLevelNumber(), false);
                 break;
             case TextScreen.BUTTON_RESTART:
                 GameController.requestRestartLevel(false);
                 break;
             case TextScreen.BUTTON_MENU:
-                GameController.setTransition(TransitionState.TO_INTRO);
+                FaderHandler.setTransitionState(TransitionState.TO_INTRO);
                 Fader.setState(FaderState.OUT);
                 ((JFrame) frame).setTitle("Lemmini");
                 break;

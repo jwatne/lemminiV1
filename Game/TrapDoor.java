@@ -50,7 +50,7 @@ public final class TrapDoor {
      *
      * @param e number of entries
      */
-    static void reset(final int e) {
+    public static void reset(final int e) {
         entries = e;
         counter = 0;
     }

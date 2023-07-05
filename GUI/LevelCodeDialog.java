@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import game.GameController;
+import gameutil.FaderHandler;
 
 /*
  * Copyright 2009 Volker Oth
@@ -125,15 +125,17 @@ public class LevelCodeDialog extends JDialog {
     @SuppressWarnings("unchecked")
     private void init() {
         // level pack 0 is the dummy level pack -> not selectable
-        for (int i = 1; i < GameController.getLevelPackNum(); i++) {
-            jComboBoxLvlPack.addItem(GameController.getLevelPack(i).getName());
+        for (int i = 1; i < FaderHandler.getLevelPackNum(); i++) {
+            jComboBoxLvlPack.addItem(FaderHandler.getLevelPack(i).getName());
         }
-        int lpi = GameController.getCurLevelPackIdx();
+
+        int lpi = FaderHandler.getCurLevelPackIdx();
+
         if (lpi == 0) {
             lpi = 1;
         }
-        jComboBoxLvlPack.setSelectedIndex(lpi - 1);
 
+        jComboBoxLvlPack.setSelectedIndex(lpi - 1);
         levelPackIndex = lpi;
         jTextFieldCode.setText("");
     }

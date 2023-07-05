@@ -1,7 +1,6 @@
 package lemmini;
 
 import game.Core;
-import game.GameController;
 import game.GroupBitfield;
 import game.LevelPack;
 import game.UpdateListener;
@@ -20,6 +19,7 @@ import game.UpdateListener;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import gameutil.FaderHandler;
 
 /**
  * Listener to inform the GUI of the player's progress.
@@ -41,18 +41,18 @@ public class LevelMenuUpdateListener implements UpdateListener {
 
     @Override
     public final void update() {
-        if (GameController.getCurLevelPackIdx() != 0) { // 0 is the dummy pack
-            LevelPack lvlPack = GameController
-                    .getLevelPack(GameController.getCurLevelPackIdx());
+        if (FaderHandler.getCurLevelPackIdx() != 0) { // 0 is the dummy pack
+            LevelPack lvlPack = FaderHandler
+                    .getLevelPack(FaderHandler.getCurLevelPackIdx());
             String pack = lvlPack.getName();
-            String diff = lvlPack.getDiffLevels()[GameController
+            String diff = lvlPack.getDiffLevels()[FaderHandler
                     .getCurDiffLevel()];
             // get next level
-            int num = GameController.getCurLevelNumber() + 1;
+            int num = FaderHandler.getCurLevelNumber() + 1;
 
             if (num >= lvlPack
-                    .getLevels(GameController.getCurDiffLevel()).length) {
-                num = GameController.getCurLevelNumber();
+                    .getLevels(FaderHandler.getCurDiffLevel()).length) {
+                num = FaderHandler.getCurLevelNumber();
             }
 
             // set next level as available

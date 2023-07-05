@@ -705,14 +705,14 @@ public class GraphicsPane extends JPanel
 
             switch (button) {
             case TextScreen.BUTTON_CONTINUE:
-                GameController.nextLevel(); // continue to next level
+                FaderHandler.nextLevel(); // continue to next level
                 FaderHandler.requestChangeLevel(
                         FaderHandler.getCurLevelPackIdx(),
                         FaderHandler.getCurDiffLevel(),
                         FaderHandler.getCurLevelNumber(), false);
                 break;
             case TextScreen.BUTTON_RESTART:
-                GameController.requestRestartLevel(false);
+                FaderHandler.requestRestartLevel(false);
                 break;
             case TextScreen.BUTTON_MENU:
                 FaderHandler.setTransitionState(TransitionState.TO_INTRO);
@@ -720,7 +720,7 @@ public class GraphicsPane extends JPanel
                 ((JFrame) frame).setTitle("Lemmini");
                 break;
             case TextScreen.BUTTON_REPLAY:
-                GameController.requestRestartLevel(true);
+                FaderHandler.requestRestartLevel(true);
                 break;
             case TextScreen.BUTTON_SAVEREPLAY:
                 String replayPath = ToolBox.getFileName(Lemmini.getThisFrame(),

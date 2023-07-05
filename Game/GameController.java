@@ -47,17 +47,10 @@ import tools.ToolBox;
  * @author Volker Oth
  */
 public final class GameController {
-
-    /**
-     * The maximum number of levels for a difficulty level.
-     */
-    private static final int MAX_LEVELS = 30;
-
     /** key repeat bitmask for icons. */
     public static final int KEYREPEAT_ICON = 1;
     /** key repeat bitmask for keys. */
     public static final int KEYREPEAT_KEY = 2;
-
     /** updates 5 frames instead of 1 in fast forward mode. */
     public static final int FAST_FWD_MULTI = 5;
     /** updates 3 frames instead of 1 in Superlemming mode. */
@@ -69,7 +62,6 @@ public final class GameController {
     public static final int MICROSEC_PER_FRAME = 30 * 1000;
     /** resync if time difference greater than that (in microseconds). */
     public static final int MICROSEC_RESYNC = 5 * 30 * 1000;
-
     /** redraw animated level obejcts every 3rd frame (about 100ms). */
     private static final int MAX_ANIM_CTR = 100 * 1000 / MICROSEC_PER_FRAME;
     /** open Entry after about 1.5 seconds. */
@@ -78,10 +70,8 @@ public final class GameController {
     /** one second is 33.33 ticks (integer would cause error). */
     private static final double MAX_SECOND_CTR = 1000.0 * 1000
             / MICROSEC_PER_FRAME;
-
     /** the background stencil. */
     private static Stencil stencil;
-
     /** the background image. */
     private static BufferedImage bgImage;
     /** flag: use advanced mouse selection methods. */
@@ -96,7 +86,6 @@ public final class GameController {
     private static GameState gameState;
     /** flag: entry is opened. */
     private static boolean entryOpened;
-
     /** flag: nuke was activated. */
     private static boolean nuke;
     /** flag: game is paused. */
@@ -336,82 +325,6 @@ public final class GameController {
     }
 
     /**
-     * Calculate absolute level number from diff level and relative level
-     * number.
-     *
-     * @param lvlPack             level pack
-     * @param diffLevel           difficulty level
-     * @param relativeLevelNumber relative level number
-     * @return absolute level number (0..127)
-     */
-    public static int absLevelNum(final int lvlPack, final int diffLevel,
-            final int relativeLevelNumber) {
-        final LevelPack[] levelPack = FaderHandler.getLevelPack();
-        final LevelPack lpack = levelPack[lvlPack];
-        // calculate absolute level number
-        int absLvl = relativeLevelNumber;
-
-        for (int i = 0; i < diffLevel; i++) {
-            absLvl += lpack.getLevels(i).length;
-        }
-
-        return absLvl;
-    }
-
-    /**
-     * Calculate diffLevel and relative level number from absolute level number.
-     *
-     * @param lvlPack level pack
-     * @param lvlAbs  absolute level number
-     * @return { difficulty level, relative level number }
-     */
-    public static int[] relLevelNum(final int lvlPack, final int lvlAbs) {
-        final int[] retval = new int[2];
-        final LevelPack[] levelPack = FaderHandler.getLevelPack();
-        final LevelPack lpack = levelPack[lvlPack];
-        final int diffLevels = lpack.getDiffLevels().length;
-        int lvl = 0;
-        int diffLvl = 0;
-        int maxLevels = MAX_LEVELS;
-
-        for (int i = 0, ls = 0; i < diffLevels; i++) {
-            final int oldLs = ls;
-            // add number of levels existing in this diff level
-            maxLevels = lpack.getLevels(i).length;
-            ls += maxLevels;
-
-            if (lvlAbs < ls) {
-                diffLvl = i;
-                lvl = lvlAbs - oldLs; // relative level mumber
-                break;
-            }
-        }
-
-        retval[0] = diffLvl;
-        retval[1] = lvl;
-        return retval;
-    }
-
-    /**
-     * Proceed to next level.
-     *
-     * @return true: ok, false: no more level in this difficulty level
-     */
-    public static synchronized boolean nextLevel() {
-        final int num = FaderHandler.getCurLevelNumber() + 1;
-        final LevelPack[] levelPack = FaderHandler.getLevelPack();
-        final int curLevelPack = FaderHandler.getCurLevelPackIdx();
-        final int curDiffLevel = FaderHandler.getCurDiffLevel();
-
-        if (num < levelPack[curLevelPack].getLevels(curDiffLevel).length) {
-            FaderHandler.setCurLevelNumber(num);
-            return true;
-        } else {
-            return false; // congrats - difficulty level done
-        }
-    }
-
-    /**
      * Fade out at end of level.
      */
     public static synchronized void endLevel() {
@@ -445,22 +358,6 @@ public final class GameController {
      */
     public static void setLevelMenuUpdateListener(final UpdateListener l) {
         levelMenuUpdateListener = l;
-    }
-
-    /**
-     * Request the restart of this level.
-     *
-     * @param doReplay
-     */
-    public static synchronized void requestRestartLevel(
-            final boolean doReplay) {
-        if (doReplay) {
-            FaderHandler.setTransitionState(TransitionState.REPLAY_LEVEL);
-        } else {
-            FaderHandler.setTransitionState(TransitionState.RESTART_LEVEL);
-        }
-
-        Fader.setState(FaderState.OUT);
     }
 
     /**

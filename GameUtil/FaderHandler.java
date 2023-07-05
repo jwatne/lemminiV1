@@ -54,6 +54,10 @@ import tools.ToolBox;
  */
 public final class FaderHandler {
     /**
+     * The maximum number of levels for a difficulty level.
+     */
+    private static final int MAX_LEVELS = 30;
+    /**
      * Maximum hexidecimal value for an RGBA color component.
      */
     private static final int MAX_COLOR_COMPONENT_VALUE = 0xff;
@@ -279,6 +283,61 @@ public final class FaderHandler {
     }
 
     /**
+     * Calculate absolute level number from diff level and relative level
+     * number.
+     *
+     * @param lvlPack             level pack
+     * @param diffLevel           difficulty level
+     * @param relativeLevelNumber relative level number
+     * @return absolute level number (0..127)
+     */
+    public static int absLevelNum(final int lvlPack, final int diffLevel,
+            final int relativeLevelNumber) {
+        final LevelPack lpack = levelPack[lvlPack];
+        // calculate absolute level number
+        int absLvl = relativeLevelNumber;
+
+        for (int i = 0; i < diffLevel; i++) {
+            absLvl += lpack.getLevels(i).length;
+        }
+
+        return absLvl;
+    }
+
+    /**
+     * Calculate diffLevel and relative level number from absolute level number.
+     *
+     * @param lvlPack level pack
+     * @param lvlAbs  absolute level number
+     * @return { difficulty level, relative level number }
+     */
+    public static int[] relLevelNum(final int lvlPack, final int lvlAbs) {
+        final int[] retval = new int[2];
+        final LevelPack lpack = levelPack[lvlPack];
+        final int diffLevels = lpack.getDiffLevels().length;
+        int lvl = 0;
+        int diffLvl = 0;
+        int maxLevels = MAX_LEVELS;
+
+        for (int i = 0, ls = 0; i < diffLevels; i++) {
+            final int oldLs = ls;
+            // add number of levels existing in this diff level
+            maxLevels = lpack.getLevels(i).length;
+            ls += maxLevels;
+
+            if (lvlAbs < ls) {
+                diffLvl = i;
+                lvl = lvlAbs - oldLs; // relative level mumber
+                break;
+            }
+        }
+
+        retval[0] = diffLvl;
+        retval[1] = lvl;
+        return retval;
+    }
+
+    /**
      * Request a new level.
      *
      * @param lPack    index of level pack
@@ -296,6 +355,38 @@ public final class FaderHandler {
             FaderHandler.setTransitionState(TransitionState.LOAD_REPLAY);
         } else {
             FaderHandler.setTransitionState(TransitionState.LOAD_LEVEL);
+        }
+
+        Fader.setState(FaderState.OUT);
+    }
+
+    /**
+     * Proceed to next level.
+     *
+     * @return true: ok, false: no more level in this difficulty level
+     */
+    public static synchronized boolean nextLevel() {
+        final int num = FaderHandler.getCurLevelNumber() + 1;
+
+        if (num < levelPack[curLevelPack].getLevels(curDiffLevel).length) {
+            FaderHandler.setCurLevelNumber(num);
+            return true;
+        } else {
+            return false; // congrats - difficulty level done
+        }
+    }
+
+    /**
+     * Request the restart of this level.
+     *
+     * @param doReplay
+     */
+    public static synchronized void requestRestartLevel(
+            final boolean doReplay) {
+        if (doReplay) {
+            FaderHandler.setTransitionState(TransitionState.REPLAY_LEVEL);
+        } else {
+            FaderHandler.setTransitionState(TransitionState.RESTART_LEVEL);
         }
 
         Fader.setState(FaderState.OUT);

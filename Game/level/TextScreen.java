@@ -385,7 +385,7 @@ public final class TextScreen {
                 textScreen.printCentered(
                         "Your access code for level " + (ln + 2), 1,
                         LemmFont.Color.BROWN);
-                final int absLevel = GameController.absLevelNum(
+                final int absLevel = FaderHandler.absLevelNum(
                         FaderHandler.getCurLevelPackIdx(),
                         FaderHandler.getCurDiffLevel(), ln + 1);
                 final String code = LevelCode.create(lp.getCodeSeed(), absLevel,

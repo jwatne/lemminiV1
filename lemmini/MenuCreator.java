@@ -106,7 +106,7 @@ public class MenuCreator {
                         FaderHandler.getCurDiffLevel(),
                         FaderHandler.getCurLevelNumber(), false);
             } else {
-                GameController.requestRestartLevel(false);
+                FaderHandler.requestRestartLevel(false);
             }
         }
     }
@@ -669,7 +669,7 @@ public class MenuCreator {
                     if (lvlAbs != -1) {
                         // calculate level pack and relative levelnumber
                         // from absolute number
-                        final int[] l = GameController.relLevelNum(lvlPack,
+                        final int[] l = FaderHandler.relLevelNum(lvlPack,
                                 lvlAbs);
                         final int diffLvl = l[0];
                         final int lvlRel = l[1];

@@ -16,7 +16,7 @@ import game.SoundController;
 import game.Type;
 import game.level.Level;
 import game.level.Mask;
-import game.level.SpriteObject;
+import game.level.SpriteObjectHandler;
 import game.level.Stencil;
 import lemmini.Constants;
 import tools.Props;
@@ -349,6 +349,10 @@ public class Lemming {
      * Class for handling Stopper skill for the current Lemming, if assigned.
      */
     private Stopper stopper;
+    /**
+     * Handler for <code>this</code> Lemming's SpriteObjects.
+     */
+    private SpriteObjectHandler spriteObjectHandler;
 
     /**
      * Constructor: Create Lemming.
@@ -382,6 +386,7 @@ public class Lemming {
         miner = new Miner(this);
         basher = new Basher(this);
         stopper = new Stopper(this);
+        spriteObjectHandler = new SpriteObjectHandler(this);
     }
 
     /**
@@ -527,16 +532,17 @@ public class Lemming {
 
         switch (s & (Stencil.MSK_TRAP | Stencil.MSK_EXIT)) {
         case Stencil.MSK_TRAP_DROWN:
-            newType = animateDrowning(newType, s);
+            newType = spriteObjectHandler.animateDrowning(newType, s);
             break;
         case Stencil.MSK_TRAP_DIE:
-            newType = animateNormalDeath(newType, s);
+            newType = spriteObjectHandler.animateNormalDeath(newType, s);
             break;
         case Stencil.MSK_TRAP_REPLACE:
-            replaceLemmingWithSpecialDeathAnimation(s);
+            hasDied = spriteObjectHandler
+                    .replaceLemmingWithSpecialDeathAnimation(s, hasDied);
             break;
         case Stencil.MSK_EXIT:
-            newType = animateExitLevel(newType, s);
+            newType = spriteObjectHandler.animateExitLevel(newType, s, type);
             break;
         default:
             break;
@@ -748,121 +754,6 @@ public class Lemming {
         }
 
         return trigger;
-    }
-
-    /**
-     * Animates exiting the level.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @param s               {@link Stencil} value from the middle of the
-     *                        Lemming.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateExitLevel(final Type startingNewType, final int s) {
-        Type newType = startingNewType;
-
-        switch (type) {
-        case WALKER:
-        case JUMPER:
-        case BASHER:
-        case MINER:
-        case BUILDER:
-        case DIGGER:
-            final SpriteObject spr = GameController.getLevel()
-                    .getSprObject(Stencil.getObjectID(s));
-            newType = Type.EXITING;
-            SoundController.getSound().play(spr.getSound());
-            break;
-        default:
-            break;
-        }
-
-        return newType;
-    }
-
-    /**
-     * Replaces the Lemming with the special death animation.
-     *
-     * @param s {@link Stencil} value from the middle of the Lemming.
-     */
-    private void replaceLemmingWithSpecialDeathAnimation(final int s) {
-        final SpriteObject spr = GameController.getLevel()
-                .getSprObject(Stencil.getObjectID(s));
-
-        if (spr.canBeTriggered()) {
-            if (spr.trigger()) {
-                SoundController.getSound().play(spr.getSound());
-                hasDied = true;
-            }
-        } else {
-            SoundController.getSound().play(spr.getSound());
-            hasDied = true;
-        }
-
-        if (type == Type.STOPPER || type == Type.BOMBER_STOPPER) {
-            // erase stopper mask
-            final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
-            m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
-        }
-    }
-
-    /**
-     * Animates normal death.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @param s               {@link Stencil} value from the middle of the
-     *                        Lemming.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateNormalDeath(final Type startingNewType, final int s) {
-        Type newType = startingNewType;
-
-        if (type != Type.TRAPPED) {
-            final SpriteObject spr = GameController.getLevel()
-                    .getSprObject(Stencil.getObjectID(s));
-
-            if (spr.canBeTriggered()) {
-                if (spr.trigger()) {
-                    SoundController.getSound().play(spr.getSound());
-                    newType = Type.TRAPPED;
-                }
-            } else {
-                SoundController.getSound().play(spr.getSound());
-                newType = Type.TRAPPED;
-            }
-
-            if (type == Type.STOPPER || type == Type.BOMBER_STOPPER) {
-                // erase stopper mask
-                final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
-                m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
-            }
-        }
-
-        return newType;
-    }
-
-    /**
-     * Animates drowning.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @param s               {@link Stencil} value from the middle of the
-     *                        Lemming.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateDrowning(final Type startingNewType, final int s) {
-        Type newType = startingNewType;
-
-        if (type != Type.DROWNING) {
-            newType = Type.DROWNING;
-            final SpriteObject spr = GameController.getLevel()
-                    .getSprObject(Stencil.getObjectID(s));
-            SoundController.getSound().play(spr.getSound());
-        }
-
-        return newType;
     }
 
     /**

@@ -7,7 +7,6 @@ import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
 import game.Core;
-import game.ExplosionHandler;
 import game.GameController;
 import game.LemmingExplosion;
 import game.MiscGfx;
@@ -307,6 +306,7 @@ public class Lemming {
      * Class for handling explosions, if any, for the current Lemming.
      */
     private final LemmingExplosion exploder;
+
     /**
      * Class for handling builder skill, if assigned to the current Lemming.
      */
@@ -350,6 +350,11 @@ public class Lemming {
      */
     private Stopper stopper;
     /**
+     * Class for handling bomber skill for the current Lemming, if assigned.
+     */
+    private Bomber bomber;
+
+    /**
      * Handler for <code>this</code> Lemming's SpriteObjects.
      */
     private SpriteObjectHandler spriteObjectHandler;
@@ -386,7 +391,39 @@ public class Lemming {
         miner = new Miner(this);
         basher = new Basher(this);
         stopper = new Stopper(this);
+        bomber = new Bomber(this);
         spriteObjectHandler = new SpriteObjectHandler(this);
+    }
+
+    /**
+     * Returns class for handling explosions, if any, for the current Lemming.
+     *
+     * @return class for handling explosions, if any, for the current Lemming.
+     */
+    public LemmingExplosion getExploder() {
+        return exploder;
+    }
+
+    /**
+     * Returns class for handling bomber skill for the current Lemming, if
+     * assigned.
+     *
+     * @return class for handling bomber skill for the current Lemming, if
+     *         assigned.
+     */
+    public Bomber getBomber() {
+        return bomber;
+    }
+
+    /**
+     * Sets class for handling bomber skill for the current Lemming, if
+     * assigned.
+     *
+     * @param lemmingBomber class for handling bomber skill for the current
+     *                      Lemming, if assigned.
+     */
+    public void setBomber(final Bomber lemmingBomber) {
+        this.bomber = lemmingBomber;
     }
 
     /**
@@ -441,7 +478,7 @@ public class Lemming {
                 m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
                 //$FALL-THROUGH$
             case BOMBER:
-                explode();
+                bomber.explode(type);
                 break;
             case SPLAT:
             case DROWNING:
@@ -460,8 +497,8 @@ public class Lemming {
                 break;
             case CLIMBER_TO_WALKER:
                 newType = Type.WALKER;
-                y -= CLIMBER_TO_WALKER_Y_OFFSET; // why is this needed? could be
-                                                 // done via foot
+                y -= CLIMBER_TO_WALKER_Y_OFFSET;
+                // why is this needed? could be done via foot
                 // coordinates?
                 break;
             case DIGGER:
@@ -552,7 +589,7 @@ public class Lemming {
         switch (type) {
         case FALLER:
             if (explode) {
-                explode();
+                bomber.explode(type);
             } else {
                 newType = faller.animateFaller(newType);
             }
@@ -617,7 +654,7 @@ public class Lemming {
 
             //$FALL-THROUGH$
         case BOMBER:
-            animateBomber();
+            bomber.animateBomber();
             break;
         case CLIMBER_TO_WALKER:
         default:
@@ -625,7 +662,7 @@ public class Lemming {
             // should at
             // least explode
             if (explode) {
-                explode();
+                bomber.explode(type);
             }
         }
 
@@ -741,22 +778,6 @@ public class Lemming {
     }
 
     /**
-     * Animates bomber.
-     */
-    private void animateBomber() {
-        int free;
-        free = freeBelow(Floater.FLOATER_STEP);
-
-        if (free == Faller.FALL_DISTANCE_FORCE_FALL) {
-            y += Faller.FALLER_STEP;
-        } else {
-            y += free;
-        }
-
-        faller.crossedLowerBorder();
-    }
-
-    /**
      * Erases mask and converts to normal stopper.
      */
     private void eraseMaskAndConvertToNormalStopper() {
@@ -772,7 +793,7 @@ public class Lemming {
      */
     private void animateSplat(final boolean explode) {
         if (explode) {
-            explode();
+            bomber.explode(type);
         } else if (frameIdx == 0) { // looped once
             SoundController.getSound().play(SoundController.SND_SPLAT);
         }
@@ -834,7 +855,7 @@ public class Lemming {
      * @param oldType old skill/type of Lemming
      * @param newType new skill/type of Lemming
      */
-    private void changeType(final Type oldType, final Type newType) {
+    public void changeType(final Type oldType, final Type newType) {
         if (oldType != newType) {
             type = newType;
             lemRes = lemmings[Type.getOrdinal(type)];
@@ -860,27 +881,6 @@ public class Lemming {
             default:
                 canChangeSkill = false;
             }
-        }
-    }
-
-    /**
-     * Let the Lemming explode.
-     */
-    public void explode() {
-        SoundController.getSound().play(SoundController.SND_EXPLODE);
-        // create particle explosion
-        ExplosionHandler.addExplosion(midX(), midY());
-        hasDied = true;
-        changeType(type, Type.BOMBER);
-        // consider height difference between lemming and mask
-        final Mask m = lemRes.getMask(Direction.RIGHT);
-        // check if lemming is standing on steel
-        final int sy = y + 1;
-
-        if (x > 0 && x < Level.WIDTH && sy > 0 && sy < Level.HEIGHT) {
-            m.eraseMask(x - m.getWidth() / 2,
-                    midY() - m.getHeight() / 2 + Constants.THREE, 0,
-                    Stencil.MSK_STEEL);
         }
     }
 
@@ -1300,14 +1300,7 @@ public class Lemming {
                 }
 
                 nuke = true;
-
-                if (exploder.getExplodeNumCtr() == 0) {
-                    exploder.setExplodeNumCtr(Constants.FIVE);
-                    exploder.setExplodeCtr(0);
-                    return true;
-                } else {
-                    return false;
-                }
+                return bomber.canChangeToBomber();
             }
 
             return false;
@@ -1339,13 +1332,7 @@ public class Lemming {
             nuke = true;
             //$FALL-THROUGH$
         case BOMBER:
-            if (exploder.getExplodeNumCtr() == 0) {
-                exploder.setExplodeNumCtr(Constants.FIVE);
-                exploder.setExplodeCtr(0);
-                return true;
-            } else {
-                return false;
-            }
+            return bomber.canChangeToBomber();
         default:
             break;
         }

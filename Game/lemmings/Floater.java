@@ -61,7 +61,7 @@ public class Floater {
         int free;
 
         if (explode) {
-            lemming.explode();
+            lemming.getBomber().explode(lemming.getSkill());
         } else {
             free = lemming.freeBelow(FLOATER_STEP);
 
@@ -92,7 +92,7 @@ public class Floater {
      */
     public void animateFloaterStart(final boolean explode) {
         if (explode) {
-            lemming.explode();
+            lemming.getBomber().explode(lemming.getSkill());
         } else {
             int counter2 = lemming.getCounter2();
 

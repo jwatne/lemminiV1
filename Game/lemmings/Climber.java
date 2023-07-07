@@ -54,7 +54,7 @@ public class Climber {
         Type newType = startingNewType;
 
         if (explode) {
-            lemming.explode();
+            lemming.getBomber().explode(lemming.getSkill());
         } else {
             int counter = lemming.getCounter();
 

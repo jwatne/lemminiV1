@@ -363,7 +363,7 @@ public class Lemming {
     public Lemming(final int sx, final int sy) {
         frameIdx = 0;
         type = Type.FALLER; // always start with a faller
-        lemRes = lemmings[getOrdinal(type)];
+        lemRes = lemmings[Type.getOrdinal(type)];
         counter = 0;
         selectCtr = 0;
         dir = Direction.RIGHT; // always start walking to the right
@@ -387,23 +387,6 @@ public class Lemming {
         basher = new Basher(this);
         stopper = new Stopper(this);
         spriteObjectHandler = new SpriteObjectHandler(this);
-    }
-
-    /**
-     * Get number of Lemming type in internal resource array.
-     *
-     * @param t Type
-     * @return resource number for type
-     */
-    public static int getOrdinal(final Type t) {
-        switch (t) {
-        case BOMBER_STOPPER:
-            return Type.BOMBER.ordinal();
-        case FLOATER_START:
-            return Type.FLOATER.ordinal();
-        default:
-            return t.ordinal();
-        }
     }
 
     /**
@@ -453,7 +436,8 @@ public class Lemming {
             switch (type) {
             case BOMBER_STOPPER:
 
-                final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
+                final Mask m = lemmings[Type.getOrdinal(Type.STOPPER)]
+                        .getMask(dir);
                 m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
                 //$FALL-THROUGH$
             case BOMBER:
@@ -776,7 +760,7 @@ public class Lemming {
      * Erases mask and converts to normal stopper.
      */
     private void eraseMaskAndConvertToNormalStopper() {
-        final Mask m = lemmings[getOrdinal(Type.STOPPER)].getMask(dir);
+        final Mask m = lemmings[Type.getOrdinal(Type.STOPPER)].getMask(dir);
         m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
         type = Type.BOMBER;
     }
@@ -853,7 +837,7 @@ public class Lemming {
     private void changeType(final Type oldType, final Type newType) {
         if (oldType != newType) {
             type = newType;
-            lemRes = lemmings[getOrdinal(type)];
+            lemRes = lemmings[Type.getOrdinal(type)];
 
             if (newType == Type.DIGGER) {
                 frameIdx = lemRes.getFrames() * TIME_SCALE - 1;
@@ -1263,7 +1247,9 @@ public class Lemming {
         default:
             t = type;
         }
-        String n = LEMM_NAMES[getOrdinal(t)];
+
+        String n = LEMM_NAMES[Type.getOrdinal(t)];
+
         if (n.length() > 0) {
             if (canFloat) {
                 if (canClimb) {
@@ -1277,6 +1263,7 @@ public class Lemming {
                 }
             }
         }
+
         return n;
     }
 
@@ -1445,7 +1432,7 @@ public class Lemming {
      * @return static resource for this skill/type
      */
     private static LemmingResource getResource(final Type type) {
-        return lemmings[getOrdinal(type)];
+        return lemmings[Type.getOrdinal(type)];
     }
 
     /**

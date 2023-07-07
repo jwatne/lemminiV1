@@ -85,4 +85,21 @@ public enum Type {
     public static Type get(final int val) {
         return LOOKUP.get(val);
     }
+
+    /**
+     * Get number of Lemming type in internal resource array.
+     *
+     * @param t Type
+     * @return resource number for type
+     */
+    public static int getOrdinal(final Type t) {
+        switch (t) {
+        case BOMBER_STOPPER:
+            return Type.BOMBER.ordinal();
+        case FLOATER_START:
+            return Type.FLOATER.ordinal();
+        default:
+            return t.ordinal();
+        }
+    }
 }

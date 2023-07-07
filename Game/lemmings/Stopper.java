@@ -76,7 +76,7 @@ public class Stopper {
                 }
 
                 // conversion to faller or walker -> erase stopper mask
-                final Mask m = Lemming.getLemmings()[Lemming
+                final Mask m = Lemming.getLemmings()[Type
                         .getOrdinal(Type.STOPPER)]
                                 .getMask(lemming.getDirection());
                 m.clearType(lemming.getMaskX(), lemming.getMaskY(), 0,

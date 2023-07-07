@@ -168,8 +168,7 @@ public class SpriteObjectHandler {
             final LemmingResource[] lemmings = Lemming.getLemmings();
             final Direction dir = lemming.getDirection();
             // erase stopper mask
-            final Mask m = lemmings[Lemming.getOrdinal(Type.STOPPER)]
-                    .getMask(dir);
+            final Mask m = lemmings[Type.getOrdinal(Type.STOPPER)].getMask(dir);
             m.clearType(lemming.getMaskX(), lemming.getMaskY(), 0,
                     Stencil.MSK_STOPPER);
         }

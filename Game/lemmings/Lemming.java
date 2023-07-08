@@ -617,7 +617,7 @@ public class Lemming {
             newType = climber.animateClimber(newType, explode);
             break;
         case SPLAT:
-            animateSplat(explode);
+            bomber.animateSplat(explode);
             break;
         case BASHER:
             newType = basher.animateBasher(newType, explode);
@@ -784,19 +784,6 @@ public class Lemming {
         final Mask m = lemmings[Type.getOrdinal(Type.STOPPER)].getMask(dir);
         m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
         type = Type.BOMBER;
-    }
-
-    /**
-     * Animates splat.
-     *
-     * @param explode <code>true</code> if the Lemming is to explode.
-     */
-    private void animateSplat(final boolean explode) {
-        if (explode) {
-            bomber.explode(type);
-        } else if (frameIdx == 0) { // looped once
-            SoundController.getSound().play(SoundController.SND_SPLAT);
-        }
     }
 
     /**

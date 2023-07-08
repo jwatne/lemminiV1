@@ -31,7 +31,7 @@ public enum Type {
     CLIMBER_TO_WALKER,
     /** a Lemming on a parachute. */
     FLOATER,
-    /** a Lemming dieing from a fall. */
+    /** a Lemming dying from a fall. */
     SPLAT,
     /** a Lemming blocking the way for the other Lemmings. */
     STOPPER,

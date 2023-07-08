@@ -106,4 +106,17 @@ public class Bomber {
         }
     }
 
+    /**
+     * Animates splat.
+     *
+     * @param explode <code>true</code> if the Lemming is to explode.
+     */
+    public void animateSplat(final boolean explode) {
+        if (explode) {
+            this.explode(lemming.getSkill());
+        } else if (lemming.getFrameIdx() == 0) { // looped once
+            SoundController.getSound().play(SoundController.SND_SPLAT);
+        }
+    }
+
 }

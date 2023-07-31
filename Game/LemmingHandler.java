@@ -7,6 +7,7 @@ import java.util.List;
 
 import game.lemmings.Lemming;
 import game.lemmings.SkillHandler;
+import game.lemmings.SkillSetter;
 import game.level.Entry;
 import game.level.Level;
 import game.level.ReleaseRateHandler;
@@ -168,7 +169,7 @@ public final class LemmingHandler {
         boolean canSet = false;
 
         if (GameController.isCheat()) {
-            canSet = lemm.setSkill(SkillHandler.getLemmSkill());
+            canSet = SkillSetter.setSkill(SkillHandler.getLemmSkill(), lemm);
         } else {
             canSet = SkillHandler.canSetSkillOfLemmingIfNotCheatMode(lemm);
         }
@@ -232,7 +233,7 @@ public final class LemmingHandler {
             synchronized (lemmings) {
                 for (final Lemming l : lemmings) {
                     if (!l.nuke() && !l.hasDied() && !l.hasLeft()) {
-                        l.setSkill(Type.NUKE);
+                        SkillSetter.setSkill(Type.NUKE, l);
                         // System.out.println("nuked!");
                         break;
                     }

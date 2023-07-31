@@ -169,7 +169,7 @@ public final class SkillHandler {
             final LinkedList<Lemming> lemmings) {
         synchronized (lemmings) {
             final Lemming l = lemmings.get(rs.getLemming());
-            l.setSkill(rs.getSkill());
+            SkillSetter.setSkill(rs.getSkill(), l);
             l.setSelected();
         }
 
@@ -269,56 +269,56 @@ public final class SkillHandler {
 
         switch (lemmSkill) {
         case BASHER:
-            if (numBashers > 0 && lemm.setSkill(lemmSkill)) {
+            if (numBashers > 0 && SkillSetter.setSkill(lemmSkill, lemm)) {
                 numBashers -= 1;
                 canSet = true;
             }
 
             break;
         case BOMBER:
-            if (numBombers > 0 && lemm.setSkill(lemmSkill)) {
+            if (numBombers > 0 && SkillSetter.setSkill(lemmSkill, lemm)) {
                 numBombers -= 1;
                 canSet = true;
             }
 
             break;
         case BUILDER:
-            if (numBuilders > 0 && lemm.setSkill(lemmSkill)) {
+            if (numBuilders > 0 && SkillSetter.setSkill(lemmSkill, lemm)) {
                 numBuilders -= 1;
                 canSet = true;
             }
 
             break;
         case CLIMBER:
-            if (numClimbers > 0 && lemm.setSkill(lemmSkill)) {
+            if (numClimbers > 0 && SkillSetter.setSkill(lemmSkill, lemm)) {
                 numClimbers -= 1;
                 canSet = true;
             }
 
             break;
         case DIGGER:
-            if (numDiggers > 0 && lemm.setSkill(lemmSkill)) {
+            if (numDiggers > 0 && SkillSetter.setSkill(lemmSkill, lemm)) {
                 numDiggers -= 1;
                 canSet = true;
             }
 
             break;
         case FLOATER:
-            if (numFloaters > 0 && lemm.setSkill(lemmSkill)) {
+            if (numFloaters > 0 && SkillSetter.setSkill(lemmSkill, lemm)) {
                 numFloaters -= 1;
                 canSet = true;
             }
 
             break;
         case MINER:
-            if (numMiners > 0 && lemm.setSkill(lemmSkill)) {
+            if (numMiners > 0 && SkillSetter.setSkill(lemmSkill, lemm)) {
                 numMiners -= 1;
                 canSet = true;
             }
 
             break;
         case STOPPER:
-            if (numBlockers > 0 && lemm.setSkill(lemmSkill)) {
+            if (numBlockers > 0 && SkillSetter.setSkill(lemmSkill, lemm)) {
                 numBlockers -= 1;
                 canSet = true;
             }

@@ -24,7 +24,7 @@ import game.SoundController;
 import game.TransitionState;
 import game.TrapDoor;
 import game.Type;
-import game.lemmings.Lemming;
+import game.lemmings.LemmingImageLoader;
 import game.lemmings.SkillHandler;
 import game.level.Level;
 import game.level.ReleaseRateHandler;
@@ -481,7 +481,7 @@ public final class FaderHandler {
         final String lvlPath = levelPack[curLevelPack]
                 .getInfo(curDiffLevel, curLevelNumber).getFileName();
         // lemmings need to be reloaded to contain pink color
-        Lemming.loadLemmings(frame);
+        LemmingImageLoader.loadLemmings(frame);
         // loading the level will patch pink lemmings pixels to correct color
         GameController.getLevel().loadLevel(lvlPath, frame);
 

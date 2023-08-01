@@ -1,25 +1,16 @@
 package game.lemmings;
 
-import java.awt.Component;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.Transparency;
 import java.awt.image.BufferedImage;
 
-import game.Core;
 import game.GameController;
 import game.LemmingExplosion;
 import game.MiscGfx;
-import game.ResourceException;
 import game.SoundController;
 import game.Type;
 import game.level.Level;
 import game.level.Mask;
 import game.level.SpriteObjectHandler;
 import game.level.Stencil;
-import lemmini.Constants;
-import tools.Props;
-import tools.ToolBox;
 
 /*
  * Copyright 2009 Volker Oth
@@ -51,10 +42,8 @@ public class Lemming {
      * Number of pixels to add/subtract when stepping.
      */
     public static final int STEP_PIXELS = 4;
-    /** name of the configuration file. */
-    private static final String LEMM_INI_STR = "misc/lemming.ini";
     /** number of resources (animations/names). */
-    private static final int NUM_RESOURCES = 17;
+    public static final int NUM_RESOURCES = 17;
 
     /**
      * display string for skills/types. order must be the same as in the enum!.
@@ -288,8 +277,19 @@ public class Lemming {
         return lemmings;
     }
 
+    /**
+     * Sets static array of resources for each Lemming skill/type.
+     *
+     * @param lemmingResources static array of resources for each Lemming
+     *                         skill/type.
+     */
+    public static void setLemmings(final LemmingResource[] lemmingResources) {
+        lemmings = lemmingResources;
+    }
+
     /** font used for the explosion counter. */
     private static ExplodeFont explodeFont;
+
     /**
      * Class for handling explosions, if any, for the current Lemming.
      */
@@ -381,6 +381,15 @@ public class Lemming {
         stopper = new Stopper(this);
         bomber = new Bomber(this);
         spriteObjectHandler = new SpriteObjectHandler(this);
+    }
+
+    /**
+     * Sets font used for the explosion counter.
+     *
+     * @param fontUsed font used for the explosion counter.
+     */
+    public static void setExplodeFont(final ExplodeFont fontUsed) {
+        Lemming.explodeFont = fontUsed;
     }
 
     /**
@@ -930,111 +939,6 @@ public class Lemming {
                         }
                     }
                 }
-            }
-        }
-    }
-
-    /**
-     * Load images used for Lemming animations.
-     *
-     * @param cmp parent component
-     * @throws ResourceException
-     */
-    public static void loadLemmings(final Component cmp)
-            throws ResourceException {
-        explodeFont = new ExplodeFont(cmp);
-        final MediaTracker tracker = new MediaTracker(cmp);
-        // read lemmings definition file
-        final String fn = Core.findResource(LEMM_INI_STR);
-        final Props p = new Props();
-
-        if (!p.load(fn)) {
-            throw new ResourceException(LEMM_INI_STR);
-        }
-
-        lemmings = new LemmingResource[NUM_RESOURCES];
-        // read lemmings
-        final int[] def = {-1};
-
-        for (int i = 0; true; i++) {
-            int[] val = p.get("lemm_" + i, def);
-            int type;
-
-            if (val.length == Constants.THREE) {
-                // frames, directions, animation type
-                type = i;
-
-                if (lemmings[type] == null) {
-                    final BufferedImage sourceImg = ToolBox.imageToBuffered(
-                            Core.loadImage(tracker, "misc/lemm_" + i + ".gif"),
-                            Transparency.BITMASK);
-                    try {
-                        tracker.waitForAll();
-                    } catch (final InterruptedException ex) {
-                    }
-
-                    lemmings[type] = new LemmingResource(sourceImg, val[0],
-                            val[1]);
-                    lemmings[type].setAnimMode(
-                            (val[2] == 0) ? Animation.LOOP : Animation.ONCE);
-                }
-            } else {
-                break;
-            }
-
-            // read mask
-            val = p.get("mask_" + i, def);
-
-            if (val.length == Constants.THREE) {
-                // mask_Y: frames, directions, step
-                type = i;
-                final Image sourceImg = Core.loadImage(tracker,
-                        "misc/mask_" + i + ".gif");
-                final Mask mask = new Mask(ToolBox.imageToBuffered(sourceImg,
-                        Transparency.BITMASK), val[0]);
-                lemmings[type].setMask(Direction.RIGHT, mask);
-                final int dirs = val[1];
-
-                if (dirs > 1) {
-                    final Mask maskLeft = new Mask(ToolBox.flipImageX(ToolBox
-                            .imageToBuffered(sourceImg, Transparency.BITMASK)),
-                            val[0]);
-                    lemmings[type].setMask(Direction.LEFT, maskLeft);
-                }
-
-                lemmings[type].setMaskStep(val[2]);
-            }
-
-            // read indestructible mask
-            val = p.get("imask_" + i, def);
-
-            if (val.length == 2) {
-                // mask_Y: type, frames, directions, step
-                type = i;
-                final Image sourceImg = Core.loadImage(tracker,
-                        "misc/imask_" + i + ".gif");
-                final Mask mask = new Mask(ToolBox.imageToBuffered(sourceImg,
-                        Transparency.BITMASK), val[0]);
-                lemmings[type].setImask(Direction.RIGHT, mask);
-                final int dirs = val[1];
-
-                if (dirs > 1) {
-                    final Mask maskLeft = new Mask(ToolBox.flipImageX(ToolBox
-                            .imageToBuffered(sourceImg, Transparency.BITMASK)),
-                            val[0]);
-                    lemmings[type].setImask(Direction.LEFT, maskLeft);
-                }
-            }
-
-            // read foot position and size
-            val = p.get("pos_" + i, def);
-
-            if (val.length == Constants.THREE) {
-                lemmings[type].setFootX(val[0]);
-                lemmings[type].setFootY(val[1]);
-                lemmings[type].setSize(val[2]);
-            } else {
-                break;
             }
         }
     }

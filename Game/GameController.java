@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import game.lemmings.Lemming;
+import game.lemmings.LemmingImageLoader;
 import game.lemmings.SkillHandler;
 import game.level.Explosion;
 import game.level.Level;
@@ -281,7 +282,7 @@ public final class GameController {
         SoundController.initSound();
         Icons.init(frame);
         Explosion.init(frame);
-        Lemming.loadLemmings(frame);
+        LemmingImageLoader.loadLemmings(frame);
         LemmingHandler.init();
         ExplosionHandler.init();
         LemmFont.init(frame);

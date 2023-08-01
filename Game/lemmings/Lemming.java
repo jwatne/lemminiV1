@@ -8,7 +8,6 @@ import game.MiscGfx;
 import game.SoundController;
 import game.Type;
 import game.level.Level;
-import game.level.Mask;
 import game.level.SpriteObjectHandler;
 import game.level.Stencil;
 
@@ -296,10 +295,6 @@ public class Lemming {
     private final LemmingExplosion exploder;
 
     /**
-     * Class for handling builder skill, if assigned to the current Lemming.
-     */
-    private final Builder builder;
-    /**
      * Class for handling falling for current Lemming.
      */
     private final Faller faller;
@@ -314,30 +309,6 @@ public class Lemming {
     }
 
     /**
-     * Class for handling floater skill, if assigned to the current Lemming.
-     */
-    private final Floater floater;
-    /**
-     * Class for handling climber skill, if assigned to the current Lemming.
-     */
-    private final Climber climber;
-    /**
-     * Class for handling walking for the current Lemming.
-     */
-    private final Walker walker;
-    /**
-     * Class for handling mining skill for the current Lemming, if assigned.
-     */
-    private final Miner miner;
-    /**
-     * Class for handling basher skill for the current Lemming, if assigned.
-     */
-    private final Basher basher;
-    /**
-     * Class for handling Stopper skill for the current Lemming, if assigned.
-     */
-    private Stopper stopper;
-    /**
      * Class for handling bomber skill for the current Lemming, if assigned.
      */
     private Bomber bomber;
@@ -346,6 +317,10 @@ public class Lemming {
      * Handler for <code>this</code> Lemming's SpriteObjects.
      */
     private SpriteObjectHandler spriteObjectHandler;
+    /**
+     * Lemming state machine.
+     */
+    private LemmingStateMachine lemmingStateMachine;
 
     /**
      * Constructor: Create Lemming.
@@ -371,16 +346,10 @@ public class Lemming {
         hasLeft = false; // not yet
         nuke = false;
         exploder = new LemmingExplosion();
-        builder = new Builder(this);
         faller = new Faller(this);
-        floater = new Floater(this);
-        climber = new Climber(this);
-        walker = new Walker(this);
-        miner = new Miner(this);
-        basher = new Basher(this);
-        stopper = new Stopper(this);
         bomber = new Bomber(this);
         spriteObjectHandler = new SpriteObjectHandler(this);
+        lemmingStateMachine = new LemmingStateMachine(this);
     }
 
     /**
@@ -439,7 +408,8 @@ public class Lemming {
         flipDirBorder();
 
         // lemming state machine
-        newType = executeLemmingStateMachine(newType, oldX, explode);
+        newType = lemmingStateMachine.executeLemmingStateMachine(newType, oldX,
+                explode);
 
         // check collision with exit and traps
         newType = processTrapMasks(newType);
@@ -530,103 +500,6 @@ public class Lemming {
     }
 
     /**
-     * Executes the Lemming state machine.
-     *
-     * @param initialNewType the original new Type to be assigned to the Lemming
-     *                       before the call to this method.
-     * @param oldX           the old X value of the foot in pixels.
-     * @param explode        <code>true</code> if the Lemming is to explode.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type executeLemmingStateMachine(final Type initialNewType,
-            final int oldX, final boolean explode) {
-        Type newType = initialNewType;
-        int free;
-
-        switch (type) {
-        case FALLER:
-            if (explode) {
-                bomber.explode(type);
-            } else {
-                newType = faller.animateFaller(newType);
-            }
-
-            break;
-        case JUMPER:
-            if (explode) {
-                newType = Type.BOMBER;
-                playOhNoIfNotToBeNuked();
-            } else if (!turnedByStopper()) {
-                newType = animateJumper(newType);
-            }
-
-            break;
-        case WALKER:
-            newType = walker.animateWalker(newType, oldX, explode);
-            break;
-        case FLOATER_START:
-            floater.animateFloaterStart(explode);
-            //$FALL-THROUGH$
-        case FLOATER:
-            newType = floater.animateFloater(newType, explode);
-            break;
-        case CLIMBER:
-            newType = climber.animateClimber(newType, explode);
-            break;
-        case SPLAT:
-            bomber.animateSplat(explode);
-            break;
-        case BASHER:
-            newType = basher.animateBasher(newType, explode);
-            break;
-        case MINER:
-            newType = miner.animateMiner(newType, explode);
-            break;
-        case DIGGER:
-        case BUILDER_END:
-            // Shared DIGGER / BUILDER_END code:
-            if (explode) {
-                newType = Type.BOMBER;
-                playOhNoIfNotToBeNuked();
-            }
-
-            break;
-        case BUILDER:
-            newType = builder.animateBuilder(newType, oldX, explode);
-            break;
-        case STOPPER:
-            newType = stopper.animateStopper(newType, explode);
-            break;
-        case BOMBER_STOPPER:
-            // don't erase stopper mask before stopper finally explodes or falls
-            free = freeBelow(Floater.FLOATER_STEP);
-
-            if (free > 0) {
-                // stopper falls -> erase mask and convert to normal stopper.
-                eraseMaskAndConvertToNormalStopper();
-                // fall through
-            } else {
-                break;
-            }
-
-            //$FALL-THROUGH$
-        case BOMBER:
-            bomber.animateBomber();
-            break;
-        case CLIMBER_TO_WALKER:
-        default:
-            // Both CLIMBER_TO_WALKER and all cases not explicitly checked above
-            // should at
-            // least explode
-            if (explode) {
-                bomber.explode(type);
-            }
-        }
-
-        return newType;
-    }
-
-    /**
      * Animates once.
      *
      * @param startingTrigger the initial value of the trigger before calling
@@ -666,37 +539,6 @@ public class Lemming {
         }
 
         return trigger;
-    }
-
-    /**
-     * Erases mask and converts to normal stopper.
-     */
-    private void eraseMaskAndConvertToNormalStopper() {
-        final Mask m = lemmings[Type.getOrdinal(Type.STOPPER)].getMask(dir);
-        m.clearType(maskX, maskY, 0, Stencil.MSK_STOPPER);
-        type = Type.BOMBER;
-    }
-
-    /**
-     * Animates jumper.
-     *
-     * @param startingNewType the original new Type to be assigned to the
-     *                        Lemming before the call to this method.
-     * @return the updated new Type to be assigned to the Lemming.
-     */
-    private Type animateJumper(final Type startingNewType) {
-        Type newType = startingNewType;
-        final int levitation = aboveGround();
-
-        if (levitation > JUMPER_STEP) {
-            y -= JUMPER_STEP;
-        } else {
-            // conversion to walker
-            y -= levitation;
-            newType = Type.WALKER;
-        }
-
-        return newType;
     }
 
     /**

@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import game.lemmings.Lemming;
+import game.lemmings.LemmingAnimator;
 import game.lemmings.SkillHandler;
 import game.lemmings.SkillSetter;
 import game.level.Entry;
@@ -257,7 +258,7 @@ public final class LemmingHandler {
                     continue;
                 }
 
-                l.animate();
+                LemmingAnimator.animate(l);
             }
         }
     }

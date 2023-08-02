@@ -5,6 +5,7 @@ import game.SoundController;
 import game.Type;
 import game.level.Level;
 import game.level.Mask;
+import game.level.SpriteObjectHandler;
 import game.level.Stencil;
 import lemmini.Constants;
 /*
@@ -45,6 +46,41 @@ public final class LemmingAnimator {
      */
     private LemmingAnimator() {
 
+    }
+
+    /**
+     * Update animation, move Lemming, check state transitions.
+     *
+     * @param lemming the Lemming to be animated.
+     */
+    public static void animate(final Lemming lemming) {
+        final Type type = lemming.getSkill();
+        final Type oldType = type;
+        Type newType = type;
+        final int oldX = lemming.getX();
+        final boolean explode = lemming.getExploder().checkExplodeState();
+        int selectCtr = lemming.getSelectCtr();
+
+        if (selectCtr > 0) {
+            lemming.setSelectCtr(--selectCtr);
+        }
+
+        flipDirBorder(lemming);
+        // lemming state machine
+        final LemmingStateMachine machine = new LemmingStateMachine(lemming);
+        newType = machine.executeLemmingStateMachine(newType, oldX, explode);
+
+        // check collision with exit and traps
+        newType = processTrapMasks(newType, lemming);
+
+        // animate
+        if (oldType == newType) {
+            final boolean trigger = animateLoopOrOnce(lemming);
+            newType = animateIfTriggerConditionReached(newType, trigger,
+                    lemming);
+        }
+
+        lemming.changeType(oldType, newType);
     }
 
     /**
@@ -177,4 +213,176 @@ public final class LemmingAnimator {
 
         return newType;
     }
+
+    /**
+     * Animates the Lemming's current type if the trigger condition is reached.
+     *
+     * @param initialNewType the original new Type to be assigned to the Lemming
+     *                       before the call to this method.
+     * @param trigger        <code>true</code> if trigger condition reached.
+     * @param lemming        the Lemming to animate.
+     * @return the updated new Type to be assigned to the Lemming.
+     */
+    private static Type animateIfTriggerConditionReached(
+            final Type initialNewType, final boolean trigger,
+            final Lemming lemming) {
+        Type newType = initialNewType;
+
+        if (trigger) {
+            // Trigger condition reached?
+            newType = LemmingAnimator.animateLemming(initialNewType, lemming);
+        }
+
+        return newType;
+    }
+
+    /**
+     * Performs the proper animation for a LOOP or ONCE animation mode.
+     *
+     * @param lemming the Lemming to be animated.
+     *
+     * @return <code>true</code> if the trigger condition is reached by
+     *         executing the animation.
+     */
+    private static boolean animateLoopOrOnce(final Lemming lemming) {
+        boolean trigger = false;
+
+        switch (lemming.getLemRes().getAnimMode()) {
+        case LOOP:
+            trigger = animateLoop(trigger, lemming);
+            break;
+        case ONCE:
+            trigger = animateOnce(trigger, lemming);
+            break;
+        default:
+            break;
+        }
+
+        return trigger;
+    }
+
+    /**
+     * Perform special animations if the {@link Stencil} for the pixel in the
+     * middle of the Lemming indicates a trap or level exit.
+     *
+     * @param initialNewType the original new Type to be assigned to the Lemming
+     *                       before the call to this method.
+     * @param lemming        the Lemming to be animated.
+     * @return the updated new Type to be assigned to the Lemming.
+     */
+    private static Type processTrapMasks(final Type initialNewType,
+            final Lemming lemming) {
+        Type newType = initialNewType;
+        final int s = lemming.stencilMid();
+        final SpriteObjectHandler spriteObjectHandler = new SpriteObjectHandler(
+                lemming);
+
+        switch (s & (Stencil.MSK_TRAP | Stencil.MSK_EXIT)) {
+        case Stencil.MSK_TRAP_DROWN:
+            newType = spriteObjectHandler.animateDrowning(newType, s);
+            break;
+        case Stencil.MSK_TRAP_DIE:
+            newType = spriteObjectHandler.animateNormalDeath(newType, s);
+            break;
+        case Stencil.MSK_TRAP_REPLACE:
+            final boolean hasDied = lemming.hasDied();
+            lemming.setHasDied(spriteObjectHandler
+                    .replaceLemmingWithSpecialDeathAnimation(s, hasDied));
+            break;
+        case Stencil.MSK_EXIT:
+            newType = spriteObjectHandler.animateExitLevel(newType, s,
+                    lemming.getSkill());
+            break;
+        default:
+            break;
+        }
+
+        return newType;
+    }
+
+    /**
+     * Animates once.
+     *
+     * @param startingTrigger the initial value of the trigger before calling
+     *                        this method.
+     * @param lemming         the Lemming to be animated.
+     * @return the updated value of the trigger.
+     */
+    private static boolean animateOnce(final boolean startingTrigger,
+            final Lemming lemming) {
+        boolean trigger = startingTrigger;
+        int frameIdx = lemming.getFrameIdx();
+
+        if (frameIdx < lemming.getLemRes().getFrames() * Lemming.TIME_SCALE
+                - 1) {
+            lemming.setFrameIdx(++frameIdx);
+        } else {
+            trigger = true;
+        }
+
+        return trigger;
+    }
+
+    /**
+     * Animates loop.
+     *
+     * @param startingTrigger the initial value of the trigger before calling
+     *                        this method.
+     * @param lemming         the Lemming to be animated.
+     * @return the updated value of the trigger.
+     */
+    private static boolean animateLoop(final boolean startingTrigger,
+            final Lemming lemming) {
+        boolean trigger = startingTrigger;
+        int frameIdx = lemming.getFrameIdx();
+        final LemmingResource lemRes = lemming.getLemRes();
+
+        if (++frameIdx >= lemRes.getFrames() * Lemming.TIME_SCALE) {
+            frameIdx = 0;
+        }
+
+        lemming.setFrameIdx(frameIdx);
+        final int maskStep = lemRes.getMaskStep();
+
+        if (maskStep > 0 && frameIdx % (maskStep * Lemming.TIME_SCALE) == 0) {
+            trigger = true;
+        }
+
+        return trigger;
+    }
+
+    /**
+     * Check if Lemming reached the left or right border of the level and was
+     * turned.
+     *
+     * @param lemming
+     *
+     * @return true if lemming was turned, false otherwise.
+     */
+    private static boolean flipDirBorder(final Lemming lemming) {
+        boolean flip = false;
+
+        if (lemming.getLemRes().getDirs() > 1) {
+            int x = lemming.getX();
+
+            if (x < 0) {
+                x = 0;
+                flip = true;
+            } else if (x >= Level.WIDTH) {
+                x = Level.WIDTH - 1;
+                flip = true;
+            }
+
+            lemming.setX(x);
+        }
+
+        if (flip) {
+            lemming.setDirection(
+                    (lemming.getDirection() == Direction.RIGHT) ? Direction.LEFT
+                            : Direction.RIGHT);
+        }
+
+        return flip;
+    }
+
 }

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -14,14 +13,9 @@ import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.List;
 
-import game.Core;
 import game.GameController;
-import game.LemmException;
-import game.ResourceException;
 import game.Steel;
 import game.Terrain;
-import game.lemmings.Lemming;
-import gameutil.FaderHandler;
 import gameutil.Sprite;
 import lemmini.Constants;
 import tools.Props;
@@ -61,26 +55,6 @@ public class Level {
      * Number of RGB color channels (R, G, and B).
      */
     private static final int NUM_RGB_CHANNELS = 3;
-    /**
-     * Entry animation type.
-     */
-    private static final int ENTRY_ANIMATION = 3;
-    /**
-     * Maximum number of Sprite objects.
-     */
-    private static final int MAX_NUM_SPRITE_OBJECTS = 64;
-    /**
-     * Number of int elements in steel_x array.
-     */
-    private static final int STEEL_X_LENGTH = 4;
-    /**
-     * Number of int elements in terrain_x array.
-     */
-    private static final int TERRAIN_X_LENGTH = 4;
-    /**
-     * Number of int elements in object_x array.
-     */
-    private static final int OBJECT_X_LENGTH = 5;
     /** maximum width of level. */
     public static final int WIDTH = 1664 * 2;
     /** maximum height of level. */
@@ -88,12 +62,6 @@ public class Level {
     /** array of default ARGB colors for particle effects. */
     public static final int[] DEFAULT_PARTICLE_COLORS = {0xff00ff00, 0xff0000ff,
             0xffffffff, 0xffffffff, 0xffff0000};
-
-    /** array of default styles. */
-    private static final String[] STYLES = {"dirt", "fire", "marble", "pillar",
-            "crystal", "brick", "rock", "snow", "Bubble", "special"};
-    /** template color to be replaced with debris color. */
-    private static final int TEMPLATE_COLOR = 0xffff00ff;
 
     /**
      * Array of normal sprite objects - no transparency, drawn behind background
@@ -164,163 +132,155 @@ public class Level {
      * stencil.
      */
     private Image[] tiles;
+
     /** sprite objects of all sprite objects available in this style. */
     private SpriteObject[] sprObjAvailable;
+
     /**
      * terrain the Lemmings walk on etc. - originally 400 tiles, 4 bytes each
      */
     private List<Terrain> terrain;
+
     /**
      * Steel areas which are indestructible - originally 32 objects, 4 bytes
      * each.
      */
-    private List<Steel> steel; //
+    private List<Steel> steel;
+
     /** level name - originally 32 bytes ASCII - filled with whitespaces. */
     private String lvlName;
     /** used to read in the configuration file. */
     private Props props;
 
     /**
-     * Load a level and all level resources.
+     * Returns background color as ARGB.
      *
-     * @param fname file name
-     * @param frame the parent component (main frame of the application).
-     * @throws ResourceException
-     * @throws LemmException
+     * @return background color as ARGB.
      */
-    public void loadLevel(final String fname, final Component frame)
-            throws ResourceException, LemmException {
-        ready = false;
-        // read level properties from file
-        final Props p = new Props();
-        if (!p.load(fname)) {
-            throw new ResourceException(fname);
-        }
+    public int getBgCol() {
+        return bgCol;
+    }
 
-        // read name
-        lvlName = p.get("name", "");
-        // out(fname + " - " + lvlName);
-        maxFallDistance = p.get("maxFallDistance",
-                FaderHandler.getCurLevelPack().getMaxFallDistance());
-        // read configuration in big endian word
-        releaseRate = p.get("releaseRate", -1);
-        // out("releaseRate = " + releaseRate);
-        numLemmings = p.get("numLemmings", -1);
-        // out("numLemmings = " + numLemmings);
-        numToRescue = p.get("numToRescue", -1);
-        // out("numToRescue = " + numToRescue);
-        timeLimitSeconds = p.get("timeLimitSeconds", -1);
+    /**
+     * Sets background color as ARGB.
+     *
+     * @param argbColor background color as ARGB.
+     */
+    public void setBgCol(final int argbColor) {
+        this.bgCol = argbColor;
+    }
 
-        if (timeLimitSeconds == -1) {
-            final int timeLimit = p.get("timeLimit", -1);
-            timeLimitSeconds = timeLimit * Constants.SECONDS_PER_MINUTE;
-        }
+    /**
+     * Returns background tiles.
+     *
+     * @return background tiles.
+     */
+    public Image[] getTiles() {
+        return tiles;
+    }
 
-        // out("timeLimit = " + timeLimit);
-        numClimbers = p.get("numClimbers", -1);
-        // out("numClimbers = " + numClimbers);
-        numFloaters = p.get("numFloaters", -1);
-        // out("numFloaters = " + numFloaters);
-        numBombers = p.get("numBombers", -1);
-        // out("numBombers = " + numBombers);
-        numBlockers = p.get("numBlockers", -1);
-        // out("numBlockers = " + numBlockers);
-        numBuilders = p.get("numBuilders", -1);
-        // out("numBuilders = " + numBuilders);
-        numBashers = p.get("numBashers", -1);
-        // out("numBashers = " + numBashers);
-        numMiners = p.get("numMiners", -1);
-        // out("numMiners = " + numMiners);
-        numDiggers = p.get("numDiggers", -1);
-        // out("numDiggers = " + numDiggers);
-        xPos = p.get("xPos", -1);
-        // out("xPos = " + xPos);
-        final String strStyle = p.get("style", "");
-        int style;
-        style = -1;
+    /**
+     * Sets background tiles.
+     *
+     * @param backgroundTiles background tiles.
+     */
+    public void setTiles(final Image[] backgroundTiles) {
+        this.tiles = backgroundTiles;
+    }
 
-        for (int i = 0; i < STYLES.length; i++) {
-            if (strStyle.equalsIgnoreCase(STYLES[i])) {
-                style = i;
-                break;
-            }
-        }
+    /**
+     * Returns props used to read in the configuration file.
+     *
+     * @return props used to read in the configuration file.
+     */
+    public Props getProps() {
+        return props;
+    }
 
-        // out("style = " + styles[style]);
-        superlemming = p.get("superlemming", false);
+    /**
+     * Sets props used to read in the configuration file.
+     *
+     * @param configProps props used to read in the configuration file.
+     */
+    public void setProps(final Props configProps) {
+        this.props = configProps;
+    }
 
-        // read objects
-        // out("\n[Objects]");
-        objects = new ArrayList<LvlObject>();
-        final int[] def = {-1};
+    /**
+     * Returns sprite objects of all sprite objects available in this style.
+     *
+     * @return sprite objects of all sprite objects available in this style.
+     */
+    public SpriteObject[] getSprObjAvailable() {
+        return sprObjAvailable;
+    }
 
-        for (int i = 0; true /* i < 32 */; i++) {
-            final int[] val = p.get("object_" + i, def);
+    /**
+     * Sets sprite objects of all sprite objects available in this style.
+     *
+     * @param spriteObjects sprite objects of all sprite objects available in
+     *                      this style.
+     */
+    public void setSprObjAvailable(final SpriteObject[] spriteObjects) {
+        this.sprObjAvailable = spriteObjects;
+    }
 
-            if (val.length == OBJECT_X_LENGTH) {
-                final LvlObject obj = new LvlObject(val);
-                objects.add(obj);
-                // out("" + obj.id + ", " + obj.xPos + ", " + obj.yPos + ", "+
-                // obj.paintMode +
-                // ", " + obj.upsideDown);
-            } else {
-                break;
-            }
-        }
+    /**
+     * Returns Steel areas which are indestructible.
+     *
+     * @return Steel areas which are indestructible.
+     */
+    public List<Steel> getSteel() {
+        return steel;
+    }
 
-        // read terrain
-        // out("\n[Terrain]");
-        terrain = new ArrayList<Terrain>();
+    /**
+     * Sets Steel areas which are indestructible.
+     *
+     * @param steelList Steel areas which are indestructible.
+     */
+    public void setSteel(final List<Steel> steelList) {
+        this.steel = steelList;
+    }
 
-        for (int i = 0; true /* i < 400 */; i++) {
-            final int[] val = p.get("terrain_" + i, def);
+    /**
+     * Returns Objects like doors - originally 32 objects where each consists of
+     * 8 bytes.
+     *
+     * @return Objects like doors - originally 32 objects where each consists of
+     *         8 bytes.
+     */
+    public List<LvlObject> getObjects() {
+        return objects;
+    }
 
-            if (val.length == TERRAIN_X_LENGTH) {
-                final Terrain ter = new Terrain(val);
-                terrain.add(ter);
-                // out("" + ter.id + ", " + ter.xPos + ", " + ter.yPos + ", " +
-                // ter.modifier);
-            } else {
-                break;
-            }
-        }
+    /**
+     * Sets Objects like doors - originally 32 objects where each consists of 8
+     * bytes.
+     *
+     * @param objectList Objects like doors - originally 32 objects where each
+     *                   consists of 8 bytes.
+     */
+    public void setObjects(final List<LvlObject> objectList) {
+        this.objects = objectList;
+    }
 
-        // read steel blocks
-        // out("\n[Steel]");
-        steel = new ArrayList<Steel>();
+    /**
+     * Returns terrain the Lemmings walk on etc.
+     *
+     * @return terrain the Lemmings walk on etc.
+     */
+    public List<Terrain> getTerrain() {
+        return terrain;
+    }
 
-        for (int i = 0; true/* i < 32 */; i++) {
-            final int[] val = p.get("steel_" + i, def);
-
-            if (val.length == STEEL_X_LENGTH) {
-                final Steel stl = new Steel(val);
-                steel.add(stl);
-                // out("" + stl.xPos + ", " + stl.yPos + ", " + stl.width + ", "
-                // + stl.height);
-            } else {
-                break;
-            }
-        }
-
-        // load objects
-        sprObjAvailable = null;
-        // first load the data from object descriptor file xxx.ini
-        final String fnames = Core
-                .findResource("styles/" + strStyle + "/" + strStyle + ".ini");
-        props = new Props();
-
-        if (!props.load(fnames)) {
-            if (style != -1) {
-                throw new ResourceException(fnames);
-            } else {
-                throw new LemmException("Style " + strStyle + " not existing.");
-            }
-        }
-
-        // load blockset
-        tiles = loadTileSet(strStyle, frame);
-        sprObjAvailable = loadObjects(strStyle, frame);
-        ready = true;
+    /**
+     * Sets terrain the Lemmings walk on etc.
+     *
+     * @param terrainList terrain the Lemmings walk on etc.
+     */
+    public void setTerrain(final List<Terrain> terrainList) {
+        this.terrain = terrainList;
     }
 
     /**
@@ -720,159 +680,6 @@ public class Level {
         }
     }
 
-    // /**
-    // * Debug output.
-    // * @param o string to print
-    // */
-    // private static void out(final String o) {
-    // System.out.println(o);
-    // }
-
-    /**
-     * Load tile set from a styles folder.
-     *
-     * @param set name of the style
-     * @param cmp parent component
-     * @return array of images where each image contains one tile
-     * @throws ResourceException
-     */
-    private Image[] loadTileSet(final String set, final Component cmp)
-            throws ResourceException {
-        final List<Image> images = new ArrayList<Image>(64);
-        final MediaTracker tracker = new MediaTracker(cmp);
-        final int numTiles = props.get("tiles", 64);
-
-        for (int n = 0; n < numTiles; n++) {
-            final String fName = "styles/" + set + "/" + set + "_"
-                    + Integer.toString(n) + ".gif";
-            final Image img = Core.loadImage(tracker, fName);
-            images.add(img);
-        }
-
-        try {
-            tracker.waitForAll();
-        } catch (final InterruptedException ex) {
-            System.err.println("Waiting thread interrupted");
-        }
-
-        Image[] ret = new Image[images.size()];
-        ret = images.toArray(ret);
-        // images = null;
-        return ret;
-    }
-
-    /**
-     * Load level sprite objects.
-     *
-     * @param set name of the style
-     * @param cmp parent component
-     * @return array of images where each image contains one tile
-     * @throws ResourceException
-     */
-    private SpriteObject[] loadObjects(final String set, final Component cmp)
-            throws ResourceException {
-        // URLClassLoader urlLoader = (URLClassLoader)
-        // this.getClass().getClassLoader();
-        final MediaTracker tracker = new MediaTracker(cmp);
-        // first some global settings
-        bgCol = props.get("bgColor", 0x000000) | Constants.MAX_ALPHA;
-        bgColor = new Color(bgCol);
-        debrisCol = props.get("debrisColor", Color.WHITE.getRGB())
-                | Constants.MAX_ALPHA;
-        // replace pink color with debris color
-        Lemming.patchColors(TEMPLATE_COLOR, debrisCol);
-        particleCol = props.get("particleColor", DEFAULT_PARTICLE_COLORS);
-
-        for (int i = 0; i < particleCol.length; i++) {
-            particleCol[i] |= Constants.MAX_ALPHA;
-        }
-
-        // go through all the entries (shouldn't be more than 64)
-        List<SpriteObject> sprites = new ArrayList<SpriteObject>(
-                MAX_NUM_SPRITE_OBJECTS);
-        int idx;
-
-        for (idx = 0; true; idx++) {
-            // get number of animations
-            final String sIdx = Integer.toString(idx);
-            final int frames = props.get("frames_" + sIdx, -1);
-
-            if (frames < 0) {
-                break;
-            }
-
-            // load screenBuffer
-            String fName = "styles/" + set + "/" + set + "o_"
-                    + Integer.toString(idx) + ".gif";
-            Image img = Core.loadImage(tracker, fName);
-
-            try {
-                tracker.waitForAll();
-            } catch (final InterruptedException ex) {
-            }
-
-            // get animation mode
-            final int anim = props.get("anim_" + sIdx, -1);
-
-            if (anim < 0) {
-                break;
-            }
-
-            final SpriteObject sprite = new SpriteObject(img, frames);
-
-            switch (anim) {
-            case 0: // dont' animate
-                sprite.setAnimMode(Sprite.Animation.NONE);
-                break;
-            case 1: // loop mode
-                sprite.setAnimMode(Sprite.Animation.LOOP);
-                break;
-            case 2: // triggered animation - for the moment handle like loop
-                sprite.setAnimMode(Sprite.Animation.TRIGGERED);
-                break;
-            case ENTRY_ANIMATION: // entry animation
-                sprite.setAnimMode(Sprite.Animation.ONCE);
-                break;
-            default:
-                break;
-            }
-
-            // get object type
-            final int type = props.get("type_" + sIdx, -1);
-
-            if (type < 0) {
-                break;
-            }
-            sprite.setType(SpriteObject.getType(type));
-
-            switch (sprite.getType()) {
-            case EXIT:
-            case NO_DIG_LEFT:
-            case NO_DIG_RIGHT:
-            case TRAP_DIE:
-            case TRAP_REPLACE:
-            case TRAP_DROWN:
-                // load mask
-                fName = "styles/" + set + "/" + set + "om_"
-                        + Integer.toString(idx) + ".gif";
-                img = Core.loadImage(tracker, fName);
-                sprite.setMask(img);
-                break;
-            default:
-                break;
-            }
-            // get sound
-            final int sound = props.get("sound_" + sIdx, -1);
-            sprite.setSound(sound);
-
-            sprites.add(sprite);
-        }
-        SpriteObject[] ret = new SpriteObject[sprites.size()];
-        ret = sprites.toArray(ret);
-        sprites = null;
-        return ret;
-    }
-
     /**
      * Create a mini map for this level.
      *
@@ -1040,12 +847,30 @@ public class Level {
     }
 
     /**
+     * Sets background color.
+     *
+     * @param background background color.
+     */
+    public void setBgColor(final Color background) {
+        bgColor = background;
+    }
+
+    /**
      * Get ready state of level.
      *
      * @return true if level is completely loaded.
      */
     public boolean isReady() {
         return ready;
+    }
+
+    /**
+     * Sets ready state of level.
+     *
+     * @param isReady true if level is completely loaded.
+     */
+    public void setReady(final boolean isReady) {
+        this.ready = isReady;
     }
 
     /**
@@ -1058,15 +883,33 @@ public class Level {
     }
 
     /**
+     * Sets maximum safe fall distance.
+     *
+     * @param maxSafeDistance maximum safe fall distance.
+     */
+    public void setMaxFallDistance(final int maxSafeDistance) {
+        this.maxFallDistance = maxSafeDistance;
+    }
+
+    /**
      * Get array of ARGB colors used for particle effects.
      *
      * @return array of ARGB colors used for particle effects
      */
     public int[] getParticleCol() {
         // Return clone to avoid malicious code vulnerability of potentially
-        // exposing
-        // internal representation by returning a reference to a mutable object.
+        // exposing internal representation by returning a reference to a
+        // mutable object.
         return particleCol.clone();
+    }
+
+    /**
+     * Sets array of ARGB colors used for particle effects.
+     *
+     * @param particleColors array of ARGB colors used for particle effects.
+     */
+    public void setParticleCol(final int[] particleColors) {
+        particleCol = particleColors.clone();
     }
 
     /**
@@ -1079,12 +922,30 @@ public class Level {
     }
 
     /**
+     * Sets start screen x position.
+     *
+     * @param position start screen x position.
+     */
+    public void setxPos(final int position) {
+        this.xPos = position;
+    }
+
+    /**
      * Get number of climbers in this level : max 0xfa (250).
      *
      * @return number of climbers in this level
      */
     public int getNumClimbers() {
         return numClimbers;
+    }
+
+    /**
+     * Sets number of climbers in this level.
+     *
+     * @param climbers number of climbers in this level.
+     */
+    public void setNumClimbers(final int climbers) {
+        this.numClimbers = climbers;
     }
 
     /**
@@ -1097,12 +958,30 @@ public class Level {
     }
 
     /**
+     * Sets number of floaters in this level.
+     *
+     * @param floaters number of floaters in this level.
+     */
+    public void setNumFloaters(final int floaters) {
+        this.numFloaters = floaters;
+    }
+
+    /**
      * Get number of bombers in this level : max 0xfa (250).
      *
      * @return number of bombers in this level
      */
     public int getNumBombers() {
         return numBombers;
+    }
+
+    /**
+     * Sets number of bombers in this level.
+     *
+     * @param bombers number of bombers in this level.
+     */
+    public void setNumBombers(final int bombers) {
+        this.numBombers = bombers;
     }
 
     /**
@@ -1115,12 +994,30 @@ public class Level {
     }
 
     /**
+     * Sets number of blockers in this level.
+     *
+     * @param blockers number of blockers in this level.
+     */
+    public void setNumBlockers(final int blockers) {
+        this.numBlockers = blockers;
+    }
+
+    /**
      * Get number of builders in this level : max 0xfa (250).
      *
      * @return number of builders in this level
      */
     public int getNumBuilders() {
         return numBuilders;
+    }
+
+    /**
+     * Sets number of builders in this level.
+     *
+     * @param builders number of builders in this level.
+     */
+    public void setNumBuilders(final int builders) {
+        this.numBuilders = builders;
     }
 
     /**
@@ -1133,6 +1030,15 @@ public class Level {
     }
 
     /**
+     * Sets number of bashers in this level.
+     *
+     * @param bashers number of bashers in this level.
+     */
+    public void setNumBashers(final int bashers) {
+        this.numBashers = bashers;
+    }
+
+    /**
      * Get number of miners in this level : max 0xfa (250).
      *
      * @return number of miners in this level
@@ -1142,12 +1048,30 @@ public class Level {
     }
 
     /**
+     * Sets number of miners in this level.
+     *
+     * @param miners number of miners in this level.
+     */
+    public void setNumMiners(final int miners) {
+        this.numMiners = miners;
+    }
+
+    /**
      * Get number of diggers in this level : max 0xfa (250).
      *
      * @return number of diggers in this level
      */
-    public int getMumDiggers() {
+    public int getNumDiggers() {
         return numDiggers;
+    }
+
+    /**
+     * Sets number of diggers in this level.
+     *
+     * @param diggers number of diggers in this level.
+     */
+    public void setNumDiggers(final int diggers) {
+        this.numDiggers = diggers;
     }
 
     /**
@@ -1157,6 +1081,15 @@ public class Level {
      */
     public int getTimeLimitSeconds() {
         return timeLimitSeconds;
+    }
+
+    /**
+     * Sets time limit in seconds.
+     *
+     * @param timeLimit time limit in seconds.
+     */
+    public void setTimeLimitSeconds(final int timeLimit) {
+        this.timeLimitSeconds = timeLimit;
     }
 
     /**
@@ -1170,6 +1103,15 @@ public class Level {
     }
 
     /**
+     * Sets number of Lemmings to rescue.
+     *
+     * @param numberToRescue number of Lemmings to rescue.
+     */
+    public void setNumToRescue(final int numberToRescue) {
+        this.numToRescue = numberToRescue;
+    }
+
+    /**
      * Get number of Lemmings in this level (maximum 0x0072 = 114 in original
      * LVL format).
      *
@@ -1177,6 +1119,17 @@ public class Level {
      */
     public int getNumLemmings() {
         return numLemmings;
+    }
+
+    /**
+     * Sets number of Lemmings in this level (maximum 0x0072 = 114 in original
+     * LVL format).
+     *
+     * @param lemmingsInLevel number of Lemmings in this level (maximum 0x0072 =
+     *                        114 in original LVL format).
+     */
+    public void setNumLemmings(final int lemmingsInLevel) {
+        this.numLemmings = lemmingsInLevel;
     }
 
     /**
@@ -1189,12 +1142,30 @@ public class Level {
     }
 
     /**
+     * Sets color of debris pixels as ARGB.
+     *
+     * @param debrisColor color of debris pixels as ARGB.
+     */
+    public void setDebrisColor(final int debrisColor) {
+        debrisCol = debrisColor;
+    }
+
+    /**
      * Get release rate : 0 is slowest, 0x0FA (250) is fastest.
      *
      * @return release rate : 0 is slowest, 0x0FA (250) is fastest
      */
     public int getReleaseRate() {
         return releaseRate;
+    }
+
+    /**
+     * Sets release rate : 0 is slowest, 0x0FA (250) is fastest.
+     *
+     * @param rate release rate : 0 is slowest, 0x0FA (250) is fastest.
+     */
+    public void setReleaseRate(final int rate) {
+        this.releaseRate = rate;
     }
 
     /**
@@ -1207,11 +1178,30 @@ public class Level {
     }
 
     /**
+     * Sets whether this is a SuperLemming level.
+     *
+     * @param superLemmingLevel true if this is a SuperLemming level, false
+     *                          otherwise.
+     */
+    public void setSuperlemming(final boolean superLemmingLevel) {
+        this.superlemming = superLemmingLevel;
+    }
+
+    /**
      * Get level name.
      *
      * @return level name
      */
     public String getLevelName() {
         return lvlName;
+    }
+
+    /**
+     * Sets level name.
+     *
+     * @param name level name.
+     */
+    public void setLevelName(final String name) {
+        lvlName = name;
     }
 }

@@ -27,6 +27,7 @@ import game.Type;
 import game.lemmings.LemmingImageLoader;
 import game.lemmings.SkillHandler;
 import game.level.Level;
+import game.level.LevelLoader;
 import game.level.ReleaseRateHandler;
 import game.level.TextScreen;
 import game.replay.ReplayController;
@@ -483,7 +484,7 @@ public final class FaderHandler {
         // lemmings need to be reloaded to contain pink color
         LemmingImageLoader.loadLemmings(frame);
         // loading the level will patch pink lemmings pixels to correct color
-        GameController.getLevel().loadLevel(lvlPath, frame);
+        LevelLoader.loadLevel(lvlPath, frame, GameController.getLevel());
 
         // if width and height would be stored inside the level, the bgImage
         // etc. would have to be recreated here

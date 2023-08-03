@@ -154,7 +154,7 @@ public final class SkillHandler {
         numBuilders = level.getNumBuilders();
         numBashers = level.getNumBashers();
         numMiners = level.getNumMiners();
-        numDiggers = level.getMumDiggers();
+        numDiggers = level.getNumDiggers();
     }
 
     /**

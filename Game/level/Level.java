@@ -5,18 +5,13 @@ import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Transparency;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
-import java.awt.image.WritableRaster;
-import java.util.ArrayList;
 import java.util.List;
 
 import game.GameController;
 import game.Steel;
 import game.Terrain;
-import gameutil.Sprite;
 import lemmini.Constants;
 import tools.Props;
 import tools.ToolBox;
@@ -336,20 +331,9 @@ public class Level {
         }
 
         // now for the animated objects
-        final List<SpriteObject> oCombined = new ArrayList<SpriteObject>(64);
-        final List<SpriteObject> oBehind = new ArrayList<SpriteObject>(64);
-        final List<SpriteObject> oFront = new ArrayList<SpriteObject>(4);
-        final List<Entry> entry = new ArrayList<Entry>(4);
-
-        for (int n = 0; n < objects.size(); n++) {
-            try {
-                processNthLvlObject(bgImage, stencil, oCombined, oBehind,
-                        oFront, entry, n);
-            } catch (final ArrayIndexOutOfBoundsException ex) {
-                // System.out.println("Array out of bounds");
-            }
-        }
-
+        final ObjectProcessor objectProcessor = new ObjectProcessor(this);
+        final List<Entry> entry = objectProcessor.processObjects(bgImage,
+                stencil);
         entries = new Entry[entry.size()];
         entries = entry.toArray(entries);
 
@@ -382,15 +366,13 @@ public class Level {
             }
         }
 
-        // flush tiles
-        // if (tiles != null)
-        // for (int i=0; i < tiles.length; i++)
-        // tiles[i].flush();
-
+        final List<SpriteObject> oCombined = objectProcessor.getoCombined();
         sprObjects = new SpriteObject[oCombined.size()];
         sprObjects = oCombined.toArray(sprObjects);
+        final List<SpriteObject> oFront = objectProcessor.getoFront();
         sprObjFront = new SpriteObject[oFront.size()];
         sprObjFront = oFront.toArray(sprObjFront);
+        final List<SpriteObject> oBehind = objectProcessor.getoBehind();
         sprObjBehind = new SpriteObject[oBehind.size()];
         sprObjBehind = oBehind.toArray(sprObjBehind);
         return stencil;
@@ -455,176 +437,6 @@ public class Level {
                     bgImage.setRGB(x + tx, y + ty, col);
                     stencil.set(yLineStencil + tx + x, Stencil.MSK_BRICK);
                 }
-            }
-        }
-    }
-
-    private void processNthLvlObject(final BufferedImage bgImage,
-            final Stencil stencil, final List<SpriteObject> oCombined,
-            final List<SpriteObject> oBehind, final List<SpriteObject> oFront,
-            final List<Entry> entry, final int n) {
-        final int bgWidth = bgImage.getWidth();
-        final int bgHeight = bgImage.getHeight();
-        AffineTransform tx;
-        final LvlObject o = objects.get(n);
-        // if (sprObjAvailable[o.id].animMode != Sprite.ANIM_NONE) {
-        final SpriteObject spr = new SpriteObject(sprObjAvailable[o.getId()]);
-        spr.setX(o.getxPos());
-        spr.setY(o.getyPos());
-        // affine transform for flipping
-        tx = AffineTransform.getScaleInstance(1, -1);
-        tx.translate(0, -spr.getHeight());
-        final AffineTransformOp op = new AffineTransformOp(tx,
-                AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-        BufferedImage imgSpr;
-
-        // check for entries (ignore upside down entries)
-        if (spr.getType() == SpriteObject.Type.ENTRY && !o.isUpsideDown()) {
-            final Entry e = new Entry(o.getxPos() + spr.getWidth() / 2,
-                    o.getyPos());
-            e.setId(oCombined.size());
-            entry.add(e);
-            spr.setAnimMode(Sprite.Animation.NONE);
-        }
-
-        // animated
-        final boolean drawOnVis = o
-                .getPaintMode() == LvlObject.MODE_VIS_ON_TERRAIN;
-        final boolean noOverwrite = o
-                .getPaintMode() == LvlObject.MODE_VIS_ON_TERRAIN;
-        final boolean inFront = (drawOnVis || !noOverwrite);
-
-        if (inFront) {
-            oFront.add(spr);
-        } else {
-            oBehind.add(spr);
-        }
-
-        oCombined.add(spr);
-
-        // draw stencil (only for objects that are not upside down)
-        if (!o.isUpsideDown()) {
-            for (int y = 0; y < spr.getHeight(); y++) {
-                if (y + spr.getY() < 0 || y + spr.getY() >= bgHeight) {
-                    continue;
-                }
-
-                final int yLineStencil = (y + spr.getY()) * bgWidth;
-
-                for (int x = 0; x < spr.getWidth(); x++) {
-                    // boolean pixOverdraw = false;
-                    if (x + spr.getX() < 0 || x + spr.getX() >= bgWidth) {
-                        continue;
-                    }
-
-                    // manage collision mask
-                    // now read stencil
-                    int stencilVal;
-                    stencilVal = stencil.get(yLineStencil + spr.getX() + x);
-
-                    // store object type in mask and idx in higher byte
-                    if (spr.getType() != SpriteObject.Type.ENTRY
-                            && spr.getType() != SpriteObject.Type.PASSIVE) {
-                        if ((spr.getMask(x, y) & Constants.MAX_ALPHA) != 0) {
-                            // not transparent
-                            // avoid two objects on the same stencil
-                            // position
-                            // overlap makes it impossible to delete
-                            // pixels in objects (mask operations)
-                            if (Stencil.getObjectID(stencilVal) == 0) {
-                                stencil.or(yLineStencil + spr.getX() + x,
-                                        spr.getMaskType()
-                                                | Stencil.createObjectID(n));
-                            } // else: overlap - erased later in object
-                              // instance
-                        }
-                    }
-                }
-            }
-        }
-
-        // remove invisible pixels from all object frames that are "in
-        // front"
-        // for upside down objects, just create the upside down copy
-        if (o.isUpsideDown() || inFront) {
-            for (int frame = 0; frame < spr.getNumFrames(); frame++) {
-                imgSpr = ToolBox.createImage(spr.getWidth(), spr.getHeight(),
-                        Transparency.BITMASK);
-
-                // get flipped or normal version
-                if (o.isUpsideDown()) {
-                    // flip the image vertically
-                    imgSpr = op.filter(spr.getImage(frame), imgSpr);
-                } else {
-                    final WritableRaster rImgSpr = imgSpr.getRaster();
-                    rImgSpr.setRect(spr.getImage(frame).getRaster());
-                    // just copy
-                }
-
-                // for "in front" objects the really drawn pixels have
-                // to be determined
-                if (inFront) {
-                    for (int y = 0; y < spr.getHeight(); y++) {
-                        if (y + spr.getY() < 0 || y + spr.getY() >= bgHeight) {
-                            continue;
-                        }
-
-                        processSpriteObjectRow(bgWidth, stencil, n, spr, imgSpr,
-                                o, y);
-                    }
-                }
-                // spr.img[frame].flush(); // will be overwritten ->
-                // flush data
-                spr.setImage(frame, imgSpr);
-            }
-        }
-    }
-
-    private void processSpriteObjectRow(final int bgWidth,
-            final Stencil stencil, final int n, final SpriteObject spr,
-            final BufferedImage imgSpr, final LvlObject o, final int y) {
-        final int yLineStencil = (y + spr.getY()) * bgWidth;
-        final boolean drawOnVis = o
-                .getPaintMode() == LvlObject.MODE_VIS_ON_TERRAIN;
-        final boolean noOverwrite = o
-                .getPaintMode() == LvlObject.MODE_NO_OVERWRITE;
-        final boolean drawFull = o.getPaintMode() == LvlObject.MODE_FULL;
-
-        for (int x = 0; x < spr.getWidth(); x++) {
-            if (x + spr.getX() < 0 || x + spr.getX() >= bgWidth) {
-                continue;
-            }
-
-            // now read stencil
-            final int stencilVal = stencil.get(yLineStencil + spr.getX() + x);
-            final int stencilValMasked = stencilVal & Stencil.MSK_WALK_ON;
-            boolean paint = drawFull || (stencilValMasked != 0 && drawOnVis)
-                    || (stencilValMasked == 0 && noOverwrite);
-            // hack for overlap:
-            final int id = Stencil.getObjectID(stencilVal);
-
-            // check if a different interactive object
-            // was already entered at this pixel
-            // position
-            // however: exits must always be painted
-            // also: passive objects will always be
-            // painted
-            if (spr.getType() != SpriteObject.Type.PASSIVE
-                    && spr.getType() != SpriteObject.Type.EXIT && id != 0
-                    && id != n) {
-                paint = false;
-            }
-
-            // sprite screenBuffer pixel
-            final int imgCol = imgSpr.getRGB(x, y);
-
-            if ((imgCol & Constants.MAX_ALPHA) == 0) {
-                continue;
-            }
-
-            if (!paint) {
-                imgSpr.setRGB(x, y, imgCol & Color.WHITE.getRGB());
-                // set transparent
             }
         }
     }

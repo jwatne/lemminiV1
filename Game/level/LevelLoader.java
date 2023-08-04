@@ -40,6 +40,10 @@ import tools.Props;
  */
 public final class LevelLoader {
     /**
+     * Maximum number of Sprite objects.
+     */
+    public static final int MAX_NUM_SPRITE_OBJECTS = 64;
+    /**
      * Number of int elements in steel_x array.
      */
     private static final int STEEL_X_LENGTH = 4;
@@ -58,10 +62,6 @@ public final class LevelLoader {
      * Entry animation type.
      */
     private static final int ENTRY_ANIMATION = 3;
-    /**
-     * Maximum number of Sprite objects.
-     */
-    private static final int MAX_NUM_SPRITE_OBJECTS = 64;
     /** template color to be replaced with debris color. */
     private static final int TEMPLATE_COLOR = 0xffff00ff;
 

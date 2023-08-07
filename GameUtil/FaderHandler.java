@@ -28,6 +28,7 @@ import game.lemmings.LemmingImageLoader;
 import game.lemmings.SkillHandler;
 import game.level.Level;
 import game.level.LevelLoader;
+import game.level.LevelPainter;
 import game.level.ReleaseRateHandler;
 import game.level.TextScreen;
 import game.replay.ReplayController;
@@ -509,8 +510,9 @@ public final class FaderHandler {
         final BufferedImage bgImage = GameController.getBgImage();
         bgGfx.clearRect(0, 0, bgImage.getWidth(), bgImage.getHeight());
         final Level level = GameController.getLevel();
-        GameController.setStencil(
-                level.paintLevel(bgImage, frame, GameController.getStencil()));
+        final LevelPainter levelPainter = new LevelPainter(level);
+        GameController.setStencil(levelPainter.paintLevel(bgImage, frame,
+                GameController.getStencil()));
         ExplosionHandler.initLevel();
         Icons.reset();
         TrapDoor.reset(level.getEntryNum());

@@ -1,12 +1,10 @@
 package game.level;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Transparency;
 import java.awt.image.BufferedImage;
-import java.awt.image.PixelGrabber;
 import java.util.List;
 
 import game.GameController;
@@ -63,6 +61,7 @@ public class Level {
      * image.
      */
     private SpriteObject[] sprObjBehind;
+
     /**
      * Array of special sprite objects - with transparency, drawn above
      * background image.
@@ -72,6 +71,7 @@ public class Level {
     private SpriteObject[] sprObjects;
     /** array of level entries. */
     private Entry[] entries;
+
     /** release rate : 0 is slowest, 0x0FA (250) is fastest. */
     private int releaseRate;
     /**
@@ -146,6 +146,65 @@ public class Level {
     private String lvlName;
     /** used to read in the configuration file. */
     private Props props;
+
+    /**
+     * Returns array of level entries.
+     *
+     * @return array of level entries.
+     */
+    public Entry[] getEntries() {
+        return entries;
+    }
+
+    /**
+     * Sets array of level entries.
+     *
+     * @param levelEntries array of level entries.
+     */
+    public void setEntries(final Entry[] levelEntries) {
+        this.entries = levelEntries;
+    }
+
+    /**
+     * Returns array of all sprite objects (in front and behind).
+     *
+     * @return array of all sprite objects (in front and behind).
+     */
+    public SpriteObject[] getSprObjects() {
+        return sprObjects;
+    }
+
+    /**
+     * Sets array of all sprite objects (in front and behind).
+     *
+     * @param allSprites array of all sprite objects (in front and behind).
+     */
+    public void setSprObjects(final SpriteObject[] allSprites) {
+        this.sprObjects = allSprites;
+    }
+
+    /**
+     * Returns Array of normal sprite objects - no transparency, drawn behind
+     * background image.
+     *
+     * @return Array of normal sprite objects - no transparency, drawn behind
+     *         background image.
+     */
+    public SpriteObject[] getSprObjBehind() {
+        return sprObjBehind;
+    }
+
+    /**
+     * Sets Array of normal sprite objects - no transparency, drawn behind
+     * background image.
+     *
+     * @param spritesBehindBackground Array of normal sprite objects - no
+     *                                transparency, drawn behind background
+     *                                image.
+     */
+    public void setSprObjBehind(final SpriteObject[] spritesBehindBackground) {
+        this.sprObjBehind = spritesBehindBackground;
+    }
 
     /**
      * Returns background color as ARGB.
@@ -276,169 +335,6 @@ public class Level {
      */
     public void setTerrain(final List<Terrain> terrainList) {
         this.terrain = terrainList;
-    }
-
-    /**
-     * Paint a level.
-     *
-     * @param bgImage background image to draw into
-     * @param cmp     parent component
-     * @param s       stencil to reuse
-     * @return stencil of this level
-     */
-    public Stencil paintLevel(final BufferedImage bgImage, final Component cmp,
-            final Stencil s) {
-        // flush all resources
-        sprObjFront = null;
-        sprObjBehind = null;
-        sprObjects = null;
-        entries = null;
-        // the screenBuffer should be big enough to hold the level
-        // returns stencil buffer;
-        final int bgWidth = bgImage.getWidth();
-        final int bgHeight = bgImage.getHeight();
-        // try to reuse old stencil
-        Stencil stencil;
-
-        if (s != null && s.getWidth() == bgWidth
-                && s.getHeight() == bgImage.getHeight()) {
-            s.clear();
-            stencil = s;
-        } else {
-            stencil = new Stencil(bgWidth, bgImage.getHeight());
-        }
-
-        // paint terrain
-        for (int n = 0; n < terrain.size(); n++) {
-            final Terrain t = terrain.get(n);
-            final Image i = tiles[t.getId()];
-            final int width = i.getWidth(null);
-            final int height = i.getHeight(null);
-
-            final int[] source = new int[width * height];
-            final PixelGrabber pixelgrabber = new PixelGrabber(i, 0, 0, width,
-                    height, source, 0, width);
-
-            try {
-                pixelgrabber.grabPixels();
-            } catch (final InterruptedException interruptedexception) {
-            }
-
-            try {
-                paintTerrain(bgImage, stencil, width, height, source, t);
-            } catch (final ArrayIndexOutOfBoundsException ex) {
-            }
-        }
-
-        // now for the animated objects
-        final ObjectProcessor objectProcessor = new ObjectProcessor(this);
-        final List<Entry> entry = objectProcessor.processObjects(bgImage,
-                stencil);
-        entries = new Entry[entry.size()];
-        entries = entry.toArray(entries);
-
-        // paint steel tiles into stencil
-        for (int n = 0; n < steel.size(); n++) {
-            final Steel stl = steel.get(n);
-            final int sx = stl.getxPos();
-            final int sy = stl.getyPos();
-
-            for (int y = 0; y < stl.getHeight(); y++) {
-                if (y + sy < 0 || y + sy >= bgHeight) {
-                    continue;
-                }
-
-                final int yLineStencil = (y + sy) * bgWidth;
-
-                for (int x = 0; x < stl.getWidth(); x++) {
-                    if (x + sx < 0 || x + sx >= bgWidth) {
-                        continue;
-                    }
-
-                    int stencilVal = stencil.get(yLineStencil + x + sx);
-                    // only allow steel on brick
-                    if ((stencilVal & Stencil.MSK_BRICK) != 0) {
-                        stencilVal &= ~Stencil.MSK_BRICK;
-                        stencilVal |= Stencil.MSK_STEEL;
-                        stencil.set(yLineStencil + x + sx, stencilVal);
-                    }
-                }
-            }
-        }
-
-        final List<SpriteObject> oCombined = objectProcessor.getoCombined();
-        sprObjects = new SpriteObject[oCombined.size()];
-        sprObjects = oCombined.toArray(sprObjects);
-        final List<SpriteObject> oFront = objectProcessor.getoFront();
-        sprObjFront = new SpriteObject[oFront.size()];
-        sprObjFront = oFront.toArray(sprObjFront);
-        final List<SpriteObject> oBehind = objectProcessor.getoBehind();
-        sprObjBehind = new SpriteObject[oBehind.size()];
-        sprObjBehind = oBehind.toArray(sprObjBehind);
-        return stencil;
-    }
-
-    private void paintTerrain(final BufferedImage bgImage,
-            final Stencil stencil, final int width, final int height,
-            final int[] source, final Terrain t) {
-        final int bgWidth = bgImage.getWidth();
-        final int bgHeight = bgImage.getHeight();
-        final int tx = t.getxPos();
-        final int ty = t.getyPos();
-        final boolean upsideDown = (t.getModifier()
-                & Terrain.MODE_UPSIDE_DOWN) != 0;
-        final boolean overwrite = (t.getModifier()
-                & Terrain.MODE_NO_OVERWRITE) == 0;
-        final boolean remove = (t.getModifier() & Terrain.MODE_REMOVE) != 0;
-
-        for (int y = 0; y < height; y++) {
-            if (y + ty < 0 || y + ty >= bgHeight) {
-                continue;
-            }
-
-            final int yLineStencil = (y + ty) * bgWidth;
-            int yLine;
-
-            if (upsideDown) {
-                yLine = (height - y - 1) * width;
-            } else {
-                yLine = y * width;
-            }
-
-            for (int x = 0; x < width; x++) {
-                if (x + tx < 0 || x + tx >= bgWidth) {
-                    continue;
-                }
-
-                final int col = source[yLine + x];
-
-                // ignore transparent pixels
-                if ((col & Constants.MAX_ALPHA) == 0) {
-                    continue;
-                }
-
-                boolean paint = false;
-
-                if (!overwrite) {
-                    // don't overwrite -> only paint if background is
-                    // transparent
-                    if (stencil
-                            .get(yLineStencil + tx + x) == Stencil.MSK_EMPTY) {
-                        paint = true;
-                    }
-                } else if (remove) {
-                    bgImage.setRGB(x + tx, y + ty, 0 /* bgCol */);
-                    stencil.set(yLineStencil + tx + x, Stencil.MSK_EMPTY);
-                } else {
-                    paint = true;
-                }
-
-                if (paint) {
-                    bgImage.setRGB(x + tx, y + ty, col);
-                    stencil.set(yLineStencil + tx + x, Stencil.MSK_BRICK);
-                }
-            }
-        }
     }
 
     /**
@@ -1015,5 +911,27 @@ public class Level {
      */
     public void setLevelName(final String name) {
         lvlName = name;
+    }
+
+    /**
+     * Returns Array of special sprite objects - with transparency, drawn above
+     * background image.
+     *
+     * @return Array of special sprite objects - with transparency, drawn above
+     *         background image.
+     */
+    public SpriteObject[] getSprObjFront() {
+        return sprObjFront;
+    }
+
+    /**
+     * Sets Array of special sprite objects - with transparency, drawn above
+     * background image.
+     *
+     * @param spriteObjects Array of special sprite objects - with transparency,
+     *                      drawn above background image.
+     */
+    public void setSprObjFront(final SpriteObject[] spriteObjects) {
+        this.sprObjFront = spriteObjects;
     }
 }

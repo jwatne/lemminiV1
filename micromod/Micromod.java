@@ -66,10 +66,6 @@ public class Micromod {
      */
     private static final int NUM_ROWS = 64;
     /**
-     * Number fcount values - used for mod calc.
-     */
-    private static final int NUM_FCOUNT_VALUES = 3;
-    /**
      * Max 2 bit value = 3 (base 10).
      */
     private static final int MAX_2_BIT_VALUE = 3;
@@ -112,7 +108,7 @@ public class Micromod {
     /**
      * Maximum volume value.
      */
-    private static final int MAX_VOLUME = 64;
+    public static final int MAX_VOLUME = 64;
     /**
      * Amount to add to index to get vol value in buffer.
      */
@@ -238,9 +234,9 @@ public class Micromod {
     /** In finetune. */
     private static final int IN_FINETUNE = 0x04;
     /** Ch struct len. */
-    private static final int CH_STRUCT_LEN = 0x16;
+    public static final int CH_STRUCT_LEN = 0x16;
     /** Ch spos. */
-    private static final int CH_SPOS = 0x00;
+    public static final int CH_SPOS = 0x00;
     /** Ch step. */
     private static final int CH_STEP = 0x01;
     /** Ch ampl. */
@@ -250,25 +246,25 @@ public class Micromod {
     /** Ch assigned. */
     private static final int CH_ASSIGNED = 0x04;
     /** Ch volume. */
-    private static final int CH_VOLUME = 0x05;
+    public static final int CH_VOLUME = 0x05;
     /** Ch finetune. */
     private static final int CH_FINETUNE = 0x06;
     /** Ch period. */
-    private static final int CH_PERIOD = 0x07;
+    public static final int CH_PERIOD = 0x07;
     /** Ch porta period. */
-    private static final int CH_PORTA_PERIOD = 0x08;
+    public static final int CH_PORTA_PERIOD = 0x08;
     /** Ch porta param. */
-    private static final int CH_PORTA_PARAM = 0x09;
+    public static final int CH_PORTA_PARAM = 0x09;
     /** Ch panning. */
     private static final int CH_PANNING = 0x0A;
     /** Ch arpeggio. */
-    private static final int CH_ARPEGGIO = 0x0B;
+    public static final int CH_ARPEGGIO = 0x0B;
     /** Ch vibr period. */
     private static final int CH_VIBR_PERIOD = 0x0C;
     /** Ch vibr param. */
     private static final int CH_VIBR_PARAM = 0x0D;
     /** Ch vibr count. */
-    private static final int CH_VIBR_COUNT = 0x0E;
+    public static final int CH_VIBR_COUNT = 0x0E;
     /** Ch trem volume. */
     private static final int CH_TREM_VOLUME = 0x0F;
     /** Ch trem param. */
@@ -280,31 +276,23 @@ public class Micromod {
     /** Ch note instru. */
     private static final int CH_NOTE_INSTRU = 0x13;
     /** Ch note effect. */
-    private static final int CH_NOTE_EFFECT = 0x14;
+    public static final int CH_NOTE_EFFECT = 0x14;
     /** Ch note eparam. */
-    private static final int CH_NOTE_EPARAM = 0x15;
-    /** Fx arpeggio. */
-    private static final int FX_ARPEGGIO = 0x00;
-    /** Fx porta up. */
-    private static final int FX_PORTA_UP = 0x01;
-    /** Fx porta down. */
-    private static final int FX_PORTA_DOWN = 0x02;
+    public static final int CH_NOTE_EPARAM = 0x15;
     /** Fx tone porta. */
-    private static final int FX_TONE_PORTA = 0x03;
+    public static final int FX_TONE_PORTA = 0x03;
     /** Fx vibrato. */
-    private static final int FX_VIBRATO = 0x04;
+    public static final int FX_VIBRATO = 0x04;
     /** Fx tporta vol. */
-    private static final int FX_TPORTA_VOL = 0x05;
+    public static final int FX_TPORTA_VOL = 0x05;
     /** Fx vibrato vol. */
-    private static final int FX_VIBRATO_VOL = 0x06;
+    public static final int FX_VIBRATO_VOL = 0x06;
     /** Fx tremolo. */
-    private static final int FX_TREMOLO = 0x07;
+    public static final int FX_TREMOLO = 0x07;
     /** Fx set panning. */
     private static final int FX_SET_PANNING = 0x08;
     /** Fx set spos. */
     private static final int FX_SET_SPOS = 0x09;
-    /** FX volume slide. */
-    private static final int FX_VOLUME_SLIDE = 0x0A;
     /** FX pat jump. */
     private static final int FX_PAT_JUMP = 0x0B;
     /** FX set volume. */
@@ -312,7 +300,7 @@ public class Micromod {
     /** FX pat break. */
     private static final int FX_PAT_BREAK = 0x0D;
     /** FX extended. */
-    private static final int FX_EXTENDED = 0x0E;
+    public static final int FX_EXTENDED = 0x0E;
     /** FX set speed. */
     private static final int FX_SET_SPEED = 0x0F;
     /** EX fine port up. */
@@ -335,16 +323,14 @@ public class Micromod {
     /** EX set panning. */
     @SuppressWarnings("unused")
     private static final int EX_SET_PANNING = 0x80;
-    /** EX retrig. */
-    private static final int EX_RETRIG = 0x90;
     /** EX fine vol up. */
     private static final int EX_FINE_VOL_UP = 0xA0;
     /** EX fine vol dn. */
     private static final int EX_FINE_VOL_DN = 0xB0;
     /** EX note cut. */
-    private static final int EX_NOTE_CUT = 0xC0;
+    public static final int EX_NOTE_CUT = 0xC0;
     /** EX note delay. */
-    private static final int EX_NOTE_DELAY = 0xD0;
+    public static final int EX_NOTE_DELAY = 0xD0;
     /** EX pat delay. */
     private static final int EX_PAT_DELAY = 0xE0;
     /** EX invert loop. */
@@ -384,10 +370,9 @@ public class Micromod {
     private int row;
     /** N row. */
     private int nrow;
-    /** Tick. */
-    private int tick;
     /** Temp. */
     private int tempo;
+
     /** Beats per minute. */
     private int bpm;
     /** F count. */
@@ -404,6 +389,10 @@ public class Micromod {
     private final int samplerate;
     /** Ticks remaining. */
     private int tickremain;
+    /**
+     * Handles ticks for the Micromod instance.
+     */
+    private TickHandler tickHandler;
 
     /**
      * Constructor ( mod - module data ).
@@ -412,6 +401,7 @@ public class Micromod {
      * @param sampleRateHz  sample rate in Hertz
      */
     public Micromod(final byte[] modDataBuffer, final int sampleRateHz) {
+        this.tickHandler = new TickHandler(this);
         this.mod = modDataBuffer;
         this.samplerate = sampleRateHz;
         // System.out.println( "micromod/e (c)2005 mumart@gmail.com" );
@@ -516,6 +506,69 @@ public class Micromod {
     }
 
     /**
+     * Returns F count.
+     *
+     * @return F count.
+     */
+    public int getFcount() {
+        return fcount;
+    }
+
+    /**
+     * Sets F count.
+     *
+     * @param fs F count.
+     */
+    public void setFcount(final int fs) {
+        this.fcount = fs;
+    }
+
+    /**
+     * Returns channels.
+     *
+     * @return channels.
+     */
+    public int[] getChannels() {
+        return channels;
+    }
+
+    /**
+     * Returns number of channels.
+     *
+     * @return number of channels.
+     */
+    public int getNumchan() {
+        return numchan;
+    }
+
+    /**
+     * Sets number of channels.
+     *
+     * @param numberOfChannels number of channels.
+     */
+    public void setNumchan(final int numberOfChannels) {
+        this.numchan = numberOfChannels;
+    }
+
+    /**
+     * Returns tempo value.
+     *
+     * @return tempo value.
+     */
+    public int getTempo() {
+        return tempo;
+    }
+
+    /**
+     * Sets tempo value.
+     *
+     * @param tempoValue tempo value.
+     */
+    public void setTempo(final int tempoValue) {
+        this.tempo = tempoValue;
+    }
+
+    /**
      * Return the song length in samples.
      *
      * @return song length in samples
@@ -523,9 +576,11 @@ public class Micromod {
     public int getlen() {
         reset();
         int len = getticklen();
-        while (!tick()) {
+
+        while (!tickHandler.tick()) {
             len += getticklen();
         }
+
         reset();
         return len;
     }
@@ -542,11 +597,14 @@ public class Micromod {
             final int length) {
         int len = length;
         int offset = ofs;
+
         while (len > 0) {
             int count = tickremain;
+
             if (count > len) {
                 count = len;
             }
+
             for (int chan = 0; chan < numchan; chan++) {
                 final int coffset = chan * CH_STRUCT_LEN;
                 final int ampl = channels[coffset + CH_AMPL];
@@ -565,11 +623,13 @@ public class Micromod {
                 final int step = channels[coffset + CH_STEP];
                 final int llen = lep1 - lsta;
                 final boolean dontmix = llen <= FP_ONE && spos >= lsta;
+
                 if (!dontmix) {
                     for (int x = 0; x < count; x++) {
                         while (spos >= lep1) {
                             spos -= llen;
                         }
+
                         final int sample = mod[sidx
                                 + (spos >> FP_SHIFT)] << Constants.SHIFT_8;
                         l[offset + x] += sample * lamp >> FP_SHIFT;
@@ -577,13 +637,17 @@ public class Micromod {
                         spos += step;
                     }
                 }
+
                 channels[coffset + CH_SPOS] = spos;
             }
+
             tickremain -= count;
+
             if (tickremain == 0) {
-                tick();
+                tickHandler.tick();
                 tickremain = getticklen();
             }
+
             offset += count;
             len -= count;
         }
@@ -595,7 +659,7 @@ public class Micromod {
         nrow = 0;
         row = 0;
         tempo = DEFAULT_TEMPO;
-        tick = DEFAULT_TICK;
+        tickHandler.setTick(DEFAULT_TICK);
         bpm = DEFAULT_BPM;
         loopchan = 0;
         loopcount = 0;
@@ -631,101 +695,12 @@ public class Micromod {
         tickremain = getticklen();
     }
 
-    private boolean tick() {
-        tick--;
-
-        if (tick <= 0) {
-            tick = tempo;
-            return row();
-        }
-
-        // Update channel fx
-        for (int chan = 0; chan < numchan; chan++) {
-            final int coffset = chan * CH_STRUCT_LEN;
-            final int effect = channels[coffset + CH_NOTE_EFFECT];
-            final int eparam = channels[coffset + CH_NOTE_EPARAM];
-
-            switch (effect) {
-            case FX_ARPEGGIO:
-                switch (fcount % NUM_FCOUNT_VALUES) {
-                case 0:
-                    channels[coffset + CH_ARPEGGIO] = 0;
-                    break;
-                case 1:
-                    channels[coffset + CH_ARPEGGIO] = (eparam
-                            & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4;
-                    break;
-                case 2:
-                    channels[coffset + CH_ARPEGGIO] = eparam
-                            & Constants.FOUR_BIT_MASK;
-                    break;
-                default:
-                    break;
-                }
-
-                break;
-            case FX_PORTA_UP:
-                channels[coffset + CH_PERIOD] -= eparam;
-                break;
-            case FX_PORTA_DOWN:
-                channels[coffset + CH_PERIOD] += eparam;
-                break;
-            case FX_TONE_PORTA:
-                toneporta(coffset);
-                break;
-            case FX_VIBRATO:
-                vibrato(coffset);
-                break;
-            case FX_TPORTA_VOL:
-                volslide(coffset, eparam);
-                toneporta(coffset);
-                break;
-            case FX_VIBRATO_VOL:
-                volslide(coffset, eparam);
-                vibrato(coffset);
-                break;
-            case FX_TREMOLO:
-                tremolo(coffset);
-                break;
-            case FX_VOLUME_SLIDE:
-                volslide(coffset, eparam);
-                break;
-            case FX_EXTENDED:
-                switch (eparam & Constants.BITS_5_TO_8_MASK) {
-                case EX_RETRIG:
-                    int rtparam = eparam & Constants.FOUR_BIT_MASK;
-                    if (rtparam == 0) {
-                        rtparam = 1;
-                    }
-                    if (fcount % rtparam == 0) {
-                        channels[coffset + CH_SPOS] = 0;
-                    }
-                    break;
-                case EX_NOTE_CUT:
-                    if ((eparam & Constants.FOUR_BIT_MASK) == fcount) {
-                        channels[coffset + CH_VOLUME] = 0;
-                    }
-                    break;
-                case EX_NOTE_DELAY:
-                    if ((eparam & Constants.FOUR_BIT_MASK) == fcount) {
-                        trigger(coffset);
-                    }
-                    break;
-                default:
-                    break;
-                }
-                break;
-            default:
-                break;
-            }
-            channels[coffset + CH_VIBR_COUNT]++;
-        }
-        mixupdate();
-        fcount++;
-        return false;
-    }
-
-    private boolean row() {
+    /**
+     * Process row.
+     *
+     * @return <code>true</code> if song is ended.
+     */
+    public boolean row() {
         // Decide whether to restart.
         boolean songend = isSongEnd();
 
@@ -828,7 +803,7 @@ public class Micromod {
     private void handleFXSetSpeed(final int eparam) {
         if (eparam < INT_BITS) {
             tempo = eparam;
-            tick = eparam;
+            tickHandler.setTick(eparam);
         } else {
             bpm = eparam;
         }
@@ -911,7 +886,8 @@ public class Micromod {
 
             break;
         case EX_PAT_DELAY:
-            tick = tempo + tempo * (eparam & Constants.FOUR_BIT_MASK);
+            tickHandler.setTick(
+                    tempo + tempo * (eparam & Constants.FOUR_BIT_MASK));
             break;
         default:
             break;
@@ -983,7 +959,12 @@ public class Micromod {
         return songend;
     }
 
-    private void trigger(final int coffset) {
+    /**
+     * Process a trigger for the given column offset value.
+     *
+     * @param coffset the column offset.
+     */
+    public void trigger(final int coffset) {
         final int period = channels[coffset + CH_NOTE_PERIOD];
         final int instru = channels[coffset + CH_NOTE_INSTRU];
         final int effect = channels[coffset + CH_NOTE_EFFECT];
@@ -1008,46 +989,22 @@ public class Micromod {
         if (period != 0) {
             channels[coffset + CH_INSTRUMENT] = channels[coffset + CH_ASSIGNED];
             channels[coffset + CH_PORTA_PERIOD] = period;
+
             if (effect != FX_TONE_PORTA && effect != FX_TPORTA_VOL) {
                 channels[coffset + CH_PERIOD] = period;
                 channels[coffset + CH_SPOS] = 0;
             }
+
             channels[coffset + CH_VIBR_COUNT] = 0;
         }
     }
 
-    private void volslide(final int coffset, final int eparam) {
-        int vol = channels[coffset + CH_VOLUME];
-        vol += (eparam & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4;
-        vol -= eparam & Constants.FOUR_BIT_MASK;
-        if (vol > MAX_VOLUME) {
-            vol = MAX_VOLUME;
-        }
-        if (vol < 0) {
-            vol = 0;
-        }
-        channels[coffset + CH_VOLUME] = vol;
-    }
-
-    private void toneporta(final int coffset) {
-        int sp = channels[coffset + CH_PERIOD];
-        final int dp = channels[coffset + CH_PORTA_PERIOD];
-        if (sp < dp) {
-            sp += channels[coffset + CH_PORTA_PARAM];
-            if (sp > dp) {
-                sp = dp;
-            }
-        }
-        if (sp > dp) {
-            sp -= channels[coffset + CH_PORTA_PARAM];
-            if (sp < dp) {
-                sp = dp;
-            }
-        }
-        channels[coffset + CH_PERIOD] = sp;
-    }
-
-    private void vibrato(final int coffset) {
+    /**
+     * Processes vibrato for the given channel offset value.
+     *
+     * @param coffset the channel offset.
+     */
+    public void vibrato(final int coffset) {
         final int vparam = channels[coffset + CH_VIBR_PARAM];
         final int vspeed = (vparam
                 & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4;
@@ -1062,7 +1019,12 @@ public class Micromod {
         channels[coffset + CH_VIBR_PERIOD] = tval * vdepth >> Constants.SHIFT_7;
     }
 
-    private void tremolo(final int coffset) {
+    /**
+     * Processes tremolo for the given channel offset value.
+     *
+     * @param coffset the channel offset.
+     */
+    public void tremolo(final int coffset) {
         final int tparam = channels[coffset + CH_TREM_PARAM];
         final int tspeed = (tparam
                 & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4;
@@ -1077,7 +1039,10 @@ public class Micromod {
         channels[coffset + CH_TREM_VOLUME] = tval * tdepth >> Constants.SHIFT_7;
     }
 
-    private void mixupdate() {
+    /**
+     * Updates the mix.
+     */
+    public void mixupdate() {
         for (int chan = 0; chan < numchan; chan++) {
             final int coffset = chan * CH_STRUCT_LEN;
             int a = channels[coffset + CH_VOLUME]

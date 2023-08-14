@@ -81,7 +81,7 @@ public class TickHandler {
 
         if (tick <= 0) {
             tick = micromod.getTempo();
-            return micromod.row();
+            return micromod.getRowHandler().row();
         }
 
         final int[] channels = micromod.getChannels();

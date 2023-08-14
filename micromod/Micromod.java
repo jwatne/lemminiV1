@@ -54,18 +54,6 @@ public class Micromod {
      */
     private static final int FIVE_BIT_MASK = 0x1F;
     /**
-     * Offset for eparam component in buffer.
-     */
-    private static final int EPARAM_OFFSET = 3;
-    /**
-     * Mask for 5th bit = 0x10.
-     */
-    private static final int BIT_5_MASK = 0x10;
-    /**
-     * Maximum number of rows.
-     */
-    private static final int NUM_ROWS = 64;
-    /**
      * Max 2 bit value = 3 (base 10).
      */
     private static final int MAX_2_BIT_VALUE = 3;
@@ -116,11 +104,11 @@ public class Micromod {
     /**
      * Amount deducted for values > {@link #MAX7}.
      */
-    private static final int REDUCTION16 = 16;
+    public static final int REDUCTION16 = 16;
     /**
      * Max value = 7.
      */
-    private static final int MAX7 = 7;
+    public static final int MAX7 = 7;
     /**
      * Amount to add for fine value.
      */
@@ -144,7 +132,7 @@ public class Micromod {
     /**
      * Minimum value for sample index in buffer.
      */
-    private static final int MIN_SAMPLE_INDEX = 1084;
+    public static final int MIN_SAMPLE_INDEX = 1084;
     /**
      * Second index of number of channels in buffer.
      */
@@ -152,7 +140,7 @@ public class Micromod {
     /**
      * Multiplier of values to be in tens place.
      */
-    private static final int TEN = 10;
+    public static final int TEN = 10;
     /**
      * xxCH.
      */
@@ -172,7 +160,7 @@ public class Micromod {
     /**
      * Number of channels = 4.
      */
-    private static final int FOUR_CHANNELS = 4;
+    public static final int FOUR_CHANNELS = 4;
     /**
      * FLT4.
      */
@@ -196,7 +184,7 @@ public class Micromod {
     /**
      * Lowest index of patterns in buffer.
      */
-    private static final int FIRST_PATTERN_INDEX = 952;
+    public static final int FIRST_PATTERN_INDEX = 952;
     /**
      * Maximum number of patterns.
      */
@@ -208,7 +196,7 @@ public class Micromod {
     /**
      * Bit mask for value 127 = 0x7f.
      */
-    private static final int ONE_HUNDRED_TWENTY_SEVEN_MASK = 0x7F;
+    public static final int ONE_HUNDRED_TWENTY_SEVEN_MASK = 0x7F;
     /**
      * Index of songlen in buffer.
      */
@@ -216,9 +204,9 @@ public class Micromod {
     /**
      * Java 32 bits per int.
      */
-    private static final int INT_BITS = 32;
+    public static final int INT_BITS = 32;
     /** FP shift. */
-    private static final int FP_SHIFT = 13;
+    public static final int FP_SHIFT = 13;
     /** FP one. */
     private static final int FP_ONE = 1 << FP_SHIFT;
     /** In struct len. */
@@ -248,7 +236,7 @@ public class Micromod {
     /** Ch volume. */
     public static final int CH_VOLUME = 0x05;
     /** Ch finetune. */
-    private static final int CH_FINETUNE = 0x06;
+    public static final int CH_FINETUNE = 0x06;
     /** Ch period. */
     public static final int CH_PERIOD = 0x07;
     /** Ch porta period. */
@@ -256,25 +244,23 @@ public class Micromod {
     /** Ch porta param. */
     public static final int CH_PORTA_PARAM = 0x09;
     /** Ch panning. */
-    private static final int CH_PANNING = 0x0A;
+    public static final int CH_PANNING = 0x0A;
     /** Ch arpeggio. */
     public static final int CH_ARPEGGIO = 0x0B;
     /** Ch vibr period. */
-    private static final int CH_VIBR_PERIOD = 0x0C;
+    public static final int CH_VIBR_PERIOD = 0x0C;
     /** Ch vibr param. */
-    private static final int CH_VIBR_PARAM = 0x0D;
+    public static final int CH_VIBR_PARAM = 0x0D;
     /** Ch vibr count. */
     public static final int CH_VIBR_COUNT = 0x0E;
     /** Ch trem volume. */
-    private static final int CH_TREM_VOLUME = 0x0F;
+    public static final int CH_TREM_VOLUME = 0x0F;
     /** Ch trem param. */
-    private static final int CH_TREM_PARAM = 0x10;
-    /** Ch pat loop row. */
-    private static final int CH_PAT_LOOP_ROW = 0x11;
+    public static final int CH_TREM_PARAM = 0x10;
     /** Ch note period. */
-    private static final int CH_NOTE_PERIOD = 0x12;
+    public static final int CH_NOTE_PERIOD = 0x12;
     /** Ch note instru. */
-    private static final int CH_NOTE_INSTRU = 0x13;
+    public static final int CH_NOTE_INSTRU = 0x13;
     /** Ch note effect. */
     public static final int CH_NOTE_EFFECT = 0x14;
     /** Ch note eparam. */
@@ -289,50 +275,13 @@ public class Micromod {
     public static final int FX_VIBRATO_VOL = 0x06;
     /** Fx tremolo. */
     public static final int FX_TREMOLO = 0x07;
-    /** Fx set panning. */
-    private static final int FX_SET_PANNING = 0x08;
-    /** Fx set spos. */
-    private static final int FX_SET_SPOS = 0x09;
-    /** FX pat jump. */
-    private static final int FX_PAT_JUMP = 0x0B;
-    /** FX set volume. */
-    private static final int FX_SET_VOLUME = 0x0C;
-    /** FX pat break. */
-    private static final int FX_PAT_BREAK = 0x0D;
     /** FX extended. */
     public static final int FX_EXTENDED = 0x0E;
-    /** FX set speed. */
-    private static final int FX_SET_SPEED = 0x0F;
-    /** EX fine port up. */
-    private static final int EX_FINE_PORT_UP = 0x10;
-    /** EX fine port dn. */
-    private static final int EX_FINE_PORT_DN = 0x20;
-    /** EX set gliss. */
-    @SuppressWarnings("unused")
-    private static final int EX_SET_GLISS = 0x30;
-    /** EX set vibr wav. */
-    @SuppressWarnings("unused")
-    private static final int EX_SET_VIBR_WAV = 0x40;
-    /** EX set finetune. */
-    private static final int EX_SET_FINETUNE = 0x50;
-    /** EX pat loop. */
-    private static final int EX_PAT_LOOP = 0x60;
-    /** EX set trem wav. */
-    @SuppressWarnings("unused")
-    private static final int EX_SET_TREM_WAV = 0x70;
-    /** EX set panning. */
-    @SuppressWarnings("unused")
-    private static final int EX_SET_PANNING = 0x80;
-    /** EX fine vol up. */
-    private static final int EX_FINE_VOL_UP = 0xA0;
-    /** EX fine vol dn. */
-    private static final int EX_FINE_VOL_DN = 0xB0;
+
     /** EX note cut. */
     public static final int EX_NOTE_CUT = 0xC0;
     /** EX note delay. */
     public static final int EX_NOTE_DELAY = 0xD0;
-    /** EX pat delay. */
-    private static final int EX_PAT_DELAY = 0xE0;
     /** EX invert loop. */
     @SuppressWarnings("unused")
     private static final int EX_INVERT_LOOP = 0xF0;
@@ -356,31 +305,22 @@ public class Micromod {
     private final byte[] mod;
     /** Amiga? */
     private boolean amiga;
+
     /** Number of channels. */
     private int numchan;
     /** Song length. */
     private final int songlen;
+
     /** Restart. */
     private int restart;
-    /** Pattern. */
-    private int pat;
-    /** N pattern. */
-    private int npat;
-    /** Row. */
-    private int row;
-    /** N row. */
-    private int nrow;
     /** Temp. */
     private int tempo;
 
     /** Beats per minute. */
     private int bpm;
+
     /** F count. */
     private int fcount;
-    /** Loop count. */
-    private int loopcount;
-    /** Loop channel. */
-    private int loopchan;
     /** Instruments. */
     private final int[] instruments = new int[IN_STRUCT_LEN * INT_BITS];
     /** Channels. */
@@ -395,6 +335,11 @@ public class Micromod {
     private TickHandler tickHandler;
 
     /**
+     * Processes rows for the Micromod instance.
+     */
+    private RowHandler rowHandler;
+
+    /**
      * Constructor ( mod - module data ).
      *
      * @param modDataBuffer byte buffer containing MOD data
@@ -402,6 +347,7 @@ public class Micromod {
      */
     public Micromod(final byte[] modDataBuffer, final int sampleRateHz) {
         this.tickHandler = new TickHandler(this);
+        this.rowHandler = new RowHandler(this);
         this.mod = modDataBuffer;
         this.samplerate = sampleRateHz;
         // System.out.println( "micromod/e (c)2005 mumart@gmail.com" );
@@ -503,6 +449,98 @@ public class Micromod {
         }
 
         reset();
+    }
+
+    /**
+     * Returns the row handler for the Micromod instance.
+     *
+     * @return the row handler for the Micromod instance.
+     */
+    public RowHandler getRowHandler() {
+        return rowHandler;
+    }
+
+    /**
+     * Indicates whether the computer running the program is an Amiga.
+     *
+     * @return <code>true</code> if the computer running the program is an
+     *         Amiga.
+     */
+    public boolean isAmiga() {
+        return amiga;
+    }
+
+    /**
+     * Sets whether the computer running the program is an Amiga.
+     *
+     * @param isAmiga <code>true</code> if the computer running the program is
+     *                an Amiga.
+     */
+    public void setAmiga(final boolean isAmiga) {
+        this.amiga = isAmiga;
+    }
+
+    /**
+     * Returns beats per minute.
+     *
+     * @return beats per minute.
+     */
+    public int getBpm() {
+        return bpm;
+    }
+
+    /**
+     * Sets beats per minute.
+     *
+     * @param beatsPerMinute beats per minute.
+     */
+    public void setBpm(final int beatsPerMinute) {
+        this.bpm = beatsPerMinute;
+    }
+
+    /**
+     * Sets tick handler for Micromod instance.
+     *
+     * @return tick handler for Micromod instance.
+     */
+    public TickHandler getTickHandler() {
+        return tickHandler;
+    }
+
+    /**
+     * Returns restart.
+     *
+     * @return restart.
+     */
+    public int getRestart() {
+        return restart;
+    }
+
+    /**
+     * Sets restart.
+     *
+     * @param restartValue restart.
+     */
+    public void setRestart(final int restartValue) {
+        this.restart = restartValue;
+    }
+
+    /**
+     * Returns song length.
+     *
+     * @return song length.
+     */
+    public int getSonglen() {
+        return songlen;
+    }
+
+    /**
+     * Returns mod.
+     *
+     * @return mod.
+     */
+    public byte[] getMod() {
+        return mod;
     }
 
     /**
@@ -654,15 +692,10 @@ public class Micromod {
     }
 
     private void reset() {
-        npat = 0;
-        pat = 0;
-        nrow = 0;
-        row = 0;
+        rowHandler.reset();
         tempo = DEFAULT_TEMPO;
         tickHandler.setTick(DEFAULT_TICK);
         bpm = DEFAULT_BPM;
-        loopchan = 0;
-        loopcount = 0;
 
         for (int n = 0; n < channels.length; n++) {
             channels[n] = 0;
@@ -691,272 +724,8 @@ public class Micromod {
             channels[chan * CH_STRUCT_LEN + CH_PANNING] = p;
         }
 
-        row();
+        rowHandler.row();
         tickremain = getticklen();
-    }
-
-    /**
-     * Process row.
-     *
-     * @return <code>true</code> if song is ended.
-     */
-    public boolean row() {
-        // Decide whether to restart.
-        boolean songend = isSongEnd();
-
-        // Jump to next row
-        pat = npat;
-        row = nrow;
-        // Decide next row.
-        getNextRow();
-
-        // Load channels and process fx
-        fcount = 0;
-        final int poffset = mod[FIRST_PATTERN_INDEX + pat]
-                & ONE_HUNDRED_TWENTY_SEVEN_MASK;
-        final int roffset = MIN_SAMPLE_INDEX
-                + (poffset * 64 * numchan * FOUR_CHANNELS)
-                + (row * numchan * 4);
-
-        for (int chan = 0; chan < numchan; chan++) {
-            final int coffset = chan * CH_STRUCT_LEN;
-            final int noffset = roffset + (chan * FOUR_CHANNELS);
-            channels[coffset + CH_NOTE_PERIOD] = (mod[noffset + 1]
-                    & Constants.EIGHT_BIT_MASK)
-                    | ((mod[noffset]
-                            & Constants.FOUR_BIT_MASK) << Constants.SHIFT_8);
-            channels[coffset + CH_NOTE_INSTRU] = ((mod[noffset + 2]
-                    & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4)
-                    | (mod[noffset] & BIT_5_MASK);
-            channels[coffset + CH_NOTE_EFFECT] = mod[noffset + 2]
-                    & Constants.FOUR_BIT_MASK;
-            channels[coffset + CH_NOTE_EPARAM] = mod[noffset + EPARAM_OFFSET]
-                    & Constants.EIGHT_BIT_MASK;
-            final int effect = channels[coffset + CH_NOTE_EFFECT];
-            final int eparam = channels[coffset + CH_NOTE_EPARAM];
-
-            if (!(effect == FX_EXTENDED && ((eparam
-                    & Constants.BITS_5_TO_8_MASK) == EX_NOTE_DELAY))) {
-                trigger(coffset);
-            }
-
-            channels[coffset + CH_ARPEGGIO] = 0;
-            channels[coffset + CH_VIBR_PERIOD] = 0;
-            channels[coffset + CH_TREM_VOLUME] = 0;
-
-            switch (effect) {
-            case FX_TONE_PORTA:
-                handleFXTonePortA(coffset, eparam);
-                break;
-            case FX_VIBRATO:
-                handleFXVibrato(coffset, eparam);
-                break;
-            case FX_VIBRATO_VOL:
-                vibrato(coffset);
-                break;
-            case FX_TREMOLO:
-                handleFXTremolo(coffset, eparam);
-                break;
-            case FX_SET_PANNING:
-                handleFXSetpanning(coffset, eparam);
-                break;
-            case FX_SET_SPOS:
-                channels[coffset + CH_SPOS] = eparam << FP_SHIFT
-                        + Constants.SHIFT_8;
-                break;
-            case FX_PAT_JUMP:
-                handleFXPatJump(eparam);
-                break;
-            case FX_SET_VOLUME:
-                channels[coffset + CH_VOLUME] = (eparam > MAX_VOLUME)
-                        ? MAX_VOLUME
-                        : eparam;
-                break;
-            case FX_PAT_BREAK:
-                handleFXPatBreak(eparam);
-                break;
-            case FX_EXTENDED:
-                handleFXExtended(chan, coffset, eparam);
-                break;
-            case FX_SET_SPEED:
-                handleFXSetSpeed(eparam);
-                break;
-            default:
-                break;
-            }
-        }
-
-        mixupdate();
-        fcount++;
-
-        if (npat >= songlen) {
-            npat = restart;
-        }
-
-        if (nrow >= NUM_ROWS) {
-            nrow = 0;
-        }
-
-        return songend;
-    }
-
-    private void handleFXSetSpeed(final int eparam) {
-        if (eparam < INT_BITS) {
-            tempo = eparam;
-            tickHandler.setTick(eparam);
-        } else {
-            bpm = eparam;
-        }
-    }
-
-    private void handleFXExtended(final int chan, final int coffset,
-            final int eparam) {
-        switch (eparam & Constants.BITS_5_TO_8_MASK) {
-        case EX_FINE_PORT_UP:
-            channels[coffset + CH_PERIOD] -= (eparam & Constants.FOUR_BIT_MASK);
-            break;
-        case EX_FINE_PORT_DN:
-            channels[coffset + CH_PERIOD] += (eparam & Constants.FOUR_BIT_MASK);
-            break;
-
-        case EX_SET_FINETUNE:
-            int ftval = eparam & Constants.FOUR_BIT_MASK;
-
-            if (ftval > MAX7) {
-                ftval -= REDUCTION16;
-            }
-
-            channels[coffset + CH_FINETUNE] = ftval;
-            break;
-        case EX_PAT_LOOP:
-            final int plparam = eparam & Constants.FOUR_BIT_MASK;
-
-            if (plparam == 0) {
-                channels[coffset + CH_PAT_LOOP_ROW] = row;
-            }
-
-            if (plparam > 0 && channels[coffset + CH_PAT_LOOP_ROW] < row) {
-                if (loopcount <= 0) {
-                    loopcount = plparam;
-                    loopchan = chan;
-                    nrow = channels[coffset + CH_PAT_LOOP_ROW];
-                    npat = pat;
-                } else if (loopchan == chan) {
-                    if (loopcount == 1) {
-                        channels[coffset + CH_PAT_LOOP_ROW] = row + 1;
-                    } else {
-                        nrow = channels[coffset + CH_PAT_LOOP_ROW];
-                        npat = pat;
-                    }
-                    loopcount--;
-                }
-            }
-            break;
-
-        case EX_FINE_VOL_UP:
-            int fvolup = channels[coffset + CH_VOLUME]
-                    + (eparam & Constants.FOUR_BIT_MASK);
-
-            if (fvolup > MAX_VOLUME) {
-                fvolup = MAX_VOLUME;
-            }
-
-            channels[coffset + CH_VOLUME] = fvolup;
-            break;
-        case EX_FINE_VOL_DN:
-            int fvoldn = channels[coffset + CH_VOLUME]
-                    - (eparam & Constants.FOUR_BIT_MASK);
-
-            if (fvoldn > MAX_VOLUME) {
-                fvoldn = 0;
-            }
-
-            channels[coffset + CH_VOLUME] = fvoldn;
-            break;
-        case EX_NOTE_CUT:
-            if ((eparam & Constants.FOUR_BIT_MASK) == fcount) {
-                channels[coffset + CH_VOLUME] = 0;
-            }
-
-            break;
-        case EX_NOTE_DELAY:
-            if ((eparam & Constants.FOUR_BIT_MASK) == fcount) {
-                trigger(coffset);
-            }
-
-            break;
-        case EX_PAT_DELAY:
-            tickHandler.setTick(
-                    tempo + tempo * (eparam & Constants.FOUR_BIT_MASK));
-            break;
-        default:
-            break;
-        }
-    }
-
-    private void handleFXPatBreak(final int eparam) {
-        if (loopcount <= 0) {
-            npat = pat + 1;
-            nrow = ((eparam & Constants.BITS_5_TO_8_MASK) >> Constants.SHIFT_4)
-                    * TEN + (eparam & Constants.FOUR_BIT_MASK);
-        }
-    }
-
-    private void handleFXPatJump(final int eparam) {
-        if (loopcount <= 0) {
-            npat = eparam;
-            nrow = 0;
-        }
-    }
-
-    private void handleFXSetpanning(final int coffset, final int eparam) {
-        if (!amiga) {
-            channels[coffset + CH_PANNING] = eparam;
-        }
-    }
-
-    private void handleFXTremolo(final int coffset, final int eparam) {
-        if (eparam != 0) {
-            channels[coffset + CH_TREM_PARAM] = eparam;
-        }
-
-        tremolo(coffset);
-    }
-
-    private void handleFXVibrato(final int coffset, final int eparam) {
-        if (eparam != 0) {
-            channels[coffset + CH_VIBR_PARAM] = eparam;
-        }
-
-        vibrato(coffset);
-    }
-
-    private void handleFXTonePortA(final int coffset, final int eparam) {
-        if (eparam != 0) {
-            channels[coffset + CH_PORTA_PARAM] = eparam;
-        }
-    }
-
-    private void getNextRow() {
-        nrow = row + 1;
-
-        if (nrow == NUM_ROWS) {
-            npat = pat + 1;
-            nrow = 0;
-        }
-    }
-
-    private boolean isSongEnd() {
-        boolean songend = false;
-
-        if (npat < pat) {
-            songend = true;
-        }
-
-        if (npat == pat && nrow <= row && loopcount <= 0) {
-            songend = true;
-        }
-        return songend;
     }
 
     /**

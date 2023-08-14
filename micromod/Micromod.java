@@ -96,7 +96,7 @@ public class Micromod {
     /**
      * Maximum volume value.
      */
-    public static final int MAX_VOLUME = 64;
+    static final int MAX_VOLUME = 64;
     /**
      * Amount to add to index to get vol value in buffer.
      */
@@ -104,11 +104,11 @@ public class Micromod {
     /**
      * Amount deducted for values > {@link #MAX7}.
      */
-    public static final int REDUCTION16 = 16;
+    static final int REDUCTION16 = 16;
     /**
      * Max value = 7.
      */
-    public static final int MAX7 = 7;
+    static final int MAX7 = 7;
     /**
      * Amount to add for fine value.
      */
@@ -132,7 +132,7 @@ public class Micromod {
     /**
      * Minimum value for sample index in buffer.
      */
-    public static final int MIN_SAMPLE_INDEX = 1084;
+    static final int MIN_SAMPLE_INDEX = 1084;
     /**
      * Second index of number of channels in buffer.
      */
@@ -140,7 +140,7 @@ public class Micromod {
     /**
      * Multiplier of values to be in tens place.
      */
-    public static final int TEN = 10;
+    static final int TEN = 10;
     /**
      * xxCH.
      */
@@ -160,7 +160,7 @@ public class Micromod {
     /**
      * Number of channels = 4.
      */
-    public static final int FOUR_CHANNELS = 4;
+    static final int FOUR_CHANNELS = 4;
     /**
      * FLT4.
      */
@@ -184,7 +184,7 @@ public class Micromod {
     /**
      * Lowest index of patterns in buffer.
      */
-    public static final int FIRST_PATTERN_INDEX = 952;
+    static final int FIRST_PATTERN_INDEX = 952;
     /**
      * Maximum number of patterns.
      */
@@ -196,7 +196,7 @@ public class Micromod {
     /**
      * Bit mask for value 127 = 0x7f.
      */
-    public static final int ONE_HUNDRED_TWENTY_SEVEN_MASK = 0x7F;
+    static final int ONE_HUNDRED_TWENTY_SEVEN_MASK = 0x7F;
     /**
      * Index of songlen in buffer.
      */
@@ -204,9 +204,9 @@ public class Micromod {
     /**
      * Java 32 bits per int.
      */
-    public static final int INT_BITS = 32;
+    static final int INT_BITS = 32;
     /** FP shift. */
-    public static final int FP_SHIFT = 13;
+    static final int FP_SHIFT = 13;
     /** FP one. */
     private static final int FP_ONE = 1 << FP_SHIFT;
     /** In struct len. */
@@ -222,9 +222,9 @@ public class Micromod {
     /** In finetune. */
     private static final int IN_FINETUNE = 0x04;
     /** Ch struct len. */
-    public static final int CH_STRUCT_LEN = 0x16;
+    static final int CH_STRUCT_LEN = 0x16;
     /** Ch spos. */
-    public static final int CH_SPOS = 0x00;
+    static final int CH_SPOS = 0x00;
     /** Ch step. */
     private static final int CH_STEP = 0x01;
     /** Ch ampl. */
@@ -234,54 +234,54 @@ public class Micromod {
     /** Ch assigned. */
     private static final int CH_ASSIGNED = 0x04;
     /** Ch volume. */
-    public static final int CH_VOLUME = 0x05;
+    static final int CH_VOLUME = 0x05;
     /** Ch finetune. */
-    public static final int CH_FINETUNE = 0x06;
+    static final int CH_FINETUNE = 0x06;
     /** Ch period. */
-    public static final int CH_PERIOD = 0x07;
+    static final int CH_PERIOD = 0x07;
     /** Ch porta period. */
-    public static final int CH_PORTA_PERIOD = 0x08;
+    static final int CH_PORTA_PERIOD = 0x08;
     /** Ch porta param. */
-    public static final int CH_PORTA_PARAM = 0x09;
+    static final int CH_PORTA_PARAM = 0x09;
     /** Ch panning. */
-    public static final int CH_PANNING = 0x0A;
+    static final int CH_PANNING = 0x0A;
     /** Ch arpeggio. */
-    public static final int CH_ARPEGGIO = 0x0B;
+    static final int CH_ARPEGGIO = 0x0B;
     /** Ch vibr period. */
-    public static final int CH_VIBR_PERIOD = 0x0C;
+    static final int CH_VIBR_PERIOD = 0x0C;
     /** Ch vibr param. */
-    public static final int CH_VIBR_PARAM = 0x0D;
+    static final int CH_VIBR_PARAM = 0x0D;
     /** Ch vibr count. */
-    public static final int CH_VIBR_COUNT = 0x0E;
+    static final int CH_VIBR_COUNT = 0x0E;
     /** Ch trem volume. */
-    public static final int CH_TREM_VOLUME = 0x0F;
+    static final int CH_TREM_VOLUME = 0x0F;
     /** Ch trem param. */
-    public static final int CH_TREM_PARAM = 0x10;
+    static final int CH_TREM_PARAM = 0x10;
     /** Ch note period. */
-    public static final int CH_NOTE_PERIOD = 0x12;
+    static final int CH_NOTE_PERIOD = 0x12;
     /** Ch note instru. */
-    public static final int CH_NOTE_INSTRU = 0x13;
+    static final int CH_NOTE_INSTRU = 0x13;
     /** Ch note effect. */
-    public static final int CH_NOTE_EFFECT = 0x14;
+    static final int CH_NOTE_EFFECT = 0x14;
     /** Ch note eparam. */
-    public static final int CH_NOTE_EPARAM = 0x15;
+    static final int CH_NOTE_EPARAM = 0x15;
     /** Fx tone porta. */
-    public static final int FX_TONE_PORTA = 0x03;
+    static final int FX_TONE_PORTA = 0x03;
     /** Fx vibrato. */
-    public static final int FX_VIBRATO = 0x04;
+    static final int FX_VIBRATO = 0x04;
     /** Fx tporta vol. */
-    public static final int FX_TPORTA_VOL = 0x05;
+    static final int FX_TPORTA_VOL = 0x05;
     /** Fx vibrato vol. */
-    public static final int FX_VIBRATO_VOL = 0x06;
+    static final int FX_VIBRATO_VOL = 0x06;
     /** Fx tremolo. */
-    public static final int FX_TREMOLO = 0x07;
+    static final int FX_TREMOLO = 0x07;
     /** FX extended. */
-    public static final int FX_EXTENDED = 0x0E;
+    static final int FX_EXTENDED = 0x0E;
 
     /** EX note cut. */
-    public static final int EX_NOTE_CUT = 0xC0;
+    static final int EX_NOTE_CUT = 0xC0;
     /** EX note delay. */
-    public static final int EX_NOTE_DELAY = 0xD0;
+    static final int EX_NOTE_DELAY = 0xD0;
     /** EX invert loop. */
     @SuppressWarnings("unused")
     private static final int EX_INVERT_LOOP = 0xF0;
@@ -332,12 +332,12 @@ public class Micromod {
     /**
      * Handles ticks for the Micromod instance.
      */
-    private TickHandler tickHandler;
+    private final TickHandler tickHandler;
 
     /**
      * Processes rows for the Micromod instance.
      */
-    private RowHandler rowHandler;
+    private final RowHandler rowHandler;
 
     /**
      * Constructor ( mod - module data ).
@@ -352,12 +352,24 @@ public class Micromod {
         this.samplerate = sampleRateHz;
         // System.out.println( "micromod/e (c)2005 mumart@gmail.com" );
         songlen = modDataBuffer[SONGLEN_INDEX] & ONE_HUNDRED_TWENTY_SEVEN_MASK;
+        getRestartStatusForBuffer(modDataBuffer);
+        final int numpatterns = getNumPatterns(modDataBuffer);
+        determineIfAmiga(modDataBuffer);
+        final int sampleidx = MIN_SAMPLE_INDEX
+                + FOUR_CHANNELS * numchan * BITS_PER_PATTERN * numpatterns;
+        loopThroughInstValues(modDataBuffer, sampleidx);
+        reset();
+    }
+
+    private void getRestartStatusForBuffer(final byte[] modDataBuffer) {
         restart = modDataBuffer[RESTART_INDEX] & ONE_HUNDRED_TWENTY_SEVEN_MASK;
 
         if (restart >= songlen) {
             restart = 0;
         }
+    }
 
+    private int getNumPatterns(final byte[] modDataBuffer) {
         int numpatterns = 0;
 
         for (int n = 0; n < MAX_NUM_PATTERNS; n++) {
@@ -369,6 +381,77 @@ public class Micromod {
             }
         }
 
+        return numpatterns;
+    }
+
+    private void loopThroughInstValues(final byte[] modDataBuffer,
+            final int initialSampleidx) {
+        int sampleidx = initialSampleidx;
+
+        for (int inst = 0; inst < MAX_INST; inst++) {
+            int slen = ushortbe(modDataBuffer,
+                    inst * INST_MULTIPLIER + SLEN_OFFSET) << 1;
+            final int fine = getFine(modDataBuffer, inst);
+            final int vol = getVol(modDataBuffer, inst);
+            int lsta = ushortbe(modDataBuffer,
+                    inst * INST_MULTIPLIER + LSTA_OFFSET) << 1;
+            int llen = ushortbe(modDataBuffer,
+                    inst * INST_MULTIPLIER + LLEN_OFFSET) << 1;
+            slen = updateSlen(modDataBuffer, sampleidx, slen);
+
+            if (llen < LLEN_CUTOFF || lsta >= slen) {
+                lsta = slen - 1;
+                llen = 1;
+            }
+
+            final int lend = getLend(slen, lsta, llen);
+            final int ioffset = (inst + 1) * IN_STRUCT_LEN;
+            instruments[ioffset + IN_SAMPLE_INDEX] = sampleidx;
+            instruments[ioffset + IN_LOOP_START] = lsta;
+            instruments[ioffset + IN_LOOP_END] = lend;
+            instruments[ioffset + IN_FINETUNE] = fine;
+            instruments[ioffset + IN_VOLUME] = vol;
+            sampleidx += slen;
+        }
+    }
+
+    private int getFine(final byte[] modDataBuffer, final int inst) {
+        int fine = modDataBuffer[inst * INST_MULTIPLIER + FINE_OFFSET]
+                & Constants.FOUR_BIT_MASK;
+
+        if (fine > MAX7) {
+            fine -= REDUCTION16;
+        }
+        return fine;
+    }
+
+    private int getVol(final byte[] modDataBuffer, final int inst) {
+        int vol = modDataBuffer[inst * INST_MULTIPLIER + VOL_OFFSET]
+                & ONE_HUNDRED_TWENTY_SEVEN_MASK;
+
+        if (vol > MAX_VOLUME) {
+            vol = MAX_VOLUME;
+        }
+        return vol;
+    }
+
+    private int updateSlen(final byte[] modDataBuffer, final int sampleidx,
+            final int initialSlen) {
+        int slen = initialSlen;
+
+        if (sampleidx + slen - 1 >= modDataBuffer.length) {
+            System.out.println("Module is truncated!");
+            slen = modDataBuffer.length - sampleidx;
+
+            if (slen < 0) {
+                slen = 0;
+            }
+        }
+
+        return slen;
+    }
+
+    private void determineIfAmiga(final byte[] modDataBuffer) {
         switch ((modDataBuffer[AMIGA_NUM_CHANNEL_INDEX_1] << Constants.SHIFT_8)
                 | modDataBuffer[AMIGA_NUM_CHANNEL_INDEX_2]
                         & Constants.EIGHT_BIT_MASK) {
@@ -393,62 +476,15 @@ public class Micromod {
         default:
             throw new IllegalArgumentException("MOD Format not recognised!");
         }
+    }
 
-        int sampleidx = MIN_SAMPLE_INDEX
-                + FOUR_CHANNELS * numchan * BITS_PER_PATTERN * numpatterns;
+    private int getLend(final int slen, final int lsta, final int llen) {
+        int lend = lsta + llen - 1;
 
-        for (int inst = 0; inst < MAX_INST; inst++) {
-            int slen = ushortbe(modDataBuffer,
-                    inst * INST_MULTIPLIER + SLEN_OFFSET) << 1;
-            int fine = modDataBuffer[inst * INST_MULTIPLIER + FINE_OFFSET]
-                    & Constants.FOUR_BIT_MASK;
-
-            if (fine > MAX7) {
-                fine -= REDUCTION16;
-            }
-
-            int vol = modDataBuffer[inst * INST_MULTIPLIER + VOL_OFFSET]
-                    & ONE_HUNDRED_TWENTY_SEVEN_MASK;
-
-            if (vol > MAX_VOLUME) {
-                vol = MAX_VOLUME;
-            }
-
-            int lsta = ushortbe(modDataBuffer,
-                    inst * INST_MULTIPLIER + LSTA_OFFSET) << 1;
-            int llen = ushortbe(modDataBuffer,
-                    inst * INST_MULTIPLIER + LLEN_OFFSET) << 1;
-
-            if (sampleidx + slen - 1 >= modDataBuffer.length) {
-                System.out.println("Module is truncated!");
-                slen = modDataBuffer.length - sampleidx;
-
-                if (slen < 0) {
-                    slen = 0;
-                }
-            }
-
-            if (llen < LLEN_CUTOFF || lsta >= slen) {
-                lsta = slen - 1;
-                llen = 1;
-            }
-
-            int lend = lsta + llen - 1;
-
-            if (lend >= slen) {
-                lend = slen - 1;
-            }
-
-            final int ioffset = (inst + 1) * IN_STRUCT_LEN;
-            instruments[ioffset + IN_SAMPLE_INDEX] = sampleidx;
-            instruments[ioffset + IN_LOOP_START] = lsta;
-            instruments[ioffset + IN_LOOP_END] = lend;
-            instruments[ioffset + IN_FINETUNE] = fine;
-            instruments[ioffset + IN_VOLUME] = vol;
-            sampleidx += slen;
+        if (lend >= slen) {
+            lend = slen - 1;
         }
-
-        reset();
+        return lend;
     }
 
     /**

@@ -151,7 +151,7 @@ public final class Diff {
         setDWord(patch, DATA_ID);
 
         // examine source buffer
-        int ofs = writeSourceToDest(patch, src, trg);
+        final int ofs = writeSourceToDest(patch, src, trg);
 
         // if the files end identically, the offset needs to be written
         writeOffsetIfFilesEndIdentically(patch, ofs);
@@ -193,51 +193,133 @@ public final class Diff {
             out("Offset: " + ofs);
             ofs = 0;
             // check for insert, delete, replace
-            int len;
-            int leni;
-            int lend;
-            int lenr;
-            int[] lens;
-
-            leni = checkInsert(src, trg);
-            lend = checkDelete(src, trg);
-            lenr = checkReplace(src, trg);
-            lens = checkSubstitute(src, trg);
-            len = Math.min(leni, lend);
-            len = Math.min(len, lenr);
-            len = Math.min(len, lens[1]);
+            final int leni = checkInsert(src, trg);
+            final int lend = checkDelete(src, trg);
+            final int lenr = checkReplace(src, trg);
+            final int[] lens = checkSubstitute(src, trg);
+            final int len = getLen(leni, lend, lenr, lens);
             int state = -1;
 
             if (len > windowLength) {
-                // completely lost synchronisation
-                final int rs = src.length() - src.getIndex();
-                final int rt = trg.length() - trg.getIndex();
-
-                if (rs == rt) {
-                    // len = rs;
-                    state = REPLACE;
-                } else {
-                    // len = rt;
-                    state = INSERT;
-                }
-
+                state = getReplaceOrInsertState(src, trg);
                 break; // Exit while loop.
             }
 
-            if (len == leni) {
-                state = INSERT;
-            } else if (len == lend) {
-                state = DELETE;
-            } else if (len == lenr) {
-                state = REPLACE;
-            } else if (len == lens[1]) {
-                state = SUBSTITUTE;
-            }
+            state = getFinalState(leni, lend, lenr, lens, state);
 
-            handleState(patch, src, trg, len, lens, state);
+            switch (state) {
+            case INSERT:
+                handleInsert(patch, trg, len);
+                break;
+            case DELETE:
+                handleDelete(patch, src, len);
+                break;
+            case REPLACE:
+                // replace
+                handleReplace(patch, src, trg, len);
+                break;
+            case SUBSTITUTE:
+                handleSubstitute(patch, src, trg, lens);
+                break;
+            default:
+                break;
+            }
         }
 
         return ofs;
+    }
+
+    private static void handleSubstitute(final List<Byte> patch,
+            final Buffer src, final Buffer trg, final int[] lens) {
+        // substitute
+        out("Substitute: " + lens[0] + "/" + lens[1]);
+        patch.add(SUBSTITUTE);
+        setLen(patch, lens[0]);
+        setLen(patch, lens[1]);
+
+        for (int i = 0; i < lens[1]; i++) {
+            patch.add((byte) trg.getByte());
+        }
+
+        src.setIndex(src.getIndex() + lens[0]);
+    }
+
+    private static void handleReplace(final List<Byte> patch, final Buffer src,
+            final Buffer trg, final int len) {
+        out("Replace: " + len);
+        patch.add(REPLACE);
+        setLen(patch, len);
+
+        for (int i = 0; i < len; i++) {
+            patch.add((byte) trg.getByte());
+        }
+
+        src.setIndex(src.getIndex() + len);
+    }
+
+    private static void handleDelete(final List<Byte> patch, final Buffer src,
+            final int len) {
+        // delete
+        out("Delete: " + len);
+        patch.add(DELETE);
+        setLen(patch, len);
+        src.setIndex(src.getIndex() + len);
+    }
+
+    private static void handleInsert(final List<Byte> patch, final Buffer trg,
+            final int len) {
+        // insert
+        out("Insert: " + len);
+        patch.add(INSERT);
+        setLen(patch, len);
+
+        for (int i = 0; i < len; i++) {
+            patch.add((byte) trg.getByte());
+        }
+    }
+
+    private static int getLen(final int leni, final int lend, final int lenr,
+            final int[] lens) {
+        int len = Math.min(leni, lend);
+        len = Math.min(len, lenr);
+        len = Math.min(len, lens[1]);
+        return len;
+    }
+
+    private static int getReplaceOrInsertState(final Buffer src,
+            final Buffer trg) {
+        int state;
+        // completely lost synchronisation
+        final int rs = src.length() - src.getIndex();
+        final int rt = trg.length() - trg.getIndex();
+
+        if (rs == rt) {
+            // len = rs;
+            state = REPLACE;
+        } else {
+            // len = rt;
+            state = INSERT;
+        }
+
+        return state;
+    }
+
+    private static int getFinalState(final int leni, final int lend,
+            final int lenr, final int[] lens, final int initialState) {
+        int state = initialState;
+        final int len = getLen(leni, lend, lenr, lens);
+
+        if (len == leni) {
+            state = INSERT;
+        } else if (len == lend) {
+            state = DELETE;
+        } else if (len == lenr) {
+            state = REPLACE;
+        } else if (len == lens[1]) {
+            state = SUBSTITUTE;
+        }
+
+        return state;
     }
 
     private static void writeOffsetIfFilesEndIdentically(final List<Byte> patch,
@@ -272,58 +354,6 @@ public final class Diff {
         return retVal;
     }
 
-    private static void handleState(final List<Byte> patch, final Buffer src,
-            final Buffer trg, final int len, final int[] lens,
-            final int state) {
-        switch (state) {
-        case INSERT:
-            // insert
-            out("Insert: " + len);
-            patch.add(INSERT);
-            setLen(patch, len);
-
-            for (int i = 0; i < len; i++) {
-                patch.add((byte) trg.getByte());
-            }
-
-            break;
-        case DELETE:
-            // delete
-            out("Delete: " + len);
-            patch.add(DELETE);
-            setLen(patch, len);
-            src.setIndex(src.getIndex() + len);
-            break;
-        case REPLACE:
-            // replace
-            out("Replace: " + len);
-            patch.add(REPLACE);
-            setLen(patch, len);
-
-            for (int i = 0; i < len; i++) {
-                patch.add((byte) trg.getByte());
-            }
-
-            src.setIndex(src.getIndex() + len);
-            break;
-        case SUBSTITUTE:
-            // replace
-            out("Substitute: " + lens[0] + "/" + lens[1]);
-            patch.add(SUBSTITUTE);
-            setLen(patch, lens[0]);
-            setLen(patch, lens[1]);
-
-            for (int i = 0; i < lens[1]; i++) {
-                patch.add((byte) trg.getByte());
-            }
-
-            src.setIndex(src.getIndex() + lens[0]);
-            break;
-        default:
-            break;
-        }
-    }
-
     /**
      * Create a target buffer from a source buffer and a buffer of differences.
      *
@@ -340,24 +370,31 @@ public final class Diff {
         // calculate src crc
         final Adler32 crc = new Adler32();
         crc.update(src.getData());
+
         // analyze header
         if (patch.getDWord() != Diff.HEADER_ID) {
             throw new DiffException("No header id found in patch");
         }
+
         final int lenSrc = getLen(patch);
+
         if (lenSrc != src.length()) {
             throw new DiffException(
                     "Size of source differs from that in patch header");
         }
+
         final int lenTrg = getLen(patch);
         final int crcPatchSrc = patch.getDWord();
+
         if (crcPatchSrc != (int) crc.getValue()) {
             throw new DiffException("CRC of source (0x"
                     + Integer.toHexString((int) crc.getValue())
                     + ") differs from that in patch header (0x"
                     + Integer.toHexString(crcPatchSrc) + ")");
         }
+
         final int crcTrg = patch.getDWord();
+
         if (patch.getDWord() != Diff.DATA_ID) {
             throw new DiffException("No data id found in patch header");
         }
@@ -366,49 +403,7 @@ public final class Diff {
 
         // step through patch buffer
         try {
-            while (patch.getIndex() < patch.length()) {
-                final int ofs = getLen(patch);
-                out("Offset: " + ofs);
-                // copy bytes from source buffer
-                for (int i = 0; i < ofs; i++) {
-                    trg.setByte((byte) src.getByte());
-                }
-                // check for patch buffer empty
-                if (patch.getIndex() == patch.length()) {
-                    break;
-                }
-                // now there must follow a command followed by a
-                final int cmdIdx = patch.getIndex(); // just for exception
-                final int cmd = patch.getByte();
-                final int len = getLen(patch);
-                switch (cmd) {
-                case Diff.DELETE:
-                    out("Delete: " + len);
-                    src.setIndex(src.getIndex() + len);
-                    break;
-                case Diff.REPLACE:
-                    out("Replace/");
-                    src.setIndex(src.getIndex() + len);
-                    //$FALL-THROUGH$
-                case Diff.INSERT:
-                    out("Insert: " + len);
-                    for (int r = 0; r < len; r++) {
-                        trg.setByte((byte) patch.getByte());
-                    }
-                    break;
-                case Diff.SUBSTITUTE:
-                    final int lenT = getLen(patch);
-                    out("Substitute: " + len + "/" + lenT);
-                    src.setIndex(src.getIndex() + len);
-                    for (int r = 0; r < lenT; r++) {
-                        trg.setByte((byte) patch.getByte());
-                    }
-                    break;
-                default:
-                    throw new DiffException("Unknown command " + cmd
-                            + " at patch offset " + cmdIdx);
-                }
-            }
+            stepThroughPatchBuffer(src, patch, trg);
         } catch (final ArrayIndexOutOfBoundsException ex) {
             throw new DiffException(
                     "Array index exceeds bounds. Patch file corrupt...");
@@ -423,11 +418,67 @@ public final class Diff {
         // compare crc
         crc.reset();
         crc.update(trg.getData());
+
         if (crcTrg != (int) crc.getValue()) {
             throw new DiffException("CRC of target differs from that in patch");
         }
 
         return trg.getData();
+    }
+
+    private static void stepThroughPatchBuffer(final Buffer src,
+            final Buffer patch, final Buffer trg) throws DiffException {
+        while (patch.getIndex() < patch.length()) {
+            final int ofs = getLen(patch);
+            out("Offset: " + ofs);
+
+            // copy bytes from source buffer
+            for (int i = 0; i < ofs; i++) {
+                trg.setByte((byte) src.getByte());
+            }
+
+            // check for patch buffer empty
+            if (patch.getIndex() == patch.length()) {
+                break;
+            }
+
+            // now there must follow a command followed by a
+            final int cmdIdx = patch.getIndex(); // just for exception
+            final int cmd = patch.getByte();
+            final int len = getLen(patch);
+
+            switch (cmd) {
+            case Diff.DELETE:
+                out("Delete: " + len);
+                src.setIndex(src.getIndex() + len);
+                break;
+            case Diff.REPLACE:
+                out("Replace/");
+                src.setIndex(src.getIndex() + len);
+                //$FALL-THROUGH$
+            case Diff.INSERT:
+                out("Insert: " + len);
+
+                for (int r = 0; r < len; r++) {
+                    trg.setByte((byte) patch.getByte());
+                }
+
+                break;
+            case Diff.SUBSTITUTE:
+                final int lenT = getLen(patch);
+                out("Substitute: " + len + "/" + lenT);
+                src.setIndex(src.getIndex() + len);
+
+                for (int r = 0; r < lenT; r++) {
+                    trg.setByte((byte) patch.getByte());
+                }
+
+                break;
+            default:
+                throw new DiffException("Unknown command " + cmd
+                        + " at patch offset " + cmdIdx);
+            }
+        }
     }
 
     /**
@@ -495,24 +546,22 @@ public final class Diff {
         final int is = src.getIndex();
         final byte[] bt = trg.getData();
         final int it = trg.getIndex();
-        int len = windowLength;
-        if (is + len + resyncLength >= bs.length) {
-            len = bs.length - is - resyncLength;
-        }
-        if (it + len + resyncLength >= bt.length) {
-            len = bt.length - it - resyncLength;
-        }
+        int len = getLenForCheckingSubstitute(bs, is, bt, it);
+
         for (int w = 1; w < len; w++) {
             int r;
+
             for (r = 0; r < resyncLength; r++) {
                 if (bs[is + r] != bt[it + w + r]) {
                     break;
                 }
             }
+
             if (r == resyncLength) {
                 return w;
             }
         }
+
         return Integer.MAX_VALUE;
     }
 
@@ -530,24 +579,22 @@ public final class Diff {
         final int is = src.getIndex();
         final byte[] bt = trg.getData();
         final int it = trg.getIndex();
-        int len = windowLength;
-        if (is + len + resyncLength >= bs.length) {
-            len = bs.length - is - resyncLength;
-        }
-        if (it + len + resyncLength >= bt.length) {
-            len = bt.length - it - resyncLength;
-        }
+        int len = getLenForCheckingSubstitute(bs, is, bt, it);
+
         for (int w = 1; w < len; w++) {
             int r;
+
             for (r = 0; r < resyncLength; r++) {
                 if (bs[is + w + r] != bt[it + r]) {
                     break;
                 }
             }
+
             if (r == resyncLength) {
                 return w;
             }
         }
+
         return Integer.MAX_VALUE;
     }
 
@@ -565,24 +612,22 @@ public final class Diff {
         final int is = src.getIndex();
         final byte[] bt = trg.getData();
         final int it = trg.getIndex();
-        int len = windowLength;
-        if (is + len + resyncLength >= bs.length) {
-            len = bs.length - is - resyncLength;
-        }
-        if (it + len + resyncLength >= bt.length) {
-            len = bt.length - it - resyncLength;
-        }
+        int len = getLenForCheckingSubstitute(bs, is, bt, it);
+
         for (int w = 1; w < len; w++) {
             int r;
+
             for (r = 0; r < resyncLength; r++) {
                 if (bs[is + w + r] != bt[it + w + r]) {
                     break;
                 }
             }
+
             if (r == resyncLength) {
                 return w;
             }
         }
+
         return Integer.MAX_VALUE;
     }
 
@@ -602,24 +647,19 @@ public final class Diff {
         final int is = src.getIndex();
         final byte[] bt = trg.getData();
         final int it = trg.getIndex();
-        int len = windowLength;
-        if (is + len + resyncLength >= bs.length) {
-            len = bs.length - is - resyncLength;
-        }
-        if (it + len + resyncLength >= bt.length) {
-            len = bt.length - it - resyncLength;
-        }
-
+        final int len = getLenForCheckingSubstitute(bs, is, bt, it);
         final List<int[]> solutions = new ArrayList<int[]>();
 
         for (int ws = 1; ws < len; ws++) {
             for (int wt = 1; wt < len; wt++) {
                 int r;
+
                 for (r = 0; r < resyncLength; r++) {
                     if (bs[is + ws + r] != bt[it + wt + r]) {
                         break;
                     }
                 }
+
                 if (r == resyncLength) {
                     final int[] retVal = new int[2];
                     retVal[0] = ws;
@@ -639,14 +679,32 @@ public final class Diff {
 
         // search best solution
         int sMinIdx = 0;
+
         for (int i = 1; i < solutions.size(); i++) {
             final int[] s = solutions.get(i);
             final int[] sMin = solutions.get(sMinIdx);
+
             if (s[0] + s[1] < sMin[0] + sMin[1]) {
                 sMinIdx = i;
             }
         }
+
         return solutions.get(sMinIdx);
+    }
+
+    private static int getLenForCheckingSubstitute(final byte[] bs,
+            final int is, final byte[] bt, final int it) {
+        int len = windowLength;
+
+        if (is + len + resyncLength >= bs.length) {
+            len = bs.length - is - resyncLength;
+        }
+
+        if (it + len + resyncLength >= bt.length) {
+            len = bt.length - it - resyncLength;
+        }
+
+        return len;
     }
 
     /**

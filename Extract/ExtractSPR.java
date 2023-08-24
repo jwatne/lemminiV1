@@ -114,22 +114,8 @@ public class ExtractSPR {
      * @throws ExtractException
      */
     Palette loadPalette(final String fname) throws ExtractException {
-        byte[] buffer;
         // read file into buffer
-        int paletteSize = 0;
-        final File f = new File(fname);
-
-        try (FileInputStream fi = new FileInputStream(fname)) {
-            buffer = new byte[(int) f.length()];
-
-            if (fi.read(buffer) < 1) {
-                System.out.println("0 bytes read from file " + fname);
-            }
-        } catch (final FileNotFoundException e) {
-            throw new ExtractException("File " + fname + " not found");
-        } catch (final IOException e) {
-            throw new ExtractException("I/O error while reading " + fname);
-        }
+        final byte[] buffer = loadPaletteFileIntoBuffer(fname);
 
         // check header
         if (buffer[0] != PALETTE_HEADER_0_VALUE
@@ -140,23 +126,16 @@ public class ExtractSPR {
                     "File " + fname + " ist not a lemmings palette file");
         }
 
-        paletteSize = unsigned(buffer[INDEX_4])
+        final int paletteSize = unsigned(buffer[INDEX_4])
                 + unsigned(buffer[INDEX_5]) * HIGH_BYTE_MULTIPLIER;
         // number of palette entries
 
         byte[] r = new byte[paletteSize];
         byte[] g = new byte[paletteSize];
         byte[] b = new byte[paletteSize];
-        int ofs = Constants.INDEX_6; // skip two bytes which contain number o
-                                     // palette (?)
-
-        for (int idx = 0; idx < paletteSize; idx++) {
-            r[idx] = buffer[ofs++];
-            g[idx] = buffer[ofs++];
-            b[idx] = buffer[ofs++];
-            ofs++;
-        }
-
+        final int ofs = Constants.INDEX_6; // skip two bytes which contain
+                                           // number o palette (?)
+        initializeRGBArrays(buffer, paletteSize, r, g, b, ofs);
         // search for double entries, create
         // new palette without double entries
         // and lookup table to fix the pixel values
@@ -164,10 +143,7 @@ public class ExtractSPR {
         final byte[] compressedG = new byte[paletteSize];
         final byte[] compressedB = new byte[paletteSize];
         lookupBuf = new int[paletteSize];
-        Arrays.fill(lookupBuf, -1); // mark all entries invalid
-        Arrays.fill(compressedR, (byte) 0);
-        Arrays.fill(compressedG, (byte) 0);
-        Arrays.fill(compressedB, (byte) 0);
+        zeroOutArrays(compressedR, compressedG, compressedB);
         int compressedIndex = 0;
 
         for (int i = 0; i < paletteSize; i++) {
@@ -212,6 +188,54 @@ public class ExtractSPR {
         return palette;
     }
 
+    private void zeroOutArrays(final byte[] compressedR,
+            final byte[] compressedG, final byte[] compressedB) {
+        Arrays.fill(lookupBuf, -1); // mark all entries invalid
+        Arrays.fill(compressedR, (byte) 0);
+        Arrays.fill(compressedG, (byte) 0);
+        Arrays.fill(compressedB, (byte) 0);
+    }
+
+    private void initializeRGBArrays(final byte[] buffer, final int paletteSize,
+            final byte[] r, final byte[] g, final byte[] b,
+            final int initialOffset) {
+        int ofs = initialOffset;
+
+        for (int idx = 0; idx < paletteSize; idx++) {
+            r[idx] = buffer[ofs++];
+            g[idx] = buffer[ofs++];
+            b[idx] = buffer[ofs++];
+            ofs++;
+        }
+    }
+
+    /**
+     * Loads palette data from the named file into a buffer.
+     *
+     * @param fname Name of palette file
+     * @return the buffer with palette data.
+     * @throws ExtractException if an error occurs.
+     */
+    private byte[] loadPaletteFileIntoBuffer(final String fname)
+            throws ExtractException {
+        byte[] buffer;
+        final File f = new File(fname);
+
+        try (FileInputStream fi = new FileInputStream(fname)) {
+            buffer = new byte[(int) f.length()];
+
+            if (fi.read(buffer) < 1) {
+                System.out.println("0 bytes read from file " + fname);
+            }
+        } catch (final FileNotFoundException e) {
+            throw new ExtractException("File " + fname + " not found");
+        } catch (final IOException e) {
+            throw new ExtractException("I/O error while reading " + fname);
+        }
+
+        return buffer;
+    }
+
     /**
      * Convert byte in unsigned int.
      *
@@ -230,26 +254,11 @@ public class ExtractSPR {
      * @throws ExtractException
      */
     GIFImage[] loadSPR(final String fname) throws ExtractException {
-        byte[] buffer;
-
         if (palette == null) {
             throw new ExtractException("Load Palette first!");
         }
 
-        // read file into buffer
-        final File f = new File(fname);
-
-        try (FileInputStream fi = new FileInputStream(fname)) {
-            buffer = new byte[(int) f.length()];
-
-            if (fi.read(buffer) < 1) {
-                System.out.println("0 bytes read from file " + fname);
-            }
-        } catch (final FileNotFoundException e) {
-            throw new ExtractException("File " + fname + " not found");
-        } catch (final IOException e) {
-            throw new ExtractException("I/O error while reading " + fname);
-        }
+        final byte[] buffer = loadPaletteFileIntoBuffer(fname);
 
         // check header
         if (buffer[0] != SPR_HEADER_0_VALUE || buffer[1] != SPR_HEADER_1_VALUE
@@ -280,119 +289,127 @@ public class ExtractSPR {
                 + unsigned(buffer[Constants.INDEX_7]) * HIGH_BYTE_MULTIPLIER;
 
         images = new GIFImage[frames];
-        byte b;
-        int lineOfs;
 
         for (int frame = 0; frame < frames; frame++) {
-            // get header info
-            final int xOfs = unsigned(buffer[ofs++])
-                    + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
-            // x offset of data in output image
-
-            final int yOfs = unsigned(buffer[ofs++])
-                    + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
-            // y offset of data in output image
-
-            final int maxLen = unsigned(buffer[ofs++])
-                    + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
-            // maximum length of a data line
-
-            final int lines = unsigned(buffer[ofs++])
-                    + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
-            // number of data lines
-
-            final int width = unsigned(buffer[ofs++])
-                    + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
-            // width of output image
-
-            final int height = unsigned(buffer[ofs++])
-                    + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
-            // height of output image
-
-            final byte[] pixels = new byte[width * height];
-
-            for (int i = 0; i < pixels.length; i++) {
-                pixels[i] = TRANSPARENT_INDEX;
-            }
-
-            int y = yOfs * width;
-
-            int pxOffset = 0; // additional offset for lines broken in several
-                              // packets
-
-            for (int line = 0; line < lines;) {
-                // read line
-                b = buffer[ofs++]; // start character including length (>= 0x80)
-                                   // or line offset (<0x80)
-                lineOfs = 0;
-
-                while (b == LARGE_SPRITE_LINE_OFFSET) { // special line offset
-                                                        // for large sprites
-                    lineOfs += LARGE_SPRITE_LINE_OFFSET;
-                    b = buffer[ofs++];
-                }
-
-                if (!((b & Constants.HEX80) == Constants.HEX80)) {
-                    // additional line offset
-                    lineOfs += (b & LARGE_SPRITE_LINE_OFFSET);
-                    b = buffer[ofs++]; // start character
-                }
-
-                // get line length
-                final int len = (b & Constants.EIGHT_BIT_MASK)
-                        - Constants.HEX80;
-
-                if (len < 0 || len > LARGE_SPRITE_LINE_OFFSET || len > maxLen) {
-                    throw new ExtractException(
-                            "Maximum data line length exceeded in line " + line
-                                    + " of frame " + frame + " of " + fname
-                                    + " (ofs:" + ofs + ")");
-                }
-
-                if (len > 0) {
-                    try {
-                        for (int pixel = 0; pixel < len; pixel++) {
-                            // none of the extracted images uses more than 128
-                            // colors (indeed much less)
-                            // but some use higher indeces. Instead of mirroring
-                            // the palette, just and every
-                            // entry with 0x7f.
-                            // The lookup table is needed to get new index in
-                            // compresse palette
-                            final byte pixVal = (byte) (lookupBuf[buffer[ofs++]
-                                    & LARGE_SPRITE_LINE_OFFSET]
-                                    & Constants.EIGHT_BIT_MASK);
-                            pixels[y + xOfs + lineOfs + pixel
-                                    + pxOffset] = pixVal;
-                        }
-                    } catch (final ArrayIndexOutOfBoundsException ex) {
-                        throw new ExtractException(
-                                "Index out of bounds in line " + line
-                                        + " of frame " + frame + " of " + fname
-                                        + " (ofs:" + ofs + ")");
-                    }
-
-                    b = buffer[ofs++]; // end character must be HEX80
-
-                    if ((b & Constants.EIGHT_BIT_MASK) != Constants.HEX80) {
-                        // if this is not the end character, the line is
-                        // continued after an offset
-                        pxOffset += (lineOfs + len);
-                        ofs--;
-                        continue;
-                    }
-                }
-
-                pxOffset = 0;
-                line++;
-                y += width;
-            }
-
-            // convert byte array into BufferedImage
-            images[frame] = new GIFImage(width, height, pixels, palette);
+            ofs = processFrame(fname, buffer, ofs, frame);
         }
 
         return images;
+    }
+
+    private int processFrame(final String fname, final byte[] buffer,
+            final int initialOffset, final int frame) throws ExtractException {
+        int ofs = initialOffset;
+        byte b;
+        int lineOfs;
+        // get header info
+        final int xOfs = unsigned(buffer[ofs++])
+                + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
+        // x offset of data in output image
+
+        final int yOfs = unsigned(buffer[ofs++])
+                + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
+        // y offset of data in output image
+
+        final int maxLen = unsigned(buffer[ofs++])
+                + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
+        // maximum length of a data line
+
+        final int lines = unsigned(buffer[ofs++])
+                + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
+        // number of data lines
+
+        final int width = unsigned(buffer[ofs++])
+                + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
+        // width of output image
+
+        final int height = unsigned(buffer[ofs++])
+                + unsigned(buffer[ofs++]) * HIGH_BYTE_MULTIPLIER;
+        // height of output image
+
+        final byte[] pixels = getPixelsArray(width, height);
+        int y = yOfs * width;
+        int pxOffset = 0; // additional offset for lines broken in several
+                          // packets
+
+        for (int line = 0; line < lines;) {
+            // read line
+            b = buffer[ofs++]; // start character including length (>= 0x80)
+                               // or line offset (<0x80)
+            lineOfs = 0;
+
+            while (b == LARGE_SPRITE_LINE_OFFSET) { // special line offset
+                                                    // for large sprites
+                lineOfs += LARGE_SPRITE_LINE_OFFSET;
+                b = buffer[ofs++];
+            }
+
+            if (!((b & Constants.HEX80) == Constants.HEX80)) {
+                // additional line offset
+                lineOfs += (b & LARGE_SPRITE_LINE_OFFSET);
+                b = buffer[ofs++]; // start character
+            }
+
+            // get line length
+            final int len = (b & Constants.EIGHT_BIT_MASK) - Constants.HEX80;
+
+            if (len < 0 || len > LARGE_SPRITE_LINE_OFFSET || len > maxLen) {
+                throw new ExtractException(
+                        "Maximum data line length exceeded in line " + line
+                                + " of frame " + frame + " of " + fname
+                                + " (ofs:" + ofs + ")");
+            }
+
+            if (len > 0) {
+                try {
+                    for (int pixel = 0; pixel < len; pixel++) {
+                        // none of the extracted images uses more than 128
+                        // colors (indeed much less)
+                        // but some use higher indeces. Instead of mirroring
+                        // the palette, just and every
+                        // entry with 0x7f.
+                        // The lookup table is needed to get new index in
+                        // compressed palette
+                        final byte pixVal = (byte) (lookupBuf[buffer[ofs++]
+                                & LARGE_SPRITE_LINE_OFFSET]
+                                & Constants.EIGHT_BIT_MASK);
+                        pixels[y + xOfs + lineOfs + pixel + pxOffset] = pixVal;
+                    }
+                } catch (final ArrayIndexOutOfBoundsException ex) {
+                    throw new ExtractException("Index out of bounds in line "
+                            + line + " of frame " + frame + " of " + fname
+                            + " (ofs:" + ofs + ")");
+                }
+
+                b = buffer[ofs++]; // end character must be HEX80
+
+                if ((b & Constants.EIGHT_BIT_MASK) != Constants.HEX80) {
+                    // if this is not the end character, the line is
+                    // continued after an offset
+                    pxOffset += (lineOfs + len);
+                    ofs--;
+                    continue;
+                }
+            }
+
+            pxOffset = 0;
+            line++;
+            y += width;
+        }
+
+        // convert byte array into BufferedImage
+        images[frame] = new GIFImage(width, height, pixels, palette);
+        return ofs;
+    }
+
+    private byte[] getPixelsArray(final int width, final int height) {
+        final byte[] pixels = new byte[width * height];
+
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = TRANSPARENT_INDEX;
+        }
+
+        return pixels;
     }
 
     /**
